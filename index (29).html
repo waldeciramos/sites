@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dra. Thais Pereira Xavier &middot; Fisioterapia &amp; Reabilitação &middot; Estiva-MG</title>
+<meta name="description" content="Fisioterapia motora, acupuntura, eletroterapia e reabilitação especializada em Estiva-MG. Dra. Thais Pereira Xavier, mais de 20 anos de experiência.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--t900:#0d3b40;--t800:#134e55;--t700:#1a6068;--t600:#22757f;--t500:#2a8a95;--t400:#3da8b4;--t300:#6ec4cc;--t200:#a8dde2;--t100:#d4eff2;--t50:#edf8fa;--gold:#c9a84c;--cream:#faf8f4;--w100:#f5f0e8;--w200:#e8dfc8;--txt:#0d1f22;--txm:#2a4a50;--txl:#5a7a80;--txu:#8fa8ad;--fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif;--rsm:6px;--rmd:14px;--rlg:24px;--rxl:40px;--ss:0 4px 24px rgba(13,59,64,.08);--sc:0 8px 40px rgba(13,59,64,.12);--sh:0 24px 80px rgba(13,59,64,.22);--ease:cubic-bezier(.16,1,.3,1);--esp:cubic-bezier(.34,1.56,.64,1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body{font-family:var(--fb);font-size:16px;line-height:1.7;color:var(--txt);background:var(--cream);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}a{text-decoration:none;color:inherit}ul,ol{list-style:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:absolute;top:-100%;left:1rem;background:var(--t600);color:#fff;padding:.6rem 1.4rem;border-radius:var(--rsm);font-weight:600;z-index:9999;transition:top .2s}.skip:focus{top:1rem}
+.wrap{width:100%;max-width:1240px;margin-inline:auto;padding-inline:clamp(20px,5vw,60px)}
+
+/* TOPBAR */
+.topbar{background:var(--t900);color:rgba(255,255,255,.6);font-size:12.5px;padding:9px 0}
+.tb-in{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.tb-l{display:flex;gap:18px;flex-wrap:wrap}
+.tb-i{display:flex;align-items:center;gap:7px}.tb-i i{color:var(--t300);font-size:11px}.tb-i a:hover{color:#fff}
+#tb-clk{font-variant-numeric:tabular-nums;font-weight:500;color:rgba(255,255,255,.35)}
+
+/* HEADER */
+.sh{position:sticky;top:0;z-index:200;background:rgba(250,248,244,.97);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--w200);transition:box-shadow .3s}
+.sh.sc{box-shadow:var(--ss)}
+.hi{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:15px}
+.logo{display:flex;align-items:center;gap:14px}
+.lm{width:48px;height:48px;border-radius:50%;background:linear-gradient(145deg,var(--t500),var(--t800));display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0;box-shadow:0 4px 14px rgba(42,138,149,.3)}
+.ln{font-family:var(--fd);font-weight:700;font-size:1.15rem;color:var(--t800);line-height:1.1}
+.lc{font-size:10.5px;color:var(--txl);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+.snav{display:flex;align-items:center;gap:2px}
+.nl{font-size:14px;font-weight:500;color:var(--txm);padding:8px 15px;border-radius:var(--rsm);transition:color .2s,background .2s;position:relative}
+.nl::after{content:'';position:absolute;bottom:4px;left:15px;right:15px;height:2px;background:var(--t400);border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease)}
+.nl:hover,.nl.act{color:var(--t600)}.nl:hover::after,.nl.act::after{transform:scaleX(1)}
+.nlc{background:var(--t600);color:#fff!important;padding:9px 20px;border-radius:var(--rxl);font-weight:600;font-size:14px;margin-left:10px;transition:background .2s,transform .25s var(--esp),box-shadow .2s}
+.nlc:hover{background:var(--t700);transform:translateY(-2px);box-shadow:0 8px 20px rgba(42,138,149,.35)}.nlc::after{display:none}
+.hbg{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+.hbg span{display:block;width:24px;height:2px;background:var(--t700);border-radius:2px;transition:transform .3s,opacity .3s}
+.hbg.op span:nth-child(1){transform:translateY(7px) rotate(45deg)}.hbg.op span:nth-child(2){opacity:0}.hbg.op span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* MOBILE NAV */
+.mn{display:none;position:fixed;inset:0;z-index:300;background:rgba(13,59,64,.97);backdrop-filter:blur(24px);flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;pointer-events:none;transition:opacity .35s}
+.mn.op{display:flex;opacity:1;pointer-events:all}
+.mnl{font-family:var(--fd);font-size:2.4rem;font-weight:700;color:rgba(255,255,255,.65);padding:10px 24px;transition:color .2s}.mnl:hover{color:var(--t300)}
+.mncl{position:absolute;top:22px;right:22px;background:rgba(255,255,255,.08);border:none;border-radius:50%;width:48px;height:48px;color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}.mncl:hover{background:rgba(255,255,255,.15)}
+
+/* HERO */
+.hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;background:var(--t900)}
+.hbg2{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1600&q=80');background-size:cover;background-position:center;opacity:.17;animation:drift 20s ease-in-out infinite alternate}
+@keyframes drift{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.1) translate(-1%,-.5%)}}
+.hmesh{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 50%,rgba(42,138,149,.5) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 80% 30%,rgba(13,59,64,.85) 0%,transparent 70%)}
+.hring{position:absolute;right:-140px;top:50%;transform:translateY(-50%);width:620px;height:620px;border-radius:50%;border:1px solid rgba(255,255,255,.06);pointer-events:none}
+.hring::before{content:'';position:absolute;inset:50px;border-radius:50%;border:1px solid rgba(255,255,255,.04)}
+.hcnt{position:relative;z-index:2;max-width:680px;padding-block:110px 160px}
+.htag{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:var(--rxl);padding:7px 18px;font-size:12px;font-weight:500;color:var(--t200);letter-spacing:.07em;text-transform:uppercase;margin-bottom:28px;backdrop-filter:blur(8px);animation:fu .7s var(--ease) both}
+.htag i{color:var(--gold)}
+.hh1{font-family:var(--fd);font-size:clamp(2.8rem,6vw,5rem);font-weight:700;line-height:1.07;color:#fff;margin-bottom:22px;animation:fu .7s .1s var(--ease) both}
+.hh1 em{font-style:italic;color:var(--t300)}
+.hsub{font-size:clamp(1rem,1.8vw,1.12rem);color:rgba(255,255,255,.62);line-height:1.85;max-width:510px;margin-bottom:42px;font-weight:300;animation:fu .7s .2s var(--ease) both}
+.hbtns{display:flex;gap:14px;flex-wrap:wrap;animation:fu .7s .3s var(--ease) both}
+.btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--fb);font-weight:600;font-size:15px;padding:13px 26px;border-radius:var(--rxl);border:none;cursor:pointer;transition:transform .25s var(--esp),box-shadow .25s,background .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-3px)}
+.btp{background:var(--t400);color:#fff;box-shadow:0 8px 28px rgba(61,168,180,.4)}.btp:hover{background:var(--t300);box-shadow:0 12px 36px rgba(61,168,180,.55)}
+.btg{background:transparent;color:rgba(255,255,255,.82);border:1.5px solid rgba(255,255,255,.28);backdrop-filter:blur(8px)}.btg:hover{background:rgba(255,255,255,.1)}
+.btt{background:var(--t700);color:#fff;box-shadow:0 8px 24px rgba(42,138,149,.3)}.btt:hover{background:var(--t600)}
+.bta{background:var(--t500);color:#fff;box-shadow:0 8px 24px rgba(42,138,149,.3)}.bta:hover{background:var(--t400)}
+.hst{position:absolute;bottom:0;left:0;right:0;z-index:3;background:rgba(255,255,255,.04);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07)}
+.hstg{display:grid;grid-template-columns:repeat(4,1fr)}
+.hsi{padding:20px 0;text-align:center;border-right:1px solid rgba(255,255,255,.07)}.hsi:last-child{border-right:none}.hsi:hover{background:rgba(255,255,255,.04)}
+.hsn{font-family:var(--fd);font-size:2rem;font-weight:700;color:#fff;line-height:1;margin-bottom:3px}.hsn span{color:var(--t300)}
+.hsl{font-size:11.5px;color:rgba(255,255,255,.4);letter-spacing:.04em}
+@keyframes fu{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+
+/* SECTION BASE */
+.sec{padding-block:clamp(64px,8vw,120px)}.sec-alt{background:var(--w100)}
+.sech{text-align:center;margin-bottom:clamp(40px,6vw,72px)}
+.sct{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t500);margin-bottom:14px}
+.sct::before,.sct::after{content:'';display:block;width:26px;height:1.5px;background:var(--t300);border-radius:2px}
+.stt{font-family:var(--fd);font-size:clamp(2rem,4vw,3.1rem);font-weight:700;color:var(--t900);line-height:1.15;margin-bottom:16px}
+.ssb{font-size:1.02rem;color:var(--txl);max-width:540px;margin-inline:auto;line-height:1.85}
+
+/* DIFERENCIAIS */
+.dstrip{background:var(--t800);padding-block:50px}
+.dgrid{display:grid;grid-template-columns:repeat(4,1fr)}
+.di{padding:22px 28px;border-right:1px solid rgba(255,255,255,.07);display:flex;align-items:flex-start;gap:16px;transition:background .2s}.di:hover{background:rgba(255,255,255,.04)}.di:last-child{border-right:none}
+.dico{width:46px;height:46px;flex-shrink:0;border-radius:12px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--t300)}
+.dtt{font-family:var(--fd);font-size:1.05rem;font-weight:600;color:#fff;margin-bottom:4px}
+.dds{font-size:13px;color:rgba(255,255,255,.42);line-height:1.6}
+
+/* SERVICOS */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:24px}
+.sc2{background:#fff;border-radius:var(--rlg);overflow:hidden;box-shadow:var(--ss);border:1px solid rgba(42,138,149,.07);transition:transform .35s var(--ease),box-shadow .35s;cursor:pointer;display:flex;flex-direction:column}
+.sc2:hover{transform:translateY(-8px);box-shadow:var(--sc)}
+.sth{height:175px;position:relative;overflow:hidden}.sth img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}.sc2:hover .sth img{transform:scale(1.07)}
+.sov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(13,59,64,.55) 100%)}
+.sbdg{position:absolute;bottom:-20px;right:22px;width:44px;height:44px;border-radius:12px;background:var(--t500);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;box-shadow:0 6px 18px rgba(42,138,149,.4);border:3px solid #fff;z-index:2}
+.sbdy{padding:34px 26px 26px;flex:1;display:flex;flex-direction:column}
+.sttl{font-family:var(--fd);font-size:1.25rem;font-weight:700;color:var(--t800);margin-bottom:9px}
+.sdsc{font-size:13.5px;color:var(--txl);line-height:1.8;flex:1}
+.smr{display:inline-flex;align-items:center;gap:7px;margin-top:18px;font-size:13px;font-weight:600;color:var(--t500);transition:gap .2s}.sc2:hover .smr{gap:12px}.smr i{font-size:11px}
+
+/* SOBRE */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,80px);align-items:center}
+.avis{position:relative}
+.afr{border-radius:var(--rlg);overflow:hidden;box-shadow:var(--sh);position:relative}
+.afr img{width:100%;height:520px;object-fit:cover;display:block;transition:transform .8s var(--ease)}.afr:hover img{transform:scale(1.04)}
+.abdg{position:absolute;top:26px;left:-22px;background:#fff;border-radius:var(--rmd);padding:15px 18px;box-shadow:var(--sc);display:flex;align-items:center;gap:12px;z-index:3}
+.abdgn{font-family:var(--fd);font-size:2rem;font-weight:700;color:var(--t600);line-height:1}
+.abdgt{font-size:11.5px;color:var(--txl);max-width:65px;line-height:1.4}
+.aacc{position:absolute;bottom:36px;right:-24px;background:var(--t600);border-radius:var(--rmd);padding:18px 22px;color:#fff;z-index:3;box-shadow:0 12px 40px rgba(42,138,149,.4)}
+.aaccn{font-family:var(--fd);font-size:1.9rem;font-weight:700;line-height:1}
+.aaccl{font-size:11.5px;opacity:.65;margin-top:4px}
+.adts{position:absolute;bottom:-22px;left:-22px;width:110px;height:110px;background-image:radial-gradient(circle,var(--t200) 1.5px,transparent 1.5px);background-size:15px 15px;z-index:1;border-radius:var(--rmd)}
+.atag{display:inline-flex;align-items:center;gap:8px;background:var(--t50);border:1px solid var(--t200);border-radius:var(--rxl);padding:6px 16px;font-size:11.5px;font-weight:600;color:var(--t600);letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+.att{font-family:var(--fd);font-size:clamp(1.9rem,3.2vw,2.7rem);font-weight:700;color:var(--t900);line-height:1.12;margin-bottom:18px}
+.ald{font-size:1.02rem;color:var(--txl);line-height:1.9;margin-bottom:26px}
+.spl{display:flex;flex-direction:column;gap:9px;margin-bottom:34px}
+.spi{display:flex;align-items:flex-start;gap:11px;font-size:14.5px;color:var(--txm)}
+.spch{width:21px;height:21px;border-radius:50%;background:var(--t100);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.spch i{font-size:9px;color:var(--t600)}
+
+/* DEPOIMENTOS */
+.dtw{overflow:hidden;cursor:grab;user-select:none;border-radius:var(--rlg)}.dtw.drag{cursor:grabbing}
+.dtr{display:flex;gap:24px;transition:transform .5s var(--ease);will-change:transform}
+.dc{min-width:360px;max-width:360px;background:#fff;border-radius:var(--rlg);padding:36px 32px;box-shadow:var(--ss);border:1px solid rgba(42,138,149,.06);flex-shrink:0;display:flex;flex-direction:column;gap:18px;transition:box-shadow .3s}.dc:hover{box-shadow:var(--sc)}
+.dstr{display:flex;gap:4px;color:var(--gold)}.dstr i{font-size:14px}
+.dtxt{font-size:15px;color:var(--txm);line-height:1.85;font-style:italic;flex:1}
+.dtxt::before{content:'\201C';font-family:var(--fd);font-size:3rem;color:var(--t200);line-height:0;vertical-align:-.5em;margin-right:4px}
+.dau{display:flex;align-items:center;gap:14px;border-top:1px solid var(--w200);padding-top:18px}
+.dav{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--t400),var(--t700));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0}
+.dnm{font-weight:600;font-size:14.5px;color:var(--t800);line-height:1.2}
+.drl{font-size:12px;color:var(--txu);margin-top:2px}
+.dctrl{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:32px}
+.dbtn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--t200);background:#fff;color:var(--t500);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,color .2s,border-color .2s;font-size:14px}
+.dbtn:hover{background:var(--t500);color:#fff;border-color:var(--t500)}
+.ddts{display:flex;gap:8px}
+.ddt{width:8px;height:8px;border-radius:50%;background:var(--t200);cursor:pointer;transition:background .25s,transform .25s}.ddt.act{background:var(--t500);transform:scale(1.3)}
+
+/* GALERIA */
+.ggrid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto;gap:16px}
+.gi{border-radius:var(--rmd);overflow:hidden;position:relative;cursor:pointer}
+.gi:nth-child(1){grid-column:span 2;grid-row:span 2}
+.gi img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}.gi:hover img{transform:scale(1.07)}
+.gi:nth-child(1) img{height:440px}.gi:not(:nth-child(1)) img{height:208px}
+.gov{position:absolute;inset:0;background:rgba(13,59,64,0);display:flex;align-items:center;justify-content:center;transition:background .35s}.gi:hover .gov{background:rgba(13,59,64,.45)}
+.gic{color:#fff;font-size:1.6rem;opacity:0;transform:scale(.6);transition:opacity .3s,transform .3s}.gi:hover .gic{opacity:1;transform:scale(1)}
+.lb{position:fixed;inset:0;z-index:1000;background:rgba(10,30,33,.95);display:none;align-items:center;justify-content:center;backdrop-filter:blur(12px)}.lb.op{display:flex}
+.lbi{position:relative;max-width:90vw;max-height:90vh}
+.lbi img{max-width:90vw;max-height:85vh;border-radius:var(--rmd);box-shadow:var(--sh);object-fit:contain}
+.lbcl{position:absolute;top:-48px;right:0;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}.lbcl:hover{background:rgba(255,255,255,.2)}
+.lbnv{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:50%;width:46px;height:46px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;font-size:16px}.lbnv:hover{background:rgba(255,255,255,.2)}
+.lbp{left:-56px}.lbn{right:-56px}
+
+/* BLOG */
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.bc{background:#fff;border-radius:var(--rlg);overflow:hidden;box-shadow:var(--ss);border:1px solid rgba(42,138,149,.06);transition:transform .35s var(--ease),box-shadow .35s;cursor:pointer}
+.bc:hover{transform:translateY(-6px);box-shadow:var(--sc)}
+.bth{height:190px;overflow:hidden;position:relative}
+.bth img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}.bc:hover .bth img{transform:scale(1.07)}
+.bcat{position:absolute;top:14px;left:14px;background:var(--t500);color:#fff;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border-radius:var(--rxl)}
+.bbd{padding:26px}
+.bmt{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--txu);margin-bottom:12px}.bmt i{color:var(--t300)}
+.btt2{font-family:var(--fd);font-size:1.2rem;font-weight:700;color:var(--t800);line-height:1.3;margin-bottom:10px;transition:color .2s}.bc:hover .btt2{color:var(--t500)}
+.bex{font-size:13.5px;color:var(--txl);line-height:1.75;margin-bottom:18px}
+.blk{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--t500);transition:gap .2s}.bc:hover .blk{gap:12px}.blk i{font-size:10px}
+
+/* CONTATO */
+.cg{display:grid;grid-template-columns:5fr 7fr;gap:28px;align-items:start}
+.ci{background:var(--t800);border-radius:var(--rlg);padding:clamp(28px,4vw,46px);color:#fff;position:relative;overflow:hidden}
+.ci::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(61,168,180,.28) 0%,transparent 70%);pointer-events:none}
+.citt{font-family:var(--fd);font-size:1.75rem;font-weight:700;margin-bottom:6px}
+.cisb{font-size:13.5px;color:rgba(255,255,255,.45);margin-bottom:32px}
+.clist{display:flex;flex-direction:column;gap:22px}
+.citem{display:flex;align-items:flex-start;gap:14px}
+.cico{width:40px;height:40px;flex-shrink:0;border-radius:10px;background:rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--t300)}
+.clbl{font-size:10.5px;color:rgba(255,255,255,.38);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.cval{font-size:14.5px;color:#fff;line-height:1.5}.cval a{color:var(--t200)}.cval a:hover{color:var(--t100)}
+.srow{display:flex;gap:10px;margin-top:32px}
+.sbtn{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.65);font-size:16px;transition:background .2s,color .2s,transform .25s var(--esp)}.sbtn:hover{background:var(--t500);color:#fff;transform:translateY(-3px)}
+.mw{border-radius:var(--rlg);overflow:hidden;margin-top:28px;height:250px;background:var(--t900);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:rgba(255,255,255,.4);font-size:13.5px;text-align:center;border:1px solid rgba(255,255,255,.07)}.mw i{font-size:2rem;color:var(--t400)}
+
+.fc{background:#fff;border-radius:var(--rlg);padding:clamp(28px,4vw,46px);box-shadow:var(--sc);border:1px solid rgba(42,138,149,.06)}
+.ftt{font-family:var(--fd);font-size:1.65rem;font-weight:700;color:var(--t900);margin-bottom:5px}
+.fsb{font-size:13.5px;color:var(--txl);margin-bottom:28px}
+.frw{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.flbl{font-size:13px;font-weight:600;color:var(--txm);letter-spacing:.02em}
+.fctrl{padding:12px 15px;border:1.5px solid var(--w200);border-radius:var(--rsm);font-family:var(--fb);font-size:14px;color:var(--txt);background:var(--cream);transition:border-color .2s,box-shadow .2s;outline:none}
+.fctrl::placeholder{color:var(--txu)}.fctrl:focus{border-color:var(--t400);background:#fff;box-shadow:0 0 0 3px rgba(61,168,180,.14)}
+select.fctrl{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a7a80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+textarea.fctrl{resize:vertical;min-height:95px}
+.ferr{font-size:12px;color:#e05252;margin-top:3px;display:none}.fg.err .fctrl{border-color:#e05252}.fg.err .ferr{display:block}
+.bsnd{width:100%;background:var(--t600);color:#fff;padding:14px;font-size:15px;font-weight:600;border-radius:var(--rxl);box-shadow:0 8px 28px rgba(42,138,149,.33);justify-content:center;margin-top:4px}.bsnd:hover{background:var(--t700);box-shadow:0 12px 36px rgba(42,138,149,.44)}
+.fnote{text-align:center;font-size:12px;color:var(--txu);margin-top:12px;line-height:1.6}
+.fsuc{display:none;text-align:center;padding:18px;background:var(--t50);border:1px solid var(--t200);border-radius:var(--rmd);color:var(--t700);font-weight:500;margin-top:14px}.fsuc.show{display:block}
+
+/* FOOTER */
+.sf{background:var(--t900);color:rgba(255,255,255,.5);padding-block:64px 28px}
+.ftg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.ftt2{font-family:var(--fd);font-size:.95rem;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.fli li{margin-bottom:9px}.fli a{font-size:13px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:8px;transition:color .2s,gap .2s}.fli a:hover{color:var(--t300);gap:12px}.fli i{font-size:10px}
+.fbt{border-top:1px solid rgba(255,255,255,.07);padding-top:24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:rgba(255,255,255,.28)}
+
+/* WA */
+.wa{position:fixed;bottom:26px;right:26px;z-index:400;width:58px;height:58px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.65rem;box-shadow:0 8px 28px rgba(37,211,102,.48);animation:wap 2.5s ease infinite;transition:transform .3s var(--esp),box-shadow .3s}.wa:hover{transform:scale(1.12) rotate(8deg);box-shadow:0 12px 36px rgba(37,211,102,.65)}
+@keyframes wap{0%,100%{box-shadow:0 8px 28px rgba(37,211,102,.48)}50%{box-shadow:0 8px 28px rgba(37,211,102,.48),0 0 0 14px rgba(37,211,102,.1)}}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .7s var(--ease),transform .7s var(--ease)}.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .dgrid{grid-template-columns:1fr 1fr}.di{border-bottom:1px solid rgba(255,255,255,.07)}
+  .agrid{grid-template-columns:1fr}.avis{max-width:540px;margin-inline:auto}
+  .cg{grid-template-columns:1fr}.ftg{grid-template-columns:1fr 1fr}
+  .bgrid{grid-template-columns:1fr 1fr}.lbp{left:-48px}.lbn{right:-48px}
+}
+@media(max-width:768px){
+  .snav{display:none}.hbg{display:flex}
+  .sgrid{grid-template-columns:1fr}.frw{grid-template-columns:1fr}
+  .hstg{grid-template-columns:1fr 1fr}.hsi:nth-child(2){border-right:none}
+  .abdg{left:0}.aacc{right:0}.ftg{grid-template-columns:1fr}
+  .fbt{justify-content:center;text-align:center}.dgrid{grid-template-columns:1fr}
+  .ggrid{grid-template-columns:1fr 1fr}.gi:nth-child(1){grid-column:span 2;grid-row:auto}
+  .gi:nth-child(1) img{height:220px}.gi:not(:nth-child(1)) img{height:160px}
+  .bgrid{grid-template-columns:1fr}.dc{min-width:300px;max-width:300px}
+  .lbp{left:-42px}.lbn{right:-42px}
+}
+@media(max-width:480px){
+  .hbtns{flex-direction:column}.btn{justify-content:center}
+  .dc{min-width:calc(100vw - 60px);max-width:calc(100vw - 60px)}
+  .lbp,.lbn{display:none}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Pular para o conteúdo</a>
+
+<div class="topbar"><div class="wrap tb-in"><div class="tb-l">
+  <div class="tb-i"><i class="fas fa-map-marker-alt"></i><span>Estiva — MG</span></div>
+  <div class="tb-i"><i class="fas fa-phone"></i><a href="tel:+5535984020761">(35) 98402-0761</a></div>
+  <div class="tb-i"><i class="fas fa-clock"></i><span>Seg&ndash;Sex 8h&ndash;18h &nbsp;&middot;&nbsp; Sáb 8h&ndash;12h</span></div>
+</div><time id="tb-clk" aria-live="polite"></time></div></div>
+
+<header class="sh"><div class="wrap hi">
+  <a href="#" class="logo" aria-label="Início">
+    <div class="lm" aria-hidden="true"><i class="fas fa-spa"></i></div>
+    <div><div class="ln">Dra. Thais Pereira Xavier</div><div class="lc">Fisioterapia &amp; Reabilitação &middot; CREFITO</div></div>
+  </a>
+  <nav class="snav" aria-label="Principal">
+    <a href="#" class="nl act">Início</a>
+    <a href="#servicos" class="nl">Especialidades</a>
+    <a href="#sobre" class="nl">Sobre</a>
+    <a href="#depoimentos" class="nl">Depoimentos</a>
+    <a href="#blog" class="nl">Blog</a>
+    <a href="#contato" class="nl">Contato</a>
+    <a href="#contato" class="nl nlc"><i class="fas fa-calendar-check" aria-hidden="true"></i> Agendar</a>
+  </nav>
+  <button class="hbg" id="hbg" aria-label="Menu" aria-expanded="false" aria-controls="mob-nav"><span></span><span></span><span></span></button>
+</div></header>
+
+<nav class="mn" id="mob-nav" aria-label="Mobile" aria-hidden="true">
+  <button class="mncl" id="mncl" aria-label="Fechar menu"><i class="fas fa-times"></i></button>
+  <a href="#" class="mnl">Início</a>
+  <a href="#servicos" class="mnl">Especialidades</a>
+  <a href="#sobre" class="mnl">Sobre</a>
+  <a href="#depoimentos" class="mnl">Depoimentos</a>
+  <a href="#blog" class="mnl">Blog</a>
+  <a href="#contato" class="mnl">Contato</a>
+  <a href="#contato" class="mnl" style="color:var(--t300)">Agendar Consulta</a>
+</nav>
+
+<main id="main" tabindex="-1">
+
+<!-- HERO -->
+<section class="hero" aria-labelledby="h1"><div class="hbg2" role="img" aria-label="Fisioterapia"></div><div class="hmesh" aria-hidden="true"></div><div class="hring" aria-hidden="true"></div>
+<div class="wrap"><div class="hcnt">
+  <div class="htag"><i class="fas fa-award"></i> Estiva-MG &nbsp;&middot;&nbsp; +20 anos de excelência</div>
+  <h1 class="hh1" id="h1">Cuidar com<br><em>ciência e dedicação</em></h1>
+  <p class="hsub">Fisioterapia motora, acupuntura, eletroterapia e reabilitação personalizada. Tratamentos modernos que devolvem qualidade de vida e alívio real da dor.</p>
+  <div class="hbtns">
+    <a href="#contato" class="btn btp"><i class="fas fa-calendar-check" aria-hidden="true"></i> Agendar Avaliação</a>
+    <a href="#servicos" class="btn btg"><i class="fas fa-stethoscope" aria-hidden="true"></i> Ver Tratamentos</a>
+  </div>
+</div></div>
+<div class="hst" aria-label="Estatísticas"><div class="wrap hstg">
+  <div class="hsi"><div class="hsn">20<span>+</span></div><div class="hsl">Anos de experiência</div></div>
+  <div class="hsi"><div class="hsn">2<span>k+</span></div><div class="hsl">Pacientes atendidos</div></div>
+  <div class="hsi"><div class="hsn">6</div><div class="hsl">Especialidades</div></div>
+  <div class="hsi"><div class="hsn">98<span>%</span></div><div class="hsl">Satisfação</div></div>
+</div></div></section>
+
+<!-- DIFERENCIAIS -->
+<div class="dstrip"><div class="wrap"><div class="dgrid">
+  <div class="di rv"><div class="dico" aria-hidden="true"><i class="fas fa-user-md"></i></div><div><div class="dtt">Atendimento Personalizado</div><div class="dds">Protocolo único baseado no seu quadro clínico</div></div></div>
+  <div class="di rv d1"><div class="dico" aria-hidden="true"><i class="fas fa-heartbeat"></i></div><div><div class="dtt">Técnicas Avançadas</div><div class="dds">Equipamentos modernos e evidência científica</div></div></div>
+  <div class="di rv d2"><div class="dico" aria-hidden="true"><i class="fas fa-clock"></i></div><div><div class="dtt">Horários Flexíveis</div><div class="dds">Segunda a sábado, agendamento via WhatsApp</div></div></div>
+  <div class="di rv d3"><div class="dico" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></div><div><div class="dtt">Centro de Estiva-MG</div><div class="dds">Fácil acesso e estacionamento disponível</div></div></div>
+</div></div></div>
+
+<!-- SERVIÇOS -->
+<section id="servicos" class="sec" aria-labelledby="srv-h"><div class="wrap">
+  <div class="sech"><div class="sct rv">Especialidades</div><h2 class="stt rv d1" id="srv-h">Tratamentos que transformam</h2><p class="ssb rv d2">Técnicas modernas e equipamentos de última geração para uma recuperação eficiente e duradoura</p></div>
+  <div class="sgrid">
+    <article class="sc2 rv"><div class="sth"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=640&q=75" alt="Fisioterapia motora" loading="lazy"><div class="sov" aria-hidden="true"></div><div class="sbdg" aria-hidden="true"><i class="fas fa-bone"></i></div></div><div class="sbdy"><h3 class="sttl">Fisioterapia Motora</h3><p class="sdsc">Reabilitação completa para pré e pós-operatório de membros superiores e inferiores com técnicas específicas.</p><span class="smr">Saiba mais <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+    <article class="sc2 rv d1"><div class="sth"><img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=640&q=75" alt="Acupuntura" loading="lazy"><div class="sov" aria-hidden="true"></div><div class="sbdg" aria-hidden="true"><i class="fas fa-leaf"></i></div></div><div class="sbdy"><h3 class="sttl">Acupuntura</h3><p class="sdsc">Terapia milenar para alívio de dores, estresse e diversas condições de saúde com agulhas especiais.</p><span class="smr">Saiba mais <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+    <article class="sc2 rv d2"><div class="sth"><img src="https://images.unsplash.com/photo-1591343395082-e120aa9b6cde?w=640&q=75" alt="Eletroterapia" loading="lazy"><div class="sov" aria-hidden="true"></div><div class="sbdg" aria-hidden="true"><i class="fas fa-bolt"></i></div></div><div class="sbdy"><h3 class="sttl">Eletroterapia e Tens</h3><p class="sdsc">Correntes terapêuticas para alívio da dor, fortalecimento muscular e aceleração da recuperação.</p><span class="smr">Saiba mais <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+    <article class="sc2 rv"><div class="sth"><img src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=640&q=75" alt="Tratamento de joelho" loading="lazy"><div class="sov" aria-hidden="true"></div><div class="sbdg" aria-hidden="true"><i class="fas fa-user-injured"></i></div></div><div class="sbdy"><h3 class="sttl">Tratamento de Joelho</h3><p class="sdsc">Especialidade em lesões e dores no joelho com protocolo estruturado da avaliação à alta funcional.</p><span class="smr">Saiba mais <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+    <article class="sc2 rv d1"><div class="sth"><img src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?w=640&q=75" alt="Palmilhas" loading="lazy"><div class="sov" aria-hidden="true"></div><div class="sbdg" aria-hidden="true"><i class="fas fa-shoe-prints"></i></div></div><div class="sbdy"><h3 class="sttl">Palmilhas Personalizadas</h3><p class="sdsc">Fabricação sob medida para correção postural e alívio de dores com avaliação biomecânica completa.</p><span class="smr">Saiba mais <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+    <article class="sc2 rv d2"><div class="sth"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=640&q=75" alt="Reabilitação" loading="lazy"><div class="sov" aria-hidden="true"></div><div class="sbdg" aria-hidden="true"><i class="fas fa-hospital"></i></div></div><div class="sbdy"><h3 class="sttl">Reabilitação Pós-Operatória</h3><p class="sdsc">Recuperação especializada após cirurgias ortopédicas, inclusive paralisia facial pós-operatória.</p><span class="smr">Saiba mais <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+  </div>
+</div></section>
+
+<!-- SOBRE -->
+<section id="sobre" class="sec sec-alt" aria-labelledby="abt-h"><div class="wrap"><div class="agrid">
+  <div class="avis rv"><div class="adts" aria-hidden="true"></div>
+    <div class="afr"><img src="https://images.unsplash.com/photo-1590650516494-0c8e4a4dd61e?w=800&q=80" alt="Dra. Thais Pereira Xavier em atendimento">
+      <div class="abdg" aria-label="20 anos"><div class="abdgn">20</div><div class="abdgt">anos de experiência</div></div>
+      <div class="aacc" aria-label="2 mil pacientes"><div class="aaccn">2k+</div><div class="aaccl">Pacientes atendidos</div></div>
+    </div>
+  </div>
+  <div class="rv d1">
+    <div class="atag"><i class="fas fa-star-of-life" aria-hidden="true"></i> Sobre a Especialista</div>
+    <h2 class="att" id="abt-h">Dra. Thais<br>Pereira Xavier</h2>
+    <p class="ald">Fisioterapeuta especializada em Fisioterapia Motora e Acupuntura, formada há mais de 20 anos. Atuo com dedicação total — do pré-operatório até o retorno pleno à vida ativa.</p>
+    <ul class="spl" aria-label="Áreas de atuação">
+      <li class="spi"><div class="spch" aria-hidden="true"><i class="fas fa-check"></i></div>Pré e pós-operatório de todos os membros</li>
+      <li class="spi"><div class="spch" aria-hidden="true"><i class="fas fa-check"></i></div>Paralisia facial pós-operatória</li>
+      <li class="spi"><div class="spch" aria-hidden="true"><i class="fas fa-check"></i></div>Fabricação de palmilhas personalizadas</li>
+      <li class="spi"><div class="spch" aria-hidden="true"><i class="fas fa-check"></i></div>Alívio de dores no joelho e coluna</li>
+      <li class="spi"><div class="spch" aria-hidden="true"><i class="fas fa-check"></i></div>Acupuntura para diversas condições clínicas</li>
+      <li class="spi"><div class="spch" aria-hidden="true"><i class="fas fa-check"></i></div>Eletroterapia, Tens e ultrassom terapêutico</li>
+    </ul>
+    <a href="#contato" class="btn btt"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Agendar Avaliação</a>
+  </div>
+</div></div></section>
+
+<!-- DEPOIMENTOS -->
+<section id="depoimentos" class="sec" aria-labelledby="dep-h"><div class="wrap">
+  <div class="sech"><div class="sct rv">Depoimentos</div><h2 class="stt rv d1" id="dep-h">O que nossos pacientes dizem</h2><p class="ssb rv d2">Histórias reais de recuperação e qualidade de vida transformada</p></div>
+  <div class="dtw rv" id="dtw"><div class="dtr" id="dtr">
+    <div class="dc"><div class="dstr" aria-label="5 estrelas"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="dtxt">Depois de uma cirurgia no joelho, achei que não voltaria a caminhar normalmente. A Dra. Thais me devolveu a mobilidade em três meses. Profissional incrível, atenciosa e muito competente.</p><div class="dau"><div class="dav">MA</div><div><div class="dnm">Maria Aparecida S.</div><div class="drl">Tratamento pós-op de joelho</div></div></div></div>
+    <div class="dc"><div class="dstr" aria-label="5 estrelas"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="dtxt">Sofria com dores crônicas na coluna há anos. A acupuntura foi reveladora — senti diferença já nas primeiras sessões. Hoje tenho qualidade de vida que não tinha há muito tempo.</p><div class="dau"><div class="dav" style="background:linear-gradient(135deg,var(--t300),var(--t600))">JC</div><div><div class="dnm">José Carlos M.</div><div class="drl">Acupuntura para dor lombar</div></div></div></div>
+    <div class="dc"><div class="dstr" aria-label="5 estrelas"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="dtxt">As palmilhas personalizadas resolveram um problema que eu tinha há anos com dores nos pés. Avaliação completa e resultado além das expectativas. Recomendo muito!</p><div class="dau"><div class="dav" style="background:linear-gradient(135deg,var(--gold),var(--t600))">RL</div><div><div class="dnm">Rita de Lourdes F.</div><div class="drl">Palmilhas personalizadas</div></div></div></div>
+    <div class="dc"><div class="dstr" aria-label="5 estrelas"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="dtxt">Tive paralisia facial após uma cirurgia e o tratamento da Dra. Thais foi fundamental para minha recuperação — física e emocional. Uma profissional excepcional.</p><div class="dau"><div class="dav" style="background:linear-gradient(135deg,var(--t500),var(--t900))">PC</div><div><div class="dnm">Paulo César A.</div><div class="drl">Reabilitação de paralisia facial</div></div></div></div>
+    <div class="dc"><div class="dstr" aria-label="5 estrelas"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="dtxt">Passei por cirurgia no ombro e a fisioterapia foi essencial. A Dra. Thais é extremamente cuidadosa, explica cada procedimento. Voltei a jogar tênis!</p><div class="dau"><div class="dav" style="background:linear-gradient(135deg,var(--t400),var(--t800))">FO</div><div><div class="dnm">Fernanda Oliveira</div><div class="drl">Fisioterapia pós-op de ombro</div></div></div></div>
+    <div class="dc"><div class="dstr" aria-label="5 estrelas"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="dtxt">A eletroterapia resolveu uma contratura que me impedia de trabalhar. Em poucas sessões voltei às minhas atividades normais. Atendimento impecável!</p><div class="dau"><div class="dav" style="background:linear-gradient(135deg,var(--t300),var(--t700))">WS</div><div><div class="dnm">Wagner Santos</div><div class="drl">Eletroterapia — contratura muscular</div></div></div></div>
+  </div></div>
+  <div class="dctrl rv d1">
+    <button class="dbtn" id="dp" aria-label="Anterior"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+    <div class="ddts" id="dds" role="tablist" aria-label="Depoimentos"></div>
+    <button class="dbtn" id="dn" aria-label="Próximo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+  </div>
+</div></section>
+
+<!-- GALERIA -->
+<section class="sec sec-alt" aria-labelledby="gal-h"><div class="wrap">
+  <div class="sech"><div class="sct rv">Galeria</div><h2 class="stt rv d1" id="gal-h">Nossa clínica</h2><p class="ssb rv d2">Ambiente moderno, acolhedor e equipado para o melhor atendimento</p></div>
+  <div class="ggrid rv">
+    <div class="gi" data-src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=85" tabindex="0" role="button" aria-label="Ver foto: Fisioterapia"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=75" alt="Sessão de fisioterapia" loading="lazy"><div class="gov" aria-hidden="true"><i class="fas fa-expand gic"></i></div></div>
+    <div class="gi" data-src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&q=85" tabindex="0" role="button" aria-label="Ver foto: Acupuntura"><img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=75" alt="Acupuntura" loading="lazy"><div class="gov" aria-hidden="true"><i class="fas fa-expand gic"></i></div></div>
+    <div class="gi" data-src="https://images.unsplash.com/photo-1591343395082-e120aa9b6cde?w=900&q=85" tabindex="0" role="button" aria-label="Ver foto: Eletroterapia"><img src="https://images.unsplash.com/photo-1591343395082-e120aa9b6cde?w=600&q=75" alt="Eletroterapia" loading="lazy"><div class="gov" aria-hidden="true"><i class="fas fa-expand gic"></i></div></div>
+    <div class="gi" data-src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=900&q=85" tabindex="0" role="button" aria-label="Ver foto: Joelho"><img src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=600&q=75" alt="Tratamento de joelho" loading="lazy"><div class="gov" aria-hidden="true"><i class="fas fa-expand gic"></i></div></div>
+    <div class="gi" data-src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=900&q=85" tabindex="0" role="button" aria-label="Ver foto: Reabilitação"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=600&q=75" alt="Reabilitação" loading="lazy"><div class="gov" aria-hidden="true"><i class="fas fa-expand gic"></i></div></div>
+  </div>
+</div></section>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Galeria"><div class="lbi">
+  <button class="lbcl" id="lbcl" aria-label="Fechar"><i class="fas fa-times" aria-hidden="true"></i></button>
+  <button class="lbnv lbp" id="lbp" aria-label="Anterior"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+  <img src="" alt="" id="lbimg">
+  <button class="lbnv lbn" id="lbn" aria-label="Próximo"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+</div></div>
+
+<!-- BLOG -->
+<section id="blog" class="sec" aria-labelledby="blog-h"><div class="wrap">
+  <div class="sech"><div class="sct rv">Blog de Saúde</div><h2 class="stt rv d1" id="blog-h">Dicas e informações</h2><p class="ssb rv d2">Conteúdo educativo sobre saúde, reabilitação e bem-estar para o seu dia a dia</p></div>
+  <div class="bgrid">
+    <article class="bc rv"><div class="bth"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=75" alt="Fisioterapia pós-op" loading="lazy"><span class="bcat">Reabilitação</span></div><div class="bbd"><div class="bmt"><i class="far fa-calendar-alt" aria-hidden="true"></i> 10 Jan 2025 <i class="far fa-clock" aria-hidden="true"></i> 5 min</div><h3 class="btt2">Como acelerar sua recuperação pós-operatória com fisioterapia</h3><p class="bex">Iniciar a fisioterapia logo após a cirurgia reduz o tempo de recuperação e melhora os resultados. Saiba o que esperar de cada fase do tratamento.</p><span class="blk">Ler artigo <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+    <article class="bc rv d1"><div class="bth"><img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=75" alt="Acupuntura e dor" loading="lazy"><span class="bcat">Acupuntura</span></div><div class="bbd"><div class="bmt"><i class="far fa-calendar-alt" aria-hidden="true"></i> 22 Jan 2025 <i class="far fa-clock" aria-hidden="true"></i> 4 min</div><h3 class="btt2">Acupuntura e dor crônica: o que a ciência comprova</h3><p class="bex">Estudos mostram que a acupuntura reduz significativamente dores crônicas. Entenda como funciona o mecanismo de ação desta terapia milenar.</p><span class="blk">Ler artigo <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+    <article class="bc rv d2"><div class="bth"><img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=75" alt="Postura escolar" loading="lazy"><span class="bcat">Postura</span></div><div class="bbd"><div class="bmt"><i class="far fa-calendar-alt" aria-hidden="true"></i> 3 Fev 2025 <i class="far fa-clock" aria-hidden="true"></i> 3 min</div><h3 class="btt2">Volta às aulas: como proteger a coluna do seu filho</h3><p class="bex">A mochila não deve ultrapassar 10% do peso da criança. Veja dicas práticas para prevenir dores e problemas posturais desde cedo.</p><span class="blk">Ler artigo <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></article>
+  </div>
+</div></section>
+
+<!-- CONTATO -->
+<section id="contato" class="sec sec-alt" aria-labelledby="ctt-h"><div class="wrap">
+  <div class="sech"><div class="sct rv">Contato</div><h2 class="stt rv d1" id="ctt-h">Agende sua consulta</h2><p class="ssb rv d2">Preencha o formulário e entraremos em contato via WhatsApp para confirmar o horário</p></div>
+  <div class="cg">
+    <div class="ci rv">
+      <h3 class="citt">Vamos conversar?</h3><p class="cisb">Estamos prontos para cuidar de você</p>
+      <ul class="clist" role="list">
+        <li class="citem"><div class="cico" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></div><div><div class="clbl">Endereço</div><div class="cval">Rua Vereador Ernesto Ramalho Gomes, 36<br>Estiva — MG</div></div></li>
+        <li class="citem"><div class="cico" aria-hidden="true"><i class="fas fa-phone-alt"></i></div><div><div class="clbl">Telefone / WhatsApp</div><div class="cval"><a href="tel:+5535984020761">(35) 98402-0761</a></div></div></li>
+        <li class="citem"><div class="cico" aria-hidden="true"><i class="fas fa-clock"></i></div><div><div class="clbl">Horários</div><div class="cval">Segunda a Sexta: 8h às 18h<br>Sábado: 8h às 12h</div></div></li>
+        <li class="citem"><div class="cico" aria-hidden="true"><i class="fas fa-car"></i></div><div><div class="clbl">Estacionamento</div><div class="cval">Disponível no Hospital local</div></div></li>
+      </ul>
+      <div class="srow" aria-label="Redes sociais">
+        <a href="https://facebook.com" target="_blank" rel="noopener" class="sbtn" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+        <a href="https://instagram.com" target="_blank" rel="noopener" class="sbtn" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+        <a href="https://wa.me/5535984020761" target="_blank" rel="noopener" class="sbtn" aria-label="WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+      </div>
+      <div class="mw"><i class="fas fa-map-marked-alt" aria-hidden="true"></i><span>Rua Vereador Ernesto Ramalho Gomes, 36<br>Estiva — MG</span></div>
+    </div>
+    <div class="fc rv d1">
+      <h3 class="ftt">Agendamento rápido</h3><p class="fsb">Você será redirecionado ao WhatsApp para confirmar</p>
+      <form id="appt" novalidate aria-label="Formulário de agendamento">
+        <div class="frw">
+          <div class="fg" id="gn"><label class="flbl" for="fn">Nome completo <span aria-hidden="true" style="color:#e05252">*</span></label><input class="fctrl" type="text" id="fn" autocomplete="name" required aria-required="true" placeholder="Maria Aparecida Silva"><span class="ferr" role="alert">Nome é obrigatório</span></div>
+          <div class="fg" id="gp"><label class="flbl" for="fp">WhatsApp <span aria-hidden="true" style="color:#e05252">*</span></label><input class="fctrl" type="tel" id="fp" autocomplete="tel" required aria-required="true" placeholder="(35) 98402-0761"><span class="ferr" role="alert">Informe um telefone válido</span></div>
+        </div>
+        <div class="fg" id="gt"><label class="flbl" for="ft">Tratamento de interesse <span aria-hidden="true" style="color:#e05252">*</span></label>
+          <select class="fctrl" id="ft" required aria-required="true"><option value="" disabled selected>Selecione uma especialidade</option><option>Fisioterapia Motora</option><option>Acupuntura</option><option>Eletroterapia / Tens</option><option>Tratamento de Joelho</option><option>Palmilhas Personalizadas</option><option>Reabilitação Pós-Operatória</option><option>Outros</option></select>
+          <span class="ferr" role="alert">Selecione um tratamento</span></div>
+        <div class="fg"><label class="flbl" for="fm">Mensagem <span style="font-weight:400;color:var(--txu)">(opcional)</span></label><textarea class="fctrl" id="fm" rows="3" placeholder="Descreva brevemente sua condição ou dúvida…"></textarea></div>
+        <button type="submit" class="btn bsnd"><i class="fab fa-whatsapp" aria-hidden="true"></i> Enviar Agendamento</button>
+        <p class="fnote">Seus dados são usados apenas para agendamento. Privacidade garantida.</p>
+        <div class="fsuc" id="fsuc" role="status">✅ Agendamento enviado! Abrindo WhatsApp…</div>
+      </form>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer class="sf"><div class="wrap">
+  <div class="ftg">
+    <div><div class="lm" style="width:44px;height:44px;font-size:18px;margin-bottom:14px" aria-hidden="true"><i class="fas fa-spa"></i></div>
+      <div style="font-family:var(--fd);font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px">Dra. Thais Pereira Xavier</div>
+      <p style="font-size:13px;line-height:1.85;max-width:270px">Mais de 20 anos dedicados à saúde e reabilitação. Tratamentos modernos e atendimento personalizado em Estiva-MG.</p></div>
+    <nav aria-label="Especialidades"><div class="ftt2">Especialidades</div><ul class="fli" role="list"><li><a href="#servicos"><i class="fas fa-chevron-right" aria-hidden="true"></i> Fisioterapia Motora</a></li><li><a href="#servicos"><i class="fas fa-chevron-right" aria-hidden="true"></i> Acupuntura</a></li><li><a href="#servicos"><i class="fas fa-chevron-right" aria-hidden="true"></i> Eletroterapia / Tens</a></li><li><a href="#servicos"><i class="fas fa-chevron-right" aria-hidden="true"></i> Tratamento de Joelho</a></li><li><a href="#servicos"><i class="fas fa-chevron-right" aria-hidden="true"></i> Palmilhas Personalizadas</a></li></ul></nav>
+    <nav aria-label="Contato"><div class="ftt2">Contato</div><ul class="fli" role="list"><li><a href="tel:+5535984020761"><i class="fas fa-phone-alt" aria-hidden="true"></i> (35) 98402-0761</a></li><li><a href="https://wa.me/5535984020761" target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp</a></li><li><a href="#contato"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Rua V.E.R. Gomes, 36</a></li><li><a href="#contato"><i class="fas fa-clock" aria-hidden="true"></i> Seg&ndash;Sex 8h&ndash;18h</a></li><li><a href="#contato"><i class="fas fa-clock" aria-hidden="true"></i> Sáb 8h&ndash;12h</a></li></ul></nav>
+  </div>
+  <div class="fbt"><span>&copy; <span id="yr"></span> Clínica de Fisioterapia &mdash; Dra. Thais Pereira Xavier. Todos os direitos reservados.</span><span>Desenvolvido com dedicação para sua saúde &#10084;</span></div>
+</div></footer>
+
+<a href="https://wa.me/5535984020761?text=Ol%C3%A1%21+Gostaria+de+agendar+uma+consulta." class="wa" target="_blank" rel="noopener" aria-label="Abrir WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+
+<script>
+(function(){
+  var c=document.getElementById('tb-clk');
+  function t(){c.textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+  t();setInterval(t,30000);
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  var h=document.querySelector('.sh');
+  window.addEventListener('scroll',function(){h.classList.toggle('sc',scrollY>30)},{passive:true});
+  var btn=document.getElementById('hbg'),nav=document.getElementById('mob-nav'),cl=document.getElementById('mncl');
+  function op(){nav.classList.add('op');nav.setAttribute('aria-hidden','false');btn.setAttribute('aria-expanded','true');btn.classList.add('op');document.body.style.overflow='hidden'}
+  function cl2(){nav.classList.remove('op');nav.setAttribute('aria-hidden','true');btn.setAttribute('aria-expanded','false');btn.classList.remove('op');document.body.style.overflow=''}
+  btn.addEventListener('click',op);cl.addEventListener('click',cl2);
+  nav.querySelectorAll('.mnl').forEach(function(a){a.addEventListener('click',cl2)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')cl2()});
+  var els=document.querySelectorAll('.rv');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(el){io.observe(el)});
+  } else {els.forEach(function(e){e.classList.add('in')})}
+  var nls=document.querySelectorAll('.nl:not(.nlc)');
+  var ids=['servicos','sobre','depoimentos','blog','contato'];
+  var secs=ids.map(function(i){return document.getElementById(i)}).filter(Boolean);
+  function upd(){var y=scrollY+120,cur='';secs.forEach(function(s){if(y>=s.offsetTop)cur=s.id});nls.forEach(function(a){var hh=a.getAttribute('href').replace('#','');a.classList.toggle('act',hh===cur||(cur===''&&hh===''))})}
+  window.addEventListener('scroll',upd,{passive:true});upd();
+  var tr=document.getElementById('dtr'),tw=document.getElementById('dtw'),cards=tr.querySelectorAll('.dc'),dds=document.getElementById('dds'),n=cards.length,cur2=0,aut,isDrag=false,sx=0;
+  function gw(){return cards[0].offsetWidth}
+  function go(i){cur2=Math.max(0,Math.min(n-1,i));tr.style.transform='translateX(-'+(cur2*(gw()+24))+'px)';dds.querySelectorAll('.ddt').forEach(function(d,j){d.classList.toggle('act',j===cur2)})}
+  cards.forEach(function(_,i){var d=document.createElement('button');d.className='ddt'+(i===0?' act':'');d.setAttribute('role','tab');d.setAttribute('aria-label','Depoimento '+(i+1));d.addEventListener('click',function(){go(i);ra()});dds.appendChild(d)});
+  document.getElementById('dp').addEventListener('click',function(){go(cur2-1);ra()});
+  document.getElementById('dn').addEventListener('click',function(){go(cur2+1);ra()});
+  tw.addEventListener('mousedown',function(e){isDrag=true;sx=e.clientX;tw.classList.add('drag')});
+  window.addEventListener('mouseup',function(e){if(!isDrag)return;isDrag=false;tw.classList.remove('drag');if(Math.abs(sx-e.clientX)>50)go(sx-e.clientX>0?cur2+1:cur2-1);ra()});
+  tw.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  tw.addEventListener('touchend',function(e){var d=sx-e.changedTouches[0].clientX;if(Math.abs(d)>40)go(d>0?cur2+1:cur2-1);ra()});
+  function sa(){aut=setInterval(function(){go(cur2<n-1?cur2+1:0)},4500)}function ra(){clearInterval(aut);sa()}sa();
+  window.addEventListener('resize',function(){go(cur2)});
+  var gis=document.querySelectorAll('.gi'),lbx=document.getElementById('lb'),lbi=document.getElementById('lbimg'),lbcl=document.getElementById('lbcl'),lbp=document.getElementById('lbp'),lbn2=document.getElementById('lbn');
+  var srcs=[],alts=[],lc=0;
+  gis.forEach(function(el,i){srcs.push(el.dataset.src);alts.push(el.querySelector('img').alt);el.addEventListener('click',function(){lopen(i)});el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();lopen(i)}})});
+  function lopen(i){lc=i;lbi.src=srcs[i];lbi.alt=alts[i];lbx.classList.add('op');document.body.style.overflow='hidden';lbcl.focus()}
+  function lclose(){lbx.classList.remove('op');document.body.style.overflow=''}
+  lbcl.addEventListener('click',lclose);lbp.addEventListener('click',function(){lc=(lc-1+srcs.length)%srcs.length;lbi.src=srcs[lc];lbi.alt=alts[lc]});
+  lbn2.addEventListener('click',function(){lc=(lc+1)%srcs.length;lbi.src=srcs[lc];lbi.alt=alts[lc]});
+  lbx.addEventListener('click',function(e){if(e.target===lbx)lclose()});
+  document.addEventListener('keydown',function(e){if(!lbx.classList.contains('op'))return;if(e.key==='Escape')lclose();if(e.key==='ArrowLeft'){lc=(lc-1+srcs.length)%srcs.length;lbi.src=srcs[lc];lbi.alt=alts[lc]}if(e.key==='ArrowRight'){lc=(lc+1)%srcs.length;lbi.src=srcs[lc];lbi.alt=alts[lc]}});
+  var ph=document.getElementById('fp');
+  if(ph)ph.addEventListener('input',function(){var v=ph.value.replace(/\D/g,'').slice(0,11);if(v.length<=10)v=v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');else v=v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');ph.value=v});
+  var form=document.getElementById('appt'),suc=document.getElementById('fsuc');
+  if(form){
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var ok=true;
+      [['gn','fn',function(v){return v.trim().length>=2}],['gp','fp',function(v){return /^\(\d{2}\) \d{4,5}-\d{4}$/.test(v)}],['gt','ft',function(v){return v!==''}]].forEach(function(r){var g=document.getElementById(r[0]),val=document.getElementById(r[1]).value,pass=r[2](val);g.classList.toggle('err',!pass);if(!pass)ok=false});
+      if(!ok)return;
+      var nm=document.getElementById('fn').value.trim(),ph2=document.getElementById('fp').value.trim(),tr2=document.getElementById('ft').value,ms=document.getElementById('fm').value.trim();
+      var txt='Olá! Gostaria de agendar uma consulta.\n\n*Nome:* '+nm+'\n*Telefone:* '+ph2+'\n*Tratamento:* '+tr2+(ms?'\n*Mensagem:* '+ms:'');
+      window.open('https://wa.me/5535984020761?text='+encodeURIComponent(txt),'_blank','noopener');
+      suc.classList.add('show');form.reset();setTimeout(function(){suc.classList.remove('show')},5000);
+    });
+    form.querySelectorAll('.fctrl').forEach(function(el){el.addEventListener('input',function(){var g=el.closest('.fg');if(g)g.classList.remove('err')})});
+  }
+})();
+</script>
+</body>
+</html>
