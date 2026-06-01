@@ -219,33 +219,36 @@
             color: #ffe6b3;
         }
 
-        .offline-upload {
+        .upload-area-custom {
             background: rgba(255,255,255,0.05);
-            border: 2px dashed rgba(255,255,255,0.2);
+            border: 2px dashed rgba(255,255,255,0.3);
             border-radius: 12px;
-            padding: 15px;
+            padding: 20px;
             margin-bottom: 20px;
             text-align: center;
             transition: all 0.3s;
+            cursor: pointer;
         }
 
-        .offline-upload:hover {
+        .upload-area-custom:hover {
             border-color: #e94560;
             background: rgba(233,69,96,0.1);
         }
 
-        .offline-upload input {
+        .upload-area-custom input {
             display: none;
         }
 
-        .offline-upload label {
+        .upload-area-custom label {
             cursor: pointer;
             color: #ccc;
+            font-size: 0.9em;
         }
 
-        .offline-upload label i {
+        .upload-area-custom label i {
             color: #e94560;
             margin-right: 8px;
+            font-size: 1.2em;
         }
 
         .charts-grid {
@@ -390,8 +393,8 @@
         <h1><i class="fas fa-chart-line"></i> Controle de Estoque e Perdas</h1>
         <p>Monitoramento de tanques | Controle escritural vs medição real</p>
         <div class="posto-name">
-            <i class="fas fa-gas-pump"></i> SISTEMA DE MONITORAMENTO
-            <span class="data-source" id="dataSourceBadge">📁 Lendo posto.csv</span>
+            <i class="fas fa-gas-pump"></i> REDE DOM PEDRO DE POSTOS
+            <span class="data-source" id="dataSourceBadge">🔄 Carregando...</span>
         </div>
     </div>
 
@@ -399,25 +402,26 @@
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>Carregando dados do arquivo posto.csv...</p>
-            <p style="font-size: 0.8em; margin-top: 10px;">O arquivo deve estar no mesmo diretório que este HTML</p>
+            <p style="font-size: 0.8em; margin-top: 10px;">Buscando no GitHub Pages ou aguardando upload</p>
         </div>
 
         <div id="dashboardContent" style="display: none;">
             <div class="source-bar">
                 <div class="source-status" id="sourceStatus">
-                    <i class="fas fa-check-circle"></i> Dados carregados com sucesso
+                    <i class="fas fa-check-circle"></i> Dados carregados
                 </div>
-                <button class="offline-btn" id="forceReloadBtn">
-                    <i class="fas fa-sync-alt"></i> Recarregar CSV
+                <button class="offline-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Recarregar
                 </button>
             </div>
 
-            <div class="offline-upload">
-                <label for="offlineFileInput">
+            <div class="upload-area-custom" id="uploadArea">
+                <label for="fileInput">
                     <i class="fas fa-cloud-upload-alt"></i> 
-                    Ou selecione outro arquivo CSV do seu computador
+                    Clique aqui para selecionar um arquivo CSV (posto.csv)
                 </label>
-                <input type="file" id="offlineFileInput" accept=".csv">
+                <input type="file" id="fileInput" accept=".csv">
+                <p style="font-size: 0.7em; margin-top: 8px; color: #888;">Se o arquivo não carregar automaticamente, selecione manualmente</p>
             </div>
 
             <div class="filters-bar">
@@ -472,7 +476,7 @@
             </div>
         </div>
         <div class="footer">
-            <i class="fas fa-chart-simple"></i> O arquivo posto.csv deve estar no mesmo diretório do HTML
+            <i class="fas fa-chart-simple"></i> Funciona offline | Selecione o arquivo posto.csv manualmente se necessário
         </div>
     </div>
 
@@ -480,22 +484,16 @@
         let dadosCompletos = [];
         let charts = {};
 
-        // Parse do CSV (funciona para qualquer arquivo no mesmo formato)
+        // Parse do CSV
         function parseCSV(texto) {
             const linhas = texto.split(/\r?\n/);
             let dados = [];
             let produtoAtual = null;
             let tanquesAtuais = null;
-            let nomeEmpresa = '';
             
             for (let i = 0; i < linhas.length; i++) {
                 let linha = linhas[i].trim();
                 if (!linha) continue;
-                
-                // Captura nome da empresa/posto
-                if (linha.includes('REDE DOM PEDRO') || linha.includes('Empresa:')) {
-                    nomeEmpresa = linha;
-                }
                 
                 // Identifica linha de combustível
                 if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
@@ -508,24 +506,21 @@
                     continue;
                 }
                 
-                // Pula cabeçalho da tabela
-                if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença') ||
-                    linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença;Acumulado')) {
+                // Pula cabeçalho
+                if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença')) {
                     continue;
                 }
                 
-                // Processa linha de dados (começa com data)
+                // Processa linha de dados
                 if (produtoAtual && linha.match(/^\d{4}-\d{2}-\d{2}/)) {
                     const cols = linha.split(';');
                     if (cols.length >= 10) {
-                        // Limpa e converte valores
                         const limparNumero = (str) => {
-                            if (!str) return 0;
+                            if (!str || str === '') return 0;
                             return parseFloat(String(str).replace(/\./g, '').replace(',', '.')) || 0;
                         };
                         
                         const registro = {
-                            posto: nomeEmpresa || 'Posto',
                             produto: produtoAtual,
                             tanques: tanquesAtuais,
                             data: cols[0],
@@ -538,49 +533,54 @@
                             diferenca: limparNumero(cols[9])
                         };
                         
-                        // Adiciona apenas registros válidos
                         if (registro.data && (registro.saidaBombas > 0 || registro.entrada > 0)) {
                             dados.push(registro);
                         }
                     }
                 }
                 
-                // Reseta produto ao encontrar total acumulado
                 if (linha.includes('Total acumulado combustível')) {
                     produtoAtual = null;
                 }
             }
             
-            console.log(`Parse concluído: ${dados.length} registros encontrados`);
             return dados;
         }
 
-        // Carregar arquivo CSV do mesmo diretório
-        async function carregarArquivoLocal() {
-            try {
-                // Tenta buscar o posto.csv no mesmo diretório
-                const response = await fetch('posto.csv', { cache: 'no-store' });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status} - Arquivo não encontrado`);
+        // Tentar carregar de múltiplas fontes
+        async function carregarDados() {
+            const fontes = [
+                // Tenta o GitHub Pages
+                { url: 'posto.csv', nome: 'GitHub Pages' },
+                { url: './posto.csv', nome: 'Diretório atual' },
+                { url: '/sites/posto.csv', nome: 'Subdiretório sites' },
+                { url: '../posto.csv', nome: 'Diretório pai' }
+            ];
+            
+            for (const fonte of fontes) {
+                try {
+                    console.log(`Tentando: ${fonte.url}`);
+                    const response = await fetch(fonte.url, { cache: 'no-store' });
+                    if (response.ok) {
+                        const texto = await response.text();
+                        const dados = parseCSV(texto);
+                        if (dados.length > 0) {
+                            console.log(`Carregado de ${fonte.nome}: ${dados.length} registros`);
+                            document.getElementById('dataSourceBadge').innerHTML = `✅ ${fonte.nome}`;
+                            document.getElementById('sourceStatus').innerHTML = `<i class="fas fa-check-circle"></i> Dados carregados de ${fonte.nome}`;
+                            return dados;
+                        }
+                    }
+                } catch(e) {
+                    console.log(`Falha em ${fonte.url}:`, e.message);
                 }
-                const texto = await response.text();
-                const dados = parseCSV(texto);
-                
-                if (dados.length === 0) {
-                    throw new Error('Nenhum dado válido encontrado no CSV');
-                }
-                
-                return dados;
-            } catch (error) {
-                console.error('Erro ao carregar arquivo:', error);
-                throw error;
             }
+            return null;
         }
 
-        // Processar produtos e calcular totais
+        // Processar produtos
         function processarProdutos(dados, dataInicio, dataFim) {
             let dadosFiltrados = [...dados];
-            
             if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
             if (dataFim) dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
             
@@ -595,7 +595,6 @@
                         estoqueInicial: 0,
                         estoqueFinalMedido: 0,
                         primeiroRegistro: true,
-                        ultimoRegistro: null,
                         diferencas: []
                     };
                 }
@@ -605,24 +604,18 @@
                 p.vendas += reg.saidaBombas || 0;
                 p.diferencas.push({ data: reg.data, valor: reg.diferenca || 0 });
                 
-                // Primeiro registro: pega litragem inicial
                 if (p.primeiroRegistro && reg.litragemInicial > 0) {
                     p.estoqueInicial = reg.litragemInicial;
                     p.primeiroRegistro = false;
                 }
-                
-                // Último registro: pega litragem final medida
-                if (!p.ultimoRegistro || reg.data > p.ultimoRegistro.data) {
-                    p.ultimoRegistro = { data: reg.data, litragemFinal: reg.litragemFinal };
+                if (reg.litragemFinal > 0) {
+                    p.estoqueFinalMedido = reg.litragemFinal;
                 }
             });
             
-            // Calcular estoque escritural e status
             Object.keys(produtos).forEach(prod => {
                 const p = produtos[prod];
-                // Escritural = Inicial + Entradas - Vendas
                 p.estoqueEscritural = (p.estoqueInicial || 0) + p.entradas - p.vendas;
-                p.estoqueFinalMedido = p.ultimoRegistro?.litragemFinal || 0;
                 p.diferencaTotal = p.estoqueFinalMedido - p.estoqueEscritural;
                 p.status = p.diferencaTotal >= 0 ? 'Sobra' : 'Perda';
                 p.statusClass = p.diferencaTotal >= 0 ? 'positive' : 'negative';
@@ -631,7 +624,7 @@
             return produtos;
         }
 
-        // Gerar alertas baseados nas regras
+        // Gerar alertas
         function gerarAlertas(dados) {
             const alertas = [];
             const produtoDiferenças = {};
@@ -650,14 +643,14 @@
                         alertas.push({
                             produto: prod, data: d.data, diferenca: d.diferenca,
                             tipo: 'perda',
-                            mensagem: `⚠️ ALERTA - PERDA/VAZAMENTO: Diferença de ${d.diferenca.toFixed(2)}L (abaixo de -0.60L)`
+                            mensagem: `⚠️ PERDA/VAZAMENTO: ${d.diferenca.toFixed(2)}L (abaixo de -0.60L)`
                         });
                         diasNegativosConsecutivos++;
                     } else if (d.diferenca > 0.60) {
                         alertas.push({
                             produto: prod, data: d.data, diferenca: d.diferenca,
                             tipo: 'erro',
-                            mensagem: `⚠️ ERRO DE MEDIÇÃO: Diferença positiva de ${d.diferenca.toFixed(2)}L (acima de +0.60L)`
+                            mensagem: `⚠️ ERRO DE MEDIÇÃO: +${d.diferenca.toFixed(2)}L (acima de +0.60L)`
                         });
                         diasNegativosConsecutivos = 0;
                     } else {
@@ -668,7 +661,7 @@
                         alertas.push({
                             produto: prod, data: d.data, diferenca: d.diferenca,
                             tipo: 'risco',
-                            mensagem: `🔴 RISCO DE DESVIO: ${diasNegativosConsecutivos} dias consecutivos com perda no produto ${prod}`
+                            mensagem: `🔴 RISCO DE DESVIO: ${diasNegativosConsecutivos} dias consecutivos com perda`
                         });
                         diasNegativosConsecutivos = 0;
                     }
@@ -687,20 +680,19 @@
                 totalDiferenca += p.diferencaTotal;
             });
             
-            // Atualiza cards
             document.getElementById('summaryCards').innerHTML = `
                 <div class="summary-card">
-                    <h4><i class="fas fa-truck"></i> Total Compras (Entradas)</h4>
+                    <h4><i class="fas fa-truck"></i> Total Compras</h4>
                     <div class="value">${totalEntradas.toLocaleString('pt-BR')} L</div>
                 </div>
                 <div class="summary-card">
-                    <h4><i class="fas fa-gas-pump"></i> Total Vendas (Bomba)</h4>
+                    <h4><i class="fas fa-gas-pump"></i> Total Vendas</h4>
                     <div class="value">${totalVendas.toLocaleString('pt-BR')} L</div>
                 </div>
                 <div class="summary-card">
                     <h4><i class="fas fa-chart-line"></i> Diferença Total</h4>
                     <div class="value ${totalDiferenca >= 0 ? 'positive' : 'negative'}">${totalDiferenca.toLocaleString('pt-BR')} L</div>
-                    <div class="trend">${totalDiferenca >= 0 ? 'Sobra no período' : 'Perda no período'}</div>
+                    <div class="trend">${totalDiferenca >= 0 ? 'Sobra' : 'Perda'}</div>
                 </div>
                 <div class="summary-card">
                     <h4><i class="fas fa-calendar"></i> Dias Analisados</h4>
@@ -708,10 +700,9 @@
                 </div>
             `;
             
-            // Atualiza alertas
             const alertList = document.getElementById('alertList');
             if (alertas.length === 0) {
-                alertList.innerHTML = '<div style="color: #48bb78; padding: 10px;"><i class="fas fa-check-circle"></i> Nenhum alerta ativo. Controle dentro dos parâmetros.</div>';
+                alertList.innerHTML = '<div style="color: #48bb78; padding: 10px;"><i class="fas fa-check-circle"></i> Nenhum alerta ativo.</div>';
             } else {
                 alertList.innerHTML = alertas.map(a => `
                     <div class="alert-item ${a.tipo === 'risco' ? 'warning' : ''}">
@@ -721,7 +712,6 @@
                 `).join('');
             }
             
-            // Tabela de produtos
             const tableBody = document.getElementById('produtosTableBody');
             if (Object.keys(produtos).length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhum produto encontrado</td></tr>';
@@ -740,7 +730,7 @@
                 `).join('');
             }
             
-            // Gráfico de barras
+            // Gráfico
             const nomes = Object.keys(produtos);
             const entradasData = nomes.map(n => produtos[n].entradas);
             const vendasData = nomes.map(n => produtos[n].vendas);
@@ -761,18 +751,14 @@
                 options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
             });
             
-            // Gráfico de evolução
+            // Evolução
             let dadosParaEvolucao = todosDados;
             if (produtoSelecionado && produtoSelecionado !== 'all') {
                 dadosParaEvolucao = todosDados.filter(d => d.produto === produtoSelecionado);
             }
             
             const diasMap = {};
-            dadosParaEvolucao.forEach(d => { 
-                if (!diasMap[d.data]) diasMap[d.data] = 0; 
-                diasMap[d.data] += (d.diferenca || 0); 
-            });
-            
+            dadosParaEvolucao.forEach(d => { diasMap[d.data] = (diasMap[d.data] || 0) + (d.diferenca || 0); });
             const datasOrdenadas = Object.keys(diasMap).sort();
             const diferencasDiarias = datasOrdenadas.map(d => diasMap[d]);
             
@@ -791,11 +777,7 @@
                         tension: 0.3
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(2)} L - ${ctx.raw >= 0 ? 'Sobra' : 'Perda'}` } } }
-                }
+                options: { responsive: true, maintainAspectRatio: true }
             });
         }
         
@@ -811,14 +793,16 @@
             
             const produtos = processarProdutos(dadosFiltrados, dataInicio, dataFim);
             const alertas = gerarAlertas(dadosFiltrados);
-            
             atualizarDashboard(produtos, alertas, produto, dadosFiltrados);
         }
         
-        // Upload de arquivo local alternativo
-        function setupFileUpload() {
-            const fileInput = document.getElementById('offlineFileInput');
-            fileInput.addEventListener('change', async (e) => {
+        // Upload manual
+        function setupUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 
@@ -826,16 +810,13 @@
                 document.getElementById('dashboardContent').style.display = 'none';
                 
                 const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const texto = evt.target.result;
-                    const dados = parseCSV(texto);
-                    
+                reader.onload = (evt) => {
+                    const dados = parseCSV(evt.target.result);
                     if (dados.length > 0) {
                         dadosCompletos = dados;
-                        document.getElementById('dataSourceBadge').innerHTML = '📁 Arquivo Local';
+                        document.getElementById('dataSourceBadge').innerHTML = '📁 Upload Manual';
                         document.getElementById('sourceStatus').innerHTML = `<i class="fas fa-upload"></i> Arquivo carregado: ${file.name}`;
                         
-                        // Configurar filtros
                         const datas = [...new Set(dados.map(d => d.data))].sort();
                         if (datas.length) {
                             document.getElementById('dataInicio').value = datas[0];
@@ -853,7 +834,7 @@
                         document.getElementById('loading').style.display = 'none';
                         document.getElementById('dashboardContent').style.display = 'block';
                     } else {
-                        alert('Nenhum dado válido encontrado no arquivo CSV. Verifique o formato.');
+                        alert('Arquivo inválido ou sem dados');
                         document.getElementById('loading').style.display = 'none';
                     }
                 };
@@ -861,25 +842,25 @@
             });
         }
         
-        // Inicialização principal
+        // Inicialização
         async function init() {
-            setupFileUpload();
+            setupUpload();
+            document.getElementById('refreshBtn').addEventListener('click', () => location.reload());
+            document.getElementById('produtoFilter').addEventListener('change', refresh);
+            document.getElementById('dataInicio').addEventListener('change', refresh);
+            document.getElementById('dataFim').addEventListener('change', refresh);
             
-            try {
-                const dados = await carregarArquivoLocal();
+            const dados = await carregarDados();
+            
+            if (dados && dados.length > 0) {
                 dadosCompletos = dados;
                 
-                document.getElementById('dataSourceBadge').innerHTML = '✅ posto.csv';
-                document.getElementById('sourceStatus').innerHTML = '<i class="fas fa-file-csv"></i> Dados carregados do arquivo posto.csv';
-                
-                // Configurar filtros de data
                 const datas = [...new Set(dados.map(d => d.data))].sort();
                 if (datas.length) {
                     document.getElementById('dataInicio').value = datas[0];
                     document.getElementById('dataFim').value = datas[datas.length - 1];
                 }
                 
-                // Popular select de produtos
                 const produtosUnicos = [...new Set(dados.map(d => d.produto))];
                 const produtoSelect = document.getElementById('produtoFilter');
                 produtoSelect.innerHTML = '<option value="all">Todos os produtos</option>';
@@ -888,32 +869,21 @@
                 });
                 
                 refresh();
-                
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
-                
-            } catch (error) {
+            } else {
                 document.getElementById('loading').innerHTML = `
                     <div class="error-box">
                         <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e94560; margin-bottom: 15px; display: block;"></i>
-                        <p style="color: #e94560; font-size: 1.2em;">Não foi possível carregar o arquivo posto.csv!</p>
-                        <p style="margin-top: 10px;">Verifique se o arquivo está no mesmo diretório que este HTML.</p>
-                        <p style="margin-top: 10px; font-size: 0.85em;">Ou use o botão acima para selecionar um arquivo CSV manualmente.</p>
-                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #e94560; border: none; border-radius: 8px; color: white; cursor: pointer;">
-                            <i class="fas fa-sync-alt"></i> Tentar novamente
-                        </button>
+                        <p style="color: #e94560; font-size: 1.2em;">Arquivo posto.csv não encontrado!</p>
+                        <p style="margin-top: 10px;">Clique na área abaixo para selecionar o arquivo manualmente.</p>
+                        <p style="margin-top: 5px; font-size: 0.85em;">Certifique-se que o arquivo está no mesmo diretório.</p>
                     </div>
                 `;
+                document.getElementById('dashboardContent').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
             }
         }
-        
-        // Eventos
-        document.getElementById('produtoFilter').addEventListener('change', refresh);
-        document.getElementById('dataInicio').addEventListener('change', refresh);
-        document.getElementById('dataFim').addEventListener('change', refresh);
-        document.getElementById('forceReloadBtn').addEventListener('click', () => {
-            location.reload();
-        });
         
         init();
     </script>
