@@ -2,57 +2,124 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Relatório de Tanques - Visualização</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisador de Tanques - DOM PEDRO POSTOS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #0f3460, #16213e); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; }
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; }
-        .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .chart-card h3 { color: #e94560; margin-bottom: 15px; border-bottom: 2px solid #e94560; display: inline-block; }
-        .chart-container { height: 300px; }
-        .loading { text-align: center; padding: 50px; color: white; }
-        .footer { text-align: center; color: #666; margin-top: 20px; }
+        .header { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; text-align: center; border-bottom: 3px solid #e94560; }
+        .header h1 { font-size: 1.8em; margin-bottom: 10px; }
+        .header p { opacity: 0.8; }
+        .status { background: #e94560; display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; margin-top: 10px; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.3s; }
+        .chart-card:hover { transform: translateY(-5px); }
+        .chart-card h3 { color: #e94560; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e94560; display: inline-block; }
+        .chart-container { position: relative; height: 300px; }
+        .loading { text-align: center; padding: 60px; background: white; border-radius: 15px; margin: 20px 0; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #e94560; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error { background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.6); font-size: 0.8em; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .summary-card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .summary-card h4 { color: #666; font-size: 0.8em; margin-bottom: 8px; text-transform: uppercase; }
+        .summary-card .value { font-size: 1.8em; font-weight: bold; color: #e94560; }
+        .summary-card .value.negative { color: #dc3545; }
+        @media (max-width: 768px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.3em; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Relatório de Medição de Tanques</h1>
-            <p>Dados atualizados em: <span id="dataAtualizacao">Carregando...</span></p>
+            <h1>⛽ Analisador de Medição de Tanques</h1>
+            <p>Rede Dom Pedro de Postos - DP 1</p>
+            <div class="status" id="dataStatus">Carregando dados...</div>
         </div>
-        <div id="loading" class="loading">📁 Carregando dados do repositório...</div>
-        <div id="charts" style="display: none;">
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>📡 Buscando dados do repositório GitHub...</p>
+            <p style="font-size: 0.8em; margin-top: 10px;">posto.csv</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="summary-cards" id="summaryCards"></div>
             <div class="charts-grid">
-                <div class="chart-card"><h3>📈 Evolução Diária</h3><div class="chart-container"><canvas id="chartEvolucao"></canvas></div></div>
-                <div class="chart-card"><h3>🥧 Distribuição por Combustível</h3><div class="chart-container"><canvas id="chartDistribuicao"></canvas></div></div>
-                <div class="chart-card"><h3>📊 Top Diferenças</h3><div class="chart-container"><canvas id="chartDiferencas"></canvas></div></div>
-                <div class="chart-card"><h3>⛽ Performance por Combustível</h3><div class="chart-container"><canvas id="chartPerformance"></canvas></div></div>
+                <div class="chart-card">
+                    <h3>📈 Evolução Diária de Vendas</h3>
+                    <div class="chart-container"><canvas id="chartEvolucao"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>🥧 Distribuição por Combustível</h3>
+                    <div class="chart-container"><canvas id="chartDistribuicao"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>⚠️ Top 10 Dias com Maior Diferença</h3>
+                    <div class="chart-container"><canvas id="chartDiferencas"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>📊 Performance por Combustível</h3>
+                    <div class="chart-container"><canvas id="chartPerformance"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>📉 Vendas por Dia (Detalhado)</h3>
+                    <div class="chart-container"><canvas id="chartVendasDiarias"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>📏 Diferença Diária (Perda/Ganho)</h3>
+                    <div class="chart-container"><canvas id="chartDiferencaDiaria"></canvas></div>
+                </div>
             </div>
         </div>
-        <div class="footer">🔒 Dados carregados diretamente do GitHub • Nenhum upload necessário</div>
+
+        <div class="footer">
+            🔒 Dados carregados diretamente do GitHub • Última atualização: <span id="ultimaAtualizacao">-</span>
+        </div>
     </div>
 
     <script>
-        // URL do seu CSV dentro do repositório
-        const CSV_URL = 'https://raw.githubusercontent.com/waldeciramos/sites/main/dados/posto.csv';
+        // URL do seu CSV no GitHub (RAW)
+        const CSV_URL = 'https://raw.githubusercontent.com/waldeciramos/sites/main/posto.csv';
         
+        let charts = {};
+
         async function carregarDados() {
             try {
                 const response = await fetch(CSV_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const text = await response.text();
+                
                 const dados = processarCSV(text);
                 
-                document.getElementById('dataAtualizacao').innerText = new Date().toLocaleString('pt-BR');
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('charts').style.display = 'block';
+                if (dados.length === 0) throw new Error('Nenhum dado encontrado no arquivo');
                 
+                document.getElementById('dataStatus').innerHTML = `✅ Dados carregados • ${dados.length} registros`;
+                document.getElementById('ultimaAtualizacao').innerText = new Date().toLocaleString('pt-BR');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                gerarResumo(dados);
                 gerarGraficos(dados);
+                
             } catch (error) {
-                document.getElementById('loading').innerHTML = '❌ Erro ao carregar dados. Verifique se o CSV está no repositório.';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dataStatus').innerHTML = '❌ Erro ao carregar dados';
+                const container = document.querySelector('.container');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.innerHTML = `
+                    <strong>⚠️ Não foi possível carregar o arquivo posto.csv</strong><br><br>
+                    Verifique se o arquivo está no repositório:<br>
+                    <code style="background:#fff;padding:5px;display:inline-block;margin-top:10px;">${CSV_URL}</code><br><br>
+                    <a href="${CSV_URL}" target="_blank" style="color:#e94560;">Clique aqui para testar o link</a>
+                `;
+                container.appendChild(errorDiv);
                 console.error(error);
             }
         }
@@ -64,56 +131,134 @@
             
             for (let i = 0; i < linhas.length; i++) {
                 const linha = linhas[i];
+                
+                // Detecta cabeçalho do combustível
                 if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
                     const match = linha.match(/Combustível:\s*(\d+\s*-\s*[^;]+)/);
-                    if (match) combustivelAtual = match[1];
+                    if (match) {
+                        combustivelAtual = match[1];
+                    }
                     continue;
                 }
+                
+                // Linha de dados (começa com data)
                 const colunas = linha.split(';');
                 if (colunas[0] && colunas[0].match(/^\d{4}-\d{2}-\d{2}/)) {
-                    resultados.push({
-                        data: colunas[0],
-                        combustivel: combustivelAtual,
-                        saida_bombas: parseFloat(colunas[7]?.replace(/\./g, '').replace(',', '.') || 0),
-                        diferenca: parseFloat(colunas[9]?.replace(/\./g, '').replace(',', '.') || 0)
-                    });
+                    const saidaBombas = parseFloat(colunas[7]?.replace(/\./g, '').replace(',', '.') || 0);
+                    const diferenca = parseFloat(colunas[9]?.replace(/\./g, '').replace(',', '.') || 0);
+                    
+                    if (!isNaN(saidaBombas)) {
+                        resultados.push({
+                            data: colunas[0],
+                            combustivel: combustivelAtual || 'Não identificado',
+                            saida_bombas: saidaBombas,
+                            diferenca: isNaN(diferenca) ? 0 : diferenca,
+                            entrada: parseFloat(colunas[3]?.replace(/\./g, '').replace(',', '.') || 0)
+                        });
+                    }
                 }
             }
+            
             return resultados;
         }
         
-        async function gerarGraficos(dados) {
-            // Vendas por data
+        function gerarResumo(dados) {
+            const totalVendas = dados.reduce((sum, d) => sum + d.saida_bombas, 0);
+            const totalDiferenca = dados.reduce((sum, d) => sum + d.diferenca, 0);
+            const dias = [...new Set(dados.map(d => d.data))].length;
+            const mediaDiaria = totalVendas / dias;
+            
+            document.getElementById('summaryCards').innerHTML = `
+                <div class="summary-card">
+                    <h4>⛽ Total Vendido</h4>
+                    <div class="value">${totalVendas.toLocaleString('pt-BR')} L</div>
+                </div>
+                <div class="summary-card">
+                    <h4>📊 Diferença Total</h4>
+                    <div class="value ${totalDiferenca < 0 ? 'negative' : ''}">${totalDiferenca.toLocaleString('pt-BR')} L</div>
+                </div>
+                <div class="summary-card">
+                    <h4>📅 Dias Analisados</h4>
+                    <div class="value">${dias}</div>
+                </div>
+                <div class="summary-card">
+                    <h4>📈 Média Diária</h4>
+                    <div class="value">${Math.round(mediaDiaria).toLocaleString('pt-BR')} L</div>
+                </div>
+            `;
+        }
+        
+        function gerarGraficos(dados) {
+            // 1. Evolução Diária (últimos 30 dias)
             const vendasPorData = {};
-            dados.forEach(d => { vendasPorData[d.data] = (vendasPorData[d.data] || 0) + (d.saida_bombas || 0); });
-            const datas = Object.keys(vendasPorData).sort().slice(-30);
-            const vendas = datas.map(d => vendasPorData[d]);
+            dados.forEach(d => { vendasPorData[d.data] = (vendasPorData[d.data] || 0) + d.saida_bombas; });
+            const datas = Object.keys(vendasPorData).sort();
+            const ultimasDatas = datas.slice(-30);
+            const ultimasVendas = ultimasDatas.map(d => vendasPorData[d]);
             
-            new Chart(document.getElementById('chartEvolucao'), {
-                type: 'line', data: { labels: datas, datasets: [{ label: 'Vendas (L)', data: vendas, borderColor: '#e94560', fill: true }] }
+            if (charts.evolucao) charts.evolucao.destroy();
+            charts.evolucao = new Chart(document.getElementById('chartEvolucao'), {
+                type: 'line',
+                data: { labels: ultimasDatas, datasets: [{ label: 'Vendas (Litros)', data: ultimasVendas, borderColor: '#e94560', backgroundColor: 'rgba(233,69,96,0.1)', fill: true, tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: true }
             });
             
-            // Distribuição por combustível
+            // 2. Distribuição por combustível
             const porCombustivel = {};
-            dados.forEach(d => { if(d.combustivel) porCombustivel[d.combustivel] = (porCombustivel[d.combustivel] || 0) + (d.saida_bombas || 0); });
-            new Chart(document.getElementById('chartDistribuicao'), {
-                type: 'pie', data: { labels: Object.keys(porCombustivel), datasets: [{ data: Object.values(porCombustivel), backgroundColor: ['#e94560', '#0f3460', '#48bb78', '#ed8936'] }] }
+            dados.forEach(d => { porCombustivel[d.combustivel] = (porCombustivel[d.combustivel] || 0) + d.saida_bombas; });
+            const cores = ['#e94560', '#0f3460', '#48bb78', '#ed8936', '#6c5ce7', '#fdcb6e'];
+            
+            if (charts.distribuicao) charts.distribuicao.destroy();
+            charts.distribuicao = new Chart(document.getElementById('chartDistribuicao'), {
+                type: 'pie',
+                data: { labels: Object.keys(porCombustivel), datasets: [{ data: Object.values(porCombustivel), backgroundColor: cores, borderWidth: 0 }] },
+                options: { responsive: true, plugins: { legend: { position: 'right' } } }
             });
             
-            // Top diferenças
+            // 3. Top diferenças (absoluto)
             const topDiff = [...dados].sort((a,b) => Math.abs(b.diferenca) - Math.abs(a.diferenca)).slice(0,10);
-            new Chart(document.getElementById('chartDiferencas'), {
-                type: 'bar', data: { labels: topDiff.map(d => d.data), datasets: [{ label: 'Diferença (L)', data: topDiff.map(d => d.diferenca), backgroundColor: '#0f3460' }] }
+            if (charts.diferencas) charts.diferencas.destroy();
+            charts.diferencas = new Chart(document.getElementById('chartDiferencas'), {
+                type: 'bar',
+                data: { labels: topDiff.map(d => `${d.data} (${d.combustivel.substring(0,20)})`), datasets: [{ label: 'Diferença (L)', data: topDiff.map(d => d.diferenca), backgroundColor: topDiff.map(d => d.diferenca >= 0 ? '#48bb78' : '#e94560') }] },
+                options: { responsive: true }
             });
             
-            // Performance
+            // 4. Performance por combustível (média de diferença)
             const perf = {};
-            dados.forEach(d => { if(d.combustivel) { perf[d.combustivel] = (perf[d.combustivel] || 0) + Math.abs(d.diferenca || 0); } });
-            new Chart(document.getElementById('chartPerformance'), {
-                type: 'bar', data: { labels: Object.keys(perf), datasets: [{ label: 'Diferença Média (L)', data: Object.values(perf).map(v => v / dados.filter(d=>d.combustivel===Object.keys(perf)[0]).length), backgroundColor: '#48bb78' }] }
+            const contagem = {};
+            dados.forEach(d => { if(d.combustivel) { perf[d.combustivel] = (perf[d.combustivel] || 0) + Math.abs(d.diferenca); contagem[d.combustivel] = (contagem[d.combustivel] || 0) + 1; } });
+            const medias = Object.keys(perf).map(c => ({ combustivel: c, media: perf[c] / contagem[c] }));
+            
+            if (charts.performance) charts.performance.destroy();
+            charts.performance = new Chart(document.getElementById('chartPerformance'), {
+                type: 'bar',
+                data: { labels: medias.map(m => m.combustivel), datasets: [{ label: 'Média Absoluta de Diferença (L/dia)', data: medias.map(m => m.media), backgroundColor: '#0f3460' }] },
+                options: { responsive: true }
+            });
+            
+            // 5. Vendas Diárias (todas)
+            if (charts.vendasDiarias) charts.vendasDiarias.destroy();
+            charts.vendasDiarias = new Chart(document.getElementById('chartVendasDiarias'), {
+                type: 'bar',
+                data: { labels: datas.slice(-20), datasets: [{ label: 'Vendas (L)', data: datas.slice(-20).map(d => vendasPorData[d]), backgroundColor: '#48bb78' }] },
+                options: { responsive: true }
+            });
+            
+            // 6. Diferença diária
+            const difPorData = {};
+            dados.forEach(d => { difPorData[d.data] = (difPorData[d.data] || 0) + d.diferenca; });
+            const ultimasDif = datas.slice(-20).map(d => difPorData[d] || 0);
+            
+            if (charts.diferencaDiaria) charts.diferencaDiaria.destroy();
+            charts.diferencaDiaria = new Chart(document.getElementById('chartDiferencaDiaria'), {
+                type: 'bar',
+                data: { labels: datas.slice(-20), datasets: [{ label: 'Diferença (L)', data: ultimasDif, backgroundColor: ultimasDif.map(v => v >= 0 ? '#48bb78' : '#e94560') }] },
+                options: { responsive: true }
             });
         }
         
+        // Iniciar
         carregarDados();
     </script>
 </body>
