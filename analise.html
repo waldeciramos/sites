@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede Dom Pedro - Controle de Estoque e Perdas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header h1 i {
+            color: #e94560;
+            margin-right: 10px;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .posto-name {
+            display: inline-block;
+            background: #e94560;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Filtros */
+        .filters-bar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.8em;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .filter-group select, 
+        .filter-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .filter-group select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        /* Cards de resumo */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #0f3460, #16213e);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            border-left: 4px solid #e94560;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-card h4 {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .summary-card .trend {
+            font-size: 0.75em;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        /* Alertas */
+        .alert-container {
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .alert-title {
+            color: #e94560;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+
+        .alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            background: rgba(233, 69, 96, 0.15);
+            border-left: 3px solid #e94560;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: #ffcccc;
+        }
+
+        .alert-item.warning {
+            border-left-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+            color: #ffe6b3;
+        }
+
+        /* Grid de gráficos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .chart-card h3 {
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e94560;
+            display: inline-block;
+        }
+
+        .chart-card h3 i {
+            color: #e94560;
+            margin-right: 8px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        /* Tabela de produtos */
+        .products-table {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .products-table h3 {
+            padding: 18px 20px;
+            background: #0f3460;
+            color: white;
+            margin: 0;
+        }
+
+        .products-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table th,
+        .products-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .products-table th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .products-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .positive {
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .tanque-badge {
+            background: #e94560;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-right: 5px;
+            display: inline-block;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            flex-direction: column;
+            color: white;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-card .value {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-chart-line"></i> Controle de Estoque e Perdas</h1>
+        <p>Monitoramento de tanques | Controle escritural vs medição real</p>
+        <div class="posto-name"><i class="fas fa-gas-pump"></i> REDE DOM PEDRO DE POSTOS - DP 1</div>
+    </div>
+
+    <div class="container" id="app">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Carregando dados do posto.csv...</p>
+        </div>
+
+        <div id="dashboardContent" style="display: none;">
+            <!-- Filtros -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label><i class="fas fa-oil-can"></i> Produto</label>
+                    <select id="produtoFilter">
+                        <option value="all">Todos os produtos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> Data Inicial</label>
+                    <input type="date" id="dataInicio">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> Data Final</label>
+                    <input type="date" id="dataFim">
+                </div>
+            </div>
+
+            <!-- Cards Resumo -->
+            <div class="summary-grid" id="summaryCards"></div>
+
+            <!-- Alertas -->
+            <div class="alert-container" id="alertContainer">
+                <div class="alert-title"><i class="fas fa-exclamation-triangle"></i> Alertas de Estoque</div>
+                <div class="alert-list" id="alertList"></div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-bar"></i> Entradas vs Vendas vs Diferença</h3>
+                    <div class="chart-container">
+                        <canvas id="chartProdutos"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line"></i> Evolução Diária da Diferença</h3>
+                    <div class="chart-container">
+                        <canvas id="chartEvolucao"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela de Produtos -->
+            <div class="products-table">
+                <h3><i class="fas fa-clipboard-list"></i> Performance por Produto</h3>
+                <div style="overflow-x: auto;">
+                    <table id="produtosTable">
+                        <thead>
+                            <tr><th>Produto</th><th>Tanques</th><th>Entradas (L)</th><th>Vendas (L)</th><th>Estoque Escritural</th><th>Estoque Medido</th><th>Diferença</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="produtosTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <i class="fas fa-chart-simple"></i> Dados carregados diretamente do repositório | Controle de perdas e sobras
+        </div>
+    </div>
+
+    <script>
+        // URL do CSV
+        const CSV_URL = 'https://waldeciramos.github.io/sites/posto.csv';
+        
+        let dadosCompletos = [];
+        let charts = {};
+
+        // Função para fazer fetch e parse do CSV
+        async function carregarCSV() {
+            try {
+                const response = await fetch(CSV_URL);
+                const text = await response.text();
+                
+                // Parse do CSV considerando encoding
+                const linhas = text.split(/\r?\n/);
+                let produtos = {};
+                let produtoAtual = null;
+                let tanquesAtuais = null;
+                
+                for (let i = 0; i < linhas.length; i++) {
+                    let linha = linhas[i];
+                    // Identifica linha de combustível
+                    if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
+                        const matchComb = linha.match(/Combustível:\s*\d+\s*-\s*([^;]+)/);
+                        const matchTanques = linha.match(/Tanques vinculados:\s*([^;]+)/);
+                        if (matchComb) {
+                            produtoAtual = matchComb[1].trim();
+                            tanquesAtuais = matchTanques ? matchTanques[1].trim() : '';
+                        }
+                        continue;
+                    }
+                    
+                    // Pula cabeçalho da tabela
+                    if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença')) {
+                        continue;
+                    }
+                    
+                    // Processa linha de dados
+                    if (produtoAtual && linha.match(/^\d{4}-\d{2}-\d{2}/)) {
+                        const cols = linha.split(';');
+                        if (cols.length >= 10) {
+                            const registro = {
+                                produto: produtoAtual,
+                                tanques: tanquesAtuais,
+                                data: cols[0],
+                                litragemInicial: parseFloat((cols[2] || '0').replace(/\./g, '').replace(',', '.')),
+                                entrada: parseFloat((cols[3] || '0').replace(/\./g, '').replace(',', '.')),
+                                estoqueEscritural: parseFloat((cols[4] || '0').replace(/\./g, '').replace(',', '.')),
+                                litragemFinal: parseFloat((cols[6] || '0').replace(/\./g, '').replace(',', '.')),
+                                saidaBombas: parseFloat((cols[7] || '0').replace(/\./g, '').replace(',', '.')),
+                                saidaTanque: parseFloat((cols[8] || '0').replace(/\./g, '').replace(',', '.')),
+                                diferenca: parseFloat((cols[9] || '0').replace(/\./g, '').replace(',', '.'))
+                            };
+                            
+                            if (!isNaN(registro.saidaBombas) && registro.saidaBombas > 0) {
+                                dadosCompletos.push(registro);
+                            }
+                        }
+                    }
+                    
+                    // Identifica total acumulado para parar
+                    if (linha.includes('Total acumulado combustível')) {
+                        produtoAtual = null;
+                    }
+                }
+                
+                console.log(`Carregados ${dadosCompletos.length} registros`);
+                return dadosCompletos;
+            } catch (error) {
+                console.error('Erro ao carregar CSV:', error);
+                document.getElementById('loading').innerHTML = '<div class="spinner"></div><p style="color: #e94560;">Erro ao carregar dados. Verifique se o arquivo posto.csv está disponível.</p>';
+                return [];
+            }
+        }
+
+        // Processar produtos e calcular totais
+        function processarProdutos(dados, dataInicio, dataFim) {
+            let dadosFiltrados = [...dados];
+            
+            if (dataInicio) {
+                dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
+            }
+            if (dataFim) {
+                dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
+            }
+            
+            const produtos = {};
+            
+            dadosFiltrados.forEach(reg => {
+                if (!produtos[reg.produto]) {
+                    produtos[reg.produto] = {
+                        tanques: reg.tanques,
+                        entradas: 0,
+                        vendas: 0,
+                        estoqueInicial: 0,
+                        estoqueFinalMedido: 0,
+                        diferencas: [],
+                        diasConsecutivosNegativos: 0,
+                        ultimaDifNegativa: false
+                    };
+                }
+                
+                produtos[reg.produto].entradas += reg.entrada || 0;
+                produtos[reg.produto].vendas += reg.saidaBombas || 0;
+                produtos[reg.produto].diferencas.push({
+                    data: reg.data,
+                    valor: reg.diferenca || 0
+                });
+                
+                // Pega primeiro estoque inicial e último medido
+                if (!produtos[reg.produto].estoqueInicial && reg.litragemInicial) {
+                    produtos[reg.produto].estoqueInicial = reg.litragemInicial;
+                }
+                produtos[reg.produto].estoqueFinalMedido = reg.litragemFinal || reg.litragemFinal;
+            });
+            
+            // Calcular estoque escritural e status
+            Object.keys(produtos).forEach(prod => {
+                const p = produtos[prod];
+                // Escritural = Inicial + Entradas - Vendas
+                p.estoqueEscritural = (p.estoqueInicial || 0) + p.entradas - p.vendas;
+                p.diferencaTotal = p.estoqueFinalMedido - p.estoqueEscritural;
+                p.status = p.diferencaTotal >= 0 ? 'Sobra' : 'Perda';
+                p.statusClass = p.diferencaTotal >= 0 ? 'positive' : 'negative';
+            });
+            
+            return produtos;
+        }
+
+        // Gerar alertas baseados nas regras
+        function gerarAlertas(dados) {
+            const alertas = [];
+            const produtoDiferenças = {};
+            
+            // Agrupar diferenças por produto e verificar dias consecutivos
+            dados.forEach(reg => {
+                if (!produtoDiferenças[reg.produto]) {
+                    produtoDiferenças[reg.produto] = [];
+                }
+                produtoDiferenças[reg.produto].push({
+                    data: reg.data,
+                    diferenca: reg.diferenca || 0
+                });
+            });
+            
+            // Verificar cada produto
+            Object.keys(produtoDiferenças).forEach(prod => {
+                const diffs = produtoDiferenças[prod].sort((a,b) => a.data.localeCompare(b.data));
+                let diasNegativosConsecutivos = 0;
+                
+                diffs.forEach(d => {
+                    if (d.diferenca < -0.60) {
+                        alertas.push({
+                            produto: prod,
+                            data: d.data,
+                            diferenca: d.diferenca,
+                            tipo: 'perda',
+                            mensagem: `⚠️ ALERTA - PERDA/VAZAMENTO: Diferença de ${d.diferenca.toFixed(2)}L (abaixo de -0.60L)`
+                        });
+                        diasNegativosConsecutivos++;
+                    } else if (d.diferenca > 0.60) {
+                        alertas.push({
+                            produto: prod,
+                            data: d.data,
+                            diferenca: d.diferenca,
+                            tipo: 'erro',
+                            mensagem: `⚠️ ERRO DE MEDIÇÃO: Diferença positiva de ${d.diferenca.toFixed(2)}L (acima de +0.60L)`
+                        });
+                        diasNegativosConsecutivos = 0;
+                    } else {
+                        diasNegativosConsecutivos = 0;
+                    }
+                    
+                    // Alerta de 3+ dias consecutivos negativos
+                    if (diasNegativosConsecutivos >= 3) {
+                        alertas.push({
+                            produto: prod,
+                            data: d.data,
+                            diferenca: d.diferenca,
+                            tipo: 'risco',
+                            mensagem: `🔴 RISCO DE DESVIO: ${diasNegativosConsecutivos} dias consecutivos com perda no produto ${prod}`
+                        });
+                    }
+                });
+            });
+            
+            return alertas.slice(0, 15);
+        }
+
+        // Atualizar UI
+        function atualizarDashboard(produtos, alertas, produtoSelecionado, todosDados) {
+            // Cards de resumo geral
+            let totalEntradas = 0, totalVendas = 0, totalDiferenca = 0;
+            Object.values(produtos).forEach(p => {
+                totalEntradas += p.entradas;
+                totalVendas += p.vendas;
+                totalDiferenca += p.diferencaTotal;
+            });
+            
+            document.getElementById('summaryCards').innerHTML = `
+                <div class="summary-card">
+                    <h4><i class="fas fa-truck"></i> Total Compras (Entradas)</h4>
+                    <div class="value">${totalEntradas.toLocaleString('pt-BR')} L</div>
+                </div>
+                <div class="summary-card">
+                    <h4><i class="fas fa-gas-pump"></i> Total Vendas (Bomba)</h4>
+                    <div class="value">${totalVendas.toLocaleString('pt-BR')} L</div>
+                </div>
+                <div class="summary-card">
+                    <h4><i class="fas fa-chart-line"></i> Diferença Total (Tanque - Escritural)</h4>
+                    <div class="value ${totalDiferenca >= 0 ? 'positive' : 'negative'}">${totalDiferenca.toLocaleString('pt-BR')} L</div>
+                    <div class="trend">${totalDiferenca >= 0 ? 'Sobra no período' : 'Perda no período'}</div>
+                </div>
+                <div class="summary-card">
+                    <h4><i class="fas fa-calendar"></i> Dias Analisados</h4>
+                    <div class="value">${todosDados.length}</div>
+                </div>
+            `;
+            
+            // Alertas
+            const alertList = document.getElementById('alertList');
+            if (alertas.length === 0) {
+                alertList.innerHTML = '<div style="color: #48bb78; padding: 10px;"><i class="fas fa-check-circle"></i> Nenhum alerta ativo. Controle dentro dos parâmetros.</div>';
+            } else {
+                alertList.innerHTML = alertas.map(a => `
+                    <div class="alert-item ${a.tipo === 'risco' ? 'warning' : ''}">
+                        <i class="fas ${a.tipo === 'perda' ? 'fa-exclamation-triangle' : 'fa-chart-line'}"></i> 
+                        ${a.mensagem} - ${a.data}
+                    </div>
+                `).join('');
+            }
+            
+            // Tabela de produtos
+            const tableBody = document.getElementById('produtosTableBody');
+            tableBody.innerHTML = Object.entries(produtos).map(([nome, p]) => `
+                <tr>
+                    <td><strong>${nome}</strong></td>
+                    <td>${p.tanques ? p.tanques.split('-').map(t => `<span class="tanque-badge">${t.trim()}</span>`).join('') : '-'}</td>
+                    <td>${p.entradas.toLocaleString('pt-BR')}</td>
+                    <td>${p.vendas.toLocaleString('pt-BR')}</td>
+                    <td>${p.estoqueEscritural.toLocaleString('pt-BR')}</td>
+                    <td>${p.estoqueFinalMedido.toLocaleString('pt-BR')}</td>
+                    <td class="${p.statusClass}">${p.diferencaTotal.toLocaleString('pt-BR')}</td>
+                    <td class="${p.statusClass}">${p.status}</td>
+                </tr>
+            `).join('');
+            
+            // Gráfico de barras: entradas vs vendas vs diferença
+            const nomes = Object.keys(produtos);
+            const entradasData = nomes.map(n => produtos[n].entradas);
+            const vendasData = nomes.map(n => produtos[n].vendas);
+            const diferencaData = nomes.map(n => produtos[n].diferencaTotal);
+            
+            if (charts.produtos) charts.produtos.destroy();
+            const ctxProd = document.getElementById('chartProdutos').getContext('2d');
+            charts.produtos = new Chart(ctxProd, {
+                type: 'bar',
+                data: {
+                    labels: nomes,
+                    datasets: [
+                        { label: 'Entradas (L)', data: entradasData, backgroundColor: '#0f3460', borderRadius: 8 },
+                        { label: 'Vendas (L)', data: vendasData, backgroundColor: '#48bb78', borderRadius: 8 },
+                        { label: 'Diferença (L)', data: diferencaData, backgroundColor: '#e94560', borderRadius: 8 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+            
+            // Gráfico de evolução diária (para produto selecionado ou todos)
+            let dadosParaEvolucao = todosDados;
+            if (produtoSelecionado && produtoSelecionado !== 'all') {
+                dadosParaEvolucao = todosDados.filter(d => d.produto === produtoSelecionado);
+            }
+            
+            const diasMap = {};
+            dadosParaEvolucao.forEach(d => {
+                if (!diasMap[d.data]) diasMap[d.data] = 0;
+                diasMap[d.data] += (d.diferenca || 0);
+            });
+            
+            const datasOrdenadas = Object.keys(diasMap).sort();
+            const diferencasDiarias = datasOrdenadas.map(d => diasMap[d]);
+            
+            if (charts.evolucao) charts.evolucao.destroy();
+            const ctxEvo = document.getElementById('chartEvolucao').getContext('2d');
+            charts.evolucao = new Chart(ctxEvo, {
+                type: 'line',
+                data: {
+                    labels: datasOrdenadas.slice(-30),
+                    datasets: [{
+                        label: 'Diferença Diária (L)',
+                        data: diferencasDiarias.slice(-30),
+                        borderColor: '#e94560',
+                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.raw.toFixed(2)} L - ${ctx.raw >= 0 ? 'Sobra' : 'Perda'}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Inicialização
+        async function init() {
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('dashboardContent').style.display = 'none';
+            
+            const dados = await carregarCSV();
+            if (dados.length === 0) return;
+            
+            dadosCompletos = dados;
+            
+            // Configurar filtros de data
+            const datas = [...new Set(dados.map(d => d.data))].sort();
+            if (datas.length) {
+                document.getElementById('dataInicio').value = datas[0];
+                document.getElementById('dataFim').value = datas[datas.length - 1];
+            }
+            
+            // Popula produtos no select
+            const produtosUnicos = [...new Set(dados.map(d => d.produto))];
+            const produtoSelect = document.getElementById('produtoFilter');
+            produtoSelect.innerHTML = '<option value="all">Todos os produtos</option>';
+            produtosUnicos.forEach(p => {
+                produtoSelect.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+            
+            // Função para atualizar com filtros
+            function refresh() {
+                const produto = document.getElementById('produtoFilter').value;
+                const dataInicio = document.getElementById('dataInicio').value;
+                const dataFim = document.getElementById('dataFim').value;
+                
+                let dadosFiltrados = [...dados];
+                if (produto !== 'all') {
+                    dadosFiltrados = dadosFiltrados.filter(d => d.produto === produto);
+                }
+                if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
+                if (dataFim) dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
+                
+                const produtos = processarProdutos(dadosFiltrados, dataInicio, dataFim);
+                const alertas = gerarAlertas(dadosFiltrados);
+                
+                atualizarDashboard(produtos, alertas, produto, dadosFiltrados);
+            }
+            
+            // Event listeners
+            document.getElementById('produtoFilter').addEventListener('change', refresh);
+            document.getElementById('dataInicio').addEventListener('change', refresh);
+            document.getElementById('dataFim').addEventListener('change', refresh);
+            
+            refresh();
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+        }
+        
+        init();
+    </script>
+</body>
+</html>
