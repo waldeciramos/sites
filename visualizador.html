@@ -19,7 +19,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .error { background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; }
         
-        /* Filtros */
         .filters-bar {
             background: white;
             border-radius: 15px;
@@ -33,7 +32,7 @@
         }
         .filter-group {
             flex: 1;
-            min-width: 180px;
+            min-width: 200px;
         }
         .filter-group label {
             display: block;
@@ -44,7 +43,7 @@
         }
         .filter-group select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 0.9em;
@@ -59,7 +58,7 @@
             background: #e94560;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
@@ -72,17 +71,17 @@
         .card .value { font-size: 1.8em; font-weight: bold; color: #e94560; }
         .card .value.negative { color: #dc3545; }
         
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; margin-top: 20px; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; margin-top: 20px; }
         .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .chart-card h3 { color: #e94560; margin-bottom: 15px; border-bottom: 2px solid #e94560; display: inline-block; padding-bottom: 5px; font-size: 1.1em; }
-        .chart-container { height: 280px; position: relative; }
+        .chart-container { height: 300px; position: relative; }
         .footer { text-align: center; color: rgba(255,255,255,0.5); margin-top: 20px; font-size: 0.8em; padding: 15px; }
         .footer a { color: #e94560; text-decoration: none; }
         
         @media (max-width: 768px) {
             .charts-grid { grid-template-columns: 1fr; }
             .header h1 { font-size: 1.3em; }
-            .chart-container { height: 220px; }
+            .chart-container { height: 250px; }
             .filters-bar { flex-direction: column; }
         }
     </style>
@@ -91,7 +90,7 @@
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-gas-pump"></i> REDE DOM PEDRO DE POSTOS</h1>
-        <p>Medição de Tanques por Período - DP 1</p>
+        <p>Medição de Tanques por Período - DP 1 | Maio/2026</p>
         <div class="badge" id="statusBadge"><i class="fas fa-spinner fa-pulse"></i> Carregando dados...</div>
     </div>
 
@@ -112,10 +111,10 @@
             <div class="filter-group">
                 <label><i class="fas fa-calendar"></i> 📅 PERÍODO</label>
                 <select id="periodoFiltro">
-                    <option value="todos">Todos os dias</option>
-                    <option value="7">Últimos 7 dias</option>
-                    <option value="15">Últimos 15 dias</option>
-                    <option value="30">Últimos 30 dias</option>
+                    <option value="todos">📅 Todos os dias</option>
+                    <option value="7">📆 Últimos 7 dias</option>
+                    <option value="15">📆 Últimos 15 dias</option>
+                    <option value="30">📆 Últimos 30 dias</option>
                 </select>
             </div>
             <button class="btn-reset" id="resetFiltros"><i class="fas fa-undo-alt"></i> Resetar Filtros</button>
@@ -136,7 +135,7 @@
     </div>
 
     <div class="footer">
-        <i class="fas fa-database"></i> Dados carregados automaticamente do GitHub • 
+        <i class="fas fa-database"></i> Dados carregados do GitHub • 
         <a href="https://github.com/waldeciramos/sites/blob/main/posto.csv" target="_blank">posto.csv</a>
     </div>
 </div>
@@ -156,21 +155,27 @@
             if (dadosCompletos.length === 0) throw new Error('Nenhum dado encontrado');
             
             // Popular filtro de combustível
-            const combustiveis = [...new Set(dadosCompletos.map(d => d.combustivel))].filter(c => c && c !== 'Não identificado');
+            const combustiveis = [...new Set(dadosCompletos.map(d => d.combustivel))];
             const selectComb = document.getElementById('combustivelFiltro');
             selectComb.innerHTML = '<option value="todos">📊 TODOS OS COMBUSTÍVEIS</option>';
             combustiveis.forEach(c => {
-                selectComb.innerHTML += `<option value="${c}">⛽ ${c}</option>`;
+                let icone = '⛽';
+                if (c.includes('DIESEL')) icone = '🛢️';
+                if (c.includes('GASOLINA')) icone = '⛽';
+                if (c.includes('ETANOL')) icone = '🌽';
+                if (c.includes('ARLA')) icone = '💧';
+                selectComb.innerHTML += `<option value="${c}">${icone} ${c}</option>`;
             });
             
-            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros`;
+            const totalRegistros = dadosCompletos.length;
+            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${totalRegistros} registros • ${combustiveis.length} combustíveis`;
             document.getElementById('loadingArea').style.display = 'none';
             document.getElementById('contentArea').style.display = 'block';
             
             atualizarDashboard();
             
         } catch (erro) {
-            document.getElementById('loadingArea').innerHTML = `<div class="error"><h3>❌ Erro</h3><p>${erro.message}</p><a href="${CSV_URL}" target="_blank">Verificar arquivo</a></div>`;
+            document.getElementById('loadingArea').innerHTML = `<div class="error"><h3>❌ Erro ao carregar</h3><p>${erro.message}</p><a href="${CSV_URL}" target="_blank">Verificar arquivo</a></div>`;
         }
     }
     
@@ -182,33 +187,52 @@
         for (let i = 0; i < linhas.length; i++) {
             const linha = linhas[i];
             
+            // Detecta cabeçalho de combustível
             if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
-                const match = linha.match(/Combustível:\s*(\d+\s*-\s*[^;]+)/);
-                if (match) combustivelAtual = match[1];
+                // Extrai o nome do combustível (ex: "1 - DIESEL COMUM" ou "2309 - DIESEL S 10")
+                const match = linha.match(/Combustível:\s*([^;]+)/);
+                if (match) {
+                    combustivelAtual = match[1].trim();
+                }
                 continue;
             }
             
-            if (linha.includes('Total acumulado')) continue;
+            // Pula linhas de total
+            if (linha.includes('Total acumulado') || linha.includes('Total geral')) continue;
+            if (linha.includes('MEDIÇÃO DE TANQUE')) continue;
+            if (linha.includes('Empresa:')) continue;
+            if (linha.includes('Período:')) continue;
             
+            // Processa linha de dados (começa com data no formato YYYY-MM-DD)
             const colunas = linha.split(';');
             if (colunas[0] && colunas[0].match(/^\d{4}-\d{2}-\d{2}/)) {
-                const converter = (v) => {
-                    if (!v || v === '') return 0;
-                    return parseFloat(v.toString().replace(/\./g, '').replace(',', '.'));
+                const converterNumero = (valor) => {
+                    if (!valor || valor === '' || valor === ';') return 0;
+                    // Remove pontos de milhar e troca vírgula por ponto
+                    const limpo = valor.toString().replace(/\./g, '').replace(',', '.');
+                    const num = parseFloat(limpo);
+                    return isNaN(num) ? 0 : num;
                 };
                 
-                const saida = converter(colunas[7]);
-                if (saida > 0 || converter(colunas[3]) > 0) {
+                const saidaBombas = converterNumero(colunas[7]);
+                const diferenca = converterNumero(colunas[9]);
+                const entrada = converterNumero(colunas[3]);
+                
+                // Só adiciona se tiver movimento
+                if (saidaBombas > 0 || entrada > 0 || diferenca !== 0) {
                     resultados.push({
                         data: colunas[0],
                         combustivel: combustivelAtual || 'Não identificado',
-                        saida_bombas: saida,
-                        entrada: converter(colunas[3]),
-                        diferenca: converter(colunas[9])
+                        saida_bombas: saidaBombas,
+                        entrada: entrada,
+                        diferenca: diferenca
                     });
                 }
             }
         }
+        
+        console.log(`Processados ${resultados.length} registros`);
+        console.log('Combustíveis encontrados:', [...new Set(resultados.map(r => r.combustivel))]);
         return resultados;
     }
     
@@ -235,9 +259,12 @@
     
     function atualizarDashboard() {
         const dados = getDadosFiltrados();
-        if (dados.length === 0) return;
+        if (dados.length === 0) {
+            document.getElementById('summaryCards').innerHTML = '<div class="card" style="grid-column:1/-1"><h4>Nenhum dado encontrado com os filtros selecionados</h4></div>';
+            return;
+        }
         
-        // Resumo
+        // ========== RESUMO ==========
         const totalVendas = dados.reduce((s, d) => s + d.saida_bombas, 0);
         const totalDiferenca = dados.reduce((s, d) => s + d.diferenca, 0);
         const dias = [...new Set(dados.map(d => d.data))].length;
@@ -250,62 +277,96 @@
             <div class="card"><h4><i class="fas fa-tachometer-alt"></i> MÉDIA DIÁRIA</h4><div class="value">${Math.round(mediaDiaria).toLocaleString('pt-BR')} L</div></div>
         `;
         
-        // Preparar dados para gráficos
+        // ========== PREPARAR DADOS ==========
+        // Vendas por data
         const vendasPorData = {};
         dados.forEach(d => { vendasPorData[d.data] = (vendasPorData[d.data] || 0) + d.saida_bombas; });
         const datas = Object.keys(vendasPorData).sort();
         const vendasDiarias = datas.map(d => vendasPorData[d]);
         
+        // Diferença por data
         const diffPorData = {};
         dados.forEach(d => { diffPorData[d.data] = (diffPorData[d.data] || 0) + d.diferenca; });
         const diferencasDiarias = datas.map(d => diffPorData[d] || 0);
         
+        // Vendas por combustível
         const vendasPorComb = {};
         dados.forEach(d => { vendasPorComb[d.combustivel] = (vendasPorComb[d.combustivel] || 0) + d.saida_bombas; });
         
-        const topDiffs = [...dados].filter(d => Math.abs(d.diferenca) > 0).sort((a, b) => Math.abs(b.diferenca) - Math.abs(a.diferenca)).slice(0, 10);
+        // Top diferenças
+        const topDiffs = [...dados]
+            .filter(d => Math.abs(d.diferenca) > 0)
+            .sort((a, b) => Math.abs(b.diferenca) - Math.abs(a.diferenca))
+            .slice(0, 10);
         
+        // Performance por combustível (média da diferença absoluta)
         const perf = {}; const count = {};
-        dados.forEach(d => { perf[d.combustivel] = (perf[d.combustivel] || 0) + Math.abs(d.diferenca); count[d.combustivel] = (count[d.combustivel] || 0) + 1; });
+        dados.forEach(d => {
+            if (!perf[d.combustivel]) { perf[d.combustivel] = 0; count[d.combustivel] = 0; }
+            perf[d.combustivel] += Math.abs(d.diferenca);
+            count[d.combustivel]++;
+        });
         
         const cores = ['#e94560', '#0f3460', '#48bb78', '#ed8936', '#6c5ce7', '#fdcb6e', '#00cec9'];
         
         // Destruir gráficos antigos
         Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
         
-        // Gráfico 1: Evolução Diária
+        // ========== GRÁFICO 1: Evolução Diária ==========
         charts.evolucao = new Chart(document.getElementById('chartEvolucao'), {
-            type: 'line', data: { labels: datas.slice(-30), datasets: [{ label: 'Vendas (L)', data: vendasDiarias.slice(-30), borderColor: '#e94560', backgroundColor: 'rgba(233,69,96,0.1)', fill: true, tension: 0.3 }] }
+            type: 'line',
+            data: { labels: datas.slice(-30), datasets: [{ label: 'Vendas (Litros)', data: vendasDiarias.slice(-30), borderColor: '#e94560', backgroundColor: 'rgba(233,69,96,0.1)', fill: true, tension: 0.3 }] },
+            options: { responsive: true, maintainAspectRatio: true }
         });
         
-        // Gráfico 2: Distribuição por Combustível
+        // ========== GRÁFICO 2: Distribuição por Combustível ==========
         charts.distribuicao = new Chart(document.getElementById('chartDistribuicao'), {
-            type: 'pie', data: { labels: Object.keys(vendasPorComb), datasets: [{ data: Object.values(vendasPorComb), backgroundColor: cores }] }
+            type: 'pie',
+            data: { labels: Object.keys(vendasPorComb), datasets: [{ data: Object.values(vendasPorComb), backgroundColor: cores.slice(0, Object.keys(vendasPorComb).length) }] },
+            options: { responsive: true, plugins: { legend: { position: 'right' } } }
         });
         
-        // Gráfico 3: Top Diferenças
+        // ========== GRÁFICO 3: Top 10 Diferenças ==========
         charts.topDiffs = new Chart(document.getElementById('chartTopDiffs'), {
-            type: 'bar', data: { labels: topDiffs.map(d => `${d.data.substring(5)} - ${d.combustivel?.substring(0, 20)}`), datasets: [{ label: 'Diferença (L)', data: topDiffs.map(d => d.diferenca), backgroundColor: topDiffs.map(d => d.diferenca >= 0 ? '#48bb78' : '#e94560') }] }
+            type: 'bar',
+            data: { labels: topDiffs.map(d => `${d.data.substring(5)} - ${d.combustivel?.substring(0, 25)}`), datasets: [{ label: 'Diferença (Litros)', data: topDiffs.map(d => d.diferenca), backgroundColor: topDiffs.map(d => d.diferenca >= 0 ? '#48bb78' : '#e94560') }] },
+            options: { responsive: true, maintainAspectRatio: true }
         });
         
-        // Gráfico 4: Performance por Combustível
+        // ========== GRÁFICO 4: Performance por Combustível ==========
+        const labelsPerf = Object.keys(perf);
+        const dataPerf = labelsPerf.map(c => (perf[c] / count[c]).toFixed(1));
         charts.performance = new Chart(document.getElementById('chartPerformance'), {
-            type: 'bar', data: { labels: Object.keys(perf), datasets: [{ label: 'Média |Diferença| (L/dia)', data: Object.keys(perf).map(c => (perf[c] / count[c]).toFixed(1)), backgroundColor: '#0f3460' }] }
+            type: 'bar',
+            data: { labels: labelsPerf, datasets: [{ label: 'Média |Diferença| (L/dia)', data: dataPerf, backgroundColor: '#0f3460' }] },
+            options: { responsive: true, maintainAspectRatio: true }
         });
         
-        // Gráfico 5: Vendas Diárias Detalhadas
+        // ========== GRÁFICO 5: Vendas Diárias Detalhadas ==========
         charts.vendasDiarias = new Chart(document.getElementById('chartVendasDiarias'), {
-            type: 'bar', data: { labels: datas.slice(-20), datasets: [{ label: 'Vendas (L)', data: vendasDiarias.slice(-20), backgroundColor: '#48bb78' }] }
+            type: 'bar',
+            data: { labels: datas.slice(-20), datasets: [{ label: 'Vendas (Litros)', data: vendasDiarias.slice(-20), backgroundColor: '#48bb78' }] },
+            options: { responsive: true, maintainAspectRatio: true }
         });
         
-        // Gráfico 6: Diferença Diária
+        // ========== GRÁFICO 6: Diferença Diária ==========
         charts.diferencaDiaria = new Chart(document.getElementById('chartDiferencaDiaria'), {
-            type: 'bar', data: { labels: datas.slice(-20), datasets: [{ label: 'Diferença (L)', data: diferencasDiarias.slice(-20), backgroundColor: diferencasDiarias.slice(-20).map(v => v >= 0 ? '#48bb78' : '#e94560') }] }
+            type: 'bar',
+            data: { labels: datas.slice(-20), datasets: [{ label: 'Diferença (Litros)', data: diferencasDiarias.slice(-20), backgroundColor: diferencasDiarias.slice(-20).map(v => v >= 0 ? '#48bb78' : '#e94560') }] },
+            options: { responsive: true, maintainAspectRatio: true }
         });
     }
     
     // Eventos dos filtros
-    document.getElementById('combustivelFiltro').addEventListener('change', atualizarDashboard);
+    document.getElementById('combustivelFiltro').addEventListener('change', () => {
+        const sel = document.getElementById('combustivelFiltro').value;
+        const nome = sel === 'todos' ? 'TODOS' : sel;
+        document.getElementById('statusBadge').innerHTML = `<i class="fas fa-filter"></i> Filtrando: ${nome}`;
+        atualizarDashboard();
+        setTimeout(() => {
+            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros • ${[...new Set(dadosCompletos.map(d=>d.combustivel))].length} combustíveis`;
+        }, 1500);
+    });
     document.getElementById('periodoFiltro').addEventListener('change', atualizarDashboard);
     document.getElementById('resetFiltros').addEventListener('click', () => {
         document.getElementById('combustivelFiltro').value = 'todos';
