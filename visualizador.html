@@ -3,887 +3,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisador de Tanques - Relatórios e Gráficos</title>
-    <!-- Chart.js para gráficos -->
+    <title>📊 DOM PEDRO - Análise de Tanques por Combustível</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- SheetJS para ler CSV/Excel -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Bloquear seleção e botão direito */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
+            padding: 20px;
         }
-
+        
+        /* Desabilitar zoom mobile */
+        @media (max-width: 768px) {
+            body { touch-action: pan-x pan-y; }
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
         .header {
             background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
             text-align: center;
             border-bottom: 3px solid #e94560;
         }
-
-        .header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            opacity: 0.8;
-            font-size: 0.9em;
-        }
-
+        
+        .header h1 { font-size: 1.8em; }
+        .header p { opacity: 0.8; margin-top: 5px; }
         .badge {
-            display: inline-block;
             background: #e94560;
-            padding: 5px 12px;
+            display: inline-block;
+            padding: 5px 15px;
             border-radius: 20px;
-            font-size: 0.8em;
             margin-top: 10px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .upload-area {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            border: 2px dashed #ccc;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .upload-area:hover {
-            border-color: #e94560;
-            background: #fef5f7;
-        }
-
-        .upload-area.drag-over {
-            border-color: #e94560;
-            background: #fff0f3;
-        }
-
-        .upload-icon {
-            font-size: 60px;
-            color: #e94560;
-            margin-bottom: 15px;
-        }
-
-        .upload-area h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .upload-area p {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .file-info {
-            margin-top: 15px;
-            padding: 10px;
-            background: #e8f4f8;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
-        }
-
-        .tab-btn.active {
-            background: #e94560;
-        }
-
-        .tab-btn:hover {
-            background: #e94560;
-            opacity: 0.8;
-        }
-
-        .panel {
-            display: none;
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .panel.active {
-            display: block;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .chart-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .chart-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e94560;
-            display: inline-block;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-top: 15px;
-        }
-
-        canvas {
-            max-height: 300px;
-            width: 100%;
-        }
-
-        .data-table-container {
-            overflow-x: auto;
-            max-height: 400px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85em;
-        }
-
-        .data-table th,
-        .data-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .data-table th {
-            background: #e94560;
-            color: white;
-            position: sticky;
-            top: 0;
-        }
-
-        .data-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .summary-card {
-            background: linear-gradient(135deg, #e94560, #c73e54);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .summary-card h4 {
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-
-        .summary-card .value {
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-
-        .filters {
-            background: #f0f2f5;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .filter-group label {
-            display: block;
             font-size: 0.8em;
-            color: #666;
-            margin-bottom: 5px;
         }
-
-        .filter-group select,
-        .filter-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-
+        
         .loading {
-            display: none;
             text-align: center;
-            padding: 40px;
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            margin: 20px 0;
         }
-
-        .loading.show {
-            display: block;
-        }
-
+        
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #e94560;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto 20px;
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .btn {
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        /* Filtros */
+        .filters-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-size: 0.75em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9em;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .filter-group select:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        
+        .btn-reset {
             background: #e94560;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s;
+            font-weight: bold;
         }
-
-        .btn:hover {
-            background: #c73e54;
-            transform: scale(1.02);
+        
+        .btn-reset:hover { background: #c73e54; }
+        
+        /* Cards de resumo */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
-
-        .btn-secondary {
-            background: #4a5568;
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .btn-secondary:hover {
-            background: #2d3748;
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-
-        .share-section {
-            background: #2d3748;
-            border-radius: 10px;
-            padding: 15px;
+        
+        .card h4 {
+            color: #666;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .card .value.negative { color: #dc3545; }
+        
+        /* Cores por combustível */
+        .card-combustivel { cursor: pointer; transition: all 0.2s; }
+        .card-combustivel:hover { transform: scale(1.02); opacity: 0.9; }
+        
+        /* Grid de gráficos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
             margin-top: 20px;
         }
-
-        .share-section h4 {
-            color: white;
-            margin-bottom: 10px;
+        
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-
-        .share-url {
-            background: #1a202c;
-            color: #a0aec0;
-            padding: 10px;
-            border-radius: 8px;
-            font-family: monospace;
-            word-break: break-all;
-            font-size: 0.8em;
+        
+        .chart-card h3 {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e94560;
+            display: inline-block;
+            padding-bottom: 5px;
+            font-size: 1.1em;
         }
-
+        
+        .chart-container {
+            height: 280px;
+            position: relative;
+        }
+        
         .footer {
             text-align: center;
-            padding: 20px;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.8em;
+            color: rgba(255,255,255,0.4);
+            margin-top: 20px;
+            font-size: 0.7em;
+            padding: 15px;
         }
-
+        
+        .footer a { color: #e94560; text-decoration: none; }
+        
         @media (max-width: 768px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 1.3em;
-            }
-            
-            .container {
-                padding: 10px;
-            }
+            .charts-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.3em; }
+            .chart-container { height: 220px; }
+            .filters-bar { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
+
+<div class="container">
     <div class="header">
-        <h1><i class="fas fa-chart-line"></i> Analisador de Medição de Tanques</h1>
-        <p>Dados carregados automaticamente do GitHub • Upload manual também disponível</p>
-        <div class="badge" id="autoLoadBadge"><i class="fas fa-spinner fa-pulse"></i> Carregando dados do GitHub...</div>
+        <h1><i class="fas fa-gas-pump"></i> REDE DOM PEDRO DE POSTOS</h1>
+        <p>Medição de Tanques por Período - DP 1 | Maio/2026</p>
+        <div class="badge" id="statusBadge"><i class="fas fa-spinner fa-pulse"></i> Carregando dados...</div>
     </div>
 
-    <div class="container">
-        <!-- Área de Upload -->
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">
-                <i class="fas fa-cloud-upload-alt"></i>
-            </div>
-            <h3>Clique ou arraste seu arquivo CSV aqui</h3>
-            <p>Suporta arquivos .csv, .xlsx, .xls do seu sistema de medição de tanques</p>
-            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display: none;">
-            <div class="file-info" id="fileInfo"></div>
-        </div>
-
-        <!-- Loading -->
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Processando dados... <span id="loadingStatus"></span></p>
-        </div>
-
-        <!-- Abas -->
-        <div class="tabs" id="tabs" style="display: none;">
-            <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
-            <button class="tab-btn" data-tab="graficos"><i class="fas fa-chart-bar"></i> Gráficos Detalhados</button>
-            <button class="tab-btn" data-tab="tabela"><i class="fas fa-table"></i> Tabela de Dados</button>
-        </div>
-
-        <!-- Painel Dashboard -->
-        <div class="panel active" id="dashboard">
-            <div class="summary-cards" id="summaryCards"></div>
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3><i class="fas fa-chart-line"></i> Evolução Diária</h3>
-                    <div class="chart-container">
-                        <canvas id="chartEvolucao"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3><i class="fas fa-chart-pie"></i> Distribuição por Tipo</h3>
-                    <div class="chart-container">
-                        <canvas id="chartDistribuicao"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3><i class="fas fa-chart-bar"></i> Top 10 Dias com Maior Diferença</h3>
-                    <div class="chart-container">
-                        <canvas id="chartDiferencas"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3><i class="fas fa-tachometer-alt"></i> Performance por Combustível</h3>
-                    <div class="chart-container">
-                        <canvas id="chartPerformance"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Painel Gráficos Detalhados -->
-        <div class="panel" id="graficos">
-            <div class="filters" id="filters">
-                <div class="filter-group">
-                    <label><i class="fas fa-calendar"></i> Período</label>
-                    <select id="periodoFilter">
-                        <option value="all">Todos os dias</option>
-                        <option value="7">Últimos 7 dias</option>
-                        <option value="15">Últimos 15 dias</option>
-                        <option value="30">Últimos 30 dias</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label><i class="fas fa-gas-pump"></i> Combustível</label>
-                    <select id="combustivelFilter">
-                        <option value="all">Todos</option>
-                    </select>
-                </div>
-            </div>
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3><i class="fas fa-chart-line"></i> Vendas por Dia</h3>
-                    <div class="chart-container">
-                        <canvas id="chartVendas"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3><i class="fas fa-chart-line"></i> Diferença Diária (Perda/Ganho)</h3>
-                    <div class="chart-container">
-                        <canvas id="chartDiferencaDiaria"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Painel Tabela -->
-        <div class="panel" id="tabela">
-            <div class="data-table-container" id="tableContainer"></div>
-            <div class="share-section">
-                <h4><i class="fas fa-link"></i> Compartilhar esta análise</h4>
-                <p style="color: #a0aec0; font-size: 0.8em; margin-bottom: 10px;">Qualquer pessoa com o link abaixo pode ver os mesmos dados e gráficos</p>
-                <div class="share-url" id="shareUrl"></div>
-                <button class="btn btn-secondary" id="copyLinkBtn" style="margin-top: 10px;"><i class="fas fa-copy"></i> Copiar link</button>
-            </div>
-        </div>
-
-        <div class="footer">
-            <i class="fas fa-chart-simple"></i> Dados processados localmente no seu navegador - Nada é enviado para servidores
-        </div>
+    <div id="loadingArea" class="loading">
+        <div class="spinner"></div>
+        <p><i class="fas fa-cloud-download-alt"></i> Buscando dados do arquivo posto.csv...</p>
+        <p style="font-size: 0.8em; margin-top: 10px;">GitHub: waldeciramos/sites</p>
     </div>
 
-    <script>
-        // URL do CSV no GitHub para carregamento automático
-        const GITHUB_CSV_URL = 'https://raw.githubusercontent.com/waldeciramos/sites/main/posto.csv';
+    <div id="contentArea" style="display: none;">
+        <!-- Filtros -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label><i class="fas fa-gas-pump"></i> 🔍 FILTRAR POR COMBUSTÍVEL</label>
+                <select id="combustivelFiltro">
+                    <option value="todos">📊 TODOS OS COMBUSTÍVEIS</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-calendar"></i> 📅 PERÍODO</label>
+                <select id="periodoFiltro">
+                    <option value="todos">📅 Todos os dias</option>
+                    <option value="7">📆 Últimos 7 dias</option>
+                    <option value="15">📆 Últimos 15 dias</option>
+                    <option value="30">📆 Últimos 30 dias</option>
+                </select>
+            </div>
+            <button class="btn-reset" id="resetFiltros"><i class="fas fa-undo-alt"></i> Resetar Filtros</button>
+        </div>
+
+        <!-- Cards de resumo -->
+        <div class="summary-cards" id="summaryCards"></div>
         
-        // Variáveis globais
-        let dadosProcessados = null;
-        let charts = {};
+        <!-- Gráficos -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line"></i> Evolução Diária de Vendas</h3>
+                <div class="chart-container"><canvas id="chartEvolucao"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Distribuição por Combustível (Clique para filtrar)</h3>
+                <div class="chart-container"><canvas id="chartDistribuicao"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Top 10 Maiores Diferenças</h3>
+                <div class="chart-container"><canvas id="chartTopDiffs"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-bar"></i> Performance por Combustível</h3>
+                <div class="chart-container"><canvas id="chartPerformance"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line"></i> Vendas Diárias (Detalhado)</h3>
+                <div class="chart-container"><canvas id="chartVendasDiarias"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line"></i> Diferença Diária (Perda/Ganho)</h3>
+                <div class="chart-container"><canvas id="chartDiferencaDiaria"></canvas></div>
+            </div>
+        </div>
+    </div>
 
-        // Processamento do CSV (MESMA FUNÇÃO ORIGINAL)
-        function processarCSV(data) {
-            const linhas = data.split(/\r?\n/);
-            const resultados = [];
-            let combustivelAtual = '';
+    <div class="footer">
+        <i class="fas fa-database"></i> Dados carregados do GitHub • 
+        <a href="https://github.com/waldeciramos/sites/blob/main/posto.csv" target="_blank">posto.csv</a>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // PROTEÇÃO: Bloquear botão direito e F12
+    // ============================================
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+            (e.ctrlKey && e.key === 'U')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+    // ============================================
+    // CONFIGURAÇÕES
+    // ============================================
+    const CSV_URL = 'https://raw.githubusercontent.com/waldeciramos/sites/main/posto.csv';
+    let dadosCompletos = [];
+    let charts = {};
+    
+    // Mapeamento de cores por combustível
+    const coresCombustivel = {
+        'DIESEL COMUM': '#FFD700',           // Amarelo
+        'DIESEL S 10': '#FF69B4',             // Pink
+        'GASOLINA COMUM': '#87CEEB',          // Azul claro
+        'ETANOL': '#90EE90',                  // Verde claro
+        'ARLA A GRANEL': '#FFC0CB',           // Rosa claro
+        'GASOLINA ADITIVADA': '#4169E1',      // Azul royal
+        'default': '#CCCCCC'
+    };
+    
+    // ============================================
+    // CARREGAR DADOS DO GITHUB
+    // ============================================
+    async function carregarDados() {
+        try {
+            const response = await fetch(CSV_URL);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const texto = await response.text();
+            dadosCompletos = processarCSV(texto);
             
-            for (let i = 0; i < linhas.length; i++) {
-                const linha = linhas[i];
-                const colunas = linha.split(';');
+            if (dadosCompletos.length === 0) throw new Error('Nenhum dado encontrado');
+            
+            // Popular filtro de combustível
+            const combustiveis = [...new Set(dadosCompletos.map(d => d.combustivel))];
+            const selectComb = document.getElementById('combustivelFiltro');
+            selectComb.innerHTML = '<option value="todos">📊 TODOS OS COMBUSTÍVEIS</option>';
+            combustiveis.forEach(c => {
+                selectComb.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+            
+            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros • ${combustiveis.length} combustíveis`;
+            document.getElementById('loadingArea').style.display = 'none';
+            document.getElementById('contentArea').style.display = 'block';
+            
+            atualizarDashboard();
+            
+        } catch (erro) {
+            document.getElementById('loadingArea').innerHTML = `
+                <div class="error">
+                    <h3>❌ Erro ao carregar os dados</h3>
+                    <p>${erro.message}</p>
+                    <p>Verifique se o arquivo posto.csv está no repositório.</p>
+                    <a href="${CSV_URL}" target="_blank" style="color: #e94560;">Clique aqui para testar o link</a>
+                </div>
+            `;
+            document.getElementById('statusBadge').innerHTML = '<i class="fas fa-exclamation-circle"></i> Erro ao carregar';
+        }
+    }
+    
+    function processarCSV(texto) {
+        const linhas = texto.split(/\r?\n/);
+        const resultados = [];
+        let combustivelAtual = '';
+        
+        for (let i = 0; i < linhas.length; i++) {
+            const linha = linhas[i];
+            
+            // Detecta combustível - método robusto
+            if (linha.indexOf('Combustível:') !== -1 && linha.indexOf('Tanques vinculados') !== -1) {
+                const inicio = linha.indexOf('Combustível:') + 12;
+                let fim = linha.indexOf(';', inicio);
+                if (fim === -1) fim = linha.length;
+                let nome = linha.substring(inicio, fim).trim();
+                nome = nome.replace(/^\d+\s*-\s*/, '');
+                if (nome) combustivelAtual = nome;
+                continue;
+            }
+            
+            // Pular linhas de total
+            if (linha.includes('Total acumulado') || linha.includes('Total geral')) continue;
+            if (linha.includes('MEDIÇÃO') || linha.includes('Empresa:') || linha.includes('Período:')) continue;
+            if (linha.startsWith(';') || linha.trim() === '') continue;
+            
+            const colunas = linha.split(';');
+            if (colunas[0] && colunas[0].match(/^\d{4}-\d{2}-\d{2}/)) {
+                const converter = (v) => {
+                    if (!v || v === '') return 0;
+                    return parseFloat(v.toString().replace(/\./g, '').replace(',', '.'));
+                };
                 
-                // Identifica combustível
-                if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
-                    const match = linha.match(/Combustível:\s*(\d+\s*-\s*[^;]+)/);
-                    if (match) {
-                        combustivelAtual = match[1];
-                    }
-                    continue;
-                }
-                
-                // Identifica linha de dados (começa com data no formato YYYY-MM-DD)
-                if (colunas[0] && colunas[0].match(/^\d{4}-\d{2}-\d{2}/)) {
+                const saida = converter(colunas[7]);
+                if (saida > 0 || converter(colunas[3]) > 0) {
                     resultados.push({
                         data: colunas[0],
-                        combustivel: combustivelAtual,
-                        litragem_inicial: parseFloat(colunas[2]?.replace(/\./g, '').replace(',', '.') || 0),
-                        entrada: parseFloat(colunas[3]?.replace(/\./g, '').replace(',', '.') || 0),
-                        estoque_final: parseFloat(colunas[4]?.replace(/\./g, '').replace(',', '.') || 0),
-                        saida_bombas: parseFloat(colunas[7]?.replace(/\./g, '').replace(',', '.') || 0),
-                        saida_tanque: parseFloat(colunas[8]?.replace(/\./g, '').replace(',', '.') || 0),
-                        diferenca: parseFloat(colunas[9]?.replace(/\./g, '').replace(',', '.') || 0),
-                        diferenca_acum: parseFloat(colunas[11]?.replace(/\./g, '').replace(',', '.') || 0)
+                        combustivel: combustivelAtual || 'Não identificado',
+                        saida_bombas: saida,
+                        entrada: converter(colunas[3]),
+                        diferenca: converter(colunas[9])
                     });
                 }
             }
-            
-            return resultados;
         }
-
-        // Processar arquivo Excel/CSV via SheetJS
-        function processarArquivo(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = e.target.result;
-                        let dados = [];
-                        
-                        if (file.name.endsWith('.csv')) {
-                            const text = new TextDecoder('latin1').decode(new Uint8Array(data));
-                            dados = processarCSV(text);
-                        } else {
-                            const workbook = XLSX.read(data, { type: 'array' });
-                            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                            const text = jsonData.map(row => row.join(';')).join('\n');
-                            dados = processarCSV(text);
-                        }
-                        
-                        resolve(dados);
-                    } catch(err) {
-                        reject(err);
+        return resultados;
+    }
+    
+    function getDadosFiltrados() {
+        let dados = [...dadosCompletos];
+        
+        const combustivelSel = document.getElementById('combustivelFiltro').value;
+        if (combustivelSel !== 'todos') {
+            dados = dados.filter(d => d.combustivel === combustivelSel);
+        }
+        
+        const periodoSel = document.getElementById('periodoFiltro').value;
+        if (periodoSel !== 'todos') {
+            const dias = parseInt(periodoSel);
+            const datasUnicas = [...new Set(dados.map(d => d.data))].sort().reverse();
+            const dataLimite = datasUnicas[dias - 1];
+            if (dataLimite) dados = dados.filter(d => d.data >= dataLimite);
+        }
+        return dados;
+    }
+    
+    function getCorCombustivel(nome) {
+        return coresCombustivel[nome] || coresCombustivel['default'];
+    }
+    
+    function atualizarDashboard() {
+        const dados = getDadosFiltrados();
+        if (dados.length === 0) {
+            document.getElementById('summaryCards').innerHTML = '<div class="card" style="grid-column:1/-1"><h4>Nenhum dado encontrado</h4></div>';
+            return;
+        }
+        
+        // Resumo
+        const totalVendas = dados.reduce((s, d) => s + d.saida_bombas, 0);
+        const totalDiferenca = dados.reduce((s, d) => s + d.diferenca, 0);
+        const dias = [...new Set(dados.map(d => d.data))].length;
+        const mediaDiaria = totalVendas / dias;
+        
+        document.getElementById('summaryCards').innerHTML = `
+            <div class="card"><h4><i class="fas fa-chart-line"></i> TOTAL VENDIDO</h4><div class="value">${totalVendas.toLocaleString('pt-BR')} L</div></div>
+            <div class="card"><h4><i class="fas fa-balance-scale"></i> DIFERENÇA TOTAL</h4><div class="value ${totalDiferenca < 0 ? 'negative' : ''}">${totalDiferenca.toLocaleString('pt-BR')} L</div></div>
+            <div class="card"><h4><i class="fas fa-calendar-alt"></i> DIAS ANALISADOS</h4><div class="value">${dias}</div></div>
+            <div class="card"><h4><i class="fas fa-tachometer-alt"></i> MÉDIA DIÁRIA</h4><div class="value">${Math.round(mediaDiaria).toLocaleString('pt-BR')} L</div></div>
+        `;
+        
+        // Preparar dados
+        const vendasPorData = {};
+        dados.forEach(d => { vendasPorData[d.data] = (vendasPorData[d.data] || 0) + d.saida_bombas; });
+        const datas = Object.keys(vendasPorData).sort();
+        const vendasDiarias = datas.map(d => vendasPorData[d]);
+        
+        const diffPorData = {};
+        dados.forEach(d => { diffPorData[d.data] = (diffPorData[d.data] || 0) + d.diferenca; });
+        const diferencasDiarias = datas.map(d => diffPorData[d] || 0);
+        
+        const vendasPorComb = {};
+        dados.forEach(d => { vendasPorComb[d.combustivel] = (vendasPorComb[d.combustivel] || 0) + d.saida_bombas; });
+        
+        const topDiffs = [...dados].filter(d => Math.abs(d.diferenca) > 0).sort((a, b) => Math.abs(b.diferenca) - Math.abs(a.diferenca)).slice(0, 10);
+        
+        const perf = {}; const count = {};
+        dados.forEach(d => { perf[d.combustivel] = (perf[d.combustivel] || 0) + Math.abs(d.diferenca); count[d.combustivel] = (count[d.combustivel] || 0) + 1; });
+        
+        // Destruir gráficos antigos
+        Object.values(charts).forEach(chart => { if(chart) chart.destroy(); });
+        
+        // Gráfico 1: Evolução Diária
+        charts.evolucao = new Chart(document.getElementById('chartEvolucao'), {
+            type: 'line',
+            data: { labels: datas.slice(-30), datasets: [{ label: 'Vendas (L)', data: vendasDiarias.slice(-30), borderColor: '#e94560', backgroundColor: 'rgba(233,69,96,0.1)', fill: true, tension: 0.3 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+        });
+        
+        // Gráfico 2: Distribuição por Combustível (com clique)
+        const labelsDist = Object.keys(vendasPorComb);
+        const dataDist = Object.values(vendasPorComb);
+        const coresDist = labelsDist.map(l => getCorCombustivel(l));
+        
+        charts.distribuicao = new Chart(document.getElementById('chartDistribuicao'), {
+            type: 'pie',
+            data: { labels: labelsDist, datasets: [{ data: dataDist, backgroundColor: coresDist, borderWidth: 0 }] },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'right' }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw.toLocaleString('pt-BR')} L (${((ctx.raw / totalVendas)*100).toFixed(1)}%)` } } },
+                onClick: (event, activeElements) => {
+                    if (activeElements.length > 0) {
+                        const index = activeElements[0].index;
+                        const combustivel = labelsDist[index];
+                        const select = document.getElementById('combustivelFiltro');
+                        select.value = combustivel;
+                        atualizarDashboard();
+                        document.getElementById('statusBadge').innerHTML = `<i class="fas fa-filter"></i> Filtrando: ${combustivel}`;
+                        setTimeout(() => {
+                            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros • ${[...new Set(dadosCompletos.map(d=>d.combustivel))].length} combustíveis`;
+                        }, 2000);
                     }
-                };
-                
-                if (file.name.endsWith('.csv')) {
-                    reader.readAsArrayBuffer(file);
-                } else {
-                    reader.readAsArrayBuffer(file);
-                }
-            });
-        }
-
-        // Processar e gerar gráficos (MESMA FUNÇÃO ORIGINAL)
-        async function processarDados(dados, fonte = 'upload') {
-            if (!dados || dados.length === 0) return;
-            
-            dadosProcessados = dados;
-            
-            // Atualiza filtro de combustível
-            const combustiveis = [...new Set(dados.map(d => d.combustivel).filter(c => c))];
-            const combustivelSelect = document.getElementById('combustivelFilter');
-            combustivelSelect.innerHTML = '<option value="all">Todos</option>';
-            combustiveis.forEach(c => {
-                combustivelSelect.innerHTML += `<option value="${c}">${c}</option>`;
-            });
-            
-            // Atualiza cards de resumo
-            const totalVendas = dados.reduce((sum, d) => sum + (d.saida_bombas || 0), 0);
-            const totalDiferenca = dados.reduce((sum, d) => sum + (d.diferenca || 0), 0);
-            const diasAnalisados = dados.length;
-            
-            document.getElementById('summaryCards').innerHTML = `
-                <div class="summary-card">
-                    <h4><i class="fas fa-gas-pump"></i> Total Vendido (L)</h4>
-                    <div class="value">${totalVendas.toLocaleString('pt-BR')}</div>
-                </div>
-                <div class="summary-card">
-                    <h4><i class="fas fa-chart-line"></i> Diferença Total (L)</h4>
-                    <div class="value ${totalDiferenca < 0 ? 'negative' : ''}">${totalDiferenca.toLocaleString('pt-BR')}</div>
-                </div>
-                <div class="summary-card">
-                    <h4><i class="fas fa-calendar"></i> Dias Analisados</h4>
-                    <div class="value">${diasAnalisados}</div>
-                </div>
-                <div class="summary-card">
-                    <h4><i class="fas fa-tachometer-alt"></i> Média Diária (L)</h4>
-                    <div class="value">${Math.round(totalVendas / diasAnalisados).toLocaleString('pt-BR')}</div>
-                </div>
-            `;
-            
-            // Gráfico de evolução diária (dashboard)
-            const dadosPorData = {};
-            dados.forEach(d => {
-                if (!dadosPorData[d.data]) dadosPorData[d.data] = 0;
-                dadosPorData[d.data] += d.saida_bombas || 0;
-            });
-            const datas = Object.keys(dadosPorData).sort();
-            const vendas = datas.map(d => dadosPorData[d]);
-            
-            if (charts.evolucao) charts.evolucao.destroy();
-            const ctxEvolucao = document.getElementById('chartEvolucao').getContext('2d');
-            charts.evolucao = new Chart(ctxEvolucao, {
-                type: 'line',
-                data: {
-                    labels: datas.slice(-30),
-                    datasets: [{
-                        label: 'Vendas (Litros)',
-                        data: vendas.slice(-30),
-                        borderColor: '#e94560',
-                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
-            
-            // Gráfico de distribuição por combustível
-            const vendasPorCombustivel = {};
-            dados.forEach(d => {
-                if (d.combustivel) {
-                    vendasPorCombustivel[d.combustivel] = (vendasPorCombustivel[d.combustivel] || 0) + (d.saida_bombas || 0);
-                }
-            });
-            
-            if (charts.distribuicao) charts.distribuicao.destroy();
-            const ctxDist = document.getElementById('chartDistribuicao').getContext('2d');
-            charts.distribuicao = new Chart(ctxDist, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(vendasPorCombustivel),
-                    datasets: [{
-                        data: Object.values(vendasPorCombustivel),
-                        backgroundColor: ['#e94560', '#0f3460', '#4a5568', '#48bb78', '#ed8936']
-                    }]
-                },
-                options: { responsive: true }
-            });
-            
-            // Top diferenças
-            const diferencas = dados.map(d => ({ data: d.data, diferenca: d.diferenca || 0, combustivel: d.combustivel }));
-            const topDiferencas = [...diferencas].sort((a, b) => Math.abs(b.diferenca) - Math.abs(a.diferenca)).slice(0, 10);
-            
-            if (charts.diferencas) charts.diferencas.destroy();
-            const ctxDiff = document.getElementById('chartDiferencas').getContext('2d');
-            charts.diferencas = new Chart(ctxDiff, {
-                type: 'bar',
-                data: {
-                    labels: topDiferencas.map(d => `${d.data} (${d.combustivel?.substring(0, 20)})`),
-                    datasets: [{
-                        label: 'Diferença (L)',
-                        data: topDiferencas.map(d => d.diferenca),
-                        backgroundColor: topDiferencas.map(d => d.diferenca >= 0 ? '#48bb78' : '#e94560')
-                    }]
-                },
-                options: { responsive: true }
-            });
-            
-            // Performance por combustível
-            const performance = {};
-            dados.forEach(d => {
-                if (d.combustivel) {
-                    if (!performance[d.combustivel]) performance[d.combustivel] = { total: 0, count: 0 };
-                    performance[d.combustivel].total += Math.abs(d.diferenca || 0);
-                    performance[d.combustivel].count++;
-                }
-            });
-            
-            if (charts.performance) charts.performance.destroy();
-            const ctxPerf = document.getElementById('chartPerformance').getContext('2d');
-            charts.performance = new Chart(ctxPerf, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(performance),
-                    datasets: [{
-                        label: 'Média Absoluta de Diferença (L/dia)',
-                        data: Object.values(performance).map(p => p.total / p.count),
-                        backgroundColor: '#0f3460'
-                    }]
-                },
-                options: { responsive: true }
-            });
-            
-            // Gráficos detalhados
-            atualizarGraficosDetalhados();
-            
-            // Tabela
-            const tableContainer = document.getElementById('tableContainer');
-            let tableHtml = '<table class="data-table"><thead><tr>';
-            const colunas = ['Data', 'Combustível', 'Saída Bombas (L)', 'Entrada (L)', 'Diferença (L)'];
-            colunas.forEach(c => tableHtml += `<th>${c}</th>`);
-            tableHtml += '</tr></thead><tbody>';
-            
-            dados.slice(0, 500).forEach(d => {
-                tableHtml += `<tr>
-                    <td>${d.data}</td>
-                    <td>${d.combustivel || '-'}</td>
-                    <td>${(d.saida_bombas || 0).toLocaleString('pt-BR')}</td>
-                    <td>${(d.entrada || 0).toLocaleString('pt-BR')}</td>
-                    <td style="color: ${(d.diferenca || 0) >= 0 ? '#48bb78' : '#e94560'}">${(d.diferenca || 0).toLocaleString('pt-BR')}</td>
-                </tr>`;
-            });
-            tableHtml += '</tbody></table>';
-            if (dados.length > 500) tableHtml += `<p style="margin-top: 10px;">Mostrando 500 de ${dados.length} registros</p>`;
-            tableContainer.innerHTML = tableHtml;
-            
-            // Atualiza URL compartilhável
-            document.getElementById('shareUrl').innerText = window.location.href;
-            
-            // Atualiza badge
-            if (fonte === 'auto') {
-                document.getElementById('autoLoadBadge').innerHTML = `<i class="fas fa-check-circle"></i> Dados carregados do GitHub • ${dados.length} registros • ${combustiveis.length} combustíveis`;
-            }
-        }
-        
-        function atualizarGraficosDetalhados() {
-            if (!dadosProcessados) return;
-            
-            let dadosFiltrados = [...dadosProcessados];
-            
-            const periodo = document.getElementById('periodoFilter').value;
-            if (periodo !== 'all') {
-                const dias = parseInt(periodo);
-                const datasOrdenadas = [...new Set(dadosFiltrados.map(d => d.data))].sort().reverse();
-                const dataLimite = datasOrdenadas[dias - 1];
-                if (dataLimite) {
-                    dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataLimite);
                 }
             }
-            
-            const combustivel = document.getElementById('combustivelFilter').value;
-            if (combustivel !== 'all') {
-                dadosFiltrados = dadosFiltrados.filter(d => d.combustivel === combustivel);
-            }
-            
-            // Vendas por dia
-            const vendasPorData = {};
-            dadosFiltrados.forEach(d => {
-                if (!vendasPorData[d.data]) vendasPorData[d.data] = 0;
-                vendasPorData[d.data] += d.saida_bombas || 0;
-            });
-            const datas = Object.keys(vendasPorData).sort();
-            const vendas = datas.map(d => vendasPorData[d]);
-            
-            if (charts.vendas) charts.vendas.destroy();
-            const ctxVendas = document.getElementById('chartVendas').getContext('2d');
-            charts.vendas = new Chart(ctxVendas, {
-                type: 'line',
-                data: {
-                    labels: datas,
-                    datasets: [{
-                        label: 'Vendas (Litros)',
-                        data: vendas,
-                        borderColor: '#48bb78',
-                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
-                        fill: true
-                    }]
-                },
-                options: { responsive: true }
-            });
-            
-            // Diferença diária
-            const diferencaPorData = {};
-            dadosFiltrados.forEach(d => {
-                if (!diferencaPorData[d.data]) diferencaPorData[d.data] = 0;
-                diferencaPorData[d.data] += d.diferenca || 0;
-            });
-            const diferencas = datas.map(d => diferencaPorData[d] || 0);
-            
-            if (charts.diferencaDiaria) charts.diferencaDiaria.destroy();
-            const ctxDiffDia = document.getElementById('chartDiferencaDiaria').getContext('2d');
-            charts.diferencaDiaria = new Chart(ctxDiffDia, {
-                type: 'bar',
-                data: {
-                    labels: datas,
-                    datasets: [{
-                        label: 'Diferença (L)',
-                        data: diferencas,
-                        backgroundColor: diferencas.map(v => v >= 0 ? '#48bb78' : '#e94560')
-                    }]
-                },
-                options: { responsive: true }
-            });
+        });
+        
+        // Gráfico 3: Top Diferenças
+        charts.topDiffs = new Chart(document.getElementById('chartTopDiffs'), {
+            type: 'bar',
+            data: { labels: topDiffs.map(d => `${d.data.substring(5)}`), datasets: [{ label: 'Diferença (L)', data: topDiffs.map(d => d.diferenca), backgroundColor: topDiffs.map(d => d.diferenca >= 0 ? '#48bb78' : '#e94560') }] },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+        
+        // Gráfico 4: Performance por Combustível (cores específicas)
+        const labelsPerf = Object.keys(perf);
+        const dataPerf = labelsPerf.map(c => (perf[c] / count[c]).toFixed(1));
+        const coresPerf = labelsPerf.map(l => getCorCombustivel(l));
+        
+        charts.performance = new Chart(document.getElementById('chartPerformance'), {
+            type: 'bar',
+            data: { labels: labelsPerf, datasets: [{ label: 'Média |Diferença| (L/dia)', data: dataPerf, backgroundColor: coresPerf }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+        });
+        
+        // Gráfico 5: Vendas Diárias
+        charts.vendasDiarias = new Chart(document.getElementById('chartVendasDiarias'), {
+            type: 'bar', data: { labels: datas.slice(-20), datasets: [{ label: 'Vendas (L)', data: vendasDiarias.slice(-20), backgroundColor: '#48bb78' }] },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+        
+        // Gráfico 6: Diferença Diária
+        charts.diferencaDiaria = new Chart(document.getElementById('chartDiferencaDiaria'), {
+            type: 'bar', data: { labels: datas.slice(-20), datasets: [{ label: 'Diferença (L)', data: diferencasDiarias.slice(-20), backgroundColor: diferencasDiarias.slice(-20).map(v => v >= 0 ? '#48bb78' : '#e94560') }] },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+    }
+    
+    // Eventos
+    document.getElementById('combustivelFiltro').addEventListener('change', () => {
+        atualizarDashboard();
+        const sel = document.getElementById('combustivelFiltro').value;
+        if (sel !== 'todos') {
+            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-filter"></i> Filtrando: ${sel.substring(0, 30)}`;
+            setTimeout(() => {
+                document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros • ${[...new Set(dadosCompletos.map(d=>d.combustivel))].length} combustíveis`;
+            }, 2000);
+        } else {
+            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros • ${[...new Set(dadosCompletos.map(d=>d.combustivel))].length} combustíveis`;
         }
-        
-        // ========== CARREGAMENTO AUTOMÁTICO DO GITHUB ==========
-        async function carregarDoGitHub() {
-            const loading = document.getElementById('loading');
-            const tabs = document.getElementById('tabs');
-            loading.classList.add('show');
-            document.getElementById('loadingStatus').innerText = 'Baixando posto.csv do GitHub...';
-            
-            try {
-                const response = await fetch(GITHUB_CSV_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const texto = await response.text();
-                const dados = processarCSV(texto);
-                
-                if (dados.length === 0) throw new Error('Nenhum dado encontrado no arquivo');
-                
-                await processarDados(dados, 'auto');
-                
-                document.getElementById('fileInfo').innerHTML = `
-                    <i class="fas fa-check-circle"></i> Dados carregados automaticamente do GitHub: posto.csv<br>
-                    <i class="fas fa-database"></i> ${dados.length} registros processados
-                `;
-                document.getElementById('fileInfo').style.display = 'block';
-                tabs.style.display = 'flex';
-            } catch(err) {
-                document.getElementById('autoLoadBadge').innerHTML = `<i class="fas fa-exclamation-triangle"></i> Erro ao carregar do GitHub - use upload manual`;
-                console.error('Erro ao carregar do GitHub:', err);
-            } finally {
-                loading.classList.remove('show');
-            }
-        }
-        
-        // ========== EVENTOS DE UI (ORIGINAIS) ==========
-        document.getElementById('uploadArea').addEventListener('click', () => {
-            document.getElementById('fileInput').click();
-        });
-        
-        document.getElementById('uploadArea').addEventListener('dragover', (e) => {
-            e.preventDefault();
-            document.getElementById('uploadArea').classList.add('drag-over');
-        });
-        
-        document.getElementById('uploadArea').addEventListener('dragleave', () => {
-            document.getElementById('uploadArea').classList.remove('drag-over');
-        });
-        
-        document.getElementById('uploadArea').addEventListener('drop', async (e) => {
-            e.preventDefault();
-            document.getElementById('uploadArea').classList.remove('drag-over');
-            const file = e.dataTransfer.files[0];
-            if (file) await carregarArquivo(file);
-        });
-        
-        document.getElementById('fileInput').addEventListener('change', async (e) => {
-            if (e.target.files[0]) await carregarArquivo(e.target.files[0]);
-        });
-        
-        async function carregarArquivo(file) {
-            const loading = document.getElementById('loading');
-            const tabs = document.getElementById('tabs');
-            loading.classList.add('show');
-            document.getElementById('loadingStatus').innerText = 'Processando arquivo...';
-            
-            try {
-                const dados = await processarArquivo(file);
-                await processarDados(dados, 'upload');
-                
-                document.getElementById('fileInfo').innerHTML = `
-                    <i class="fas fa-check-circle"></i> Arquivo carregado: ${file.name}<br>
-                    <i class="fas fa-database"></i> ${dados.length} registros processados
-                `;
-                document.getElementById('fileInfo').style.display = 'block';
-                tabs.style.display = 'flex';
-                document.getElementById('autoLoadBadge').innerHTML = `<i class="fas fa-cloud-upload-alt"></i> Upload manual: ${file.name}`;
-            } catch(err) {
-                alert('Erro ao processar arquivo: ' + err.message);
-            } finally {
-                loading.classList.remove('show');
-            }
-        }
-        
-        // Abas
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(btn.dataset.tab).classList.add('active');
-            });
-        });
-        
-        // Filtros
-        document.getElementById('periodoFilter').addEventListener('change', atualizarGraficosDetalhados);
-        document.getElementById('combustivelFilter').addEventListener('change', atualizarGraficosDetalhados);
-        
-        // Copiar link
-        document.getElementById('copyLinkBtn').addEventListener('click', () => {
-            const url = document.getElementById('shareUrl').innerText;
-            navigator.clipboard.writeText(url);
-            alert('Link copiado! Compartilhe com qualquer pessoa.');
-        });
-        
-        // INICIAR: carregar dados do GitHub automaticamente
-        carregarDoGitHub();
-    </script>
+    });
+    document.getElementById('periodoFiltro').addEventListener('change', atualizarDashboard);
+    document.getElementById('resetFiltros').addEventListener('click', () => {
+        document.getElementById('combustivelFiltro').value = 'todos';
+        document.getElementById('periodoFiltro').value = 'todos';
+        atualizarDashboard();
+    });
+    
+    // Iniciar
+    carregarDados();
+</script>
 </body>
 </html>
