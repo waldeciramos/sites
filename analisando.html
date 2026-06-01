@@ -1,950 +1,1027 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rede Dom Pedro - Controle de Estoque e Perdas</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rede Dom Pedro — Controle de Estoque</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg:        #0a0d14;
+  --surface:   #111520;
+  --surface2:  #161b28;
+  --border:    rgba(255,255,255,0.07);
+  --accent:    #e94560;
+  --green:     #22d3a0;
+  --blue:      #3b82f6;
+  --muted:     #5a6480;
+  --text:      #e2e8f0;
+  --text2:     #94a3b8;
+  --mono:      'Space Mono', monospace;
+  --sans:      'DM Sans', sans-serif;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-        }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .header {
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 3px solid #e94560;
-        }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-        .header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+}
 
-        .header h1 i {
-            color: #e94560;
-            margin-right: 10px;
-        }
+/* ── HEADER ── */
+.header {
+  position: relative;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  z-index: 10;
+}
 
-        .header p {
-            opacity: 0.8;
-            font-size: 0.9em;
-        }
+.header::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent 60%);
+}
 
-        .posto-name {
-            display: inline-block;
-            background: #e94560;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            margin-top: 10px;
-        }
+.logo {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
 
-        .data-source {
-            display: inline-block;
-            background: #0f3460;
-            padding: 3px 12px;
-            border-radius: 15px;
-            font-size: 0.7em;
-            margin-left: 10px;
-        }
+.logo-icon {
+  width: 34px; height: 34px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 1rem;
+}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+.header-meta {
+  display: flex; gap: 10px; align-items: center;
+  font-size: 0.78rem; color: var(--text2);
+}
 
-        .source-bar {
-            background: rgba(0,0,0,0.5);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
-        .source-status {
-            color: #48bb78;
-            font-size: 0.85em;
-        }
+.badge-green { background: rgba(34,211,160,.15); color: var(--green); border: 1px solid rgba(34,211,160,.3); }
+.badge-red   { background: rgba(233,69,96,.15);  color: var(--accent); border: 1px solid rgba(233,69,96,.3); }
+.badge-blue  { background: rgba(59,130,246,.15); color: var(--blue);   border: 1px solid rgba(59,130,246,.3); }
+.badge-muted { background: rgba(255,255,255,.06); color: var(--text2); border: 1px solid var(--border); }
 
-        .source-status i {
-            margin-right: 5px;
-        }
+/* ── UPLOAD ZONE ── */
+#uploadZone {
+  position: fixed; inset: 0;
+  background: rgba(10,13,20,.97);
+  z-index: 999;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px;
+}
 
-        .filters-bar {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
+.upload-box {
+  border: 2px dashed var(--accent);
+  border-radius: 20px;
+  padding: 60px 80px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .3s;
+  background: rgba(233,69,96,.04);
+}
+.upload-box:hover, .upload-box.drag { background: rgba(233,69,96,.1); border-style: solid; }
+.upload-box i { font-size: 3rem; color: var(--accent); margin-bottom: 16px; display: block; }
+.upload-box h2 { font-size: 1.3rem; margin-bottom: 8px; }
+.upload-box p  { color: var(--text2); font-size: 0.9rem; }
+#fileInput { display: none; }
 
-        .filter-group {
-            flex: 1;
-            min-width: 180px;
-        }
+/* ── LOADING ── */
+#loadingScreen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 998;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px;
+}
+.spinner-ring {
+  width: 52px; height: 52px;
+  border: 3px solid rgba(255,255,255,.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-        .filter-group label {
-            display: block;
-            font-size: 0.8em;
-            color: #ccc;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+/* ── LAYOUT ── */
+.container { max-width: 1440px; margin: 0 auto; padding: 28px 32px; position: relative; z-index: 1; }
 
-        .filter-group select, 
-        .filter-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.3);
-            color: white;
-            font-size: 0.9em;
-            cursor: pointer;
-        }
+/* ── RESULT HERO ── */
+.result-hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
 
-        .filter-group select option {
-            background: #1a1a2e;
-            color: white;
-        }
+.result-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--result-color, var(--accent));
+}
 
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+.result-hero.positive { --result-color: var(--green); }
+.result-hero.negative { --result-color: var(--accent); }
 
-        .summary-card {
-            background: linear-gradient(135deg, #0f3460, #16213e);
-            border-radius: 15px;
-            padding: 20px;
-            color: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.3s;
-            border-left: 4px solid #e94560;
-        }
+.result-left h4 {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
 
-        .summary-card:hover {
-            transform: translateY(-3px);
-        }
+.result-value {
+  font-family: var(--mono);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
 
-        .summary-card h4 {
-            font-size: 0.85em;
-            opacity: 0.8;
-            margin-bottom: 10px;
-        }
+.result-value.positive { color: var(--green); }
+.result-value.negative { color: var(--accent); }
 
-        .summary-card .value {
-            font-size: 1.8em;
-            font-weight: bold;
-        }
+.result-sub {
+  font-size: 0.82rem;
+  color: var(--text2);
+  margin-top: 6px;
+}
 
-        .summary-card .trend {
-            font-size: 0.75em;
-            margin-top: 8px;
-            opacity: 0.7;
-        }
+.result-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-        .resultado-geral {
-            background: rgba(0,0,0,0.4);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all .2s;
+}
 
-        .resultado-geral h3 {
-            color: white;
-            margin-bottom: 15px;
-        }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #c7374f; transform: translateY(-1px); }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
 
-        .resultado-badge {
-            display: inline-block;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
+/* ── FILTERS ── */
+.filters {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;
+}
 
-        .resultado-badge.positivo {
-            background: rgba(72, 187, 120, 0.2);
-            border: 2px solid #48bb78;
-            color: #48bb78;
-        }
+.filter-group { flex: 1; min-width: 160px; }
+.filter-group label {
+  display: block;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
 
-        .resultado-badge.negativo {
-            background: rgba(233, 69, 96, 0.2);
-            border: 2px solid #e94560;
-            color: #e94560;
-        }
+.filter-group select,
+.filter-group input[type=date] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
 
-        .btn-relatorio {
-            background: #e94560;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin: 10px;
-            transition: all 0.3s;
-        }
+.filter-group select:focus,
+.filter-group input:focus { border-color: var(--accent); }
+.filter-group select option { background: var(--surface2); }
 
-        .btn-relatorio:hover {
-            transform: scale(1.02);
-            background: #c73e54;
-        }
+/* ── STAT CARDS ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
 
-        .btn-relatorio.secondary {
-            background: #0f3460;
-        }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.14); }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+.stat-card .icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: grid; place-items: center;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
 
-        .modal.active {
-            display: flex;
-        }
+.stat-card .label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
 
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80%;
-            overflow: auto;
-            padding: 25px;
-            position: relative;
-        }
+.stat-card .number {
+  font-family: var(--mono);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.stat-card .unit { font-size: 0.78rem; color: var(--text2); margin-left: 3px; }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e94560;
-        }
+/* ── CHARTS ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
 
-        .modal-header h2 {
-            color: #1a1a2e;
-        }
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+}
 
-        .close-modal {
-            background: #e94560;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            font-size: 1.2em;
-        }
+.chart-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
 
-        .relatorio-produto {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            background: #f8f9fa;
-        }
+.chart-title {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
 
-        .relatorio-produto.positivo {
-            border-left: 5px solid #48bb78;
-        }
+.chart-container { position: relative; height: 280px; }
 
-        .relatorio-produto.negativo {
-            border-left: 5px solid #e94560;
-        }
+/* ── TABLE ── */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
 
-        .relatorio-produto h4 {
-            margin-bottom: 10px;
-            color: #333;
-        }
+.table-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
 
-        .relatorio-produto .diferenca {
-            font-size: 1.3em;
-            font-weight: bold;
-        }
+.table-title {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
 
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
+.table-scroll { overflow-x: auto; }
 
-        .chart-card {
-            background: rgba(255,255,255,0.95);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 11px 18px;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
 
-        .chart-card h3 {
-            color: #1a1a2e;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e94560;
-            display: inline-block;
-        }
+tbody td {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
 
-        .chart-card h3 i {
-            color: #e94560;
-            margin-right: 8px;
-        }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(255,255,255,.025); }
 
-        .chart-container {
-            position: relative;
-            height: 320px;
-        }
+td.num { font-family: var(--mono); font-size: 0.85rem; }
+td.pos { font-family: var(--mono); color: var(--green); font-weight: 700; }
+td.neg { font-family: var(--mono); color: var(--accent); font-weight: 700; }
 
-        .products-table {
-            background: rgba(255,255,255,0.95);
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 25px;
-        }
+.tank-tag {
+  display: inline-block;
+  background: rgba(59,130,246,.15);
+  color: var(--blue);
+  border: 1px solid rgba(59,130,246,.25);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  margin: 1px;
+}
 
-        .products-table h3 {
-            padding: 18px 20px;
-            background: #0f3460;
-            color: white;
-            margin: 0;
-        }
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.82);
+  z-index: 2000;
+  align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
 
-        .products-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  width: 100%; max-width: 780px;
+  max-height: 88vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } }
 
-        .products-table th,
-        .products-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
+.modal-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.modal-head h2 { font-size: 1rem; font-weight: 700; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; font-size: 1rem;
+  display: grid; place-items: center;
+  transition: all .2s;
+}
+.modal-close:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
-        .products-table th {
-            background: #f8f9fa;
-            color: #333;
-            font-weight: 600;
-        }
+.modal-body { padding: 24px; overflow-y: auto; }
 
-        .products-table tr:hover {
-            background: #f5f5f5;
-        }
+.report-product {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.report-product.pos { border-left: 3px solid var(--green); }
+.report-product.neg { border-left: 3px solid var(--accent); }
+.report-product h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; }
+.report-product .rp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; }
+.report-product .rp-row { font-size: 0.82rem; }
+.report-product .rp-row span { color: var(--text2); }
+.report-product .rp-diff { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; margin-top: 10px; }
 
-        .positive {
-            color: #48bb78;
-            font-weight: bold;
-        }
+.modal-summary {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  text-align: center;
+}
+.ms-item .ms-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.ms-item .ms-val  { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; }
 
-        .negative {
-            color: #e94560;
-            font-weight: bold;
-        }
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  letter-spacing: 0.05em;
+}
 
-        .tanque-badge {
-            background: #e94560;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.7em;
-            margin-right: 5px;
-            display: inline-block;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 400px;
-            flex-direction: column;
-            color: white;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top-color: #e94560;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error-box {
-            background: rgba(233, 69, 96, 0.2);
-            border: 1px solid #e94560;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin: 20px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8em;
-        }
-
-        @media (max-width: 768px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            .summary-card .value {
-                font-size: 1.3em;
-            }
-        }
-    </style>
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .container { padding: 16px; }
+  .header { padding: 0 16px; }
+  .result-hero { flex-direction: column; }
+  .result-value { font-size: 1.8rem; }
+  .modal-summary { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1><i class="fas fa-chart-line"></i> Controle de Estoque e Perdas</h1>
-        <p>Monitoramento de tanques | Controle escritural vs medição real</p>
-        <div class="posto-name">
-            <i class="fas fa-gas-pump"></i> REDE DOM PEDRO DE POSTOS
-            <span class="data-source" id="dataSourceBadge">🔄 Carregando...</span>
-        </div>
+
+<!-- Upload fallback -->
+<div id="uploadZone" style="display:none;">
+  <div class="upload-box" id="dropArea" onclick="document.getElementById('fileInput').click()">
+    <i class="fas fa-file-csv"></i>
+    <h2>Selecione o arquivo posto.csv</h2>
+    <p>O arquivo não foi encontrado automaticamente.<br>Arraste ou clique para fazer upload manual.</p>
+    <input type="file" id="fileInput" accept=".csv,.txt">
+  </div>
+  <p style="color:var(--muted);font-size:.8rem;font-family:var(--mono);">Coloque o posto.csv no mesmo diretório do HTML para carregamento automático.</p>
+</div>
+
+<!-- Loading -->
+<div id="loadingScreen">
+  <div class="spinner-ring"></div>
+  <p style="font-family:var(--mono);font-size:.82rem;color:var(--text2);">Carregando posto.csv…</p>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon"><i class="fas fa-gas-pump"></i></div>
+    <div>
+      <div>Rede Dom Pedro</div>
+      <div style="font-size:.65rem;color:var(--text2);font-weight:400;letter-spacing:.02em;">Controle de Estoque &amp; Perdas</div>
     </div>
+  </div>
+  <div class="header-meta">
+    <span id="periodBadge" class="badge badge-muted">—</span>
+    <span id="statusBadge" class="badge badge-muted"><i class="fas fa-circle-notch fa-spin"></i>&nbsp;Carregando</span>
+  </div>
+</header>
 
-    <div class="container" id="app">
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Carregando dados do arquivo posto.csv...</p>
-        </div>
+<!-- Main -->
+<main class="container" id="main" style="display:none;">
 
-        <div id="dashboardContent" style="display: none;">
-            <div class="source-bar">
-                <div class="source-status" id="sourceStatus">
-                    <i class="fas fa-check-circle"></i> Dados carregados
-                </div>
-                <button class="offline-btn" id="refreshBtn">
-                    <i class="fas fa-sync-alt"></i> Recarregar
-                </button>
-            </div>
-
-            <div class="resultado-geral" id="resultadoGeral">
-                <h3><i class="fas fa-chart-simple"></i> RESULTADO GERAL DO PERÍODO</h3>
-                <div id="resultadoBadge"></div>
-                <div style="margin-top: 15px;">
-                    <button class="btn-relatorio" id="btnRelatorioGeral">
-                        <i class="fas fa-file-alt"></i> Ver Relatório Detalhado
-                    </button>
-                    <button class="btn-relatorio secondary" id="btnRelatorioProdutos">
-                        <i class="fas fa-boxes"></i> Ver Relatório por Produto
-                    </button>
-                </div>
-            </div>
-
-            <div class="filters-bar">
-                <div class="filter-group">
-                    <label><i class="fas fa-oil-can"></i> Produto</label>
-                    <select id="produtoFilter">
-                        <option value="all">Todos os produtos</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label><i class="fas fa-calendar"></i> Data Inicial</label>
-                    <input type="date" id="dataInicio">
-                </div>
-                <div class="filter-group">
-                    <label><i class="fas fa-calendar"></i> Data Final</label>
-                    <input type="date" id="dataFim">
-                </div>
-            </div>
-
-            <div class="summary-grid" id="summaryCards"></div>
-
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3><i class="fas fa-chart-bar"></i> Entradas vs Vendas vs Diferença</h3>
-                    <div class="chart-container">
-                        <canvas id="chartProdutos"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3><i class="fas fa-chart-line"></i> Evolução Diária da Diferença</h3>
-                    <div class="chart-container">
-                        <canvas id="chartEvolucao"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-table">
-                <h3><i class="fas fa-clipboard-list"></i> Performance por Produto</h3>
-                <div style="overflow-x: auto;">
-                    <table id="produtosTable">
-                        <thead>
-                            <tr><th>Produto</th><th>Tanques</th><th>Entradas (L)</th><th>Vendas (L)</th><th>Estoque Escritural</th><th>Estoque Medido</th><th>Diferença</th><th>Status</th></tr>
-                        </thead>
-                        <tbody id="produtosTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="relatorioModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modalTitle"><i class="fas fa-chart-line"></i> Relatório</h2>
-                    <button class="close-modal" onclick="fecharModal()">&times;</button>
-                </div>
-                <div id="modalBody"></div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <i class="fas fa-chart-simple"></i> Sistema de controle de perdas - Rede Dom Pedro
-        </div>
+  <!-- Result hero -->
+  <div class="result-hero" id="resultHero">
+    <div class="result-left">
+      <h4><i class="fas fa-chart-line" style="margin-right:6px;"></i>Resultado Geral do Período</h4>
+      <div class="result-value" id="resultValue">—</div>
+      <div class="result-sub" id="resultSub">—</div>
     </div>
+    <div class="result-actions">
+      <button class="btn btn-primary" id="btnGeneral"><i class="fas fa-file-lines"></i> Relatório Detalhado</button>
+      <button class="btn btn-secondary" id="btnProducts"><i class="fas fa-boxes"></i> Relatório por Produto</button>
+    </div>
+  </div>
 
-    <script>
-        let dadosCompletos = [];
-        let charts = {};
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <label><i class="fas fa-oil-can" style="margin-right:5px;"></i>Produto</label>
+      <select id="filterProd"><option value="all">Todos os produtos</option></select>
+    </div>
+    <div class="filter-group">
+      <label><i class="fas fa-calendar-days" style="margin-right:5px;"></i>Data Inicial</label>
+      <input type="date" id="filterFrom">
+    </div>
+    <div class="filter-group">
+      <label><i class="fas fa-calendar-check" style="margin-right:5px;"></i>Data Final</label>
+      <input type="date" id="filterTo">
+    </div>
+  </div>
 
-        function formatarNumero(valor) {
-            return Math.round(valor).toLocaleString('pt-BR');
-        }
+  <!-- Stats -->
+  <div class="stat-grid" id="statGrid"></div>
 
-        function parseCSV(texto) {
-            const linhas = texto.split(/\r?\n/);
-            let dados = [];
-            let produtoAtual = null;
-            let tanquesAtuais = null;
-            
-            for (let i = 0; i < linhas.length; i++) {
-                let linha = linhas[i].trim();
-                if (!linha) continue;
-                
-                if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
-                    const matchComb = linha.match(/Combustível:\s*\d+\s*-\s*([^;]+)/);
-                    const matchTanques = linha.match(/Tanques vinculados:\s*([^;]+)/);
-                    if (matchComb) {
-                        produtoAtual = matchComb[1].trim();
-                        tanquesAtuais = matchTanques ? matchTanques[1].trim() : '';
-                    }
-                    continue;
-                }
-                
-                if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença')) {
-                    continue;
-                }
-                
-                if (produtoAtual && linha.match(/^\d{4}-\d{2}-\d{2}/)) {
-                    const cols = linha.split(';');
-                    if (cols.length >= 10) {
-                        const limparNumero = (str) => {
-                            if (!str || str === '') return 0;
-                            let numStr = String(str).replace(/\./g, '').replace(',', '.');
-                            return parseFloat(numStr) || 0;
-                        };
-                        
-                        const registro = {
-                            produto: produtoAtual,
-                            tanques: tanquesAtuais,
-                            data: cols[0],
-                            litragemInicial: limparNumero(cols[2]),
-                            entrada: limparNumero(cols[3]),
-                            estoqueEscritural: limparNumero(cols[4]),
-                            litragemFinal: limparNumero(cols[6]),
-                            saidaBombas: limparNumero(cols[7]),
-                            saidaTanque: limparNumero(cols[8]),
-                            diferenca: limparNumero(cols[9])
-                        };
-                        
-                        if (registro.data && (registro.saidaBombas > 0 || registro.entrada > 0)) {
-                            dados.push(registro);
-                        }
-                    }
-                }
-                
-                if (linha.includes('Total acumulado combustível')) {
-                    produtoAtual = null;
-                }
-            }
-            
-            return dados;
-        }
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title"><i class="fas fa-chart-bar" style="margin-right:7px;color:var(--accent)"></i>Entradas × Vendas × Diferença</span>
+      </div>
+      <div class="chart-container"><canvas id="chartBar"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title"><i class="fas fa-chart-line" style="margin-right:7px;color:var(--blue)"></i>Evolução Diária da Diferença</span>
+      </div>
+      <div class="chart-container"><canvas id="chartLine"></canvas></div>
+    </div>
+  </div>
 
-        async function carregarDados() {
-            const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-            
-            const fontes = [
-                { url: 'posto.csv', nome: 'Mesmo diretório' },
-                { url: './posto.csv', nome: 'Diretório atual' },
-                { url: basePath + 'posto.csv', nome: 'Caminho relativo' },
-                { url: '/sites/posto.csv', nome: '/sites/' },
-                { url: '../posto.csv', nome: 'Diretório pai' },
-                { url: 'https://waldeciramos.github.io/sites/posto.csv', nome: 'GitHub (completo)' }
-            ];
-            
-            for (const fonte of fontes) {
-                try {
-                    console.log(`Tentando carregar: ${fonte.url}`);
-                    const response = await fetch(fonte.url, { cache: 'no-store' });
-                    if (response.ok) {
-                        const texto = await response.text();
-                        const dados = parseCSV(texto);
-                        if (dados.length > 0) {
-                            document.getElementById('dataSourceBadge').innerHTML = `✅ ${fonte.nome}`;
-                            document.getElementById('sourceStatus').innerHTML = `<i class="fas fa-check-circle"></i> Dados carregados de ${fonte.nome} (${dados.length} registros)`;
-                            console.log(`Sucesso! Carregados ${dados.length} registros de ${fonte.url}`);
-                            return dados;
-                        }
-                    }
-                } catch(e) {
-                    console.log(`Falha em ${fonte.url}:`, e.message);
-                }
-            }
-            return null;
-        }
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title"><i class="fas fa-table-list" style="margin-right:8px;color:var(--accent)"></i>Performance por Produto</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Tanques</th>
+            <th>Entradas (L)</th>
+            <th>Vendas (L)</th>
+            <th>Est. Escritural</th>
+            <th>Est. Medido</th>
+            <th>Diferença</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
 
-        function processarProdutos(dados, dataInicio, dataFim) {
-            let dadosFiltrados = [...dados];
-            if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
-            if (dataFim) dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
-            
-            const produtos = {};
-            
-            dadosFiltrados.forEach(reg => {
-                if (!produtos[reg.produto]) {
-                    produtos[reg.produto] = {
-                        tanques: reg.tanques,
-                        entradas: 0,
-                        vendas: 0,
-                        estoqueInicial: 0,
-                        estoqueFinalMedido: 0,
-                        primeiroRegistro: true
-                    };
-                }
-                
-                const p = produtos[reg.produto];
-                p.entradas += reg.entrada || 0;
-                p.vendas += reg.saidaBombas || 0;
-                
-                if (p.primeiroRegistro && reg.litragemInicial > 0) {
-                    p.estoqueInicial = reg.litragemInicial;
-                    p.primeiroRegistro = false;
-                }
-                if (reg.litragemFinal > 0) {
-                    p.estoqueFinalMedido = reg.litragemFinal;
-                }
-            });
-            
-            Object.keys(produtos).forEach(prod => {
-                const p = produtos[prod];
-                p.estoqueEscritural = (p.estoqueInicial || 0) + p.entradas - p.vendas;
-                p.diferencaTotal = p.estoqueFinalMedido - p.estoqueEscritural;
-                p.status = p.diferencaTotal >= 0 ? 'Sobra' : 'Perda';
-                p.statusClass = p.diferencaTotal >= 0 ? 'positive' : 'negative';
-            });
-            
-            return produtos;
-        }
+</main>
 
-        function atualizarResultadoGeral(produtos) {
-            let totalDiferenca = 0;
-            Object.values(produtos).forEach(p => {
-                totalDiferenca += p.diferencaTotal;
-            });
-            
-            const resultadoDiv = document.getElementById('resultadoBadge');
-            const isPositivo = totalDiferenca >= 0;
-            
-            resultadoDiv.innerHTML = `
-                <div class="resultado-badge ${isPositivo ? 'positivo' : 'negativo'}">
-                    <i class="fas ${isPositivo ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
-                    ${isPositivo ? 'SOBRA TOTAL' : 'PERDA TOTAL'}: ${formatarNumero(Math.abs(totalDiferenca))} L
-                </div>
-                <p style="color: #ccc; margin-top: 10px;">
-                    ${isPositivo ? '✅ Estoque com sobra no período' : '❌ Estoque com perda no período'}
-                </p>
-            `;
-        }
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">Relatório</h2>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
 
-        function gerarRelatorioGeral(produtos, todosDados) {
-            let totalEntradas = 0, totalVendas = 0, totalDiferenca = 0;
-            const produtosArray = [];
-            
-            Object.entries(produtos).forEach(([nome, p]) => {
-                totalEntradas += p.entradas;
-                totalVendas += p.vendas;
-                totalDiferenca += p.diferencaTotal;
-                produtosArray.push({
-                    nome: nome,
-                    tanques: p.tanques,
-                    entradas: p.entradas,
-                    vendas: p.vendas,
-                    diferenca: p.diferencaTotal,
-                    status: p.status
-                });
-            });
-            
-            return `
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h3>RESUMO GERAL</h3>
-                    <div style="font-size: 1.2em; margin: 10px 0;">
-                        <span style="color: #0f3460;">Total Compras:</span> <strong>${formatarNumero(totalEntradas)} L</strong><br>
-                        <span style="color: #0f3460;">Total Vendas:</span> <strong>${formatarNumero(totalVendas)} L</strong><br>
-                        <span style="color: ${totalDiferenca >= 0 ? '#48bb78' : '#e94560'}; font-size: 1.3em;">
-                            ${totalDiferenca >= 0 ? 'SOBRA' : 'PERDA'} TOTAL: ${formatarNumero(Math.abs(totalDiferenca))} L
-                        </span>
-                    </div>
-                    <p>Período analisado: ${todosDados.length} dias de registros</p>
-                </div>
-                <hr>
-                <h3 style="margin: 20px 0 10px 0;">DETALHAMENTO POR PRODUTO</h3>
-                ${produtosArray.map(p => `
-                    <div class="relatorio-produto ${p.status === 'Sobra' ? 'positivo' : 'negativo'}">
-                        <h4><i class="fas fa-oil-can"></i> ${p.nome}</h4>
-                        <p>Tanques: ${p.tanques || '-'}</p>
-                        <p>Entradas: ${formatarNumero(p.entradas)} L</p>
-                        <p>Vendas: ${formatarNumero(p.vendas)} L</p>
-                        <p class="diferenca" style="color: ${p.status === 'Sobra' ? '#48bb78' : '#e94560'}">
-                            ${p.status === 'Sobra' ? '✅ SOBRA' : '❌ PERDA'}: ${formatarNumero(Math.abs(p.diferenca))} L
-                        </p>
-                    </div>
-                `).join('')}
-            `;
-        }
+<div class="footer">REDE DOM PEDRO DE POSTOS · SISTEMA DE CONTROLE DE PERDAS</div>
 
-        function gerarRelatorioProdutos(produtos) {
-            return `
-                <h3 style="margin-bottom: 20px;"><i class="fas fa-boxes"></i> Performance Individual por Produto</h3>
-                ${Object.entries(produtos).map(([nome, p]) => `
-                    <div class="relatorio-produto ${p.status === 'Sobra' ? 'positivo' : 'negativo'}">
-                        <h4><i class="fas fa-gas-pump"></i> ${nome}</h4>
-                        <p><strong>Tanques vinculados:</strong> ${p.tanques ? p.tanques.split('-').map(t => t.trim()).join(', ') : '-'}</p>
-                        <p><strong>Total de Entradas:</strong> ${formatarNumero(p.entradas)} L</p>
-                        <p><strong>Total de Vendas (Bomba):</strong> ${formatarNumero(p.vendas)} L</p>
-                        <p><strong>Estoque Escritural:</strong> ${formatarNumero(p.estoqueEscritural)} L</p>
-                        <p><strong>Estoque Medido (Tanque):</strong> ${formatarNumero(p.estoqueFinalMedido)} L</p>
-                        <p class="diferenca" style="color: ${p.status === 'Sobra' ? '#48bb78' : '#e94560'}; font-size: 1.2em;">
-                            <strong>${p.status === 'Sobra' ? '📈 SOBRA' : '📉 PERDA'}: ${formatarNumero(Math.abs(p.diferencaTotal))} L</strong>
-                        </p>
-                        <p style="font-size: 0.85em; color: #666;">
-                            ${p.status === 'Sobra' ? 'Estoque final maior que o esperado' : 'Estoque final menor que o esperado - Verificar possíveis perdas'}
-                        </p>
-                    </div>
-                `).join('')}
-            `;
-        }
+<script>
+/* ========================================================
+   DATA LAYER
+   ======================================================== */
+let allData = [];
+let charts = {};
 
-        function atualizarDashboard(produtos, produtoSelecionado, todosDados) {
-            let totalEntradas = 0, totalVendas = 0, totalDiferenca = 0;
-            Object.values(produtos).forEach(p => {
-                totalEntradas += p.entradas;
-                totalVendas += p.vendas;
-                totalDiferenca += p.diferencaTotal;
-            });
-            
-            document.getElementById('summaryCards').innerHTML = `
-                <div class="summary-card">
-                    <h4><i class="fas fa-truck"></i> Total Compras</h4>
-                    <div class="value">${formatarNumero(totalEntradas)} L</div>
-                </div>
-                <div class="summary-card">
-                    <h4><i class="fas fa-gas-pump"></i> Total Vendas</h4>
-                    <div class="value">${formatarNumero(totalVendas)} L</div>
-                </div>
-                <div class="summary-card">
-                    <h4><i class="fas fa-chart-line"></i> Diferença Total</h4>
-                    <div class="value ${totalDiferenca >= 0 ? 'positive' : 'negative'}">${formatarNumero(totalDiferenca)} L</div>
-                    <div class="trend">${totalDiferenca >= 0 ? 'Sobra no período' : 'Perda no período'}</div>
-                </div>
-                <div class="summary-card">
-                    <h4><i class="fas fa-calendar"></i> Dias Analisados</h4>
-                    <div class="value">${todosDados.length}</div>
-                </div>
-            `;
-            
-            atualizarResultadoGeral(produtos);
-            
-            const tableBody = document.getElementById('produtosTableBody');
-            if (Object.keys(produtos).length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhum produto encontrado</td></tr>';
-            } else {
-                tableBody.innerHTML = Object.entries(produtos).map(([nome, p]) => `
-                    <tr>
-                        <td><strong>${nome}</strong></td>
-                        <td>${p.tanques ? p.tanques.split('-').map(t => `<span class="tanque-badge">${t.trim()}</span>`).join('') : '-'}</td>
-                        <td>${formatarNumero(p.entradas)}</td>
-                        <td>${formatarNumero(p.vendas)}</td>
-                        <td>${formatarNumero(p.estoqueEscritural)}</td>
-                        <td>${formatarNumero(p.estoqueFinalMedido)}</td>
-                        <td class="${p.statusClass}">${formatarNumero(p.diferencaTotal)}</td>
-                        <td class="${p.statusClass}">${p.status}</td>
-                    </tr>
-                `).join('');
-            }
-            
-            const nomes = Object.keys(produtos);
-            const entradasData = nomes.map(n => produtos[n].entradas);
-            const vendasData = nomes.map(n => produtos[n].vendas);
-            const diferencaData = nomes.map(n => produtos[n].diferencaTotal);
-            
-            if (charts.produtos) charts.produtos.destroy();
-            const ctxProd = document.getElementById('chartProdutos').getContext('2d');
-            charts.produtos = new Chart(ctxProd, {
-                type: 'bar',
-                data: {
-                    labels: nomes,
-                    datasets: [
-                        { label: 'Entradas (L)', data: entradasData, backgroundColor: '#0f3460', borderRadius: 8 },
-                        { label: 'Vendas (L)', data: vendasData, backgroundColor: '#48bb78', borderRadius: 8 },
-                        { label: 'Diferença (L)', data: diferencaData, backgroundColor: '#e94560', borderRadius: 8 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
-            });
-            
-            let dadosParaEvolucao = todosDados;
-            if (produtoSelecionado && produtoSelecionado !== 'all') {
-                dadosParaEvolucao = todosDados.filter(d => d.produto === produtoSelecionado);
-            }
-            
-            const diasMap = {};
-            dadosParaEvolucao.forEach(d => { diasMap[d.data] = (diasMap[d.data] || 0) + (d.diferenca || 0); });
-            const datasOrdenadas = Object.keys(diasMap).sort();
-            const diferencasDiarias = datasOrdenadas.map(d => diasMap[d]);
-            
-            if (charts.evolucao) charts.evolucao.destroy();
-            const ctxEvo = document.getElementById('chartEvolucao').getContext('2d');
-            charts.evolucao = new Chart(ctxEvo, {
-                type: 'line',
-                data: {
-                    labels: datasOrdenadas.slice(-30),
-                    datasets: [{
-                        label: 'Diferença Diária (L)',
-                        data: diferencasDiarias.slice(-30),
-                        borderColor: '#e94560',
-                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
-        }
-        
-        function refresh() {
-            const produto = document.getElementById('produtoFilter').value;
-            const dataInicio = document.getElementById('dataInicio').value;
-            const dataFim = document.getElementById('dataFim').value;
-            
-            let dadosFiltrados = [...dadosCompletos];
-            if (produto !== 'all') dadosFiltrados = dadosFiltrados.filter(d => d.produto === produto);
-            if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
-            if (dataFim) dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
-            
-            const produtos = processarProdutos(dadosFiltrados, dataInicio, dataFim);
-            atualizarDashboard(produtos, produto, dadosFiltrados);
-            
-            window.produtosAtuais = produtos;
-            window.dadosAtuais = dadosFiltrados;
-        }
-        
-        function abrirModal(tipo) {
-            const modal = document.getElementById('relatorioModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalBody = document.getElementById('modalBody');
-            
-            if (tipo === 'geral') {
-                modalTitle.innerHTML = '<i class="fas fa-chart-line"></i> Relatório Geral - Resultado do Período';
-                modalBody.innerHTML = gerarRelatorioGeral(window.produtosAtuais, window.dadosAtuais);
-            } else {
-                modalTitle.innerHTML = '<i class="fas fa-boxes"></i> Relatório por Produto - Performance Individual';
-                modalBody.innerHTML = gerarRelatorioProdutos(window.produtosAtuais);
-            }
-            
-            modal.classList.add('active');
-        }
-        
-        function fecharModal() {
-            document.getElementById('relatorioModal').classList.remove('active');
-        }
-        
-        async function init() {
-            document.getElementById('refreshBtn').addEventListener('click', () => location.reload());
-            document.getElementById('produtoFilter').addEventListener('change', refresh);
-            document.getElementById('dataInicio').addEventListener('change', refresh);
-            document.getElementById('dataFim').addEventListener('change', refresh);
-            document.getElementById('btnRelatorioGeral').addEventListener('click', () => abrirModal('geral'));
-            document.getElementById('btnRelatorioProdutos').addEventListener('click', () => abrirModal('produtos'));
-            
-            const dados = await carregarDados();
-            
-            if (dados && dados.length > 0) {
-                dadosCompletos = dados;
-                
-                const datas = [...new Set(dados.map(d => d.data))].sort();
-                if (datas.length) {
-                    document.getElementById('dataInicio').value = datas[0];
-                    document.getElementById('dataFim').value = datas[datas.length - 1];
-                }
-                
-                const produtosUnicos = [...new Set(dados.map(d => d.produto))];
-                const produtoSelect = document.getElementById('produtoFilter');
-                produtoSelect.innerHTML = '<option value="all">Todos os produtos</option>';
-                produtosUnicos.forEach(p => {
-                    produtoSelect.innerHTML += `<option value="${p}">${p}</option>`;
-                });
-                
-                refresh();
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'block';
-            } else {
-                document.getElementById('loading').innerHTML = `
-                    <div class="error-box">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e94560; margin-bottom: 15px; display: block;"></i>
-                        <p style="color: #e94560; font-size: 1.2em;">Arquivo posto.csv não encontrado!</p>
-                        <p style="margin-top: 10px;">Verifique se o arquivo está no diretório correto.</p>
-                        <p style="margin-top: 5px; font-size: 0.9em;">Caminhos buscados: mesmo diretório, /sites/, GitHub Pages</p>
-                        <p style="margin-top: 15px; font-size: 0.8em;">Acesse: <strong>https://waldeciramos.github.io/sites/analisando.html</strong></p>
-                    </div>
-                `;
-            }
-        }
-        
-        init();
-    </script>
+const fmt = n => Math.round(n).toLocaleString('pt-BR');
+
+function parseCSV(raw) {
+  // Decode ISO-8859-1 if needed (already done via Response.text with ArrayBuffer)
+  const lines = raw.split(/\r?\n/);
+  const records = [];
+  let product = null, tanks = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    // Product header
+    if (line.includes('Combustível:') && line.includes('Tanques vinculados:')) {
+      const mProd   = line.match(/Combustível:\s*\d+\s*-\s*([^;]+)/);
+      const mTanks  = line.match(/Tanques vinculados:\s*([^;]+)/);
+      product = mProd  ? mProd[1].trim()  : null;
+      tanks   = mTanks ? mTanks[1].trim() : '';
+      continue;
+    }
+
+    // End of block
+    if (line.startsWith('Total acumulado')) { product = null; continue; }
+    // Skip headers
+    if (line.startsWith('Data;')) continue;
+
+    if (product && /^\d{4}-\d{2}-\d{2}/.test(line)) {
+      const c = line.split(';');
+      if (c.length < 10) continue;
+      const n = s => parseFloat(String(s||'').replace(/\./g,'').replace(',','.')) || 0;
+      const row = {
+        product, tanks,
+        date:            c[0],
+        litInitial:      n(c[2]),
+        entry:           n(c[3]),
+        escritural:      n(c[4]),
+        litFinal:        n(c[6]),
+        salesBomb:       n(c[7]),
+        salesTank:       n(c[8]),
+        diff:            n(c[9]),
+      };
+      if (row.salesBomb > 0 || row.entry > 0) records.push(row);
+    }
+  }
+  return records;
+}
+
+async function loadData() {
+  const sources = [
+    'posto.csv', './posto.csv',
+    window.location.pathname.replace(/\/[^/]*$/, '/') + 'posto.csv',
+    '/sites/posto.csv',
+    'https://waldeciramos.github.io/sites/posto.csv'
+  ];
+
+  for (const url of sources) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) continue;
+      // Read as ArrayBuffer to handle ISO-8859-1
+      const buf = await res.arrayBuffer();
+      const text = new TextDecoder('iso-8859-1').decode(buf);
+      const data = parseCSV(text);
+      if (data.length > 0) return { data, source: url };
+    } catch (_) {}
+  }
+  return null;
+}
+
+/* ========================================================
+   PROCESSING
+   ======================================================== */
+function processProducts(data) {
+  const map = {};
+  data.forEach(row => {
+    if (!map[row.product]) {
+      map[row.product] = {
+        tanks: row.tanks,
+        entries: 0, sales: 0,
+        initLiters: 0, finalLiters: 0,
+        hasInit: false,
+      };
+    }
+    const p = map[row.product];
+    p.entries += row.entry;
+    p.sales   += row.salesBomb;
+    if (!p.hasInit && row.litInitial > 0) { p.initLiters = row.litInitial; p.hasInit = true; }
+    if (row.litFinal > 0) p.finalLiters = row.litFinal;
+  });
+
+  Object.values(map).forEach(p => {
+    p.escritural  = p.initLiters + p.entries - p.sales;
+    p.diffTotal   = p.finalLiters - p.escritural;
+    p.isPositive  = p.diffTotal >= 0;
+  });
+
+  return map;
+}
+
+/* ========================================================
+   RENDER
+   ======================================================== */
+function refresh() {
+  const prod = document.getElementById('filterProd').value;
+  const from = document.getElementById('filterFrom').value;
+  const to   = document.getElementById('filterTo').value;
+
+  let filtered = allData.filter(r =>
+    (prod === 'all' || r.product === prod) &&
+    (!from || r.date >= from) &&
+    (!to   || r.date <= to)
+  );
+
+  const products = processProducts(filtered);
+  renderHero(products);
+  renderStats(products, filtered);
+  renderTable(products);
+  renderCharts(products, filtered, prod);
+  window._products = products;
+  window._filtered = filtered;
+}
+
+function renderHero(products) {
+  let total = 0;
+  Object.values(products).forEach(p => total += p.diffTotal);
+  const pos = total >= 0;
+  const hero = document.getElementById('resultHero');
+  hero.className = 'result-hero ' + (pos ? 'positive' : 'negative');
+  document.getElementById('resultValue').className = 'result-value ' + (pos ? 'positive' : 'negative');
+  document.getElementById('resultValue').innerHTML =
+    (pos ? '<i class="fas fa-arrow-trend-up"></i>' : '<i class="fas fa-arrow-trend-down"></i>') +
+    ' ' + fmt(Math.abs(total)) + ' <span style="font-size:.8rem;opacity:.6">L</span>';
+  document.getElementById('resultSub').textContent =
+    pos ? '✅ Sobra total no período' : '❌ Perda total no período';
+}
+
+function renderStats(products, filtered) {
+  let totalEntries = 0, totalSales = 0, totalDiff = 0;
+  Object.values(products).forEach(p => {
+    totalEntries += p.entries; totalSales += p.sales; totalDiff += p.diffTotal;
+  });
+  const days = new Set(filtered.map(r => r.date)).size;
+  const pos  = totalDiff >= 0;
+
+  document.getElementById('statGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="icon" style="background:rgba(59,130,246,.15);color:var(--blue)"><i class="fas fa-truck"></i></div>
+      <div class="label">Total Compras</div>
+      <div class="number">${fmt(totalEntries)}<span class="unit">L</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="icon" style="background:rgba(34,211,160,.15);color:var(--green)"><i class="fas fa-gas-pump"></i></div>
+      <div class="label">Total Vendas</div>
+      <div class="number">${fmt(totalSales)}<span class="unit">L</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="icon" style="background:${pos?'rgba(34,211,160,.15)':'rgba(233,69,96,.15)'};color:${pos?'var(--green)':'var(--accent)'}"><i class="fas fa-balance-scale"></i></div>
+      <div class="label">Diferença Total</div>
+      <div class="number" style="color:${pos?'var(--green)':'var(--accent)'}">${fmt(totalDiff)}<span class="unit">L</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="icon" style="background:rgba(255,255,255,.06);color:var(--text2)"><i class="fas fa-calendar-days"></i></div>
+      <div class="label">Dias Analisados</div>
+      <div class="number">${days}<span class="unit">dias</span></div>
+    </div>
+  `;
+}
+
+function renderTable(products) {
+  const rows = Object.entries(products).map(([name, p]) => {
+    const cl = p.isPositive ? 'pos' : 'neg';
+    const tanks = p.tanks
+      ? p.tanks.split('-').map(t => `<span class="tank-tag">${t.trim()}</span>`).join('')
+      : '—';
+    return `<tr>
+      <td><strong>${name}</strong></td>
+      <td>${tanks}</td>
+      <td class="num">${fmt(p.entries)}</td>
+      <td class="num">${fmt(p.sales)}</td>
+      <td class="num">${fmt(p.escritural)}</td>
+      <td class="num">${fmt(p.finalLiters)}</td>
+      <td class="${cl}">${fmt(p.diffTotal)}</td>
+      <td class="${cl}">${p.isPositive ? '▲ Sobra' : '▼ Perda'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('tableBody').innerHTML = rows ||
+    '<tr><td colspan="8" style="text-align:center;color:var(--muted)">Nenhum dado encontrado</td></tr>';
+}
+
+function renderCharts(products, filtered, selectedProd) {
+  const labels    = Object.keys(products);
+  const entries   = labels.map(k => products[k].entries);
+  const sales     = labels.map(k => products[k].sales);
+  const diffs     = labels.map(k => products[k].diffTotal);
+
+  // Bar chart
+  if (charts.bar) charts.bar.destroy();
+  charts.bar = new Chart(document.getElementById('chartBar'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Entradas', data: entries, backgroundColor: 'rgba(59,130,246,.7)',  borderRadius: 5 },
+        { label: 'Vendas',   data: sales,   backgroundColor: 'rgba(34,211,160,.7)',  borderRadius: 5 },
+        { label: 'Diferença',data: diffs,
+          backgroundColor: diffs.map(v => v >= 0 ? 'rgba(34,211,160,.5)' : 'rgba(233,69,96,.7)'),
+          borderRadius: 5 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'DM Sans', size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#5a6480', font: { family: 'Space Mono', size: 9 } }, grid: { color: 'rgba(255,255,255,.04)' } },
+        y: { ticks: { color: '#5a6480', font: { family: 'Space Mono', size: 9 } }, grid: { color: 'rgba(255,255,255,.04)' } }
+      }
+    }
+  });
+
+  // Line chart
+  let lineData = selectedProd === 'all' ? filtered : filtered.filter(r => r.product === selectedProd);
+  const dayMap = {};
+  lineData.forEach(r => { dayMap[r.date] = (dayMap[r.date] || 0) + r.diff; });
+  const days = Object.keys(dayMap).sort().slice(-31);
+  const vals = days.map(d => dayMap[d]);
+
+  if (charts.line) charts.line.destroy();
+  charts.line = new Chart(document.getElementById('chartLine'), {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [{
+        label: 'Diferença Diária (L)',
+        data: vals,
+        borderColor: '#3b82f6',
+        backgroundColor: ctx => {
+          const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 280);
+          g.addColorStop(0, 'rgba(59,130,246,.3)');
+          g.addColorStop(1, 'rgba(59,130,246,.0)');
+          return g;
+        },
+        fill: true,
+        tension: 0.35,
+        pointRadius: 3,
+        pointBackgroundColor: vals.map(v => v >= 0 ? '#22d3a0' : '#e94560'),
+        pointBorderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#5a6480', font: { family: 'Space Mono', size: 8 }, maxRotation: 45 }, grid: { color: 'rgba(255,255,255,.04)' } },
+        y: { ticks: { color: '#5a6480', font: { family: 'Space Mono', size: 9 } }, grid: { color: 'rgba(255,255,255,.04)' } }
+      }
+    }
+  });
+}
+
+/* ========================================================
+   REPORTS
+   ======================================================== */
+function buildGeneralReport(products, filtered) {
+  let totalEntries = 0, totalSales = 0, totalDiff = 0;
+  const prods = Object.entries(products);
+  prods.forEach(([,p]) => { totalEntries += p.entries; totalSales += p.sales; totalDiff += p.diffTotal; });
+
+  const sumHtml = `
+    <div class="modal-summary">
+      <div class="ms-item"><div class="ms-label">Total Compras</div><div class="ms-val" style="color:var(--blue)">${fmt(totalEntries)} L</div></div>
+      <div class="ms-item"><div class="ms-label">Total Vendas</div><div class="ms-val" style="color:var(--green)">${fmt(totalSales)} L</div></div>
+      <div class="ms-item"><div class="ms-label">${totalDiff>=0?'Sobra':'Perda'} Total</div>
+        <div class="ms-val" style="color:${totalDiff>=0?'var(--green)':'var(--accent)'}">${fmt(Math.abs(totalDiff))} L</div></div>
+    </div>
+    <p style="color:var(--text2);font-size:.82rem;margin-bottom:16px">${new Set(filtered.map(r=>r.date)).size} dias de registros analisados.</p>
+    <hr style="border-color:var(--border);margin-bottom:16px">
+  `;
+
+  const detailHtml = prods.map(([name, p]) => `
+    <div class="report-product ${p.isPositive?'pos':'neg'}">
+      <h4><i class="fas fa-oil-can" style="margin-right:7px;color:${p.isPositive?'var(--green)':'var(--accent)'}"></i>${name}</h4>
+      <div class="rp-grid">
+        <div class="rp-row"><span>Entradas:</span> ${fmt(p.entries)} L</div>
+        <div class="rp-row"><span>Vendas:</span> ${fmt(p.sales)} L</div>
+        <div class="rp-row"><span>Est. Escritural:</span> ${fmt(p.escritural)} L</div>
+        <div class="rp-row"><span>Est. Medido:</span> ${fmt(p.finalLiters)} L</div>
+      </div>
+      <div class="rp-diff" style="color:${p.isPositive?'var(--green)':'var(--accent)'}">
+        ${p.isPositive?'▲ SOBRA':'▼ PERDA'}: ${fmt(Math.abs(p.diffTotal))} L
+      </div>
+    </div>
+  `).join('');
+
+  return sumHtml + detailHtml;
+}
+
+function buildProductsReport(products) {
+  return Object.entries(products).map(([name, p]) => `
+    <div class="report-product ${p.isPositive?'pos':'neg'}">
+      <h4><i class="fas fa-gas-pump" style="margin-right:7px;color:${p.isPositive?'var(--green)':'var(--accent)'}"></i>${name}</h4>
+      <p style="color:var(--text2);font-size:.8rem;margin-bottom:10px">
+        Tanques: ${p.tanks||'—'}
+      </p>
+      <div class="rp-grid">
+        <div class="rp-row"><span>Entradas:</span> ${fmt(p.entries)} L</div>
+        <div class="rp-row"><span>Vendas (Bomba):</span> ${fmt(p.sales)} L</div>
+        <div class="rp-row"><span>Est. Escritural:</span> ${fmt(p.escritural)} L</div>
+        <div class="rp-row"><span>Est. Medido (Tanque):</span> ${fmt(p.finalLiters)} L</div>
+      </div>
+      <div class="rp-diff" style="color:${p.isPositive?'var(--green)':'var(--accent)'}">
+        ${p.isPositive?'📈 SOBRA':'📉 PERDA'}: ${fmt(Math.abs(p.diffTotal))} L
+      </div>
+      <p style="font-size:.78rem;color:var(--muted);margin-top:6px">
+        ${p.isPositive?'Estoque final acima do esperado.':'Estoque final abaixo do esperado — verifique possíveis perdas.'}
+      </p>
+    </div>
+  `).join('');
+}
+
+function openModal(type) {
+  const p = window._products, f = window._filtered;
+  document.getElementById('modalTitle').textContent =
+    type === 'general' ? 'Relatório Detalhado — Resultado do Período' : 'Relatório por Produto — Performance Individual';
+  document.getElementById('modalBody').innerHTML =
+    type === 'general' ? buildGeneralReport(p, f) : buildProductsReport(p);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+/* ========================================================
+   UPLOAD FALLBACK
+   ======================================================== */
+function setupUpload() {
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('uploadZone').style.display = 'flex';
+
+  const drop = document.getElementById('dropArea');
+  const inp  = document.getElementById('fileInput');
+
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file) readFile(file);
+  });
+  inp.addEventListener('change', () => { if (inp.files[0]) readFile(inp.files[0]); });
+}
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Try UTF-8 then latin1
+    let text = e.target.result;
+    const data = parseCSV(text);
+    if (data.length === 0) { alert('Arquivo não reconhecido ou sem dados.'); return; }
+    initDashboard(data, file.name);
+  };
+  reader.readAsText(file, 'iso-8859-1');
+}
+
+/* ========================================================
+   INIT
+   ======================================================== */
+function initDashboard(data, source) {
+  allData = data;
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('uploadZone').style.display  = 'none';
+  document.getElementById('main').style.display = 'block';
+
+  document.getElementById('statusBadge').className = 'badge badge-green';
+  document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i>&nbsp;${data.length} registros`;
+
+  const dates = [...new Set(data.map(r => r.date))].sort();
+  document.getElementById('filterFrom').value = dates[0];
+  document.getElementById('filterTo').value   = dates[dates.length - 1];
+  document.getElementById('periodBadge').textContent = `${dates[0]} → ${dates[dates.length-1]}`;
+
+  const prods = [...new Set(data.map(r => r.product))];
+  const sel = document.getElementById('filterProd');
+  prods.forEach(p => { sel.innerHTML += `<option value="${p}">${p}</option>`; });
+
+  document.getElementById('filterProd').addEventListener('change', refresh);
+  document.getElementById('filterFrom').addEventListener('change', refresh);
+  document.getElementById('filterTo').addEventListener('change', refresh);
+  document.getElementById('btnGeneral').addEventListener('click', () => openModal('general'));
+  document.getElementById('btnProducts').addEventListener('click', () => openModal('products'));
+
+  refresh();
+}
+
+async function main() {
+  const result = await loadData();
+  if (result) {
+    initDashboard(result.data, result.source);
+  } else {
+    setupUpload();
+  }
+}
+
+main();
+</script>
 </body>
 </html>
