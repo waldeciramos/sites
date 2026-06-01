@@ -51,10 +51,56 @@
             margin-top: 10px;
         }
 
+        .data-source {
+            display: inline-block;
+            background: #0f3460;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 0.7em;
+            margin-left: 10px;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        /* Barra de fonte de dados */
+        .source-bar {
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .source-status {
+            color: #48bb78;
+            font-size: 0.85em;
+        }
+
+        .source-status i {
+            margin-right: 5px;
+        }
+
+        .offline-btn {
+            background: #4a5568;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s;
+        }
+
+        .offline-btn:hover {
+            background: #e94560;
         }
 
         /* Filtros */
@@ -177,6 +223,36 @@
             color: #ffe6b3;
         }
 
+        /* Área de upload offline */
+        .offline-upload {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .offline-upload:hover {
+            border-color: #e94560;
+            background: rgba(233,69,96,0.1);
+        }
+
+        .offline-upload input {
+            display: none;
+        }
+
+        .offline-upload label {
+            cursor: pointer;
+            color: #ccc;
+        }
+
+        .offline-upload label i {
+            color: #e94560;
+            margin-right: 8px;
+        }
+
         /* Grid de gráficos */
         .charts-grid {
             display: grid;
@@ -210,7 +286,7 @@
             height: 320px;
         }
 
-        /* Tabela de produtos */
+        /* Tabela */
         .products-table {
             background: rgba(255,255,255,0.95);
             border-radius: 15px;
@@ -312,16 +388,39 @@
     <div class="header">
         <h1><i class="fas fa-chart-line"></i> Controle de Estoque e Perdas</h1>
         <p>Monitoramento de tanques | Controle escritural vs medição real</p>
-        <div class="posto-name"><i class="fas fa-gas-pump"></i> REDE DOM PEDRO DE POSTOS - DP 1</div>
+        <div class="posto-name">
+            <i class="fas fa-gas-pump"></i> REDE DOM PEDRO DE POSTOS - DP 1
+            <span class="data-source" id="dataSourceBadge">🌐 Online</span>
+        </div>
     </div>
 
     <div class="container" id="app">
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Carregando dados do posto.csv...</p>
+            <p>Carregando dados...</p>
+            <p style="font-size: 0.8em; margin-top: 10px;">Buscando do GitHub ou cache local</p>
         </div>
 
         <div id="dashboardContent" style="display: none;">
+            <!-- Barra de fonte de dados -->
+            <div class="source-bar">
+                <div class="source-status" id="sourceStatus">
+                    <i class="fas fa-check-circle"></i> Dados carregados com sucesso
+                </div>
+                <button class="offline-btn" id="forceOfflineBtn">
+                    <i class="fas fa-database"></i> Usar dados em cache
+                </button>
+            </div>
+
+            <!-- Área de upload offline (opcional) -->
+            <div class="offline-upload">
+                <label for="offlineFileInput">
+                    <i class="fas fa-cloud-upload-alt"></i> 
+                    Ou arraste um arquivo CSV local para análise offline
+                </label>
+                <input type="file" id="offlineFileInput" accept=".csv">
+            </div>
+
             <!-- Filtros -->
             <div class="filters-bar">
                 <div class="filter-group">
@@ -379,95 +478,194 @@
             </div>
         </div>
         <div class="footer">
-            <i class="fas fa-chart-simple"></i> Dados carregados diretamente do repositório | Controle de perdas e sobras
+            <i class="fas fa-chart-simple"></i> Funciona offline com cache | Dados salvos localmente
         </div>
     </div>
 
     <script>
-        // URL do CSV
+        // Configuração
         const CSV_URL = 'https://waldeciramos.github.io/sites/posto.csv';
+        const STORAGE_KEY = 'posto_dados_cache';
         
         let dadosCompletos = [];
         let charts = {};
+        let currentSource = 'online';
 
-        // Função para fazer fetch e parse do CSV
-        async function carregarCSV() {
+        // Salvar dados no cache local
+        function salvarCache(dados) {
             try {
-                const response = await fetch(CSV_URL);
-                const text = await response.text();
-                
-                // Parse do CSV considerando encoding
-                const linhas = text.split(/\r?\n/);
-                let produtos = {};
-                let produtoAtual = null;
-                let tanquesAtuais = null;
-                
-                for (let i = 0; i < linhas.length; i++) {
-                    let linha = linhas[i];
-                    // Identifica linha de combustível
-                    if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
-                        const matchComb = linha.match(/Combustível:\s*\d+\s*-\s*([^;]+)/);
-                        const matchTanques = linha.match(/Tanques vinculados:\s*([^;]+)/);
-                        if (matchComb) {
-                            produtoAtual = matchComb[1].trim();
-                            tanquesAtuais = matchTanques ? matchTanques[1].trim() : '';
-                        }
-                        continue;
-                    }
-                    
-                    // Pula cabeçalho da tabela
-                    if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença')) {
-                        continue;
-                    }
-                    
-                    // Processa linha de dados
-                    if (produtoAtual && linha.match(/^\d{4}-\d{2}-\d{2}/)) {
-                        const cols = linha.split(';');
-                        if (cols.length >= 10) {
-                            const registro = {
-                                produto: produtoAtual,
-                                tanques: tanquesAtuais,
-                                data: cols[0],
-                                litragemInicial: parseFloat((cols[2] || '0').replace(/\./g, '').replace(',', '.')),
-                                entrada: parseFloat((cols[3] || '0').replace(/\./g, '').replace(',', '.')),
-                                estoqueEscritural: parseFloat((cols[4] || '0').replace(/\./g, '').replace(',', '.')),
-                                litragemFinal: parseFloat((cols[6] || '0').replace(/\./g, '').replace(',', '.')),
-                                saidaBombas: parseFloat((cols[7] || '0').replace(/\./g, '').replace(',', '.')),
-                                saidaTanque: parseFloat((cols[8] || '0').replace(/\./g, '').replace(',', '.')),
-                                diferenca: parseFloat((cols[9] || '0').replace(/\./g, '').replace(',', '.'))
-                            };
-                            
-                            if (!isNaN(registro.saidaBombas) && registro.saidaBombas > 0) {
-                                dadosCompletos.push(registro);
-                            }
-                        }
-                    }
-                    
-                    // Identifica total acumulado para parar
-                    if (linha.includes('Total acumulado combustível')) {
-                        produtoAtual = null;
-                    }
-                }
-                
-                console.log(`Carregados ${dadosCompletos.length} registros`);
-                return dadosCompletos;
-            } catch (error) {
-                console.error('Erro ao carregar CSV:', error);
-                document.getElementById('loading').innerHTML = '<div class="spinner"></div><p style="color: #e94560;">Erro ao carregar dados. Verifique se o arquivo posto.csv está disponível.</p>';
-                return [];
+                const cacheData = {
+                    timestamp: new Date().toISOString(),
+                    dados: dados
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheData));
+                console.log('Dados salvos em cache local');
+                return true;
+            } catch(e) {
+                console.warn('Erro ao salvar cache:', e);
+                return false;
             }
         }
 
-        // Processar produtos e calcular totais
+        // Carregar dados do cache local
+        function carregarCache() {
+            try {
+                const cached = localStorage.getItem(STORAGE_KEY);
+                if (cached) {
+                    const cacheData = JSON.parse(cached);
+                    if (cacheData.dados && cacheData.dados.length > 0) {
+                        console.log(`Cache carregado: ${cacheData.dados.length} registros de ${cacheData.timestamp}`);
+                        return cacheData.dados;
+                    }
+                }
+            } catch(e) {
+                console.warn('Erro ao ler cache:', e);
+            }
+            return null;
+        }
+
+        // Parse do CSV (funciona tanto para online quanto para upload local)
+        function parseCSV(texto) {
+            const linhas = texto.split(/\r?\n/);
+            let dados = [];
+            let produtoAtual = null;
+            let tanquesAtuais = null;
+            
+            for (let i = 0; i < linhas.length; i++) {
+                let linha = linhas[i];
+                
+                // Identifica linha de combustível
+                if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
+                    const matchComb = linha.match(/Combustível:\s*\d+\s*-\s*([^;]+)/);
+                    const matchTanques = linha.match(/Tanques vinculados:\s*([^;]+)/);
+                    if (matchComb) {
+                        produtoAtual = matchComb[1].trim();
+                        tanquesAtuais = matchTanques ? matchTanques[1].trim() : '';
+                    }
+                    continue;
+                }
+                
+                // Pula cabeçalho da tabela
+                if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença')) {
+                    continue;
+                }
+                
+                // Processa linha de dados
+                if (produtoAtual && linha.match(/^\d{4}-\d{2}-\d{2}/)) {
+                    const cols = linha.split(';');
+                    if (cols.length >= 10) {
+                        const registro = {
+                            produto: produtoAtual,
+                            tanques: tanquesAtuais,
+                            data: cols[0],
+                            litragemInicial: parseFloat((cols[2] || '0').replace(/\./g, '').replace(',', '.')),
+                            entrada: parseFloat((cols[3] || '0').replace(/\./g, '').replace(',', '.')),
+                            estoqueEscritural: parseFloat((cols[4] || '0').replace(/\./g, '').replace(',', '.')),
+                            litragemFinal: parseFloat((cols[6] || '0').replace(/\./g, '').replace(',', '.')),
+                            saidaBombas: parseFloat((cols[7] || '0').replace(/\./g, '').replace(',', '.')),
+                            saidaTanque: parseFloat((cols[8] || '0').replace(/\./g, '').replace(',', '.')),
+                            diferenca: parseFloat((cols[9] || '0').replace(/\./g, '').replace(',', '.'))
+                        };
+                        
+                        if (!isNaN(registro.saidaBombas) && registro.saidaBombas > 0) {
+                            dados.push(registro);
+                        }
+                    }
+                }
+                
+                // Identifica total acumulado
+                if (linha.includes('Total acumulado combustível')) {
+                    produtoAtual = null;
+                }
+            }
+            
+            return dados;
+        }
+
+        // Carregar do GitHub
+        async function carregarDoGitHub() {
+            try {
+                const response = await fetch(CSV_URL, { 
+                    cache: 'no-cache',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const texto = await response.text();
+                const dados = parseCSV(texto);
+                
+                if (dados.length > 0) {
+                    salvarCache(dados);
+                    currentSource = 'online';
+                    document.getElementById('dataSourceBadge').innerHTML = '🌐 Online';
+                    document.getElementById('sourceStatus').innerHTML = '<i class="fas fa-cloud-download-alt"></i> Dados carregados do GitHub';
+                    return dados;
+                }
+                return null;
+            } catch (error) {
+                console.warn('Erro ao carregar do GitHub:', error);
+                return null;
+            }
+        }
+
+        // Carregar dados (tenta online primeiro, depois cache)
+        async function carregarDados() {
+            // Mostra loading
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('dashboardContent').style.display = 'none';
+            
+            // Tenta carregar do GitHub primeiro
+            let dados = await carregarDoGitHub();
+            
+            // Se falhar, tenta cache
+            if (!dados || dados.length === 0) {
+                dados = carregarCache();
+                if (dados && dados.length > 0) {
+                    currentSource = 'cache';
+                    document.getElementById('dataSourceBadge').innerHTML = '💾 Offline (Cache)';
+                    document.getElementById('sourceStatus').innerHTML = '<i class="fas fa-database"></i> Dados carregados do cache local (modo offline)';
+                } else {
+                    document.getElementById('loading').innerHTML = `
+                        <div class="spinner"></div>
+                        <p style="color: #e94560;">Não foi possível carregar os dados!</p>
+                        <p style="font-size: 0.9em;">Verifique sua conexão ou faça upload de um arquivo CSV.</p>
+                        <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #e94560; border: none; border-radius: 8px; color: white; cursor: pointer;">
+                            <i class="fas fa-sync-alt"></i> Tentar novamente
+                        </button>
+                    `;
+                    return false;
+                }
+            }
+            
+            dadosCompletos = dados;
+            console.log(`Total de registros carregados: ${dadosCompletos.length}`);
+            
+            // Configurar UI
+            const datas = [...new Set(dados.map(d => d.data))].sort();
+            if (datas.length) {
+                document.getElementById('dataInicio').value = datas[0];
+                document.getElementById('dataFim').value = datas[datas.length - 1];
+            }
+            
+            const produtosUnicos = [...new Set(dados.map(d => d.produto))];
+            const produtoSelect = document.getElementById('produtoFilter');
+            produtoSelect.innerHTML = '<option value="all">Todos os produtos</option>';
+            produtosUnicos.forEach(p => {
+                produtoSelect.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+            
+            refresh();
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+            return true;
+        }
+
+        // Processar produtos
         function processarProdutos(dados, dataInicio, dataFim) {
             let dadosFiltrados = [...dados];
             
-            if (dataInicio) {
-                dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
-            }
-            if (dataFim) {
-                dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
-            }
+            if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
+            if (dataFim) dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
             
             const produtos = {};
             
@@ -479,9 +677,7 @@
                         vendas: 0,
                         estoqueInicial: 0,
                         estoqueFinalMedido: 0,
-                        diferencas: [],
-                        diasConsecutivosNegativos: 0,
-                        ultimaDifNegativa: false
+                        diferencas: []
                     };
                 }
                 
@@ -492,17 +688,14 @@
                     valor: reg.diferenca || 0
                 });
                 
-                // Pega primeiro estoque inicial e último medido
                 if (!produtos[reg.produto].estoqueInicial && reg.litragemInicial) {
                     produtos[reg.produto].estoqueInicial = reg.litragemInicial;
                 }
-                produtos[reg.produto].estoqueFinalMedido = reg.litragemFinal || reg.litragemFinal;
+                produtos[reg.produto].estoqueFinalMedido = reg.litragemFinal || 0;
             });
             
-            // Calcular estoque escritural e status
             Object.keys(produtos).forEach(prod => {
                 const p = produtos[prod];
-                // Escritural = Inicial + Entradas - Vendas
                 p.estoqueEscritural = (p.estoqueInicial || 0) + p.entradas - p.vendas;
                 p.diferencaTotal = p.estoqueFinalMedido - p.estoqueEscritural;
                 p.status = p.diferencaTotal >= 0 ? 'Sobra' : 'Perda';
@@ -512,23 +705,16 @@
             return produtos;
         }
 
-        // Gerar alertas baseados nas regras
+        // Gerar alertas
         function gerarAlertas(dados) {
             const alertas = [];
             const produtoDiferenças = {};
             
-            // Agrupar diferenças por produto e verificar dias consecutivos
             dados.forEach(reg => {
-                if (!produtoDiferenças[reg.produto]) {
-                    produtoDiferenças[reg.produto] = [];
-                }
-                produtoDiferenças[reg.produto].push({
-                    data: reg.data,
-                    diferenca: reg.diferenca || 0
-                });
+                if (!produtoDiferenças[reg.produto]) produtoDiferenças[reg.produto] = [];
+                produtoDiferenças[reg.produto].push({ data: reg.data, diferenca: reg.diferenca || 0 });
             });
             
-            // Verificar cada produto
             Object.keys(produtoDiferenças).forEach(prod => {
                 const diffs = produtoDiferenças[prod].sort((a,b) => a.data.localeCompare(b.data));
                 let diasNegativosConsecutivos = 0;
@@ -536,18 +722,14 @@
                 diffs.forEach(d => {
                     if (d.diferenca < -0.60) {
                         alertas.push({
-                            produto: prod,
-                            data: d.data,
-                            diferenca: d.diferenca,
+                            produto: prod, data: d.data, diferenca: d.diferenca,
                             tipo: 'perda',
                             mensagem: `⚠️ ALERTA - PERDA/VAZAMENTO: Diferença de ${d.diferenca.toFixed(2)}L (abaixo de -0.60L)`
                         });
                         diasNegativosConsecutivos++;
                     } else if (d.diferenca > 0.60) {
                         alertas.push({
-                            produto: prod,
-                            data: d.data,
-                            diferenca: d.diferenca,
+                            produto: prod, data: d.data, diferenca: d.diferenca,
                             tipo: 'erro',
                             mensagem: `⚠️ ERRO DE MEDIÇÃO: Diferença positiva de ${d.diferenca.toFixed(2)}L (acima de +0.60L)`
                         });
@@ -556,12 +738,9 @@
                         diasNegativosConsecutivos = 0;
                     }
                     
-                    // Alerta de 3+ dias consecutivos negativos
                     if (diasNegativosConsecutivos >= 3) {
                         alertas.push({
-                            produto: prod,
-                            data: d.data,
-                            diferenca: d.diferenca,
+                            produto: prod, data: d.data, diferenca: d.diferenca,
                             tipo: 'risco',
                             mensagem: `🔴 RISCO DE DESVIO: ${diasNegativosConsecutivos} dias consecutivos com perda no produto ${prod}`
                         });
@@ -572,9 +751,8 @@
             return alertas.slice(0, 15);
         }
 
-        // Atualizar UI
+        // Atualizar dashboard
         function atualizarDashboard(produtos, alertas, produtoSelecionado, todosDados) {
-            // Cards de resumo geral
             let totalEntradas = 0, totalVendas = 0, totalDiferenca = 0;
             Object.values(produtos).forEach(p => {
                 totalEntradas += p.entradas;
@@ -592,7 +770,7 @@
                     <div class="value">${totalVendas.toLocaleString('pt-BR')} L</div>
                 </div>
                 <div class="summary-card">
-                    <h4><i class="fas fa-chart-line"></i> Diferença Total (Tanque - Escritural)</h4>
+                    <h4><i class="fas fa-chart-line"></i> Diferença Total</h4>
                     <div class="value ${totalDiferenca >= 0 ? 'positive' : 'negative'}">${totalDiferenca.toLocaleString('pt-BR')} L</div>
                     <div class="trend">${totalDiferenca >= 0 ? 'Sobra no período' : 'Perda no período'}</div>
                 </div>
@@ -602,7 +780,6 @@
                 </div>
             `;
             
-            // Alertas
             const alertList = document.getElementById('alertList');
             if (alertas.length === 0) {
                 alertList.innerHTML = '<div style="color: #48bb78; padding: 10px;"><i class="fas fa-check-circle"></i> Nenhum alerta ativo. Controle dentro dos parâmetros.</div>';
@@ -615,7 +792,6 @@
                 `).join('');
             }
             
-            // Tabela de produtos
             const tableBody = document.getElementById('produtosTableBody');
             tableBody.innerHTML = Object.entries(produtos).map(([nome, p]) => `
                 <tr>
@@ -630,7 +806,7 @@
                 </tr>
             `).join('');
             
-            // Gráfico de barras: entradas vs vendas vs diferença
+            // Gráfico de barras
             const nomes = Object.keys(produtos);
             const entradasData = nomes.map(n => produtos[n].entradas);
             const vendasData = nomes.map(n => produtos[n].vendas);
@@ -648,24 +824,17 @@
                         { label: 'Diferença (L)', data: diferencaData, backgroundColor: '#e94560', borderRadius: 8 }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'top' } }
-                }
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
             });
             
-            // Gráfico de evolução diária (para produto selecionado ou todos)
+            // Gráfico de evolução
             let dadosParaEvolucao = todosDados;
             if (produtoSelecionado && produtoSelecionado !== 'all') {
                 dadosParaEvolucao = todosDados.filter(d => d.produto === produtoSelecionado);
             }
             
             const diasMap = {};
-            dadosParaEvolucao.forEach(d => {
-                if (!diasMap[d.data]) diasMap[d.data] = 0;
-                diasMap[d.data] += (d.diferenca || 0);
-            });
+            dadosParaEvolucao.forEach(d => { if (!diasMap[d.data]) diasMap[d.data] = 0; diasMap[d.data] += (d.diferenca || 0); });
             
             const datasOrdenadas = Object.keys(diasMap).sort();
             const diferencasDiarias = datasOrdenadas.map(d => diasMap[d]);
@@ -688,73 +857,100 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => `${ctx.raw.toFixed(2)} L - ${ctx.raw >= 0 ? 'Sobra' : 'Perda'}`
-                            }
-                        }
-                    }
+                    plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(2)} L - ${ctx.raw >= 0 ? 'Sobra' : 'Perda'}` } } }
                 }
             });
         }
+        
+        function refresh() {
+            const produto = document.getElementById('produtoFilter').value;
+            const dataInicio = document.getElementById('dataInicio').value;
+            const dataFim = document.getElementById('dataFim').value;
+            
+            let dadosFiltrados = [...dadosCompletos];
+            if (produto !== 'all') dadosFiltrados = dadosFiltrados.filter(d => d.produto === produto);
+            if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
+            if (dataFim) dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
+            
+            const produtos = processarProdutos(dadosFiltrados, dataInicio, dataFim);
+            const alertas = gerarAlertas(dadosFiltrados);
+            
+            atualizarDashboard(produtos, alertas, produto, dadosFiltrados);
+        }
+        
+        // Upload offline de arquivo local
+        function setupOfflineUpload() {
+            const fileInput = document.getElementById('offlineFileInput');
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                document.getElementById('loading').style.display = 'flex';
+                document.getElementById('dashboardContent').style.display = 'none';
+                
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const texto = evt.target.result;
+                    const dados = parseCSV(texto);
+                    
+                    if (dados.length > 0) {
+                        dadosCompletos = dados;
+                        salvarCache(dados);
+                        currentSource = 'upload';
+                        document.getElementById('dataSourceBadge').innerHTML = '📁 Arquivo Local';
+                        document.getElementById('sourceStatus').innerHTML = '<i class="fas fa-upload"></i> Dados carregados do arquivo local';
+                        
+                        // Reconfigurar UI
+                        const datas = [...new Set(dados.map(d => d.data))].sort();
+                        if (datas.length) {
+                            document.getElementById('dataInicio').value = datas[0];
+                            document.getElementById('dataFim').value = datas[datas.length - 1];
+                        }
+                        
+                        const produtosUnicos = [...new Set(dados.map(d => d.produto))];
+                        const produtoSelect = document.getElementById('produtoFilter');
+                        produtoSelect.innerHTML = '<option value="all">Todos os produtos</option>';
+                        produtosUnicos.forEach(p => {
+                            produtoSelect.innerHTML += `<option value="${p}">${p}</option>`;
+                        });
+                        
+                        refresh();
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('dashboardContent').style.display = 'block';
+                    } else {
+                        alert('Nenhum dado válido encontrado no arquivo CSV');
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('dashboardContent').style.display = 'block';
+                    }
+                };
+                reader.readAsText(file, 'latin1');
+            });
+        }
+        
+        // Forçar uso do cache
+        document.getElementById('forceOfflineBtn').addEventListener('click', () => {
+            const cached = carregarCache();
+            if (cached && cached.length > 0) {
+                dadosCompletos = cached;
+                currentSource = 'cache';
+                document.getElementById('dataSourceBadge').innerHTML = '💾 Offline (Cache)';
+                document.getElementById('sourceStatus').innerHTML = '<i class="fas fa-database"></i> Usando dados em cache (modo offline)';
+                refresh();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+            } else {
+                alert('Nenhum dado em cache disponível. Conecte-se à internet primeiro para baixar os dados.');
+            }
+        });
+        
+        // Event listeners
+        document.getElementById('produtoFilter').addEventListener('change', refresh);
+        document.getElementById('dataInicio').addEventListener('change', refresh);
+        document.getElementById('dataFim').addEventListener('change', refresh);
         
         // Inicialização
-        async function init() {
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('dashboardContent').style.display = 'none';
-            
-            const dados = await carregarCSV();
-            if (dados.length === 0) return;
-            
-            dadosCompletos = dados;
-            
-            // Configurar filtros de data
-            const datas = [...new Set(dados.map(d => d.data))].sort();
-            if (datas.length) {
-                document.getElementById('dataInicio').value = datas[0];
-                document.getElementById('dataFim').value = datas[datas.length - 1];
-            }
-            
-            // Popula produtos no select
-            const produtosUnicos = [...new Set(dados.map(d => d.produto))];
-            const produtoSelect = document.getElementById('produtoFilter');
-            produtoSelect.innerHTML = '<option value="all">Todos os produtos</option>';
-            produtosUnicos.forEach(p => {
-                produtoSelect.innerHTML += `<option value="${p}">${p}</option>`;
-            });
-            
-            // Função para atualizar com filtros
-            function refresh() {
-                const produto = document.getElementById('produtoFilter').value;
-                const dataInicio = document.getElementById('dataInicio').value;
-                const dataFim = document.getElementById('dataFim').value;
-                
-                let dadosFiltrados = [...dados];
-                if (produto !== 'all') {
-                    dadosFiltrados = dadosFiltrados.filter(d => d.produto === produto);
-                }
-                if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
-                if (dataFim) dadosFiltrados = dadosFiltrados.filter(d => d.data <= dataFim);
-                
-                const produtos = processarProdutos(dadosFiltrados, dataInicio, dataFim);
-                const alertas = gerarAlertas(dadosFiltrados);
-                
-                atualizarDashboard(produtos, alertas, produto, dadosFiltrados);
-            }
-            
-            // Event listeners
-            document.getElementById('produtoFilter').addEventListener('change', refresh);
-            document.getElementById('dataInicio').addEventListener('change', refresh);
-            document.getElementById('dataFim').addEventListener('change', refresh);
-            
-            refresh();
-            
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('dashboardContent').style.display = 'block';
-        }
-        
-        init();
+        setupOfflineUpload();
+        carregarDados();
     </script>
 </body>
 </html>
