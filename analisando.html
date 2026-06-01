@@ -167,7 +167,6 @@
             opacity: 0.7;
         }
 
-        /* Relatório de Resultado Geral */
         .resultado-geral {
             background: rgba(0,0,0,0.4);
             border-radius: 15px;
@@ -201,7 +200,6 @@
             color: #e94560;
         }
 
-        /* Botão de Relatório */
         .btn-relatorio {
             background: #e94560;
             border: none;
@@ -223,7 +221,6 @@
             background: #0f3460;
         }
 
-        /* Modal do Relatório */
         .modal {
             display: none;
             position: fixed;
@@ -464,7 +461,6 @@
                 </button>
             </div>
 
-            <!-- Resultado Geral -->
             <div class="resultado-geral" id="resultadoGeral">
                 <h3><i class="fas fa-chart-simple"></i> RESULTADO GERAL DO PERÍODO</h3>
                 <div id="resultadoBadge"></div>
@@ -525,7 +521,6 @@
             </div>
         </div>
 
-        <!-- Modal do Relatório -->
         <div id="relatorioModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -545,12 +540,10 @@
         let dadosCompletos = [];
         let charts = {};
 
-        // Formatar número sem casas decimais
         function formatarNumero(valor) {
             return Math.round(valor).toLocaleString('pt-BR');
         }
 
-        // Parse do CSV - Versão melhorada para diferentes formatos
         function parseCSV(texto) {
             const linhas = texto.split(/\r?\n/);
             let dados = [];
@@ -561,7 +554,6 @@
                 let linha = linhas[i].trim();
                 if (!linha) continue;
                 
-                // Detecta cabeçalho de produto
                 if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
                     const matchComb = linha.match(/Combustível:\s*\d+\s*-\s*([^;]+)/);
                     const matchTanques = linha.match(/Tanques vinculados:\s*([^;]+)/);
@@ -572,18 +564,15 @@
                     continue;
                 }
                 
-                // Pula linha de cabeçalho da tabela
                 if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença')) {
                     continue;
                 }
                 
-                // Processa linha de dados
                 if (produtoAtual && linha.match(/^\d{4}-\d{2}-\d{2}/)) {
                     const cols = linha.split(';');
                     if (cols.length >= 10) {
                         const limparNumero = (str) => {
                             if (!str || str === '') return 0;
-                            // Remove pontos de milhar e substitui vírgula por ponto
                             let numStr = String(str).replace(/\./g, '').replace(',', '.');
                             return parseFloat(numStr) || 0;
                         };
@@ -607,7 +596,6 @@
                     }
                 }
                 
-                // Reseta quando encontra fim da seção
                 if (linha.includes('Total acumulado combustível')) {
                     produtoAtual = null;
                 }
@@ -616,9 +604,7 @@
             return dados;
         }
 
-        // Carregar dados - Múltiplos caminhos possíveis
         async function carregarDados() {
-            // Obtém o caminho base da página atual
             const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
             
             const fontes = [
@@ -651,7 +637,6 @@
             return null;
         }
 
-        // Processar produtos
         function processarProdutos(dados, dataInicio, dataFim) {
             let dadosFiltrados = [...dados];
             if (dataInicio) dadosFiltrados = dadosFiltrados.filter(d => d.data >= dataInicio);
@@ -695,7 +680,6 @@
             return produtos;
         }
 
-        // Atualizar resultado geral
         function atualizarResultadoGeral(produtos) {
             let totalDiferenca = 0;
             Object.values(produtos).forEach(p => {
@@ -716,7 +700,6 @@
             `;
         }
 
-        // Gerar relatório
         function gerarRelatorioGeral(produtos, todosDados) {
             let totalEntradas = 0, totalVendas = 0, totalDiferenca = 0;
             const produtosArray = [];
@@ -785,7 +768,6 @@
             `;
         }
 
-        // Atualizar dashboard
         function atualizarDashboard(produtos, produtoSelecionado, todosDados) {
             let totalEntradas = 0, totalVendas = 0, totalDiferenca = 0;
             Object.values(produtos).forEach(p => {
@@ -814,10 +796,8 @@
                 </div>
             `;
             
-            // Atualizar resultado geral
             atualizarResultadoGeral(produtos);
             
-            // Tabela
             const tableBody = document.getElementById('produtosTableBody');
             if (Object.keys(produtos).length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhum produto encontrado</td></tr>';
@@ -836,7 +816,6 @@
                 `).join('');
             }
             
-            // Gráfico
             const nomes = Object.keys(produtos);
             const entradasData = nomes.map(n => produtos[n].entradas);
             const vendasData = nomes.map(n => produtos[n].vendas);
@@ -857,7 +836,6 @@
                 options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
             });
             
-            // Evolução
             let dadosParaEvolucao = todosDados;
             if (produtoSelecionado && produtoSelecionado !== 'all') {
                 dadosParaEvolucao = todosDados.filter(d => d.produto === produtoSelecionado);
@@ -900,7 +878,6 @@
             const produtos = processarProdutos(dadosFiltrados, dataInicio, dataFim);
             atualizarDashboard(produtos, produto, dadosFiltrados);
             
-            // Armazenar produtos para os botões de relatório
             window.produtosAtuais = produtos;
             window.dadosAtuais = dadosFiltrados;
         }
@@ -925,7 +902,6 @@
             document.getElementById('relatorioModal').classList.remove('active');
         }
         
-        // Inicialização
         async function init() {
             document.getElementById('refreshBtn').addEventListener('click', () => location.reload());
             document.getElementById('produtoFilter').addEventListener('change', refresh);
@@ -962,6 +938,7 @@
                         <p style="color: #e94560; font-size: 1.2em;">Arquivo posto.csv não encontrado!</p>
                         <p style="margin-top: 10px;">Verifique se o arquivo está no diretório correto.</p>
                         <p style="margin-top: 5px; font-size: 0.9em;">Caminhos buscados: mesmo diretório, /sites/, GitHub Pages</p>
+                        <p style="margin-top: 15px; font-size: 0.8em;">Acesse: <strong>https://waldeciramos.github.io/sites/analisando.html</strong></p>
                     </div>
                 `;
             }
