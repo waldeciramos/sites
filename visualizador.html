@@ -154,8 +154,11 @@
             
             if (dadosCompletos.length === 0) throw new Error('Nenhum dado encontrado');
             
-            // Popular filtro de combustível
+            // Extrair lista única de combustíveis
             const combustiveis = [...new Set(dadosCompletos.map(d => d.combustivel))];
+            console.log('Combustíveis encontrados:', combustiveis);
+            
+            // Popular filtro de combustível
             const selectComb = document.getElementById('combustivelFiltro');
             selectComb.innerHTML = '<option value="todos">📊 TODOS OS COMBUSTÍVEIS</option>';
             combustiveis.forEach(c => {
@@ -185,23 +188,39 @@
         let combustivelAtual = '';
         
         for (let i = 0; i < linhas.length; i++) {
-            const linha = linhas[i];
+            let linha = linhas[i];
             
-            // Detecta cabeçalho de combustível
-            if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
-                // Extrai o nome do combustível (ex: "1 - DIESEL COMUM" ou "2309 - DIESEL S 10")
-                const match = linha.match(/Combustível:\s*([^;]+)/);
-                if (match) {
-                    combustivelAtual = match[1].trim();
+            // ============================================
+            // DETECTA COMBUSTÍVEL - VERSÃO CORRIGIDA
+            // Procura por "Combustível:" (com acento) no início da linha
+            // ============================================
+            if (linha.indexOf('Combustível:') !== -1 && linha.indexOf('Tanques vinculados') !== -1) {
+                // Extrai o texto após "Combustível:" até o ";"
+                const inicio = linha.indexOf('Combustível:') + 12;
+                const fim = linha.indexOf(';', inicio);
+                if (fim > inicio) {
+                    combustivelAtual = linha.substring(inicio, fim).trim();
+                } else {
+                    combustivelAtual = linha.substring(inicio).trim();
                 }
+                // Remove qualquer código numérico no início (ex: "1 - " ou "2309 - ")
+                combustivelAtual = combustivelAtual.replace(/^\d+\s*-\s*/, '');
+                console.log(`Linha ${i+1}: Combustível detectado = "${combustivelAtual}"`);
                 continue;
             }
             
-            // Pula linhas de total
-            if (linha.includes('Total acumulado') || linha.includes('Total geral')) continue;
-            if (linha.includes('MEDIÇÃO DE TANQUE')) continue;
+            // Pula linhas que não são dados
+            if (linha.includes('Total acumulado')) continue;
+            if (linha.includes('Total geral')) continue;
+            if (linha.includes('MEDIÇÃO')) continue;
             if (linha.includes('Empresa:')) continue;
             if (linha.includes('Período:')) continue;
+            if (linha.includes('Depósitos:')) continue;
+            if (linha.includes('Modo:')) continue;
+            if (linha.includes('Agrupar:')) continue;
+            if (linha.includes('Exibir:')) continue;
+            if (linha.startsWith(';')) continue;
+            if (linha.trim() === '') continue;
             
             // Processa linha de dados (começa com data no formato YYYY-MM-DD)
             const colunas = linha.split(';');
@@ -219,7 +238,7 @@
                 const entrada = converterNumero(colunas[3]);
                 
                 // Só adiciona se tiver movimento
-                if (saidaBombas > 0 || entrada > 0 || diferenca !== 0) {
+                if (saidaBombas > 0 || entrada > 0) {
                     resultados.push({
                         data: colunas[0],
                         combustivel: combustivelAtual || 'Não identificado',
@@ -231,8 +250,13 @@
             }
         }
         
-        console.log(`Processados ${resultados.length} registros`);
-        console.log('Combustíveis encontrados:', [...new Set(resultados.map(r => r.combustivel))]);
+        console.log(`Total de registros processados: ${resultados.length}`);
+        
+        // Mostrar estatísticas por combustível
+        const stats = {};
+        resultados.forEach(r => { stats[r.combustivel] = (stats[r.combustivel] || 0) + 1; });
+        console.log('Registros por combustível:', stats);
+        
         return resultados;
     }
     
@@ -320,11 +344,13 @@
         });
         
         // ========== GRÁFICO 2: Distribuição por Combustível ==========
-        charts.distribuicao = new Chart(document.getElementById('chartDistribuicao'), {
-            type: 'pie',
-            data: { labels: Object.keys(vendasPorComb), datasets: [{ data: Object.values(vendasPorComb), backgroundColor: cores.slice(0, Object.keys(vendasPorComb).length) }] },
-            options: { responsive: true, plugins: { legend: { position: 'right' } } }
-        });
+        if (Object.keys(vendasPorComb).length > 0) {
+            charts.distribuicao = new Chart(document.getElementById('chartDistribuicao'), {
+                type: 'pie',
+                data: { labels: Object.keys(vendasPorComb), datasets: [{ data: Object.values(vendasPorComb), backgroundColor: cores.slice(0, Object.keys(vendasPorComb).length) }] },
+                options: { responsive: true, plugins: { legend: { position: 'right' } } }
+            });
+        }
         
         // ========== GRÁFICO 3: Top 10 Diferenças ==========
         charts.topDiffs = new Chart(document.getElementById('chartTopDiffs'), {
@@ -364,7 +390,8 @@
         document.getElementById('statusBadge').innerHTML = `<i class="fas fa-filter"></i> Filtrando: ${nome}`;
         atualizarDashboard();
         setTimeout(() => {
-            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros • ${[...new Set(dadosCompletos.map(d=>d.combustivel))].length} combustíveis`;
+            const qtd = [...new Set(dadosCompletos.map(d=>d.combustivel))].length;
+            document.getElementById('statusBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${dadosCompletos.length} registros • ${qtd} combustíveis`;
         }, 1500);
     });
     document.getElementById('periodoFiltro').addEventListener('change', atualizarDashboard);
