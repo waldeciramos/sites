@@ -1,15 +1,15 @@
 MG - REDE DOM PEDRO DE POSTOS LTDA                                                                                                                         01/06/2026 08:56;;;;;;;;;;;
-MEDI√á√ÉO DE TANQUE POR PER√çODO;;;;;;;;;;;
-Empresa: 2 - DP 1 oi;;;;;;;;;;;
-Per√≠odo: 01/05/2026 a 31/05/2026;;;;;;;;;;;
-Dep√≥sitos: ATIVOS;;;;;;;;;;;
-Modo: ANAL√çTICO;;;;;;;;;;;
-Agrupar: COMBUST√çVEL;;;;;;;;;;;
+MEDI«√O DE TANQUE POR PERÕODO;;;;;;;;;;;
+Empresa: 2 - DP 1;;;;;;;;;;;
+PerÌodo: 01/05/2026 a 31/05/2026;;;;;;;;;;;
+DepÛsitos: ATIVOS;;;;;;;;;;;
+Modo: ANALÕTICO;;;;;;;;;;;
+Agrupar: COMBUSTÕVEL;;;;;;;;;;;
 Exibir: SOMENTE COM ESTOQUE;;;;;;;;;;;
 Empresa: 2 - DP 1;;;;;;;;;;;
-Combust√≠vel: 1 - DIESEL COMUM;Tanques vinculados: 388 - 387;;;;;;;;;;
-;Inicial;;;Final;Sa√≠da;Sa√≠da;;;;;
-Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumulado;Diferen√ßa Acum.
+CombustÌvel: 1 - DIESEL COMUM;Tanques vinculados: 388 - 387;;;;;;;;;;
+;Inicial;;;Final;SaÌda;SaÌda;;;;;
+Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;DiferenÁa;Acumulado;DiferenÁa Acum.
 2026-05-01;0;10251;10000;20251;0;18553;1764,717;1698;66,7;66,7;3,8
 2026-05-02;0;18553;200;18753;0;16834;1914,19;1919;-4,8;61,9;1,7
 2026-05-03;0;16834;0;16834;0;14185;2579,983;2649;-69;-7,1;0
@@ -41,10 +41,10 @@ Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumul
 2026-05-29;0;13721;5000;18721;0;15896;2822,316;2825;-2,7;-84,7;0
 2026-05-30;0;15896;10000;25896;0;25327;689,948;569;120,9;36,2;0
 2026-05-31;0;25327;0;25327;0;24468;761,799;859;-97,2;-61;-0,1
-Total acumulado combust√≠vel;101322,274;101383;-61;-1932,5;3,1;;;;;;
-Combust√≠vel: 2 - GASOLINA COMUM;Tanques vinculados: 391;;;;;;;;;;
-;Inicial;;;Final;Sa√≠da;Sa√≠da;;;;;
-Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumulado;Diferen√ßa Acum.
+Total acumulado combustÌvel;101322,274;101383;-61;-1932,5;3,1;;;;;;
+CombustÌvel: 2 - GASOLINA COMUM;Tanques vinculados: 391;;;;;;;;;;
+;Inicial;;;Final;SaÌda;SaÌda;;;;;
+Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;DiferenÁa;Acumulado;DiferenÁa Acum.
 2026-05-01;0;5308;5000;10308;0;8480;1841,729;1828;13,7;13,7;0,7
 2026-05-02;0;8480;5000;13480;0;12217;1258,181;1263;-4,8;8,9;0,3
 2026-05-03;0;12217;0;12217;0;8480;3678,126;3737;-58,9;-50;-0,7
@@ -76,10 +76,10 @@ Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumul
 2026-05-29;0;11581;0;11581;0;9871;1745,797;1710;35,8;-205,4;-0,4
 2026-05-30;0;9871;5000;14871;0;13407;1494,159;1464;30,2;-175,2;-0,3
 2026-05-31;0;13407;0;13407;0;11364;1986,598;2043;-56,4;-231,6;-0,4
-Total acumulado combust√≠vel;53712,439;53944;-231,6;-3919,8;-10,9;;;;;;
-Combust√≠vel: 2309 - DIESEL S 10;Tanques vinculados: 398 - 394;;;;;;;;;;
-;Inicial;;;Final;Sa√≠da;Sa√≠da;;;;;
-Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumulado;Diferen√ßa Acum.
+Total acumulado combustÌvel;53712,439;53944;-231,6;-3919,8;-10,9;;;;;;
+CombustÌvel: 2309 - DIESEL S 10;Tanques vinculados: 398 - 394;;;;;;;;;;
+;Inicial;;;Final;SaÌda;SaÌda;;;;;
+Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;DiferenÁa;Acumulado;DiferenÁa Acum.
 2026-05-01;0;34482;20405;54887;0;37874;16946,441;17013;-66,6;-66,6;-0,2
 2026-05-02;0;37874;13000;50874;0;40169;10953,358;10705;248,4;181,8;0,6
 2026-05-03;0;40169;7000;47169;0;25281;22015,274;21888;127,3;309,1;0,7
@@ -111,10 +111,10 @@ Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumul
 2026-05-29;0;15684;40000;55684;0;27985;27594,492;27699;-104,5;783,3;0,1
 2026-05-30;0;27985;30000;57985;0;33047;24921,928;24938;-16;767,3;0,2
 2026-05-31;0;33047;40000;73047;0;45109;28047,398;27938;109,4;876,7;0,1
-Total acumulado combust√≠vel;814154,583;813278;876,7;17337,4;6,5;;;;;;
-Combust√≠vel: 3 - ETANOL;Tanques vinculados: 393;;;;;;;;;;
-;Inicial;;;Final;Sa√≠da;Sa√≠da;;;;;
-Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumulado;Diferen√ßa Acum.
+Total acumulado combustÌvel;814154,583;813278;876,7;17337,4;6,5;;;;;;
+CombustÌvel: 3 - ETANOL;Tanques vinculados: 393;;;;;;;;;;
+;Inicial;;;Final;SaÌda;SaÌda;;;;;
+Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;DiferenÁa;Acumulado;DiferenÁa Acum.
 2026-05-01;0;3909;5000;8909;0;8090;865,22;819;46,2;46,2;5,3
 2026-05-02;0;8090;0;8090;0;7310;716,229;780;-63,8;-17,6;-1,1
 2026-05-03;0;7310;0;7310;0;5082;2238,131;2228;10,1;-7,5;-0,2
@@ -146,10 +146,10 @@ Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumul
 2026-05-29;0;4489;0;4489;0;3486;937,506;1003;-65,5;-75,2;-0,3
 2026-05-30;0;3486;5000;8486;0;7778;647,044;708;-61;-136,2;-0,5
 2026-05-31;0;7778;0;7778;0;6843;912,478;935;-22,5;-158,7;-0,6
-Total acumulado combust√≠vel;26907,424;27066;-158,7;-1199,9;-4,6;;;;;;
-Combust√≠vel: 7321 - ARLA A GRANEL;Tanques vinculados: 397;;;;;;;;;;
-;Inicial;;;Final;Sa√≠da;Sa√≠da;;;;;
-Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumulado;Diferen√ßa Acum.
+Total acumulado combustÌvel;26907,424;27066;-158,7;-1199,9;-4,6;;;;;;
+CombustÌvel: 7321 - ARLA A GRANEL;Tanques vinculados: 397;;;;;;;;;;
+;Inicial;;;Final;SaÌda;SaÌda;;;;;
+Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;DiferenÁa;Acumulado;DiferenÁa Acum.
 2026-05-01;0;6909;0;6909;0;6136;784,385;773;11,4;11,4;1,5
 2026-05-02;0;6136;3000;9136;0;8636;511,409;500;11,4;22,8;1,8
 2026-05-03;0;8636;0;8636;0;7272;1320,249;1364;-43,8;-21;-0,8
@@ -181,5 +181,5 @@ Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferen√ßa;Acumul
 2026-05-29;0;4045;0;4045;0;2681;1359,033;1364;-5;256,1;0,7
 2026-05-30;0;2681;5000;7681;0;6545;1177,086;1136;41,1;297,2;0,8
 2026-05-31;0;6545;0;6545;0;4999;1578,564;1546;32,6;329,8;0,8
-Total acumulado combust√≠vel;40739,781;40410;329,8;1453,6;2,5;;;;;;
+Total acumulado combustÌvel;40739,781;40410;329,8;1453,6;2,5;;;;;;
 Total geral da empresa;1036836,501;1036081;755,2;11738,8;-3,4;;;;;;
