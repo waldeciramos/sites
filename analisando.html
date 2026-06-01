@@ -301,38 +301,6 @@
             font-weight: bold;
         }
 
-        .upload-area-custom {
-            background: rgba(255,255,255,0.05);
-            border: 2px dashed rgba(255,255,255,0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .upload-area-custom:hover {
-            border-color: #e94560;
-            background: rgba(233,69,96,0.1);
-        }
-
-        .upload-area-custom input {
-            display: none;
-        }
-
-        .upload-area-custom label {
-            cursor: pointer;
-            color: #ccc;
-            font-size: 0.9em;
-        }
-
-        .upload-area-custom label i {
-            color: #e94560;
-            margin-right: 8px;
-            font-size: 1.2em;
-        }
-
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -484,7 +452,6 @@
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>Carregando dados do arquivo posto.csv...</p>
-            <p style="font-size: 0.8em; margin-top: 10px;">Buscando no GitHub Pages ou aguardando upload</p>
         </div>
 
         <div id="dashboardContent" style="display: none;">
@@ -495,15 +462,6 @@
                 <button class="offline-btn" id="refreshBtn">
                     <i class="fas fa-sync-alt"></i> Recarregar
                 </button>
-            </div>
-
-            <div class="upload-area-custom" id="uploadArea">
-                <label for="fileInput">
-                    <i class="fas fa-cloud-upload-alt"></i> 
-                    Clique aqui para selecionar um arquivo CSV (posto.csv)
-                </label>
-                <input type="file" id="fileInput" accept=".csv">
-                <p style="font-size: 0.7em; margin-top: 8px; color: #888;">Se o arquivo não carregar automaticamente, selecione manualmente</p>
             </div>
 
             <!-- Resultado Geral -->
@@ -579,7 +537,7 @@
         </div>
 
         <div class="footer">
-            <i class="fas fa-chart-simple"></i> Funciona offline | Selecione o arquivo posto.csv manualmente se necessário
+            <i class="fas fa-chart-simple"></i> Sistema de controle de perdas - Rede Dom Pedro
         </div>
     </div>
 
@@ -592,7 +550,7 @@
             return Math.round(valor).toLocaleString('pt-BR');
         }
 
-        // Parse do CSV
+        // Parse do CSV - Versão melhorada para diferentes formatos
         function parseCSV(texto) {
             const linhas = texto.split(/\r?\n/);
             let dados = [];
@@ -603,6 +561,7 @@
                 let linha = linhas[i].trim();
                 if (!linha) continue;
                 
+                // Detecta cabeçalho de produto
                 if (linha.includes('Combustível:') && linha.includes('Tanques vinculados')) {
                     const matchComb = linha.match(/Combustível:\s*\d+\s*-\s*([^;]+)/);
                     const matchTanques = linha.match(/Tanques vinculados:\s*([^;]+)/);
@@ -613,16 +572,20 @@
                     continue;
                 }
                 
+                // Pula linha de cabeçalho da tabela
                 if (linha.includes('Data;Med.;Litragem;Entrada;Estoque;Med.;Litragem;Bombas;Tanque;Diferença')) {
                     continue;
                 }
                 
+                // Processa linha de dados
                 if (produtoAtual && linha.match(/^\d{4}-\d{2}-\d{2}/)) {
                     const cols = linha.split(';');
                     if (cols.length >= 10) {
                         const limparNumero = (str) => {
                             if (!str || str === '') return 0;
-                            return parseFloat(String(str).replace(/\./g, '').replace(',', '.')) || 0;
+                            // Remove pontos de milhar e substitui vírgula por ponto
+                            let numStr = String(str).replace(/\./g, '').replace(',', '.');
+                            return parseFloat(numStr) || 0;
                         };
                         
                         const registro = {
@@ -644,6 +607,7 @@
                     }
                 }
                 
+                // Reseta quando encontra fim da seção
                 if (linha.includes('Total acumulado combustível')) {
                     produtoAtual = null;
                 }
@@ -652,28 +616,36 @@
             return dados;
         }
 
-        // Carregar dados
+        // Carregar dados - Múltiplos caminhos possíveis
         async function carregarDados() {
+            // Obtém o caminho base da página atual
+            const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+            
             const fontes = [
-                { url: 'posto.csv', nome: 'GitHub Pages' },
+                { url: 'posto.csv', nome: 'Mesmo diretório' },
                 { url: './posto.csv', nome: 'Diretório atual' },
-                { url: '/sites/posto.csv', nome: 'Subdiretório sites' }
+                { url: basePath + 'posto.csv', nome: 'Caminho relativo' },
+                { url: '/sites/posto.csv', nome: '/sites/' },
+                { url: '../posto.csv', nome: 'Diretório pai' },
+                { url: 'https://waldeciramos.github.io/sites/posto.csv', nome: 'GitHub (completo)' }
             ];
             
             for (const fonte of fontes) {
                 try {
+                    console.log(`Tentando carregar: ${fonte.url}`);
                     const response = await fetch(fonte.url, { cache: 'no-store' });
                     if (response.ok) {
                         const texto = await response.text();
                         const dados = parseCSV(texto);
                         if (dados.length > 0) {
                             document.getElementById('dataSourceBadge').innerHTML = `✅ ${fonte.nome}`;
-                            document.getElementById('sourceStatus').innerHTML = `<i class="fas fa-check-circle"></i> Dados carregados de ${fonte.nome}`;
+                            document.getElementById('sourceStatus').innerHTML = `<i class="fas fa-check-circle"></i> Dados carregados de ${fonte.nome} (${dados.length} registros)`;
+                            console.log(`Sucesso! Carregados ${dados.length} registros de ${fonte.url}`);
                             return dados;
                         }
                     }
                 } catch(e) {
-                    console.log(`Falha em ${fonte.url}`);
+                    console.log(`Falha em ${fonte.url}:`, e.message);
                 }
             }
             return null;
@@ -773,7 +745,7 @@
                             ${totalDiferenca >= 0 ? 'SOBRA' : 'PERDA'} TOTAL: ${formatarNumero(Math.abs(totalDiferenca))} L
                         </span>
                     </div>
-                    <p>Período analisado: ${todosDados.length} dias</p>
+                    <p>Período analisado: ${todosDados.length} dias de registros</p>
                 </div>
                 <hr>
                 <h3 style="margin: 20px 0 10px 0;">DETALHAMENTO POR PRODUTO</h3>
@@ -953,55 +925,8 @@
             document.getElementById('relatorioModal').classList.remove('active');
         }
         
-        // Upload manual
-        function setupUpload() {
-            const fileInput = document.getElementById('fileInput');
-            const uploadArea = document.getElementById('uploadArea');
-            
-            uploadArea.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                document.getElementById('loading').style.display = 'flex';
-                document.getElementById('dashboardContent').style.display = 'none';
-                
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    const dados = parseCSV(evt.target.result);
-                    if (dados.length > 0) {
-                        dadosCompletos = dados;
-                        document.getElementById('dataSourceBadge').innerHTML = '📁 Upload Manual';
-                        document.getElementById('sourceStatus').innerHTML = `<i class="fas fa-upload"></i> Arquivo carregado: ${file.name}`;
-                        
-                        const datas = [...new Set(dados.map(d => d.data))].sort();
-                        if (datas.length) {
-                            document.getElementById('dataInicio').value = datas[0];
-                            document.getElementById('dataFim').value = datas[datas.length - 1];
-                        }
-                        
-                        const produtosUnicos = [...new Set(dados.map(d => d.produto))];
-                        const produtoSelect = document.getElementById('produtoFilter');
-                        produtoSelect.innerHTML = '<option value="all">Todos os produtos</option>';
-                        produtosUnicos.forEach(p => {
-                            produtoSelect.innerHTML += `<option value="${p}">${p}</option>`;
-                        });
-                        
-                        refresh();
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('dashboardContent').style.display = 'block';
-                    } else {
-                        alert('Arquivo inválido ou sem dados');
-                        document.getElementById('loading').style.display = 'none';
-                    }
-                };
-                reader.readAsText(file, 'ISO-8859-1');
-            });
-        }
-        
         // Inicialização
         async function init() {
-            setupUpload();
             document.getElementById('refreshBtn').addEventListener('click', () => location.reload());
             document.getElementById('produtoFilter').addEventListener('change', refresh);
             document.getElementById('dataInicio').addEventListener('change', refresh);
@@ -1035,11 +960,10 @@
                     <div class="error-box">
                         <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e94560; margin-bottom: 15px; display: block;"></i>
                         <p style="color: #e94560; font-size: 1.2em;">Arquivo posto.csv não encontrado!</p>
-                        <p style="margin-top: 10px;">Clique na área abaixo para selecionar o arquivo manualmente.</p>
+                        <p style="margin-top: 10px;">Verifique se o arquivo está no diretório correto.</p>
+                        <p style="margin-top: 5px; font-size: 0.9em;">Caminhos buscados: mesmo diretório, /sites/, GitHub Pages</p>
                     </div>
                 `;
-                document.getElementById('dashboardContent').style.display = 'block';
-                document.getElementById('loading').style.display = 'none';
             }
         }
         
