@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MikroTik hAP lite — Painel de Controle</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--bg2:#0f1526;--bg3:#151d35;--bg4:#1a2340;
+  --border:#1e2d50;--border2:#2a3f6f;
+  --accent:#00d4ff;--accent2:#0099cc;--accent-dim:#003344;
+  --green:#00ff9d;--green-dim:#003322;
+  --red:#ff4466;--red-dim:#330011;
+  --amber:#ffaa00;--amber-dim:#332200;
+  --txt:#e8f0ff;--txt2:#7a90b8;--txt3:#3a4f7a;
+  --card:#0f1526;
+  --radius:10px;--radius-lg:14px;
+}
+html{font-size:14px}
+body{background:var(--bg);color:var(--txt);font-family:'JetBrains Mono',monospace;min-height:100vh;overflow-x:hidden}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* LAYOUT */
+#app{display:flex;min-height:100vh}
+#sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s}
+#main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50}
+#content{padding:24px;flex:1}
+
+/* SIDEBAR */
+.sb-logo{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
+.sb-logo-title{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--accent);letter-spacing:0.05em}
+.sb-logo-sub{font-size:10px;color:var(--txt3);margin-top:2px}
+.sb-conn{padding:12px 16px;border-bottom:1px solid var(--border)}
+.sb-conn input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 8px;margin-bottom:6px;outline:none}
+.sb-conn input:focus{border-color:var(--accent2)}
+.sb-conn button{width:100%;background:var(--accent-dim);border:1px solid var(--accent2);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px;border-radius:6px;cursor:pointer;transition:all 0.15s}
+.sb-conn button:hover{background:var(--accent2);color:#000}
+.sb-nav{padding:8px 0;flex:1;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:9px;color:var(--txt3);letter-spacing:0.1em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;color:var(--txt2);font-size:12px;transition:all 0.15s;border-left:2px solid transparent}
+.nav-item:hover{color:var(--txt);background:var(--bg3)}
+.nav-item.active{color:var(--accent);background:var(--accent-dim);border-left-color:var(--accent)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.sb-status{padding:12px 16px;border-top:1px solid var(--border);font-size:10px}
+.status-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.dot{width:7px;height:7px;border-radius:50%;background:#333;flex-shrink:0;transition:background 0.3s}
+.dot.on{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot.off{background:var(--red)}
+
+/* TOPBAR */
+.tb-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--txt);flex:1}
+.tb-badge{padding:3px 10px;border-radius:99px;font-size:10px;border:1px solid}
+.tb-badge.ok{background:var(--green-dim);color:var(--green);border-color:#00441f}
+.tb-badge.err{background:var(--red-dim);color:var(--red);border-color:#440011}
+.tb-refresh{background:var(--bg3);border:1px solid var(--border);color:var(--txt2);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'JetBrains Mono',monospace;transition:all 0.15s}
+.tb-refresh:hover{border-color:var(--accent2);color:var(--accent)}
+
+/* PANELS */
+.panel{display:none;animation:fadeIn 0.2s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* GRID */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+
+/* METRIC CARDS */
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.metric-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:700;font-family:'Syne',sans-serif;color:var(--txt)}
+.metric-value.green{color:var(--green)}
+.metric-value.amber{color:var(--amber)}
+.metric-value.red{color:var(--red)}
+.metric-value.accent{color:var(--accent)}
+.metric-sub{font-size:10px;color:var(--txt3);margin-top:3px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:16px}
+.card-title{font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:var(--txt);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title svg{width:16px;height:16px;color:var(--accent)}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;padding:6px 10px;border-bottom:1px solid var(--border);text-align:left;font-weight:500}
+td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--txt2);font-family:'JetBrains Mono',monospace}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3);color:var(--txt)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:500}
+.badge-green{background:var(--green-dim);color:var(--green);border:1px solid #00442211}
+.badge-red{background:var(--red-dim);color:var(--red);border:1px solid #44001111}
+.badge-amber{background:var(--amber-dim);color:var(--amber);border:1px solid #44220011}
+.badge-blue{background:var(--accent-dim);color:var(--accent);border:1px solid #00334411}
+
+/* TERMINAL */
+.terminal{background:#050810;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.term-bar{background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px}
+.term-dot{width:10px;height:10px;border-radius:50%}
+.term-out{height:300px;overflow-y:auto;padding:12px 16px;font-size:12px;line-height:1.7}
+.t-prompt{color:#58a6ff}.t-out{color:#8b9dc9}.t-err{color:#ff4466}.t-ok{color:#00ff9d}.t-warn{color:#ffaa00}
+.term-in{display:flex;align-items:center;border-top:1px solid var(--border);padding:8px 14px;gap:8px;background:var(--bg3)}
+.term-prompt-sym{color:#58a6ff;font-size:12px;white-space:nowrap}
+#cmd-input{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:12px}
+.quick-cmds{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.qcmd{padding:4px 10px;font-size:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--txt2);transition:all 0.12s;white-space:nowrap}
+.qcmd:hover{background:var(--accent-dim);color:var(--accent);border-color:var(--accent2)}
+
+/* BUTTONS */
+.btn{padding:7px 14px;font-size:11px;font-family:'JetBrains Mono',monospace;border-radius:7px;cursor:pointer;border:1px solid;transition:all 0.15s}
+.btn-primary{background:var(--accent-dim);border-color:var(--accent2);color:var(--accent)}
+.btn-primary:hover{background:var(--accent2);color:#000}
+.btn-danger{background:var(--red-dim);border-color:#882233;color:var(--red)}
+.btn-danger:hover{background:#660022;color:var(--red)}
+.btn-success{background:var(--green-dim);border-color:#006633;color:var(--green)}
+.btn-success:hover{background:#004422}
+.btn-amber{background:var(--amber-dim);border-color:#664400;color:var(--amber)}
+.btn-amber:hover{background:#442200}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:12px}
+.form-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;display:block}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 10px;outline:none;transition:border 0.15s}
+.form-input:focus{border-color:var(--accent2)}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 10px;outline:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* CHART */
+.chart-wrap{position:relative;height:180px}
+
+/* PROGRESS BAR */
+.progress{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-bar{height:100%;border-radius:3px;transition:width 0.5s ease}
+.progress-green{background:var(--green)}
+.progress-amber{background:var(--amber)}
+.progress-red{background:var(--red)}
+.progress-accent{background:var(--accent)}
+
+/* TOGGLE */
+.toggle{position:relative;display:inline-block;width:36px;height:20px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:0.2s}
+.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:var(--txt3);border-radius:50%;transition:0.2s}
+input:checked + .toggle-slider{background:var(--green-dim);border-color:var(--green)}
+input:checked + .toggle-slider:before{transform:translateX(16px);background:var(--green)}
+
+/* NOTIFICATION */
+.notif{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;font-size:12px;z-index:999;animation:slideIn 0.3s ease;max-width:280px}
+.notif.ok{border-color:#006633;color:var(--green)}
+.notif.err{border-color:#660022;color:var(--red)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--txt)}
+.section-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+
+/* LOADING */
+.loading{display:inline-block;width:12px;height:12px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* BAND CONTROL */
+.band-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.band-item:last-child{border-bottom:none}
+.band-mac{font-size:11px;color:var(--txt);flex:1}
+.band-host{font-size:10px;color:var(--txt3)}
+.band-limit{display:flex;align-items:center;gap:6px}
+.band-limit input{width:70px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 6px;outline:none;text-align:center}
+
+/* MAC BLOCK */
+.mac-block-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.mac-block-item:last-child{border-bottom:none}
+
+/* CHART COLORS */
+.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-title">⬡ MikroTik Panel</div>
+    <div class="sb-logo-sub">hAP lite — RouterOS 6.49.6</div>
+  </div>
+  <div class="sb-conn">
+    <input type="text" id="sb-ip" placeholder="IP (192.168.88.1)" value="192.168.88.1">
+    <input type="text" id="sb-user" placeholder="Usuário" value="admin">
+    <input type="password" id="sb-pass" placeholder="Senha" value="789123">
+    <button onclick="conectar()">⟶ Conectar</button>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showPanel('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showPanel('terminal')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,17 10,11 4,5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Terminal
+    </div>
+    <div class="nav-section">Rede</div>
+    <div class="nav-item" onclick="showPanel('interfaces')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><line x1="12" y1="7" x2="12" y2="3"/><line x1="7" y1="17" x2="7" y2="21"/><line x1="17" y1="17" x2="17" y2="21"/></svg>
+      Interfaces
+    </div>
+    <div class="nav-item" onclick="showPanel('dhcp')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      DHCP / Clientes
+    </div>
+    <div class="nav-item" onclick="showPanel('wireless')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      Wi-Fi
+    </div>
+    <div class="nav-section">Controle</div>
+    <div class="nav-item" onclick="showPanel('banda')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      Controle de Banda
+    </div>
+    <div class="nav-item" onclick="showPanel('bloqueio')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      Bloqueio / MAC
+    </div>
+    <div class="nav-item" onclick="showPanel('firewall')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Firewall
+    </div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" onclick="showPanel('sistema')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Sistema
+    </div>
+    <div class="nav-item" onclick="showPanel('logs')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Logs
+    </div>
+  </div>
+  <div class="sb-status">
+    <div class="status-row"><div class="dot" id="dot-conn"></div><span id="txt-conn" style="color:var(--txt3)">Desconectado</span></div>
+    <div style="color:var(--txt3);font-size:9px;margin-top:2px" id="txt-ip-status"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div class="tb-title" id="tb-title">Dashboard</div>
+    <span class="tb-badge err" id="conn-badge">Offline</span>
+    <button class="tb-refresh" onclick="refreshCurrent()">↻ Atualizar</button>
+  </div>
+  <div id="content">
+
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+      <div class="grid-4">
+        <div class="metric">
+          <div class="metric-label">CPU Load</div>
+          <div class="metric-value green" id="m-cpu">—</div>
+          <div class="progress"><div class="progress-bar progress-green" id="pb-cpu" style="width:0%"></div></div>
+          <div class="metric-sub" id="m-cpu-freq">650 MHz · 1 core</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Memória</div>
+          <div class="metric-value accent" id="m-ram">—</div>
+          <div class="progress"><div class="progress-bar progress-accent" id="pb-ram" style="width:0%"></div></div>
+          <div class="metric-sub" id="m-ram-sub">Total: 32MB</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Uptime</div>
+          <div class="metric-value amber" id="m-uptime">—</div>
+          <div class="metric-sub">RouterOS 6.49.6</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Clientes DHCP</div>
+          <div class="metric-value accent" id="m-clients">—</div>
+          <div class="metric-sub">192.168.88.0/24</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+            Tráfego em tempo real — ether1 (WAN)
+          </div>
+          <div class="chart-wrap"><canvas id="chart-traffic"></canvas></div>
+          <div style="display:flex;gap:16px;margin-top:8px;font-size:10px">
+            <span><span class="legend-dot" style="background:var(--accent)"></span>Download: <b id="dl-speed">0 Kbps</b></span>
+            <span><span class="legend-dot" style="background:var(--green)"></span>Upload: <b id="ul-speed">0 Kbps</b></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/></svg>
+            Interfaces
+          </div>
+          <div id="dash-ifaces">
+            <div style="color:var(--txt3);font-size:11px;padding:20px 0;text-align:center">Conecte para ver interfaces</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          Dispositivos na rede (DHCP)
+        </div>
+        <table>
+          <thead><tr><th>Hostname</th><th>IP</th><th>MAC</th><th>Status</th><th>Expira</th></tr></thead>
+          <tbody id="dash-leases"><tr><td colspan="5" style="text-align:center;color:var(--txt3);padding:20px">Aguardando conexão...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TERMINAL -->
+    <div id="panel-terminal" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Terminal RouterOS</div><div class="section-sub">Comandos CLI diretos via API REST</div></div>
+      </div>
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="term-dot" style="background:#ff5f57"></div>
+          <div class="term-dot" style="background:#febc2e"></div>
+          <div class="term-dot" style="background:#28c840"></div>
+          <span style="font-size:11px;color:var(--txt3);margin-left:8px">MikroTik hAP lite — CLI</span>
+        </div>
+        <div class="term-out" id="term-out">
+          <div class="t-ok">╔═══════════════════════════════════════════╗</div>
+          <div class="t-ok">║  MikroTik hAP lite — Terminal Interativo  ║</div>
+          <div class="t-ok">╚═══════════════════════════════════════════╝</div>
+          <div class="t-warn"> Conecte o roteador para iniciar sessão.</div>
+          <div class="t-out"> Use os atalhos abaixo ou digite comandos RouterOS.</div>
+        </div>
+        <div class="term-in">
+          <span class="term-prompt-sym">[admin@MikroTik] &gt;</span>
+          <input type="text" id="cmd-input" placeholder="ex: ip address print" autocomplete="off">
+          <button class="btn btn-primary" onclick="runCmd()">Exec</button>
+          <button class="btn" style="border-color:var(--border);color:var(--txt3)" onclick="clearTerm()">Limpar</button>
+        </div>
+      </div>
+      <div class="quick-cmds" style="margin-top:12px">
+        <span class="qcmd" onclick="setCmd('ip address print')">ip address</span>
+        <span class="qcmd" onclick="setCmd('interface print')">interfaces</span>
+        <span class="qcmd" onclick="setCmd('system resource print')">recursos</span>
+        <span class="qcmd" onclick="setCmd('ip route print')">rotas</span>
+        <span class="qcmd" onclick="setCmd('ip firewall filter print')">firewall filter</span>
+        <span class="qcmd" onclick="setCmd('ip firewall nat print')">firewall nat</span>
+        <span class="qcmd" onclick="setCmd('ip dhcp-server lease print')">leases DHCP</span>
+        <span class="qcmd" onclick="setCmd('interface wireless print')">wireless</span>
+        <span class="qcmd" onclick="setCmd('interface wireless registration-table print')">clientes wifi</span>
+        <span class="qcmd" onclick="setCmd('log print')">logs</span>
+        <span class="qcmd" onclick="setCmd('ping 8.8.8.8 count=4')">ping 8.8.8.8</span>
+        <span class="qcmd" onclick="setCmd('system identity print')">identidade</span>
+        <span class="qcmd" onclick="setCmd('system clock print')">relógio</span>
+        <span class="qcmd" onclick="setCmd('user print')">usuários</span>
+        <span class="qcmd" onclick="setCmd('ip pool print')">pools IP</span>
+        <span class="qcmd" onclick="setCmd('queue simple print')">filas (banda)</span>
+      </div>
+    </div>
+
+    <!-- INTERFACES -->
+    <div id="panel-interfaces" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Interfaces de Rede</div><div class="section-sub">Status e tráfego de todas as interfaces</div></div>
+        <button class="btn btn-primary" onclick="loadInterfaces()">↻ Atualizar</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Nome</th><th>Tipo</th><th>MAC Address</th><th>MTU</th><th>TX Total</th><th>RX Total</th><th>Status</th></tr></thead>
+          <tbody id="iface-tbody"><tr><td colspan="7" style="text-align:center;color:var(--txt3);padding:24px">Clique em Atualizar</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Endereços IP</div>
+        <table>
+          <thead><tr><th>Endereço</th><th>Rede</th><th>Interface</th><th>Status</th></tr></thead>
+          <tbody id="addr-tbody"><tr><td colspan="4" style="text-align:center;color:var(--txt3);padding:24px">Clique em Atualizar</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DHCP -->
+    <div id="panel-dhcp" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">DHCP / Clientes</div><div class="section-sub">Dispositivos conectados à rede 192.168.88.0/24</div></div>
+        <button class="btn btn-primary" onclick="loadDHCP()">↻ Atualizar</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Leases ativos</div>
+        <table>
+          <thead><tr><th>Hostname</th><th>IP Atribuído</th><th>MAC Address</th><th>Status</th><th>Expira em</th><th>Ações</th></tr></thead>
+          <tbody id="dhcp-tbody"><tr><td colspan="6" style="text-align:center;color:var(--txt3);padding:24px">Clique em Atualizar</td></tr></tbody>
+        </table>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Servidores DHCP</div>
+          <table>
+            <thead><tr><th>Nome</th><th>Interface</th><th>Pool</th><th>Status</th></tr></thead>
+            <tbody id="dhcp-servers"><tr><td colspan="4" style="text-align:center;color:var(--txt3);padding:16px">—</td></tr></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">Pools de IP</div>
+          <table>
+            <thead><tr><th>Nome</th><th>Faixa</th></tr></thead>
+            <tbody id="dhcp-pools"><tr><td colspan="2" style="text-align:center;color:var(--txt3);padding:16px">—</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIRELESS -->
+    <div id="panel-wireless" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Wi-Fi</div><div class="section-sub">Gerenciamento wireless — SSID: Internet</div></div>
+        <button class="btn btn-primary" onclick="loadWireless()">↻ Atualizar</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Interface Wireless</div>
+          <div id="wifi-info">
+            <div style="color:var(--txt3);font-size:11px;padding:16px 0;text-align:center">Clique em Atualizar</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Alterar configurações Wi-Fi</div>
+          <div class="form-group"><label class="form-label">SSID (nome da rede)</label><input class="form-input" id="wifi-ssid" placeholder="Internet"></div>
+          <div class="form-group"><label class="form-label">Senha WPA2</label><input class="form-input" type="password" id="wifi-pass" placeholder="war@2019"></div>
+          <div class="form-group"><label class="form-label">Canal</label>
+            <select class="form-select" id="wifi-ch">
+              <option value="auto">Auto</option>
+              <option value="2412">1 (2412 MHz)</option>
+              <option value="2437">6 (2437 MHz)</option>
+              <option value="2462">11 (2462 MHz)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="saveWifi()">Salvar configurações</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Clientes Wi-Fi conectados</div>
+        <table>
+          <thead><tr><th>MAC Address</th><th>Interface</th><th>Sinal</th><th>TX Rate</th><th>RX Rate</th><th>Uptime</th></tr></thead>
+          <tbody id="wifi-clients"><tr><td colspan="6" style="text-align:center;color:var(--txt3);padding:24px">Clique em Atualizar</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BANDA -->
+    <div id="panel-banda" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Controle de Banda</div><div class="section-sub">Limite de velocidade por dispositivo (Queue Simple)</div></div>
+        <button class="btn btn-primary" onclick="loadBanda()">↻ Atualizar</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Adicionar limite de banda</div>
+          <div class="form-group"><label class="form-label">IP ou MAC do dispositivo</label><input class="form-input" id="band-target" placeholder="192.168.88.10"></div>
+          <div class="form-group"><label class="form-label">Nome (identificação)</label><input class="form-input" id="band-name" placeholder="PC-Sala"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Download máx.</label><input class="form-input" id="band-dl" placeholder="5M" value="5M"></div>
+            <div class="form-group"><label class="form-label">Upload máx.</label><input class="form-input" id="band-ul" placeholder="2M" value="2M"></div>
+          </div>
+          <button class="btn btn-primary" onclick="addBanda()">Aplicar limite</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Filas ativas</div>
+          <div id="band-list">
+            <div style="color:var(--txt3);font-size:11px;padding:16px 0;text-align:center">Clique em Atualizar para ver filas</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Gráfico de uso por fila</div>
+        <div class="chart-wrap"><canvas id="chart-banda"></canvas></div>
+      </div>
+    </div>
+
+    <!-- BLOQUEIO -->
+    <div id="panel-bloqueio" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Bloqueio por MAC / Sites</div><div class="section-sub">Controle de acesso por dispositivo e domínio</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Bloquear por MAC Address</div>
+          <div class="form-group"><label class="form-label">MAC Address</label><input class="form-input" id="block-mac" placeholder="AA:BB:CC:DD:EE:FF"></div>
+          <div class="form-group"><label class="form-label">Comentário</label><input class="form-input" id="block-mac-comment" placeholder="Dispositivo bloqueado"></div>
+          <button class="btn btn-danger" onclick="bloquearMAC()">Bloquear MAC</button>
+          <div style="margin-top:14px">
+            <div class="card-title" style="margin-bottom:10px">MACs bloqueados</div>
+            <div id="mac-block-list"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:12px">Nenhum MAC bloqueado</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Bloquear site / domínio</div>
+          <div class="form-group"><label class="form-label">Domínio ou IP</label><input class="form-input" id="block-site" placeholder="ex: facebook.com"></div>
+          <div class="form-group"><label class="form-label">Aplicar para</label>
+            <select class="form-select" id="block-who">
+              <option value="0.0.0.0/0">Todos os dispositivos</option>
+              <option value="custom">IP específico</option>
+            </select>
+          </div>
+          <div class="form-group" id="block-who-ip-wrap" style="display:none">
+            <label class="form-label">IP do dispositivo</label>
+            <input class="form-input" id="block-who-ip" placeholder="192.168.88.10">
+          </div>
+          <button class="btn btn-danger" onclick="bloquearSite()">Bloquear site</button>
+          <div style="margin-top:14px">
+            <div class="card-title" style="margin-bottom:10px">Sites bloqueados</div>
+            <div id="site-block-list"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:12px">Nenhum site bloqueado</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Regras de bloqueio no firewall (address-list)</div>
+        <table>
+          <thead><tr><th>Lista</th><th>Endereço</th><th>Comentário</th><th>Criado</th><th>Ação</th></tr></thead>
+          <tbody id="addrlist-tbody"><tr><td colspan="5" style="text-align:center;color:var(--txt3);padding:20px">Clique em Atualizar listas</td></tr></tbody>
+        </table>
+        <div class="btn-row"><button class="btn btn-primary" onclick="loadAddrList()">↻ Atualizar listas</button></div>
+      </div>
+    </div>
+
+    <!-- FIREWALL -->
+    <div id="panel-firewall" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Firewall</div><div class="section-sub">Regras de filter e NAT</div></div>
+        <button class="btn btn-primary" onclick="loadFirewall()">↻ Atualizar</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Regras Filter</div>
+        <table>
+          <thead><tr><th>#</th><th>Chain</th><th>Ação</th><th>Src</th><th>Dst</th><th>Protocolo</th><th>Porta</th><th>Status</th><th>Comentário</th></tr></thead>
+          <tbody id="fw-filter"><tr><td colspan="9" style="text-align:center;color:var(--txt3);padding:24px">Clique em Atualizar</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Regras NAT</div>
+        <table>
+          <thead><tr><th>#</th><th>Chain</th><th>Ação</th><th>Out-Interface</th><th>Src NAT</th><th>Status</th><th>Comentário</th></tr></thead>
+          <tbody id="fw-nat"><tr><td colspan="7" style="text-align:center;color:var(--txt3);padding:24px">Clique em Atualizar</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SISTEMA -->
+    <div id="panel-sistema" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Sistema</div><div class="section-sub">Configurações e ações do roteador</div></div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">Informações do hardware</div>
+          <div id="sys-info"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:16px">Clique em Carregar</div></div>
+          <button class="btn btn-primary" style="margin-top:10px" onclick="loadSysInfo()">Carregar</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Identidade / Relógio</div>
+          <div class="form-group"><label class="form-label">Nome do roteador</label><input class="form-input" id="sys-identity" placeholder="MikroTik"></div>
+          <button class="btn btn-primary" onclick="setIdentity()">Salvar nome</button>
+          <div style="margin-top:12px;font-size:11px;color:var(--txt3)" id="sys-clock">—</div>
+          <button class="btn btn-primary" style="margin-top:8px" onclick="loadClock()">Ver relógio</button>
+        </div>
+        <div class="card">
+          <div class="card-title">DNS</div>
+          <div class="form-group"><label class="form-label">DNS Primário</label><input class="form-input" id="dns1" placeholder="8.8.8.8"></div>
+          <div class="form-group"><label class="form-label">DNS Secundário</label><input class="form-input" id="dns2" placeholder="8.8.4.4"></div>
+          <button class="btn btn-primary" onclick="setDNS()">Salvar DNS</button>
+          <button class="btn" style="margin-top:6px;border-color:var(--border);color:var(--txt2)" onclick="loadDNS()">Ver DNS atual</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ações críticas</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="apiGet('/rest/system/backup','backup do sistema')">Ver backups</button>
+          <button class="btn btn-success" onclick="salvarBackup()">Salvar backup</button>
+          <button class="btn btn-amber" onclick="if(confirm('Confirma reinicialização?'))reboot()">Reiniciar roteador</button>
+          <button class="btn btn-primary" onclick="loadRoutes()">Ver rotas</button>
+          <button class="btn btn-primary" onclick="loadUsers()">Ver usuários</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div id="panel-logs" class="panel">
+      <div class="section-header">
+        <div><div class="section-title">Logs do Sistema</div><div class="section-sub">Registro de eventos do RouterOS</div></div>
+        <button class="btn btn-primary" onclick="loadLogs()">↻ Atualizar</button>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input class="form-input" id="log-filter" placeholder="Filtrar logs..." style="flex:1" oninput="filterLogs()">
+          <select class="form-select" id="log-topic" style="width:140px" onchange="filterLogs()">
+            <option value="">Todos os tópicos</option>
+            <option value="system">system</option>
+            <option value="firewall">firewall</option>
+            <option value="dhcp">dhcp</option>
+            <option value="wireless">wireless</option>
+            <option value="error">error</option>
+          </select>
+        </div>
+        <div id="log-out" style="background:#050810;border-radius:8px;padding:12px;height:400px;overflow-y:auto;font-size:11px;line-height:1.8;border:1px solid var(--border)">
+          <div style="color:var(--txt3);text-align:center;padding:20px">Clique em Atualizar para carregar logs</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+let BASE='', AUTH='', connected=false, cmdHistory=[], histIdx=-1;
+let allLogs=[], trafficChart=null, bandaChart=null;
+let prevRx=0, prevTx=0, trafficData={dl:[],ul:[]}, trafficLabels=[];
+let trafficInterval=null, currentPanel='dashboard';
+
+// ===================== CONEXÃO =====================
+function conectar(){
+  const ip=document.getElementById('sb-ip').value.trim();
+  const user=document.getElementById('sb-user').value.trim();
+  const pass=document.getElementById('sb-pass').value.trim();
+  if(!ip){notify('Informe o IP do roteador','err');return;}
+  BASE='http://'+ip; AUTH=btoa(user+':'+pass);
+  termPrint('warn','Conectando a '+ip+'...');
+  apiFetch('/rest/system/identity').then(d=>{
+    connected=true;
+    document.getElementById('dot-conn').className='dot on';
+    document.getElementById('txt-conn').textContent='Conectado';
+    document.getElementById('txt-ip-status').textContent=ip;
+    document.getElementById('conn-badge').className='tb-badge ok';
+    document.getElementById('conn-badge').textContent='Online';
+    termPrint('ok','✓ Conectado! Identidade: '+(d.name||ip));
+    notify('Conectado: '+(d.name||ip),'ok');
+    startTraffic();
+    loadDashboard();
+  }).catch(e=>{
+    connected=false;
+    document.getElementById('dot-conn').className='dot off';
+    document.getElementById('conn-badge').className='tb-badge err';
+    document.getElementById('conn-badge').textContent='Offline';
+    termPrint('err','Falha: '+e.message);
+    notify('Falha na conexão: '+e.message,'err');
+  });
+}
+
+function apiFetch(path,opts={}){
+  return fetch(BASE+path,{headers:{Authorization:'Basic '+AUTH,'Content-Type':'application/json'},...opts}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();});
+}
+function apiGet(path,label){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  termPrint('warn','→ '+label);showPanel('terminal');
+  apiFetch(path).then(d=>{
+    if(Array.isArray(d)){d.forEach((i,n)=>termPrint('out',n+': '+JSON.stringify(i).substring(0,150)));}
+    else Object.entries(d).forEach(([k,v])=>termPrint('out',k+'='+v));
+  }).catch(e=>termPrint('err',e.message));
+}
+
+// ===================== DASHBOARD =====================
+function loadDashboard(){
+  if(!connected)return;
+  apiFetch('/rest/system/resource').then(d=>{
+    const cpu=parseInt(d['cpu-load']||0);
+    document.getElementById('m-cpu').textContent=cpu+'%';
+    document.getElementById('pb-cpu').style.width=cpu+'%';
+    document.getElementById('pb-cpu').className='progress-bar '+(cpu>80?'progress-red':cpu>60?'progress-amber':'progress-green');
+    const fr=parseInt(d['free-memory']||0),tot=parseInt(d['total-memory']||1);
+    const ramPct=Math.round((1-fr/tot)*100);
+    document.getElementById('m-ram').textContent=Math.round((tot-fr)/1024/1024)+'MB';
+    document.getElementById('m-ram-sub').textContent='Total: '+Math.round(tot/1024/1024)+'MB · livre: '+Math.round(fr/1024/1024)+'MB';
+    document.getElementById('pb-ram').style.width=ramPct+'%';
+    document.getElementById('m-uptime').textContent=d['uptime']||'?';
+  }).catch(()=>{});
+  apiFetch('/rest/ip/dhcp-server/lease').then(d=>{
+    document.getElementById('m-clients').textContent=d.length;
+    const tbody=document.getElementById('dash-leases');
+    tbody.innerHTML='';
+    if(!d.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--txt3);padding:20px">Nenhum dispositivo</td></tr>';return;}
+    d.forEach(l=>{
+      const tr=document.createElement('tr');
+      const active=l.status==='bound'||l['active-address'];
+      tr.innerHTML=`<td>${l['host-name']||l.comment||'—'}</td><td>${l['active-address']||l.address||'?'}</td><td>${l['active-mac-address']||l['mac-address']||'?'}</td><td><span class="badge ${active?'badge-green':'badge-amber'}">${l.status||'waiting'}</span></td><td>${l['expires-after']||'estático'}</td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(()=>{});
+  apiFetch('/rest/interface').then(d=>{
+    const wrap=document.getElementById('dash-ifaces');
+    wrap.innerHTML='';
+    d.forEach(iface=>{
+      const running=iface.running==='true'||iface.running===true;
+      const div=document.createElement('div');
+      div.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px';
+      div.innerHTML=`<span style="color:var(--txt)">${iface.name}</span><span style="color:var(--txt3)">${iface.type}</span><span class="badge ${running?'badge-green':'badge-red'}">${running?'UP':'DOWN'}</span>`;
+      wrap.appendChild(div);
+    });
+  }).catch(()=>{});
+}
+
+// ===================== TRÁFEGO =====================
+function startTraffic(){
+  if(trafficChart){trafficChart.destroy();trafficChart=null;}
+  const ctx=document.getElementById('chart-traffic').getContext('2d');
+  trafficData={dl:Array(20).fill(0),ul:Array(20).fill(0)};
+  trafficLabels=Array(20).fill('');
+  trafficChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:trafficLabels,datasets:[
+      {label:'Download',data:trafficData.dl,borderColor:'#00d4ff',backgroundColor:'#00d4ff18',borderWidth:1.5,fill:true,tension:0.4,pointRadius:0},
+      {label:'Upload',data:trafficData.ul,borderColor:'#00ff9d',backgroundColor:'#00ff9d18',borderWidth:1.5,fill:true,tension:0.4,pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:0},plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:true,ticks:{color:'#3a4f7a',font:{size:9},callback:v=>v>1000?Math.round(v/1000)+'M':v+'K'},grid:{color:'#1e2d50'}}}}
+  });
+  if(trafficInterval)clearInterval(trafficInterval);
+  trafficInterval=setInterval(updateTraffic,2000);
+  updateTraffic();
+}
+
+function updateTraffic(){
+  if(!connected)return;
+  apiFetch('/rest/interface/stats?name=ether1').then(d=>{
+    const rx=parseInt(d['rx-byte']||d['rx-bytes']||0);
+    const tx=parseInt(d['tx-byte']||d['tx-bytes']||0);
+    if(prevRx>0){
+      const dlKbps=Math.round((rx-prevRx)*8/2/1000);
+      const ulKbps=Math.round((tx-prevTx)*8/2/1000);
+      trafficData.dl.push(dlKbps);trafficData.dl.shift();
+      trafficData.ul.push(ulKbps);trafficData.ul.shift();
+      trafficChart.update('none');
+      document.getElementById('dl-speed').textContent=dlKbps>1000?Math.round(dlKbps/1000)+' Mbps':dlKbps+' Kbps';
+      document.getElementById('ul-speed').textContent=ulKbps>1000?Math.round(ulKbps/1000)+' Mbps':ulKbps+' Kbps';
+    }
+    prevRx=rx;prevTx=tx;
+  }).catch(()=>{
+    apiFetch('/rest/interface').then(arr=>{
+      const eth=arr.find(i=>i.name==='ether1');
+      if(!eth)return;
+      const rx=parseInt(eth['rx-byte']||0);const tx=parseInt(eth['tx-byte']||0);
+      if(prevRx>0){
+        const dl=Math.round((rx-prevRx)*8/2/1000);const ul=Math.round((tx-prevTx)*8/2/1000);
+        trafficData.dl.push(Math.max(0,dl));trafficData.dl.shift();
+        trafficData.ul.push(Math.max(0,ul));trafficData.ul.shift();
+        if(trafficChart)trafficChart.update('none');
+        document.getElementById('dl-speed').textContent=dl>1000?Math.round(dl/1000)+' Mbps':dl+' Kbps';
+        document.getElementById('ul-speed').textContent=ul>1000?Math.round(ul/1000)+' Mbps':ul+' Kbps';
+      }
+      prevRx=rx;prevTx=tx;
+    }).catch(()=>{});
+  });
+}
+
+// ===================== INTERFACES =====================
+function loadInterfaces(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/interface').then(d=>{
+    const tbody=document.getElementById('iface-tbody');tbody.innerHTML='';
+    d.forEach(i=>{
+      const running=i.running==='true'||i.running===true;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td style="color:var(--txt)">${i.name}</td><td>${i.type}</td><td>${i['mac-address']||'—'}</td><td>${i.mtu||'1500'}</td><td>${fmtBytes(i['tx-byte'])}</td><td>${fmtBytes(i['rx-byte'])}</td><td><span class="badge ${running?'badge-green':'badge-red'}">${running?'UP':'DOWN'}</span></td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(e=>notify(e.message,'err'));
+  apiFetch('/rest/ip/address').then(d=>{
+    const tbody=document.getElementById('addr-tbody');tbody.innerHTML='';
+    d.forEach(a=>{
+      const disabled=a.disabled==='true'||a.disabled===true;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td style="color:var(--accent)">${a.address}</td><td>${a.network}</td><td>${a.interface}</td><td><span class="badge ${disabled?'badge-red':'badge-green'}">${disabled?'Desabilitado':'Ativo'}</span></td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(e=>notify(e.message,'err'));
+}
+
+// ===================== DHCP =====================
+function loadDHCP(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/ip/dhcp-server/lease').then(d=>{
+    const tbody=document.getElementById('dhcp-tbody');tbody.innerHTML='';
+    if(!d.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--txt3);padding:20px">Nenhum lease</td></tr>';return;}
+    d.forEach(l=>{
+      const active=l.status==='bound';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td style="color:var(--txt)">${l['host-name']||'—'}</td><td style="color:var(--accent)">${l['active-address']||l.address||'?'}</td><td>${l['active-mac-address']||l['mac-address']||'?'}</td><td><span class="badge ${active?'badge-green':'badge-amber'}">${l.status||'waiting'}</span></td><td>${l['expires-after']||'estático'}</td><td><button class="btn btn-danger" style="padding:3px 8px;font-size:10px" onclick="bloquearMACDireto('${l['active-mac-address']||l['mac-address']}','${l['host-name']||''}')">Bloquear</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(e=>notify(e.message,'err'));
+  apiFetch('/rest/ip/dhcp-server').then(d=>{
+    const tbody=document.getElementById('dhcp-servers');tbody.innerHTML='';
+    d.forEach(s=>{const disabled=s.disabled==='true'||s.disabled===true;const tr=document.createElement('tr');tr.innerHTML=`<td>${s.name}</td><td>${s.interface}</td><td>${s['address-pool']}</td><td><span class="badge ${disabled?'badge-red':'badge-green'}">${disabled?'OFF':'ON'}</span></td>`;tbody.appendChild(tr);});
+  }).catch(()=>{});
+  apiFetch('/rest/ip/pool').then(d=>{
+    const tbody=document.getElementById('dhcp-pools');tbody.innerHTML='';
+    d.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${p.name}</td><td style="color:var(--accent)">${p.ranges}</td>`;tbody.appendChild(tr);});
+  }).catch(()=>{});
+}
+
+// ===================== WIRELESS =====================
+function loadWireless(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/interface/wireless').then(d=>{
+    const wrap=document.getElementById('wifi-info');wrap.innerHTML='';
+    d.forEach(w=>{
+      const running=w.running==='true'||w.running===true;
+      wrap.innerHTML=`
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
+          <div style="color:var(--txt3)">SSID</div><div style="color:var(--green)">${w.ssid||'?'}</div>
+          <div style="color:var(--txt3)">Modo</div><div>${w.mode}</div>
+          <div style="color:var(--txt3)">Banda</div><div>${w.band}</div>
+          <div style="color:var(--txt3)">Canal</div><div>${w.channel||w.frequency} MHz</div>
+          <div style="color:var(--txt3)">MAC</div><div>${w['mac-address']}</div>
+          <div style="color:var(--txt3)">Status</div><div><span class="badge ${running?'badge-green':'badge-red'}">${running?'Ativo':'Inativo'}</span></div>
+        </div>`;
+      document.getElementById('wifi-ssid').value=w.ssid||'';
+      document.getElementById('wifi-ch').value=w.channel||w.frequency||'auto';
+    });
+  }).catch(e=>notify(e.message,'err'));
+  apiFetch('/rest/interface/wireless/registration-table').then(d=>{
+    const tbody=document.getElementById('wifi-clients');tbody.innerHTML='';
+    if(!d.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--txt3);padding:20px">Nenhum cliente Wi-Fi conectado</td></tr>';return;}
+    d.forEach(c=>{
+      const sig=parseInt(c['signal-strength']||c['rx-signal']||0);
+      const sigClass=sig>-60?'badge-green':sig>-75?'badge-amber':'badge-red';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td style="color:var(--txt)">${c['mac-address']}</td><td>${c.interface}</td><td><span class="badge ${sigClass}">${sig} dBm</span></td><td>${c['tx-rate']||'?'}</td><td>${c['rx-rate']||'?'}</td><td>${c.uptime||'?'}</td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(()=>{document.getElementById('wifi-clients').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--txt3);padding:20px">Tabela de clientes não disponível</td></tr>';});
+}
+
+function saveWifi(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  const ssid=document.getElementById('wifi-ssid').value.trim();
+  const pass=document.getElementById('wifi-pass').value.trim();
+  const ch=document.getElementById('wifi-ch').value;
+  if(!ssid){notify('Informe o SSID','err');return;}
+  const body={ssid};
+  if(ch&&ch!=='auto')body.frequency=ch;
+  apiFetch('/rest/interface/wireless/wlan2',{method:'PATCH',body:JSON.stringify(body)})
+    .then(()=>{
+      if(pass){
+        return apiFetch('/rest/interface/wireless/security-profiles',{method:'GET'}).then(profiles=>{
+          const p=profiles.find(pr=>pr.name==='wifi-seguro');
+          if(p){return apiFetch('/rest/interface/wireless/security-profiles/'+p['.id'],{method:'PATCH',body:JSON.stringify({'wpa2-pre-shared-key':pass})});}
+        });
+      }
+    })
+    .then(()=>{notify('Wi-Fi atualizado!','ok');loadWireless();})
+    .catch(e=>notify('Erro: '+e.message,'err'));
+}
+
+// ===================== BANDA =====================
+function loadBanda(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/queue/simple').then(d=>{
+    const wrap=document.getElementById('band-list');wrap.innerHTML='';
+    if(!d.length){wrap.innerHTML='<div style="color:var(--txt3);font-size:11px;text-align:center;padding:16px">Nenhuma fila ativa</div>';return;}
+    d.forEach(q=>{
+      const div=document.createElement('div');
+      div.className='band-item';
+      div.innerHTML=`<div><div class="band-mac">${q.name}</div><div class="band-host" style="color:var(--accent)">${q.target}</div></div><div style="font-size:10px;color:var(--txt3)">↓${q['max-limit'].split('/')[0]} ↑${q['max-limit'].split('/')[1]||'?'}</div><button class="btn btn-danger" style="padding:3px 8px;font-size:10px" onclick="removeBanda('${q['.id']}','${q.name}')">✕</button>`;
+      wrap.appendChild(div);
+    });
+    if(bandaChart){bandaChart.destroy();}
+    const ctx=document.getElementById('chart-banda').getContext('2d');
+    bandaChart=new Chart(ctx,{type:'bar',data:{labels:d.map(q=>q.name),datasets:[{label:'Limite Download',data:d.map(q=>parseMbps(q['max-limit'].split('/')[0])),backgroundColor:'#00d4ff44',borderColor:'#00d4ff',borderWidth:1},{label:'Limite Upload',data:d.map(q=>parseMbps(q['max-limit'].split('/')[1]||'1M')),backgroundColor:'#00ff9d44',borderColor:'#00ff9d',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7a90b8',font:{size:10}}}},scales:{x:{ticks:{color:'#7a90b8',font:{size:10}}},y:{ticks:{color:'#7a90b8',font:{size:9},callback:v=>v+'M'},grid:{color:'#1e2d50'}}}}});
+  }).catch(e=>notify(e.message,'err'));
+}
+
+function parseMbps(s){if(!s)return 0;s=s.trim();if(s.endsWith('M'))return parseFloat(s);if(s.endsWith('K'))return parseFloat(s)/1000;return parseFloat(s);}
+
+function addBanda(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  const target=document.getElementById('band-target').value.trim();
+  const name=document.getElementById('band-name').value.trim()||target;
+  const dl=document.getElementById('band-dl').value.trim()||'5M';
+  const ul=document.getElementById('band-ul').value.trim()||'2M';
+  if(!target){notify('Informe o IP ou MAC','err');return;}
+  apiFetch('/rest/queue/simple',{method:'PUT',body:JSON.stringify({name,target,['max-limit']:dl+'/'+ul})})
+    .then(()=>{notify('Limite aplicado!','ok');loadBanda();})
+    .catch(e=>notify('Erro: '+e.message,'err'));
+}
+
+function removeBanda(id,name){
+  if(!confirm('Remover limite de banda de '+name+'?'))return;
+  apiFetch('/rest/queue/simple/'+id,{method:'DELETE'})
+    .then(()=>{notify('Limite removido','ok');loadBanda();})
+    .catch(e=>notify(e.message,'err'));
+}
+
+// ===================== BLOQUEIO =====================
+document.getElementById('block-who').addEventListener('change',function(){
+  document.getElementById('block-who-ip-wrap').style.display=this.value==='custom'?'block':'none';
+});
+
+function bloquearMAC(){
+  const mac=document.getElementById('block-mac').value.trim();
+  const comment=document.getElementById('block-mac-comment').value.trim()||'Bloqueado via painel';
+  if(!mac){notify('Informe o MAC','err');return;}
+  bloquearMACDireto(mac,comment);
+}
+
+function bloquearMACDireto(mac,comment){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/ip/firewall/filter',{method:'PUT',body:JSON.stringify({chain:'forward',['src-mac-address']:mac,action:'drop',comment:comment||'Bloqueado via painel',place:'0'})})
+    .then(()=>{notify('MAC bloqueado: '+mac,'ok');loadAddrList();})
+    .catch(e=>notify('Erro: '+e.message,'err'));
+}
+
+function bloquearSite(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  const site=document.getElementById('block-site').value.trim();
+  if(!site){notify('Informe o domínio','err');return;}
+  const who=document.getElementById('block-who').value;
+  const srcIP=who==='custom'?document.getElementById('block-who-ip').value.trim():'';
+  apiFetch('/rest/ip/firewall/address-list',{method:'PUT',body:JSON.stringify({list:'sites-bloqueados',address:site,comment:'Bloqueado via painel'})})
+    .then(()=>{
+      return apiFetch('/rest/ip/firewall/filter',{method:'PUT',body:JSON.stringify({chain:'forward',['dst-address-list']:'sites-bloqueados',...(srcIP?{['src-address']:srcIP}:{}),action:'drop',comment:'Bloquear '+site,place:'0'})});
+    })
+    .then(()=>{notify('Site bloqueado: '+site,'ok');loadAddrList();document.getElementById('block-site').value='';})
+    .catch(e=>notify('Erro ao bloquear: '+e.message,'err'));
+}
+
+function loadAddrList(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/ip/firewall/address-list').then(d=>{
+    const tbody=document.getElementById('addrlist-tbody');tbody.innerHTML='';
+    if(!d.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--txt3);padding:16px">Nenhuma lista</td></tr>';return;}
+    d.forEach(a=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><span class="badge badge-red">${a.list}</span></td><td style="color:var(--amber)">${a.address}</td><td style="color:var(--txt3)">${a.comment||'—'}</td><td style="color:var(--txt3)">${a['creation-time']||'—'}</td><td><button class="btn btn-danger" style="padding:3px 8px;font-size:10px" onclick="removeAddrList('${a['.id']}')">✕ Remover</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(e=>notify(e.message,'err'));
+}
+
+function removeAddrList(id){
+  apiFetch('/rest/ip/firewall/address-list/'+id,{method:'DELETE'})
+    .then(()=>{notify('Regra removida','ok');loadAddrList();})
+    .catch(e=>notify(e.message,'err'));
+}
+
+// ===================== FIREWALL =====================
+function loadFirewall(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/ip/firewall/filter').then(d=>{
+    const tbody=document.getElementById('fw-filter');tbody.innerHTML='';
+    d.forEach((r,i)=>{
+      const action=r.action||'?';
+      const cls=action==='accept'?'badge-green':action==='drop'?'badge-red':'badge-amber';
+      const disabled=r.disabled==='true'||r.disabled===true;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${i}</td><td>${r.chain}</td><td><span class="badge ${cls}">${action}</span></td><td>${r['src-address']||'any'}</td><td>${r['dst-address']||'any'}</td><td>${r.protocol||'any'}</td><td>${r['dst-port']||r['src-port']||'—'}</td><td><span class="badge ${disabled?'badge-red':'badge-green'}">${disabled?'OFF':'ON'}</span></td><td style="color:var(--txt3);font-size:10px">${r.comment||''}</td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(e=>notify(e.message,'err'));
+  apiFetch('/rest/ip/firewall/nat').then(d=>{
+    const tbody=document.getElementById('fw-nat');tbody.innerHTML='';
+    d.forEach((r,i)=>{
+      const disabled=r.disabled==='true'||r.disabled===true;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${i}</td><td>${r.chain}</td><td><span class="badge badge-blue">${r.action}</span></td><td>${r['out-interface']||'—'}</td><td>${r['to-addresses']||'—'}</td><td><span class="badge ${disabled?'badge-red':'badge-green'}">${disabled?'OFF':'ON'}</span></td><td style="color:var(--txt3);font-size:10px">${r.comment||''}</td>`;
+      tbody.appendChild(tr);
+    });
+  }).catch(e=>notify(e.message,'err'));
+}
+
+// ===================== SISTEMA =====================
+function loadSysInfo(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/system/resource').then(d=>{
+    const wrap=document.getElementById('sys-info');
+    wrap.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px">
+      <div style="color:var(--txt3)">Placa</div><div>${d['board-name']}</div>
+      <div style="color:var(--txt3)">RouterOS</div><div style="color:var(--accent)">${d.version}</div>
+      <div style="color:var(--txt3)">CPU</div><div>${d.cpu}</div>
+      <div style="color:var(--txt3)">Arquitetura</div><div>${d['architecture-name']}</div>
+      <div style="color:var(--txt3)">RAM total</div><div>${Math.round(parseInt(d['total-memory'])/1024/1024)}MB</div>
+      <div style="color:var(--txt3)">Flash total</div><div>${Math.round(parseInt(d['total-hdd-space'])/1024/1024)}MB</div>
+      <div style="color:var(--txt3)">CPU Load</div><div style="color:var(--green)">${d['cpu-load']}%</div>
+      <div style="color:var(--txt3)">Uptime</div><div>${d.uptime}</div>
+    </div>`;
+  }).catch(e=>notify(e.message,'err'));
+}
+
+function loadClock(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/system/clock').then(d=>{
+    document.getElementById('sys-clock').textContent='Data: '+d.date+' | Hora: '+d.time+' | TZ: '+(d['time-zone-name']||'—');
+  }).catch(e=>notify(e.message,'err'));
+}
+
+function setIdentity(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  const name=document.getElementById('sys-identity').value.trim();
+  if(!name){notify('Informe o nome','err');return;}
+  apiFetch('/rest/system/identity',{method:'PATCH',body:JSON.stringify({name})})
+    .then(()=>notify('Nome atualizado: '+name,'ok'))
+    .catch(e=>notify(e.message,'err'));
+}
+
+function loadDNS(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/ip/dns').then(d=>{
+    const servers=(d.servers||d['dynamic-servers']||'').split(',');
+    document.getElementById('dns1').value=servers[0]||'8.8.8.8';
+    document.getElementById('dns2').value=servers[1]||'8.8.4.4';
+    notify('DNS carregado','ok');
+  }).catch(e=>notify(e.message,'err'));
+}
+
+function setDNS(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  const d1=document.getElementById('dns1').value.trim();
+  const d2=document.getElementById('dns2').value.trim();
+  apiFetch('/rest/ip/dns',{method:'PATCH',body:JSON.stringify({servers:d1+(d2?','+d2:'')})})
+    .then(()=>notify('DNS atualizado!','ok'))
+    .catch(e=>notify(e.message,'err'));
+}
+
+function salvarBackup(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  const name='painel-backup-'+new Date().toISOString().slice(0,10);
+  apiFetch('/rest/system/backup',{method:'PUT',body:JSON.stringify({name})})
+    .then(()=>notify('Backup salvo: '+name,'ok'))
+    .catch(e=>notify('Erro no backup: '+e.message,'err'));
+}
+
+function reboot(){
+  apiFetch('/rest/system/reboot',{method:'POST'})
+    .then(()=>{notify('Roteador reiniciando...','ok');connected=false;document.getElementById('dot-conn').className='dot off';})
+    .catch(()=>notify('Reiniciando (conexão encerrada)','ok'));
+}
+
+function loadRoutes(){
+  apiGet('/rest/ip/route','tabela de rotas');
+}
+function loadUsers(){
+  apiGet('/rest/user','usuários do sistema');
+}
+
+// ===================== LOGS =====================
+function loadLogs(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  apiFetch('/rest/log').then(d=>{
+    allLogs=d;filterLogs();
+  }).catch(e=>notify(e.message,'err'));
+}
+
+function filterLogs(){
+  const filter=document.getElementById('log-filter').value.toLowerCase();
+  const topic=document.getElementById('log-topic').value;
+  const out=document.getElementById('log-out');
+  out.innerHTML='';
+  let logs=allLogs;
+  if(topic)logs=logs.filter(l=>(l.topics||'').includes(topic));
+  if(filter)logs=logs.filter(l=>JSON.stringify(l).toLowerCase().includes(filter));
+  if(!logs.length){out.innerHTML='<div style="color:var(--txt3);text-align:center;padding:20px">Nenhum log encontrado</div>';return;}
+  logs.slice(-200).forEach(l=>{
+    const div=document.createElement('div');
+    const topics=l.topics||'';
+    const color=topics.includes('error')||topics.includes('critical')?'var(--red)':topics.includes('warning')?'var(--amber)':topics.includes('firewall')?'#aa88ff':'var(--txt2)';
+    div.innerHTML=`<span style="color:var(--txt3)">${l.time||''}</span> <span style="color:#558">[${topics}]</span> <span style="color:${color}">${l.message||''}</span>`;
+    out.appendChild(div);
+  });
+  out.scrollTop=out.scrollHeight;
+}
+
+// ===================== TERMINAL =====================
+function termPrint(type,msg){
+  const out=document.getElementById('term-out');
+  const d=document.createElement('div');
+  d.className='t-'+type;
+  d.textContent=msg;
+  out.appendChild(d);
+  out.scrollTop=out.scrollHeight;
+}
+function clearTerm(){document.getElementById('term-out').innerHTML='';}
+function setCmd(cmd){document.getElementById('cmd-input').value=cmd;document.getElementById('cmd-input').focus();}
+
+function runCmd(){
+  const raw=document.getElementById('cmd-input').value.trim();
+  if(!raw)return;
+  if(!connected){termPrint('err','Não conectado.');return;}
+  cmdHistory.unshift(raw);histIdx=-1;
+  document.getElementById('cmd-input').value='';
+  termPrint('prompt','[admin@MikroTik] > '+raw);
+  const path=cliToRest(raw);
+  if(!path){termPrint('err','Comando não mapeado. Use: ip address print, interface print, etc.');return;}
+  apiFetch(path).then(d=>{
+    if(Array.isArray(d)){
+      if(!d.length){termPrint('out','(vazio)');return;}
+      d.forEach((item,i)=>{termPrint('out',i+': '+Object.entries(item).map(([k,v])=>k+'='+v).join(' '));});
+    } else {
+      Object.entries(d).forEach(([k,v])=>termPrint('out',k+'='+v));
+    }
+  }).catch(e=>termPrint('err','Erro: '+e.message));
+}
+
+function cliToRest(cmd){
+  const map={
+    'ip address print':'/rest/ip/address',
+    'interface print':'/rest/interface',
+    'system resource print':'/rest/system/resource',
+    'ip route print':'/rest/ip/route',
+    'ip firewall filter print':'/rest/ip/firewall/filter',
+    'ip firewall nat print':'/rest/ip/firewall/nat',
+    'ip dhcp-server lease print':'/rest/ip/dhcp-server/lease',
+    'ip dhcp-server print':'/rest/ip/dhcp-server',
+    'interface wireless print':'/rest/interface/wireless',
+    'interface wireless registration-table print':'/rest/interface/wireless/registration-table',
+    'ip pool print':'/rest/ip/pool',
+    'queue simple print':'/rest/queue/simple',
+    'log print':'/rest/log',
+    'system identity print':'/rest/system/identity',
+    'system clock print':'/rest/system/clock',
+    'system routerboard print':'/rest/system/routerboard',
+    'user print':'/rest/user',
+    'ip dns print':'/rest/ip/dns',
+    'ip firewall address-list print':'/rest/ip/firewall/address-list',
+    'ip firewall connection print':'/rest/ip/firewall/connection',
+    'interface bridge port print':'/rest/interface/bridge/port',
+    'ip dhcp-client print':'/rest/ip/dhcp-client',
+    'system backup print':'/rest/system/backup',
+    'certificate print':'/rest/certificate',
+  };
+  const trimmed=cmd.trim().toLowerCase();
+  if(map[trimmed])return map[trimmed];
+  if(trimmed.startsWith('ping')){const parts=trimmed.split(' ');const addr=parts[1]||'8.8.8.8';return '/rest/tool/ping?address='+addr+'&count=4';}
+  return null;
+}
+
+document.getElementById('cmd-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){runCmd();return;}
+  if(e.key==='ArrowUp'){histIdx=Math.min(histIdx+1,cmdHistory.length-1);e.target.value=cmdHistory[histIdx]||'';}
+  if(e.key==='ArrowDown'){histIdx=Math.max(histIdx-1,-1);e.target.value=histIdx>=0?cmdHistory[histIdx]:'';}
+});
+
+// ===================== UI =====================
+function showPanel(name){
+  currentPanel=name;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  const titles={dashboard:'Dashboard',terminal:'Terminal RouterOS',interfaces:'Interfaces',dhcp:'DHCP / Clientes',wireless:'Wi-Fi',banda:'Controle de Banda',bloqueio:'Bloqueio / MAC',firewall:'Firewall',sistema:'Sistema',logs:'Logs'};
+  document.getElementById('tb-title').textContent=titles[name]||name;
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.textContent.trim().toLowerCase().includes(name.substring(0,4).toLowerCase()))n.classList.add('active');
+  });
+}
+
+function refreshCurrent(){
+  if(!connected){notify('Conecte primeiro','err');return;}
+  const actions={dashboard:loadDashboard,interfaces:loadInterfaces,dhcp:loadDHCP,wireless:loadWireless,banda:loadBanda,firewall:loadFirewall,logs:loadLogs,bloqueio:loadAddrList};
+  if(actions[currentPanel])actions[currentPanel]();
+}
+
+function notify(msg,type='ok'){
+  const n=document.createElement('div');
+  n.className='notif '+(type==='ok'?'ok':'err');
+  n.textContent=msg;
+  document.body.appendChild(n);
+  setTimeout(()=>{n.style.opacity='0';n.style.transform='translateX(100%)';n.style.transition='all 0.3s';setTimeout(()=>n.remove(),300);},3000);
+}
+
+function fmtBytes(b){
+  if(!b)return '0B';b=parseInt(b);
+  if(b>1073741824)return Math.round(b/1073741824)+'GB';
+  if(b>1048576)return Math.round(b/1048576)+'MB';
+  if(b>1024)return Math.round(b/1024)+'KB';
+  return b+'B';
+}
+
+// Init traffic chart empty
+window.addEventListener('load',()=>{
+  const ctx=document.getElementById('chart-traffic').getContext('2d');
+  trafficChart=new Chart(ctx,{type:'line',data:{labels:Array(20).fill(''),datasets:[{label:'Download',data:Array(20).fill(0),borderColor:'#00d4ff',backgroundColor:'#00d4ff18',borderWidth:1.5,fill:true,tension:0.4,pointRadius:0},{label:'Upload',data:Array(20).fill(0),borderColor:'#00ff9d',backgroundColor:'#00ff9d18',borderWidth:1.5,fill:true,tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:0},plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:true,ticks:{color:'#3a4f7a',font:{size:9},callback:v=>v+'K'},grid:{color:'#1e2d50'}}}}});
+});
+</script>
+</body>
+</html>
