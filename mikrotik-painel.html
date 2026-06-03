@@ -655,15 +655,13 @@ function conectar(){
   });
 }
 
-function isRemote(){
-  return window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.hostname !== BASE.replace('http://','');
-}
 function apiFetch(path,opts={}){
-  let url, headers;
-  if(isRemote()){
-    // Acesso remoto: usa proxy local /proxy/
-    url = window.location.origin + '/proxy/' + path.replace(/^\//,'');
-    headers = {Authorization:'Basic '+AUTH,'Content-Type':'application/json'};
+  // Proxy mode: servidor.py repassa para 192.168.88.1
+  const isProxy = window.location.port === '8080';
+  const url = isProxy ? window.location.origin + path : BASE + path;
+  return fetch(url,{headers:{Authorization:'Basic '+AUTH,'Content-Type':'application/json'},...opts})
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();});
+};
   } else {
     // Acesso local: direto no roteador
     url = BASE+path;
