@@ -655,8 +655,21 @@ function conectar(){
   });
 }
 
+function isRemote(){
+  return window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.hostname !== BASE.replace('http://','');
+}
 function apiFetch(path,opts={}){
-  return fetch(BASE+path,{headers:{Authorization:'Basic '+AUTH,'Content-Type':'application/json'},...opts}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();});
+  let url, headers;
+  if(isRemote()){
+    // Acesso remoto: usa proxy local /proxy/
+    url = window.location.origin + '/proxy/' + path.replace(/^\//,'');
+    headers = {Authorization:'Basic '+AUTH,'Content-Type':'application/json'};
+  } else {
+    // Acesso local: direto no roteador
+    url = BASE+path;
+    headers = {Authorization:'Basic '+AUTH,'Content-Type':'application/json'};
+  }
+  return fetch(url,{headers,...opts}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();});
 }
 function apiGet(path,label){
   if(!connected){notify('Conecte primeiro','err');return;}
