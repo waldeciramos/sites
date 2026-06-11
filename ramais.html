@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
@@ -271,12 +272,12 @@ mark{background:rgba(61,90,241,.15);color:var(--accent);border-radius:2px;paddin
   <!-- STATUS BAR -->
   <div class="sbar" id="sbar">
     <div class="sbar-dot ok" id="sbar-dot"></div>
-    <span id="sbar-txt">Conectando ao GitHub…</span>
+    <span id="sbar-txt">Conectando ao JSONBin…</span>
   </div>
   <div class="content" id="mainContent">
     <div style="text-align:center;padding:60px;color:var(--text3)">
       <div style="font-size:32px;margin-bottom:12px">⏳</div>
-      <div>Carregando dados do GitHub…</div>
+      <div>Carregando dados do JSONBin…</div>
     </div>
   </div>
 </div>
@@ -336,7 +337,7 @@ mark{background:rgba(61,90,241,.15);color:var(--accent);border-radius:2px;paddin
     <div class="mhd"><h2 class="mtitle">Confirmar exclusão</h2><button class="mclose" onclick="closeModal('mConfirm')">✕</button></div>
     <div class="mbody">
       <div class="cico">🗑️</div>
-      <p class="ctxt">Deseja remover <span class="cnm" id="cName"></span>?<br><span style="font-size:12px;color:var(--text3)">Esta ação salvará o JSON no GitHub automaticamente.</span></p>
+      <p class="ctxt">Deseja remover <span class="cnm" id="cName"></span>?<br><span style="font-size:12px;color:var(--text3)">Esta ação salvará o JSON no JSONBin automaticamente.</span></p>
     </div>
     <div class="mfoot">
       <button class="btn btn-g" onclick="closeModal('mConfirm')">Cancelar</button>
@@ -349,19 +350,17 @@ mark{background:rgba(61,90,241,.15);color:var(--accent);border-radius:2px;paddin
 
 <script>
 // ══════════════════════════════════════════════════
-//  ⚙️  CONFIGURAÇÃO GITHUB — EDITE AQUI SE NECESSÁRIO
+//  ⚙️  CONFIGURAÇÃO JSONBin — EDITE AQUI SE NECESSÁRIO
 // ══════════════════════════════════════════════════
-const GH_USER  = 'waldeciramos';
-const GH_REPO  = 'dompedroprojeoes';
-const GH_TOKEN = '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';
-const GH_FILE  = 'ramais.json';
-const GH_API   = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${GH_FILE}`;
+const JB_MASTER_KEY = '$2a$10$lFTdWh/opLn8wg1UFKGyHe.YaOZINd4D2qnk2qGd0PFbv.Yz686Qm';
+const JB_ACCESS_KEY = '$2a$10$eqC8ucHjOTUCijJGsw6YZeT16qAa6ybBCk2BmJdMwioIvoybhrBru';
+const JB_BIN_ID     = 'SEU_BIN_ID_AQUI'; // ← cole aqui o BIN ID após criar no jsonbin.io
+const JB_API        = `https://api.jsonbin.io/v3/b/${JB_BIN_ID}`;
 
 // ══════════════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════════════
 let DATA = null;
-let FILE_SHA = null; // SHA atual do arquivo no GitHub (necessário para atualizar)
 let cView = 'todos', cSearch = '', cPiso = null, VM = 'grid';
 
 const COLORS = ['#3d5af1','#12b76a','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#0ea5e9'];
@@ -386,70 +385,61 @@ function setStatus(state, msg){
 }
 
 // ══════════════════════════════════════════════════
-//  GITHUB API — LEITURA
+//  JSONBin API — LEITURA
 // ══════════════════════════════════════════════════
 async function loadFromGitHub(){
-  setStatus('saving','Carregando ramais.json do GitHub…');
+  setStatus('saving','Carregando ramais do JSONBin…');
   try{
-    const res = await fetch(GH_API, {
+    const res = await fetch(JB_API+'/latest', {
       headers:{
-        'Authorization': `Bearer ${GH_TOKEN}`,
-        'Accept': 'application/vnd.github+json'
+        'X-Master-Key': JB_MASTER_KEY,
+        'X-Access-Key': JB_ACCESS_KEY
       }
     });
-    if(!res.ok) throw new Error(`GitHub API: ${res.status} ${res.statusText}`);
+    if(!res.ok) throw new Error(`JSONBin API: ${res.status} ${res.statusText}`);
     const json = await res.json();
-    FILE_SHA = json.sha; // guarda SHA para updates futuros
-    const content = atob(json.content.replace(/\n/g,''));
-    DATA = JSON.parse(content);
-    setStatus('ok',`✅ Dados carregados do GitHub — ${FILE_SHA.slice(0,7)}`);
-    // abre todos os setores por padrão
+    DATA = json.record;
+    const version = json.metadata?.version ?? '?';
+    setStatus('ok',`✅ Dados carregados do JSONBin — v${version}`);
     DATA.predios.forEach(p=>p.setores.forEach(s=>openStates.add(s.id)));
     updateCounts();
     render();
   } catch(e){
     setStatus('err','❌ Erro ao carregar: '+e.message);
     toast('Erro ao carregar dados: '+e.message,'error');
-    // tenta localStorage como fallback
     const saved = localStorage.getItem('ramais_fallback');
-    if(saved){ DATA=JSON.parse(saved); setStatus('err','⚠️ Usando cache local (GitHub indisponível)'); DATA.predios.forEach(p=>p.setores.forEach(s=>openStates.add(s.id))); updateCounts(); render(); }
+    if(saved){ DATA=JSON.parse(saved); setStatus('err','⚠️ Usando cache local (JSONBin indisponível)'); DATA.predios.forEach(p=>p.setores.forEach(s=>openStates.add(s.id))); updateCounts(); render(); }
   }
 }
 
 // ══════════════════════════════════════════════════
-//  GITHUB API — ESCRITA
+//  JSONBin API — ESCRITA
 // ══════════════════════════════════════════════════
 async function saveToGitHub(){
   if(!DATA) return;
-  setStatus('saving','💾 Salvando no GitHub…');
+  setStatus('saving','💾 Salvando no JSONBin…');
   try{
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
-    const body = {
-      message: `Atualização ramais — ${new Date().toLocaleString('pt-BR')}`,
-      content,
-      sha: FILE_SHA // obrigatório para update
-    };
-    const res = await fetch(GH_API, {
+    const res = await fetch(JB_API, {
       method: 'PUT',
       headers:{
-        'Authorization': `Bearer ${GH_TOKEN}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Master-Key': JB_MASTER_KEY,
+        'X-Access-Key': JB_ACCESS_KEY
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(DATA)
     });
     if(!res.ok){
       const err = await res.json();
       throw new Error(err.message || res.statusText);
     }
     const result = await res.json();
-    FILE_SHA = result.content.sha; // atualiza SHA para próximo save
-    localStorage.setItem('ramais_fallback', JSON.stringify(DATA)); // cache local
-    setStatus('ok',`✅ Salvo no GitHub — ${FILE_SHA.slice(0,7)}`);
+    const version = result.metadata?.version ?? '?';
+    localStorage.setItem('ramais_fallback', JSON.stringify(DATA));
+    setStatus('ok',`✅ Salvo no JSONBin — v${version}`);
     return true;
   } catch(e){
     setStatus('err','❌ Erro ao salvar: '+e.message);
-    toast('Erro ao salvar no GitHub: '+e.message,'error');
+    toast('Erro ao salvar no JSONBin: '+e.message,'error');
     return false;
   }
 }
@@ -634,7 +624,7 @@ async function saveCollab(){
   const ok=await saveToGitHub();
   if(ok) toast(oldNome?'✅ Colaborador atualizado e salvo no GitHub!':'✅ Colaborador adicionado e salvo no GitHub!','success');
 }
-function confirmDelCollab(pid,sid,nome){ document.getElementById('cName').textContent=nome; document.getElementById('cBtn').onclick=async()=>{ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(s){ s.colaboradores=s.colaboradores.filter(c=>c.nome!==nome); closeModal('mConfirm'); render(); const ok=await saveToGitHub(); if(ok) toast('Colaborador removido e salvo no GitHub.','info'); } }; openModal('mConfirm'); }
+function confirmDelCollab(pid,sid,nome){ document.getElementById('cName').textContent=nome; document.getElementById('cBtn').onclick=async()=>{ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(s){ s.colaboradores=s.colaboradores.filter(c=>c.nome!==nome); closeModal('mConfirm'); render(); const ok=await saveToGitHub(); if(ok) toast('Colaborador removido e salvo no JSONBin.','info'); } }; openModal('mConfirm'); }
 
 // ══════════════════════════════════════════════════
 //  SETOR CRUD
@@ -653,7 +643,7 @@ async function saveSetor(){
   const ok=await saveToGitHub();
   if(ok) toast(editId?'✅ Setor atualizado e salvo no GitHub!':'✅ Setor adicionado e salvo no GitHub!','success');
 }
-function confirmDelSetor(pid,sid){ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(!s) return; document.getElementById('cName').textContent=`o setor "${s.nome}"`; document.getElementById('cBtn').onclick=async()=>{ p.setores=p.setores.filter(x=>x.id!==sid); closeModal('mConfirm'); render(); const ok=await saveToGitHub(); if(ok) toast('Setor removido e salvo no GitHub.','info'); }; openModal('mConfirm'); }
+function confirmDelSetor(pid,sid){ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(!s) return; document.getElementById('cName').textContent=`o setor "${s.nome}"`; document.getElementById('cBtn').onclick=async()=>{ p.setores=p.setores.filter(x=>x.id!==sid); closeModal('mConfirm'); render(); const ok=await saveToGitHub(); if(ok) toast('Setor removido e salvo no JSONBin.','info'); }; openModal('mConfirm'); }
 
 // ══════════════════════════════════════════════════
 //  EXPORT
