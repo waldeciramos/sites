@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Ramais — Grupo Dom Pedro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ════ CONFIG GITHUB — ALTERE AQUI SE NECESSÁRIO ════ */
+/* GITHUB_USER, GITHUB_REPO, GITHUB_TOKEN, GITHUB_FILE definidos no JS abaixo */
+
+/* ════ TOKENS ════ */
+:root {
+  --bg:#f5f6fa;--surface:#fff;--surface2:#f0f2f8;--surface3:#e8eaf2;
+  --border:#dde1ed;--border2:#c9cedf;
+  --text:#1a1d2e;--text2:#4a5070;--text3:#8b93b0;
+  --accent:#3d5af1;--accent-lt:#eef1ff;--accent-dk:#2a3fb3;
+  --green:#12b76a;--green-lt:#ecfdf5;
+  --amber:#f59e0b;--amber-lt:#fffbeb;
+  --red:#ef4444;--red-lt:#fef2f2;
+  --p1:#12b76a;--p1-lt:#ecfdf5;--p1-bd:#a7f3d0;
+  --p2:#3d5af1;--p2-lt:#eef1ff;--p2-bd:#c7d2fe;
+  --p3:#f59e0b;--p3-lt:#fffbeb;--p3-bd:#fde68a;
+  --sh-sm:0 2px 8px rgba(0,0,0,.08);--sh-md:0 4px 20px rgba(0,0,0,.10);--sh-lg:0 12px 40px rgba(0,0,0,.14);
+  --r:10px;--r-lg:16px;--r-xl:20px;--sw:268px;--ease:cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"]{
+  --bg:#0f1117;--surface:#161b27;--surface2:#1e2335;--surface3:#262d42;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
+  --text:#e8ecf8;--text2:#8b96b8;--text3:#50597a;
+  --accent:#5b7cf6;--accent-lt:rgba(91,124,246,.12);--accent-dk:#7a97ff;
+  --green:#34d399;--green-lt:rgba(52,211,153,.10);
+  --amber:#fbbf24;--amber-lt:rgba(251,191,36,.10);
+  --red:#f87171;--red-lt:rgba(248,113,113,.10);
+  --p1:#34d399;--p1-lt:rgba(52,211,153,.10);--p1-bd:rgba(52,211,153,.25);
+  --p2:#5b7cf6;--p2-lt:rgba(91,124,246,.12);--p2-bd:rgba(91,124,246,.3);
+  --p3:#fbbf24;--p3-lt:rgba(251,191,36,.10);--p3-bd:rgba(251,191,36,.25);
+  --sh-sm:0 2px 8px rgba(0,0,0,.4);--sh-md:0 4px 20px rgba(0,0,0,.5);--sh-lg:0 12px 40px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;transition:background .25s,color .25s}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+/* ════ LAYOUT ════ */
+.layout{display:flex;min-height:100vh}
+
+/* ════ SIDEBAR ════ */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:200}
+.sb-head{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sb-brand{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-dk));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 2px 8px rgba(61,90,241,.3)}
+.brand-co{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.brand-nm{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.sb-badge{display:inline-flex;align-items:center;gap:5px;background:var(--accent-lt);color:var(--accent);font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid var(--p2-bd);letter-spacing:.04em}
+.nav-sec{padding:14px 16px 4px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.nav-sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:1px 8px;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s var(--ease);border:none;background:none;width:calc(100% - 16px);text-align:left;position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-lt);color:var(--accent);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+.nav-ico{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-bdg{margin-left:auto;font-size:10px;font-weight:600;background:var(--surface3);color:var(--text3);padding:2px 7px;border-radius:20px;min-width:22px;text-align:center}
+.nav-item.active .nav-bdg{background:rgba(61,90,241,.15);color:var(--accent)}
+.sb-foot{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.kbd{background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)}
+.theme-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s var(--ease)}
+.theme-btn:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--p2-bd)}
+
+/* ════ MAIN ════ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* ════ TOPBAR ════ */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.sw{flex:1;position:relative;max-width:520px}
+.si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
+#sInput{width:100%;height:40px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;padding:0 36px 0 38px;outline:none;transition:all .15s var(--ease)}
+#sInput:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt);background:var(--surface)}
+#sInput::placeholder{color:var(--text3)}
+.sclear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--surface3);border:none;color:var(--text3);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;display:none;align-items:center;justify-content:center;transition:all .15s var(--ease)}
+.sclear:hover{background:var(--red-lt);color:var(--red)}
+.sclear.on{display:flex}
+.tr{display:flex;align-items:center;gap:8px;margin-left:auto}
+.vtog{display:flex;gap:3px;background:var(--surface2);padding:3px;border-radius:8px;border:1px solid var(--border)}
+.vbtn{width:30px;height:28px;border-radius:6px;border:none;background:none;color:var(--text3);font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s var(--ease);cursor:pointer}
+.vbtn.active{background:var(--surface);color:var(--accent);box-shadow:var(--sh-sm)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s var(--ease)}
+.btn-p{background:var(--accent);color:#fff}
+.btn-p:hover{background:var(--accent-dk);box-shadow:0 4px 12px rgba(61,90,241,.35)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-g{background:none;color:var(--text3);border:1px solid var(--border)}
+.btn-g:hover{background:var(--surface2);color:var(--text2)}
+.btn-s{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-s:hover{background:var(--surface3);color:var(--text)}
+.btn-d{background:var(--red-lt);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.btn-d:hover{filter:brightness(.95)}
+
+/* ════ CONTENT ════ */
+.content{padding:22px 24px;flex:1}
+
+/* ════ STATS ════ */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;display:flex;align-items:flex-start;gap:12px;transition:box-shadow .15s var(--ease)}
+.stat-card:hover{box-shadow:var(--sh-sm)}
+.stat-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.stat-lbl{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.stat-val{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* ════ PRÉDIO ════ */
+.predio-block{margin-bottom:32px}
+.predio-hd{background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);border:1px solid var(--border);border-radius:var(--r-xl);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.predio-ico{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-dk));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 14px rgba(61,90,241,.25)}
+.predio-info{flex:1;min-width:0}
+.predio-nome{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.01em;margin-bottom:4px}
+.predio-meta{display:flex;flex-wrap:wrap;gap:14px}
+.predio-mi{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
+
+/* ════ SETOR ════ */
+.setor-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:12px;transition:box-shadow .15s var(--ease)}
+.setor-block:hover{box-shadow:var(--sh-sm)}
+.setor-hd{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid transparent;cursor:pointer;user-select:none}
+.setor-block.open .setor-hd{border-bottom-color:var(--border)}
+.setor-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.setor-tg{flex:1;min-width:0}
+.setor-nome{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.setor-sub{display:flex;flex-wrap:wrap;gap:8px;margin-top:3px}
+.setor-mi{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.setor-mi a{color:var(--text3);transition:color .15s}
+.setor-mi a:hover{color:var(--accent)}
+.piso-bdg{flex-shrink:0;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px}
+.p1{background:var(--p1-lt);color:var(--p1);border:1px solid var(--p1-bd)}
+.p2{background:var(--p2-lt);color:var(--p2);border:1px solid var(--p2-bd)}
+.p3{background:var(--p3-lt);color:var(--p3);border:1px solid var(--p3-bd)}
+.pn{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.setor-cnt{flex-shrink:0;font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:20px}
+.setor-arr{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s var(--ease);flex-shrink:0}
+.setor-block.open .setor-arr{background:var(--accent-lt);color:var(--accent);border-color:var(--p2-bd)}
+.arr-ico{transition:transform .2s var(--ease)}
+.setor-block.open .arr-ico{transform:rotate(180deg)}
+
+/* ════ COLLABS ════ */
+.collabs-wrap{padding:14px 16px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.cgrid.list{grid-template-columns:1fr}
+.ccard{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;display:flex;align-items:flex-start;gap:12px;transition:all .15s var(--ease);position:relative;overflow:hidden}
+.ccard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background .15s;border-radius:3px 0 0 3px}
+.ccard:hover{border-color:var(--border2);box-shadow:var(--sh-sm);transform:translateY(-1px)}
+.ccard:hover::before{background:var(--accent)}
+.avatar{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.cbody{flex:1;min-width:0}
+.cnome{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.ccargo{font-size:11px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.cfields{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.cfield{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text2);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cfield .fi{font-size:12px;flex-shrink:0}
+.cfield a{color:var(--text2);transition:color .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.cfield a:hover{color:var(--accent);text-decoration:underline}
+.rchip{flex-shrink:0;align-self:flex-start;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;padding:5px 10px;border-radius:8px;min-width:54px;text-align:center}
+.rchip.has{background:var(--accent-lt);color:var(--accent);border:1.5px solid var(--p2-bd)}
+.rchip.no{background:var(--surface2);color:var(--text3);border:1.5px solid var(--border)}
+.cactions{display:flex;gap:3px;flex-direction:column;align-items:flex-end}
+.icobtn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;flex-shrink:0}
+.icobtn:hover.e{background:var(--accent-lt);color:var(--accent);border-color:var(--p2-bd)}
+.icobtn:hover.d{background:var(--red-lt);color:var(--red);border-color:rgba(239,68,68,.2)}
+.setor-acts{display:flex;gap:7px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+
+/* ════ EMPTY ════ */
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-ico{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty h3{font-size:15px;color:var(--text2);margin-bottom:4px}
+
+/* ════ MODAL ════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s var(--ease)}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);width:520px;max-width:94vw;box-shadow:var(--sh-lg);transform:translateY(20px) scale(.97);transition:transform .2s var(--ease);max-height:92vh;display:flex;flex-direction:column}
+.overlay.open .modal{transform:translateY(0) scale(1)}
+.mhd{padding:20px 22px 0;display:flex;align-items:center;justify-content:space-between}
+.mtitle{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.mclose{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s var(--ease)}
+.mclose:hover{background:var(--red-lt);color:var(--red);border-color:rgba(239,68,68,.3)}
+.mbody{padding:18px 22px;overflow-y:auto;flex:1}
+.mfoot{padding:0 22px 18px;display:flex;gap:8px;justify-content:flex-end}
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--text3);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+.fi-in,.fi-sel{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;padding:9px 12px;outline:none;transition:all .15s var(--ease)}
+.fi-in:focus,.fi-sel:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt);background:var(--surface)}
+.fi-in::placeholder{color:var(--text3)}
+.fi-sel option{background:var(--surface)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ════ STATUS BAR ════ */
+.sbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;color:var(--text3)}
+.sbar-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sbar-dot.ok{background:var(--green)}
+.sbar-dot.saving{background:var(--amber);animation:pulse 1s infinite}
+.sbar-dot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ════ TOAST ════ */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:2000;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:11px 15px;font-size:12.5px;color:var(--text);box-shadow:var(--sh-md);display:flex;align-items:center;gap:9px;min-width:220px;animation:tIn .25s var(--ease)}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--accent)}
+@keyframes tIn{from{transform:translateX(50px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tOut{to{transform:translateX(50px);opacity:0}}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
+mark{background:rgba(61,90,241,.15);color:var(--accent);border-radius:2px;padding:0 1px}
+.smeta{font-size:12.5px;color:var(--text3);margin-bottom:14px}
+.cico{font-size:36px;text-align:center;margin-bottom:10px}
+.ctxt{text-align:center;color:var(--text2);font-size:13.5px;line-height:1.6}
+.cnm{font-weight:700;color:var(--text)}
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}.cgrid{grid-template-columns:1fr}}
+@media(max-width:640px){.sidebar{display:none}.content{padding:14px}.topbar{padding:10px 14px}.stats-row{grid-template-columns:repeat(2,1fr);gap:8px}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ════ SIDEBAR ════ -->
+<nav class="sidebar">
+  <div class="sb-head">
+    <div class="sb-brand">
+      <div class="brand-icon">⛽</div>
+      <div>
+        <div class="brand-co">Grupo Dom Pedro</div>
+        <div class="brand-nm">Central de Ramais</div>
+      </div>
+    </div>
+    <div class="sb-badge">📅 Atualização 10/03/23</div>
+  </div>
+  <div class="nav-sec">Visualização</div>
+  <button class="nav-item active" id="nav-todos" onclick="switchView('todos')"><span class="nav-ico">🗃️</span>Todos os Ramais<span class="nav-bdg" id="cnt-todos">0</span></button>
+  <button class="nav-item" id="nav-predios" onclick="switchView('predios')"><span class="nav-ico">🏢</span>Por Prédio<span class="nav-bdg" id="cnt-predios">0</span></button>
+  <button class="nav-item" id="nav-setores" onclick="switchView('setores')"><span class="nav-ico">🗂️</span>Por Setor A-Z<span class="nav-bdg" id="cnt-setores">0</span></button>
+  <div class="nav-sec">Por Piso</div>
+  <button class="nav-item" id="nav-p1" onclick="filterPiso('1')"><span class="nav-ico">🟢</span>Piso 1<span class="nav-bdg" id="cnt-p1">0</span></button>
+  <button class="nav-item" id="nav-p2" onclick="filterPiso('2')"><span class="nav-ico">🔵</span>Piso 2<span class="nav-bdg" id="cnt-p2">0</span></button>
+  <button class="nav-item" id="nav-p3" onclick="filterPiso('3')"><span class="nav-ico">🟡</span>Piso 3<span class="nav-bdg" id="cnt-p3">0</span></button>
+  <div class="nav-sec">Ações</div>
+  <button class="nav-item" onclick="openNewCollab()"><span class="nav-ico">👤</span>Novo Colaborador</button>
+  <button class="nav-item" onclick="openNewSetor()"><span class="nav-ico">📁</span>Novo Setor</button>
+  <button class="nav-item" onclick="exportJSON()"><span class="nav-ico">💾</span>Exportar JSON</button>
+  <div class="sb-foot">
+    <span style="font-size:11px;color:var(--text3)">Tecla <span class="kbd">/</span> busca</span>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<!-- ════ MAIN ════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="sw">
+      <span class="si">🔍</span>
+      <input type="text" id="sInput" placeholder="Buscar nome, ramal, e-mail, setor…" autocomplete="off">
+      <button class="sclear" id="sclear" onclick="clearSearch()">✕</button>
+    </div>
+    <div class="tr">
+      <div class="vtog">
+        <button class="vbtn active" id="vg" onclick="setVM('grid')" title="Grade">⊞</button>
+        <button class="vbtn" id="vl" onclick="setVM('list')" title="Lista">≡</button>
+      </div>
+      <button class="btn btn-p" onclick="openNewCollab()">＋ Colaborador</button>
+    </div>
+  </div>
+  <!-- STATUS BAR -->
+  <div class="sbar" id="sbar">
+    <div class="sbar-dot ok" id="sbar-dot"></div>
+    <span id="sbar-txt">Conectando ao GitHub…</span>
+  </div>
+  <div class="content" id="mainContent">
+    <div style="text-align:center;padding:60px;color:var(--text3)">
+      <div style="font-size:32px;margin-bottom:12px">⏳</div>
+      <div>Carregando dados do GitHub…</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL COLABORADOR -->
+<div class="overlay" id="mCollab">
+  <div class="modal">
+    <div class="mhd"><h2 class="mtitle" id="mCollabTitle">Novo Colaborador</h2><button class="mclose" onclick="closeModal('mCollab')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="eId"><input type="hidden" id="eSetorKey">
+      <div class="frow">
+        <div class="fg"><label class="fl">Nome *</label><input id="fn" class="fi-in" placeholder="Nome completo"></div>
+        <div class="fg"><label class="fl">Ramal</label><input id="fr" class="fi-in" placeholder="ex: 2123"></div>
+      </div>
+      <div class="fg"><label class="fl">E-mail</label><input id="fe" class="fi-in" placeholder="colaborador@rededompedro.com"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Cargo / Função</label><input id="fc" class="fi-in" placeholder="Opcional"></div>
+        <div class="fg"><label class="fl">Telefone</label><input id="ft" class="fi-in" placeholder="Opcional"></div>
+      </div>
+      <div class="fg"><label class="fl">Subsetor</label><input id="fsub" class="fi-in" placeholder="Ex: Lançamento NF-e (opcional)"></div>
+      <div class="fg"><label class="fl">Setor *</label><select id="fsetor" class="fi-sel"><option value="">Selecione…</option></select></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" onclick="closeModal('mCollab')">Cancelar</button>
+      <button class="btn btn-p" onclick="saveCollab()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SETOR -->
+<div class="overlay" id="mSetor">
+  <div class="modal">
+    <div class="mhd"><h2 class="mtitle" id="mSetorTitle">Novo Setor</h2><button class="mclose" onclick="closeModal('mSetor')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="esId"><input type="hidden" id="esPid">
+      <div class="frow">
+        <div class="fg"><label class="fl">Nome do Setor *</label><input id="sfn" class="fi-in" placeholder="Nome"></div>
+        <div class="fg"><label class="fl">Piso</label>
+          <select id="sfp" class="fi-sel"><option value="">—</option><option value="1">Piso 1</option><option value="2">Piso 2</option><option value="3">Piso 3</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">E-mail Principal</label><input id="sfe" class="fi-in" placeholder="setor@rededompedro.com"></div>
+      <div class="fg"><label class="fl">Telefone Principal</label><input id="sft" class="fi-in" placeholder="(35) 3462-XXXX"></div>
+      <div class="fg"><label class="fl">Prédio *</label><select id="sfpredio" class="fi-sel"><option value="">Selecione…</option></select></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" onclick="closeModal('mSetor')">Cancelar</button>
+      <button class="btn btn-p" onclick="saveSetor()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRM -->
+<div class="overlay" id="mConfirm">
+  <div class="modal" style="max-width:360px">
+    <div class="mhd"><h2 class="mtitle">Confirmar exclusão</h2><button class="mclose" onclick="closeModal('mConfirm')">✕</button></div>
+    <div class="mbody">
+      <div class="cico">🗑️</div>
+      <p class="ctxt">Deseja remover <span class="cnm" id="cName"></span>?<br><span style="font-size:12px;color:var(--text3)">Esta ação salvará o JSON no GitHub automaticamente.</span></p>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" onclick="closeModal('mConfirm')">Cancelar</button>
+      <button class="btn btn-d" id="cBtn">🗑️ Remover</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  ⚙️  CONFIGURAÇÃO GITHUB — EDITE AQUI SE NECESSÁRIO
+// ══════════════════════════════════════════════════
+const GH_USER  = 'waldeciramos';
+const GH_REPO  = 'dompedroprojeoes';
+const GH_TOKEN = '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';
+const GH_FILE  = 'ramais.json';
+const GH_API   = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${GH_FILE}`;
+
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+let DATA = null;
+let FILE_SHA = null; // SHA atual do arquivo no GitHub (necessário para atualizar)
+let cView = 'todos', cSearch = '', cPiso = null, VM = 'grid';
+
+const COLORS = ['#3d5af1','#12b76a','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#0ea5e9'];
+const ICONS = {recepcao:'🪪',marketing:'📢',suprimentos:'📦',tecnologia:'💻',ti:'💻',financeiro:'💰',contabil:'📊',fiscal:'📑',cartoes:'💳',faturamento:'📋',juridico:'⚖️',pessoal:'👥',recursos:'🤝',saude:'🏥',sst:'🦺',controladoria:'🎯',coordenadoria:'📌',combustiveis:'⛽',programacao:'🖥️',gestao:'📈',orgaos:'🏛️',alugueis:'🏠',bv:'🚚',xp:'🚛',assessora:'🗒️',recebiveis:'💹',plano:'🩺',default:'🏷️'};
+const openStates = new Set();
+
+function sIcon(nome){ const n=nome.toLowerCase(); for(const k of Object.keys(ICONS)) if(n.includes(k)) return ICONS[k]; return ICONS.default; }
+function ini(nome){ return nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function aColor(nome){ let h=0; for(let c of nome) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
+function greeting(){ const h=new Date().getHours(); return h>=5&&h<12?'Bom dia':h>=12&&h<18?'Boa tarde':'Boa noite'; }
+function firstN(email){ if(!email||email==='-') return ''; const p=email.split('@')[0].split(/[._]/)[0]; return p.charAt(0).toUpperCase()+p.slice(1); }
+function mailto(email){ if(!email||email==='-') return null; const fn=firstN(email); const body=fn?`${greeting()}, ${fn}!\n\n`:`${greeting()}!\n\n`; return `mailto:${email}?body=${encodeURIComponent(body)}`; }
+
+// ══════════════════════════════════════════════════
+//  STATUS BAR
+// ══════════════════════════════════════════════════
+function setStatus(state, msg){
+  const dot=document.getElementById('sbar-dot');
+  const txt=document.getElementById('sbar-txt');
+  dot.className='sbar-dot '+state;
+  txt.textContent=msg;
+}
+
+// ══════════════════════════════════════════════════
+//  GITHUB API — LEITURA
+// ══════════════════════════════════════════════════
+async function loadFromGitHub(){
+  setStatus('saving','Carregando ramais.json do GitHub…');
+  try{
+    const res = await fetch(GH_API, {
+      headers:{
+        'Authorization': `Bearer ${GH_TOKEN}`,
+        'Accept': 'application/vnd.github+json'
+      }
+    });
+    if(!res.ok) throw new Error(`GitHub API: ${res.status} ${res.statusText}`);
+    const json = await res.json();
+    FILE_SHA = json.sha; // guarda SHA para updates futuros
+    const content = atob(json.content.replace(/\n/g,''));
+    DATA = JSON.parse(content);
+    setStatus('ok',`✅ Dados carregados do GitHub — ${FILE_SHA.slice(0,7)}`);
+    // abre todos os setores por padrão
+    DATA.predios.forEach(p=>p.setores.forEach(s=>openStates.add(s.id)));
+    updateCounts();
+    render();
+  } catch(e){
+    setStatus('err','❌ Erro ao carregar: '+e.message);
+    toast('Erro ao carregar dados: '+e.message,'error');
+    // tenta localStorage como fallback
+    const saved = localStorage.getItem('ramais_fallback');
+    if(saved){ DATA=JSON.parse(saved); setStatus('err','⚠️ Usando cache local (GitHub indisponível)'); DATA.predios.forEach(p=>p.setores.forEach(s=>openStates.add(s.id))); updateCounts(); render(); }
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  GITHUB API — ESCRITA
+// ══════════════════════════════════════════════════
+async function saveToGitHub(){
+  if(!DATA) return;
+  setStatus('saving','💾 Salvando no GitHub…');
+  try{
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
+    const body = {
+      message: `Atualização ramais — ${new Date().toLocaleString('pt-BR')}`,
+      content,
+      sha: FILE_SHA // obrigatório para update
+    };
+    const res = await fetch(GH_API, {
+      method: 'PUT',
+      headers:{
+        'Authorization': `Bearer ${GH_TOKEN}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      const err = await res.json();
+      throw new Error(err.message || res.statusText);
+    }
+    const result = await res.json();
+    FILE_SHA = result.content.sha; // atualiza SHA para próximo save
+    localStorage.setItem('ramais_fallback', JSON.stringify(DATA)); // cache local
+    setStatus('ok',`✅ Salvo no GitHub — ${FILE_SHA.slice(0,7)}`);
+    return true;
+  } catch(e){
+    setStatus('err','❌ Erro ao salvar: '+e.message);
+    toast('Erro ao salvar no GitHub: '+e.message,'error');
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════════════════
+function toggleTheme(){
+  const d=document.documentElement;
+  const dark=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('themeBtn').textContent=dark?'🌙':'☀️';
+  localStorage.setItem('theme',dark?'light':'dark');
+}
+function loadTheme(){
+  const t=localStorage.getItem('theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('themeBtn').textContent=t==='dark'?'☀️':'🌙';
+}
+
+// ══════════════════════════════════════════════════
+//  COUNTS
+// ══════════════════════════════════════════════════
+function updateCounts(){
+  if(!DATA) return;
+  let tot=0,sets=0,p1=0,p2=0,p3=0;
+  DATA.predios.forEach(p=>{ sets+=p.setores.length; p.setores.forEach(s=>{ tot+=s.colaboradores.length; s.colaboradores.forEach(()=>{ if(s.piso==='1')p1++; else if(s.piso==='2')p2++; else if(s.piso==='3')p3++; }); }); });
+  [['cnt-todos',tot],['cnt-predios',DATA.predios.length],['cnt-setores',sets],['cnt-p1',p1],['cnt-p2',p2],['cnt-p3',p3]].forEach(([id,v])=>{ const el=document.getElementById(id); if(el) el.textContent=v; });
+}
+
+// ══════════════════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════════════════
+const $si=document.getElementById('sInput');
+const $sc=document.getElementById('sclear');
+$si.addEventListener('input',()=>{ cSearch=$si.value.trim(); $sc.classList.toggle('on',cSearch.length>0); cPiso=null; render(); });
+document.addEventListener('keydown',e=>{ if(e.key==='/'&&document.activeElement!==$si){e.preventDefault();$si.focus();} if(e.key==='Escape'){clearSearch();closeAllModals();} });
+function clearSearch(){ $si.value=''; cSearch=''; $sc.classList.remove('on'); render(); }
+function hi(text,q){ if(!q||!text) return text||''; return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),'<mark>$1</mark>'); }
+function matches(c,s,q){ if(!q) return true; const lq=q.toLowerCase(); return [c.nome,c.email,c.ramal,c.cargo,c.telefone,c.subsetor,s.nome,s.email_principal].some(v=>v?.toLowerCase().includes(lq)); }
+
+// ══════════════════════════════════════════════════
+//  VIEWS
+// ══════════════════════════════════════════════════
+function switchView(v){ cView=v; cPiso=null; document.querySelectorAll('.nav-item[id^="nav-"]').forEach(b=>b.classList.remove('active')); document.getElementById('nav-'+v)?.classList.add('active'); render(); }
+function filterPiso(p){ cPiso=cPiso===p?null:p; document.querySelectorAll('.nav-item[id^="nav-p"]').forEach(b=>b.classList.remove('active')); if(cPiso) document.getElementById('nav-p'+p)?.classList.add('active'); cView='todos'; document.getElementById('nav-todos')?.classList.add('active'); render(); }
+function setVM(m){ VM=m; document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('active')); document.getElementById(m==='grid'?'vg':'vl')?.classList.add('active'); render(); }
+
+// ══════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════
+function render(){
+  if(!DATA) return;
+  updateCounts();
+  const el=document.getElementById('mainContent');
+  let tot=0,sets=0;
+  DATA.predios.forEach(p=>{ sets+=p.setores.length; p.setores.forEach(s=>tot+=s.colaboradores.length); });
+  let results=[];
+  DATA.predios.forEach(predio=>predio.setores.forEach(setor=>{
+    if(cPiso&&setor.piso!==cPiso) return;
+    setor.colaboradores.forEach(c=>{ if(matches(c,setor,cSearch)) results.push({predio,setor,collab:c}); });
+  }));
+  let html=`<div class="stats-row">
+    <div class="stat-card"><div class="stat-ico" style="background:var(--accent-lt)">👥</div><div><div class="stat-lbl">Colaboradores</div><div class="stat-val">${tot}</div><div class="stat-sub">${DATA.predios.length} prédio(s)</div></div></div>
+    <div class="stat-card"><div class="stat-ico" style="background:var(--green-lt)">🗂️</div><div><div class="stat-lbl">Setores</div><div class="stat-val">${sets}</div><div class="stat-sub">todos os pisos</div></div></div>
+    <div class="stat-card"><div class="stat-ico" style="background:var(--amber-lt)">🔍</div><div><div class="stat-lbl">Resultados</div><div class="stat-val">${results.length}</div><div class="stat-sub">${cSearch?`"${cSearch}"`:cPiso?`Piso ${cPiso}`:'todos'}</div></div></div>
+    <div class="stat-card"><div class="stat-ico" style="background:var(--red-lt)">🏢</div><div><div class="stat-lbl">Prédios</div><div class="stat-val">${DATA.predios.length}</div><div class="stat-sub">unidades</div></div></div>
+  </div>`;
+  if(cSearch&&results.length===0){ html+=`<div class="empty"><div class="empty-ico">🔍</div><h3>Sem resultados para "${cSearch}"</h3><p>Tente outro nome, ramal ou e-mail.</p></div>`; el.innerHTML=html; return; }
+  if(cSearch) html+=`<p class="smeta">🔎 ${results.length} resultado(s) para <strong>"${cSearch}"</strong></p>`;
+  if(cSearch){
+    const bySe=new Map();
+    results.forEach(r=>{ if(!bySe.has(r.setor.id)) bySe.set(r.setor.id,{predio:r.predio,setor:r.setor,collabs:[]}); bySe.get(r.setor.id).collabs.push(r.collab); });
+    bySe.forEach(({predio,setor,collabs})=>{ html+=rSetor(predio,setor,collabs,cSearch); });
+  } else if(cView==='setores'){
+    const all=[]; DATA.predios.forEach(p=>p.setores.forEach(s=>all.push({predio:p,setor:s}))); all.sort((a,b)=>a.setor.nome.localeCompare(b.setor.nome,'pt'));
+    all.forEach(({predio,setor})=>{ if(cPiso&&setor.piso!==cPiso) return; html+=rSetor(predio,setor,setor.colaboradores,''); });
+  } else {
+    DATA.predios.forEach(predio=>{ if(cPiso&&!predio.setores.some(s=>s.piso===cPiso)) return; html+=rPredio(predio); });
+  }
+  el.innerHTML=html;
+  openStates.forEach(id=>{ const e=document.getElementById('sb-'+id); if(e) e.classList.add('open'); });
+}
+
+function toggleSetor(id){ const e=document.getElementById('sb-'+id); if(!e) return; e.classList.toggle('open'); if(e.classList.contains('open')) openStates.add(id); else openStates.delete(id); }
+
+function rPredio(predio){
+  let h=`<div class="predio-block"><div class="predio-hd"><div class="predio-ico">🏢</div><div class="predio-info"><div class="predio-nome">${predio.nome}</div><div class="predio-meta">`;
+  if(predio.telefone_principal) h+=`<div class="predio-mi">📞 ${predio.telefone_principal}</div>`;
+  if(predio.sac_cliente) h+=`<div class="predio-mi">🎧 SAC Cliente: ${predio.sac_cliente}</div>`;
+  if(predio.sac_funcionarios) h+=`<div class="predio-mi">📱 SAC Func.: ${predio.sac_funcionarios}</div>`;
+  h+=`</div></div></div>`;
+  let fil=predio.setores; if(cPiso) fil=fil.filter(s=>s.piso===cPiso);
+  fil.forEach(s=>{ h+=rSetor(predio,s,s.colaboradores,''); });
+  h+=`</div>`; return h;
+}
+
+function rSetor(predio,setor,collabs,q){
+  const p=setor.piso; const pc=p?`p${p}`:'pn'; const pl=p?`Piso ${p}`:'—'; const pi={'1':'🟢','2':'🔵','3':'🟡'}[p]||'⬜';
+  const ico=sIcon(setor.nome); const ibg={'1':'background:var(--p1-lt)','2':'background:var(--p2-lt)','3':'background:var(--p3-lt)','null':'background:var(--surface2)'}[p||'null'];
+  const isOpen=openStates.has(setor.id)||!!q;
+  let h=`<div class="setor-block${isOpen?' open':''}" id="sb-${setor.id}">
+    <div class="setor-hd" onclick="toggleSetor('${setor.id}')">
+      <div class="setor-ico" style="${ibg}">${ico}</div>
+      <div class="setor-tg">
+        <div class="setor-nome">${hi(setor.nome,q)}</div>
+        <div class="setor-sub">`;
+  if(setor.email_principal) h+=`<span class="setor-mi">✉️ <a href="mailto:${setor.email_principal}" onclick="event.stopPropagation()">${hi(setor.email_principal,q)}</a></span>`;
+  if(setor.telefone_principal) h+=`<span class="setor-mi">📞 ${setor.telefone_principal}</span>`;
+  h+=`</div></div>
+      <span class="piso-bdg ${pc}">${pi} ${pl}</span>
+      <span class="setor-cnt">${collabs.length} pessoa${collabs.length!==1?'s':''}</span>
+      <div class="setor-arr"><span class="arr-ico">▾</span></div>
+    </div>`;
+  if(isOpen){
+    h+=`<div class="collabs-wrap">`;
+    if(collabs.length===0){ h+=`<p style="color:var(--text3);font-size:13px;padding:4px 0">Nenhum colaborador. <button class="btn btn-g btn-sm" onclick="openNewCollabForSetor('${predio.id}','${setor.id}')">＋ Adicionar</button></p>`; }
+    else{ h+=`<div class="cgrid${VM==='list'?' list':''}">`;collabs.forEach(c=>{ h+=rCard(predio.id,setor.id,c,q); });h+=`</div>`; }
+    h+=`<div class="setor-acts">
+      <button class="btn btn-g btn-sm" onclick="openNewCollabForSetor('${predio.id}','${setor.id}')">＋ Colaborador</button>
+      <button class="btn btn-g btn-sm" onclick="openEditSetor('${predio.id}','${setor.id}')">✏️ Editar setor</button>
+      <button class="btn btn-g btn-sm" style="color:var(--red);border-color:rgba(239,68,68,.2)" onclick="confirmDelSetor('${predio.id}','${setor.id}')">🗑️ Remover setor</button>
+    </div></div>`;
+  }
+  h+=`</div>`; return h;
+}
+
+function rCard(pid,sid,c,q){
+  const av=ini(c.nome); const col=aColor(c.nome); const hasR=c.ramal&&c.ramal!=='-'&&c.ramal!=='—';
+  const ml=mailto(c.email);
+  let fields='';
+  if(c.email&&c.email!=='-'){ fields+=`<div class="cfield"><span class="fi">✉️</span>`; if(ml) fields+=`<a href="${ml}" title="Enviar e-mail — ${greeting()}, ${firstN(c.email)}!">${hi(c.email,q)}</a>`; else fields+=`<span>${hi(c.email,q)}</span>`; fields+=`</div>`; }
+  if(c.telefone) fields+=`<div class="cfield"><span class="fi">📱</span><a href="tel:${c.telefone}">${c.telefone}</a></div>`;
+  if(c.subsetor) fields+=`<div class="cfield"><span class="fi">📂</span><span>${c.subsetor}</span></div>`;
+  const en=c.nome.replace(/'/g,"\\'");
+  return `<div class="ccard">
+    <div class="avatar" style="background:${col}">${av}</div>
+    <div class="cbody">
+      <div class="cnome">${hi(c.nome,q)}</div>
+      ${c.cargo?`<div class="ccargo">🏷️ ${hi(c.cargo,q)}</div>`:''}
+      <div class="cfields">${fields}</div>
+    </div>
+    <div class="cactions">
+      <div class="rchip ${hasR?'has':'no'}">${c.ramal||'—'}</div>
+      <div style="display:flex;gap:3px;margin-top:4px">
+        <button class="icobtn e" onclick="openEditCollab('${pid}','${sid}','${en}')" title="Editar">✏️</button>
+        <button class="icobtn d" onclick="confirmDelCollab('${pid}','${sid}','${en}')" title="Remover">🗑️</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function closeAllModals(){ document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open')); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }));
+
+// ══════════════════════════════════════════════════
+//  COLLAB CRUD
+// ══════════════════════════════════════════════════
+function fillSetorSel(selId=''){
+  const sel=document.getElementById('fsetor'); sel.innerHTML='<option value="">Selecione o setor…</option>';
+  DATA.predios.forEach(p=>{ const g=document.createElement('optgroup'); g.label=p.nome; p.setores.forEach(s=>{ const o=document.createElement('option'); o.value=p.id+'|'+s.id; o.textContent=s.nome+(s.piso?` — Piso ${s.piso}`:''); if(s.id===selId) o.selected=true; g.appendChild(o); }); sel.appendChild(g); });
+}
+function openNewCollab(){ document.getElementById('mCollabTitle').textContent='Novo Colaborador'; ['eId','eSetorKey','fn','fr','fe','fc','ft','fsub'].forEach(i=>{ const e=document.getElementById(i); if(e) e.value=''; }); fillSetorSel(); openModal('mCollab'); setTimeout(()=>document.getElementById('fn').focus(),120); }
+function openNewCollabForSetor(pid,sid){ openNewCollab(); const sel=document.getElementById('fsetor'); for(let o of sel.options){ if(o.value===pid+'|'+sid){o.selected=true;break;} } }
+function openEditCollab(pid,sid,nome){ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); const c=s?.colaboradores.find(x=>x.nome===nome); if(!c) return; document.getElementById('mCollabTitle').textContent='Editar Colaborador'; document.getElementById('eId').value=nome; document.getElementById('eSetorKey').value=pid+'|'+sid; document.getElementById('fn').value=c.nome||''; document.getElementById('fr').value=c.ramal==='-'?'':(c.ramal||''); document.getElementById('fe').value=c.email==='-'?'':(c.email||''); document.getElementById('fc').value=c.cargo||''; document.getElementById('ft').value=c.telefone||''; document.getElementById('fsub').value=c.subsetor||''; fillSetorSel(sid); openModal('mCollab'); }
+async function saveCollab(){
+  const nome=document.getElementById('fn').value.trim(); if(!nome){ toast('Nome é obrigatório.','error'); return; }
+  const sv=document.getElementById('fsetor').value; if(!sv){ toast('Selecione um setor.','error'); return; }
+  const [pid,sid]=sv.split('|'); const oldKey=document.getElementById('eSetorKey').value; const oldNome=document.getElementById('eId').value;
+  const nc={nome, ramal:document.getElementById('fr').value.trim()||'-', email:document.getElementById('fe').value.trim()||'-'};
+  const cargo=document.getElementById('fc').value.trim(); const tel=document.getElementById('ft').value.trim(); const sub=document.getElementById('fsub').value.trim();
+  if(cargo) nc.cargo=cargo; if(tel) nc.telefone=tel; if(sub) nc.subsetor=sub;
+  if(oldNome){ const [op,os]=oldKey.split('|'); const oP=DATA.predios.find(x=>x.id===op); const oS=oP?.setores.find(x=>x.id===os); if(oS) oS.colaboradores=oS.colaboradores.filter(c=>c.nome!==oldNome); }
+  const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(!s) return;
+  if(oldNome&&oldKey===sv){ const i=s.colaboradores.findIndex(c=>c.nome===oldNome); if(i>=0) s.colaboradores[i]=nc; else s.colaboradores.push(nc); } else s.colaboradores.push(nc);
+  closeModal('mCollab'); render();
+  const ok=await saveToGitHub();
+  if(ok) toast(oldNome?'✅ Colaborador atualizado e salvo no GitHub!':'✅ Colaborador adicionado e salvo no GitHub!','success');
+}
+function confirmDelCollab(pid,sid,nome){ document.getElementById('cName').textContent=nome; document.getElementById('cBtn').onclick=async()=>{ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(s){ s.colaboradores=s.colaboradores.filter(c=>c.nome!==nome); closeModal('mConfirm'); render(); const ok=await saveToGitHub(); if(ok) toast('Colaborador removido e salvo no GitHub.','info'); } }; openModal('mConfirm'); }
+
+// ══════════════════════════════════════════════════
+//  SETOR CRUD
+// ══════════════════════════════════════════════════
+function fillPredioSel(selId=''){ const sel=document.getElementById('sfpredio'); sel.innerHTML='<option value="">Selecione o prédio…</option>'; DATA.predios.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.nome; if(p.id===selId) o.selected=true; sel.appendChild(o); }); }
+function openNewSetor(){ document.getElementById('mSetorTitle').textContent='Novo Setor'; ['esId','esPid','sfn','sfe','sft'].forEach(i=>{ const e=document.getElementById(i); if(e) e.value=''; }); document.getElementById('sfp').value=''; fillPredioSel(); openModal('mSetor'); setTimeout(()=>document.getElementById('sfn').focus(),120); }
+function openEditSetor(pid,sid){ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(!s) return; document.getElementById('mSetorTitle').textContent='Editar Setor'; document.getElementById('esId').value=sid; document.getElementById('esPid').value=pid; document.getElementById('sfn').value=s.nome; document.getElementById('sfp').value=s.piso||''; document.getElementById('sfe').value=s.email_principal||''; document.getElementById('sft').value=s.telefone_principal||''; fillPredioSel(pid); openModal('mSetor'); }
+async function saveSetor(){
+  const nome=document.getElementById('sfn').value.trim(); if(!nome){ toast('Nome do setor é obrigatório.','error'); return; }
+  const pid=document.getElementById('sfpredio').value; if(!pid){ toast('Selecione um prédio.','error'); return; }
+  const p=DATA.predios.find(x=>x.id===pid); if(!p) return;
+  const editId=document.getElementById('esId').value; const oldPid=document.getElementById('esPid').value;
+  const ns={id:editId||nome.toLowerCase().replace(/[^a-z0-9]+/g,'-'),nome,piso:document.getElementById('sfp').value||null,email_principal:document.getElementById('sfe').value.trim()||null,telefone_principal:document.getElementById('sft').value.trim()||null,descricao:null,colaboradores:[]};
+  if(editId){ const oP=DATA.predios.find(x=>x.id===oldPid); if(oP){ const i=oP.setores.findIndex(x=>x.id===editId); if(i>=0){ ns.colaboradores=oP.setores[i].colaboradores; if(oldPid===pid){oP.setores[i]=ns;}else{oP.setores.splice(i,1);p.setores.push(ns);} } } } else p.setores.push(ns);
+  closeModal('mSetor'); render();
+  const ok=await saveToGitHub();
+  if(ok) toast(editId?'✅ Setor atualizado e salvo no GitHub!':'✅ Setor adicionado e salvo no GitHub!','success');
+}
+function confirmDelSetor(pid,sid){ const p=DATA.predios.find(x=>x.id===pid); const s=p?.setores.find(x=>x.id===sid); if(!s) return; document.getElementById('cName').textContent=`o setor "${s.nome}"`; document.getElementById('cBtn').onclick=async()=>{ p.setores=p.setores.filter(x=>x.id!==sid); closeModal('mConfirm'); render(); const ok=await saveToGitHub(); if(ok) toast('Setor removido e salvo no GitHub.','info'); }; openModal('mConfirm'); }
+
+// ══════════════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════════════
+function exportJSON(){ const b=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='ramais.json'; a.click(); URL.revokeObjectURL(u); toast('💾 JSON exportado!','success'); }
+
+// ══════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════
+function toast(msg,type='info'){ const icons={success:'✅',error:'❌',info:'ℹ️'}; const el=document.createElement('div'); el.className=`toast ${type}`; el.innerHTML=`<span>${icons[type]}</span>${msg}`; document.getElementById('toasts').appendChild(el); setTimeout(()=>{ el.style.animation='tOut .3s forwards'; setTimeout(()=>el.remove(),300); },4000); }
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+loadTheme();
+loadFromGitHub();
+</script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+{
+  "empresa": "Grupo Dom Pedro",
+  "predios": [
+    {
+      "id": "predio-1-central-adm",
+      "nome": "PRÉDIO 1 — CENTRAL ADMINISTRATIVA",
+      "telefone_principal": "(35) 3462-2100",
+      "sac_cliente": "0800 723 1188",
+      "sac_funcionarios": "0800 033 0933",
+      "setores": [
+        {
+          "id": "recepcao",
+          "nome": "RECEPÇÃO",
+          "piso": "1",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Cirlene Silva", "ramal": "2101", "email": "redepcao@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "programacao-dpnet",
+          "nome": "PROGRAMAÇÃO DPNET",
+          "piso": "1",
+          "email_principal": "dpnet@rededompedro.com",
+          "telefone_principal": "(35) 3462-2100",
+          "colaboradores": [
+            { "nome": "Emerson Oliveira", "ramal": "2123", "email": "emerson.oliveira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Rodolfo Souza", "ramal": "2123", "email": "rodolfo.souza@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Paulo Henrique Rosa", "ramal": "2121", "email": "paulhenrique.rosa@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "José Augusto Freitas", "ramal": "2125", "email": "joseaugusto.freitas@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Silvana Goulart", "ramal": "2125", "email": "silvana.goulart@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Vitor Henrique Silva", "ramal": "-", "email": "vitorhenrique.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Henrique Ferreira", "ramal": "-", "email": "henrique.ferreira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "marketing",
+          "nome": "MARKETING",
+          "piso": "1",
+          "email_principal": "marketing@rededompedro.com",
+          "telefone_principal": "(35) 3462-2111",
+          "colaboradores": [
+            { "nome": "Águeda Tainara", "ramal": "2221", "email": "agueda.tainara@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Lucas Pereira", "ramal": "2220", "email": "lucas.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "suprimentos",
+          "nome": "SUPRIMENTOS",
+          "piso": "1",
+          "email_principal": "suprimentos@rededompedro.com",
+          "telefone_principal": "(35) 3462-2111",
+          "colaboradores": [
+            { "nome": "Renata Mendonça", "ramal": "2247", "email": "renata.mendonca@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Victor Dias", "ramal": "-", "email": "victor.dias@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestao-tecnologica",
+          "nome": "GESTÃO TECNOLÓGICA",
+          "piso": "1",
+          "email_principal": "gestao.tecnologica@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Acássio Marques", "ramal": "2285", "email": "acassio.marques@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Aline Souza", "ramal": "2284", "email": "aline.souza@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Cintia Oliveira", "ramal": "2283", "email": "cintia.oliveira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "contas-a-receber",
+          "nome": "CONTAS A RECEBER",
+          "piso": "1",
+          "email_principal": "cobranca@rededompedro.com",
+          "telefone_principal": "(35) 3462-2102",
+          "colaboradores": [
+            { "nome": "Zuleica Pereira", "ramal": "2204", "email": "zuleica.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Petrus Paiva", "ramal": "2207", "email": "petrus.paiva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Silvana Verônica", "ramal": "2201", "email": "silvana.veronica@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Luciano Pereira", "ramal": "2295", "email": "luciano.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Devarí Simões", "ramal": "2206", "email": "devari.simoes@rededompedro.com", "cargo": "Plantonista", "telefone": null, "subsetor": null },
+            { "nome": "Reinaldo Bruno", "ramal": "2209", "email": "reinaldobruno.castro@rededompedro.com", "cargo": "Plantonista", "telefone": null, "subsetor": null },
+            { "nome": "Délcio Pereira", "ramal": "2208", "email": "delcio.pereira@rededompedro.com", "cargo": "Plantonista", "telefone": null, "subsetor": null },
+            { "nome": "Priscila Rezende", "ramal": "2210", "email": "priscila.rezende@rededompedro.com", "cargo": "Plantonista", "telefone": null, "subsetor": null },
+            { "nome": "Alysson Pereira", "ramal": "2205", "email": "alysson.pereira@rededompedro.com", "cargo": "Plantonista", "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestor-comercial",
+          "nome": "GESTOR COMERCIAL",
+          "piso": "2",
+          "email_principal": "comercial@rededompedro.com",
+          "telefone_principal": "(35) 3462-2104",
+          "colaboradores": [
+            { "nome": "Sandro Caetano", "ramal": "2261", "email": "sandro.caetano@rededompedro.com", "cargo": null, "telefone": "(31) 98455-7907", "subsetor": null },
+            { "nome": "Sergio Freitas", "ramal": "2263", "email": "sergio.freitas@rededompedro.com", "cargo": null, "telefone": "(35) 98465-3204", "subsetor": null },
+            { "nome": "João Batista", "ramal": "2262", "email": "joaobatista.junior@rededompedro.com", "cargo": null, "telefone": "(35) 98465-0913", "subsetor": null },
+            { "nome": "Larissa Romera", "ramal": "2264", "email": "larissa.romera@rededompedro.com", "cargo": null, "telefone": "(35) 99190-0012", "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestora-contabil",
+          "nome": "GESTORA CONTÁBIL",
+          "piso": "2",
+          "email_principal": null,
+          "telefone_principal": "(35) 3462-2110",
+          "colaboradores": [
+            { "nome": "Daniele Fonseca", "ramal": "2255", "email": "daniele.fonseca@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Nelma Pascoal", "ramal": "2250", "email": "nelma.pascoal@rededompedro.com", "cargo": "Fiscal", "telefone": null, "subsetor": null },
+            { "nome": "Carliane Castro", "ramal": "2254", "email": "carliane.castro@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "contabil-fiscal",
+          "nome": "CONTÁBIL FISCAL",
+          "piso": "2",
+          "email_principal": "contabilidade@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Geovane Oliveira", "ramal": "2299", "email": "geovane.oliveira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Luis Gustavo", "ramal": "2252", "email": "luisgustavo.canquerini@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Cibele Silva", "ramal": "2269", "email": "cibele.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Aline Almeida", "ramal": "2253", "email": "aline.almeida@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Mônica de Souza", "ramal": "2251", "email": "monica.souza@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Tatiane Silva", "ramal": "2259", "email": "tatiane.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": "Lançamento NF-e" },
+            { "nome": "Adriely Silva", "ramal": "2258", "email": "adriely.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Anderson Santos", "ramal": "2256", "email": "anderson.santos@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "controle-combustiveis",
+          "nome": "CONTROLE E MOVIMENTAÇÃO DE COMBUSTÍVEIS",
+          "piso": "2",
+          "email_principal": "imc@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Mariana Lima", "ramal": "2288", "email": "mariana.lima@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Jaine Melquiades", "ramal": "2288", "email": "jaine.melquiades@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Erika Silva", "ramal": "2288", "email": "erikatainara.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestora-dep-pessoal",
+          "nome": "GESTORA DEP. PESSOAL",
+          "piso": "2",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Célia Rosa", "ramal": "2257", "email": "celia.rosa@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Waldecy Ramos", "ramal": "2362", "email": "waldecy.ramos@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "departamento-pessoal",
+          "nome": "DEPARTAMENTO PESSOAL",
+          "piso": "2",
+          "email_principal": "dep.pessoal@rededompedro.com",
+          "telefone_principal": "(35) 3462-2106",
+          "colaboradores": [
+            { "nome": "Marília Tomaz", "ramal": "2232", "email": "marilia.tomaz@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Tânia Silva", "ramal": "2236", "email": "tania.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Geraldo Teixeira", "ramal": "2231", "email": "geraldomiguel.teixeira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Luana Celeste", "ramal": "2234", "email": "luana.celeste@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Vanessa Moura", "ramal": "2237", "email": "vanessa.moura@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "plano-de-saude",
+          "nome": "PLANO DE SAÚDE",
+          "piso": "2",
+          "email_principal": "beneficios@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Sonia Rodrigues", "ramal": "2233", "email": "sonia.rodrigues@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Adrieli Silva", "ramal": "-", "email": "adrieli.silva@rededompedro.com", "cargo": "Terceirizado", "telefone": "35 9963-1615", "subsetor": null }
+          ]
+        },
+        {
+          "id": "recursos-humanos",
+          "nome": "RECURSOS HUMANOS",
+          "piso": "2",
+          "email_principal": "rh@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Jéssica Pereira", "ramal": "2235", "email": "jessica.pereira@bvdistribuidora.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Gustavo Gomes", "ramal": "2260", "email": "gustavo.gomes@bvdistribuidora.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "chefe-setor-cartoes",
+          "nome": "CHEFE SETOR CARTÕES",
+          "piso": "2",
+          "email_principal": "cartao@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Maida Lucas", "ramal": "2279", "email": "maida.lucas@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Fabiana Lambert", "ramal": "2274", "email": "fabiana.lambert@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Renata Campos", "ramal": "2268", "email": "renata.campos@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Bianca Cardoso", "ramal": "2278", "email": "bianca.cardoso@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Andrieli Teofilo", "ramal": "2273", "email": "andrieli.teofilo@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestao-recebiveis-cartoes",
+          "nome": "GESTÃO DE RECEBÍVEIS (CARTÕES)",
+          "piso": "2",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Amanda Prado", "ramal": "2272", "email": "amanda.prado@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Jéssica Machado", "ramal": "2270", "email": "jessica.machado@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Suzanne Gonçalves", "ramal": "2290", "email": "suzanne.goncalves@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Mayara Fernandes Alcantara", "ramal": "2266", "email": "mayara.alcantara@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Rosilene Jacinto", "ramal": "2268", "email": "rosilene.jacinto@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestao-notas-cartoes",
+          "nome": "GESTÃO DE NOTAS (CARTÕES)",
+          "piso": "2",
+          "email_principal": "gestaodenotas.cartoes@rededompedro.com",
+          "telefone_principal": "35 3462-2124",
+          "colaboradores": [
+            { "nome": "Fernanda Moura", "ramal": "2214", "email": "fernanda.moura@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Maria Julia", "ramal": "2213", "email": "maria.julia@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Carla Pereira", "ramal": "2216", "email": "carla.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Julia Simões", "ramal": "2217", "email": "julia.simoes@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestao-recebiveis-ctf",
+          "nome": "GESTÃO DE RECEBÍVEIS (CTF)",
+          "piso": "2",
+          "email_principal": "ctf@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": []
+        },
+        {
+          "id": "faturamento",
+          "nome": "FATURAMENTO",
+          "piso": "2",
+          "email_principal": "faturamento@rededompedro.com",
+          "telefone_principal": "(35) 3462-2108",
+          "colaboradores": [
+            { "nome": "Ariana Santos", "ramal": "2286", "email": "ariana.santos@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Veronica Pereira", "ramal": "2293", "email": "veronica.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "chefe-setor-faturamento",
+          "nome": "CHEFE SETOR FATURAMENTO",
+          "piso": "2",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Luana Silva", "ramal": "2289", "email": "luana.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Pamela Alves", "ramal": "2287", "email": "pamela.alves@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Nayara Oliveira", "ramal": "2297", "email": "nayara.oliveira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestao-recebiveis-notas-prazo",
+          "nome": "GESTÃO DE RECEBÍVEIS (NOTAS A PRAZO)",
+          "piso": "2",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Raiele Andrade", "ramal": "2294", "email": "raiele.andrade@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Mylena Rezende", "ramal": "2296", "email": "mylena.silva@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Cristiane Tenório", "ramal": "2293", "email": "cristiane.tenorio@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "juridico",
+          "nome": "JURÍDICO",
+          "piso": "2",
+          "email_principal": "juridico@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Thaysa Rezende", "ramal": "2292", "email": "thaysa.rezende@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Dalva da Silva Santos", "ramal": "2267", "email": "dalva.santos@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "tecnologia-informacao",
+          "nome": "TECNOLOGIA DA INFORMAÇÃO (T.I)",
+          "piso": "2",
+          "email_principal": "suporte.ti@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Evelyne Lima", "ramal": "2227", "email": "evelyne.lima@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Tatiele Januario", "ramal": "2226", "email": "tatiele.januario@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Jéber Almeida", "ramal": "2282", "email": null, "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Bruno Henrique", "ramal": "2282", "email": null, "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Glauber", "ramal": "2281", "email": null, "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "bv-distribuidora",
+          "nome": "BV DISTRIBUIDORA",
+          "piso": "3",
+          "email_principal": "adm.bv@bvdistribuidora.com",
+          "telefone_principal": "(35) 3462-2122",
+          "colaboradores": [
+            { "nome": "Gabriel Guimarães", "ramal": "2122", "email": "gabriel.guimaraes@bvdistribuidora.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestora-controladoria",
+          "nome": "GESTORA DE CONTROLADORIA",
+          "piso": "3",
+          "email_principal": "controladoria@rededompedro.com",
+          "telefone_principal": "35 3462-2105",
+          "colaboradores": [
+            { "nome": "Suevellyn Pascoal", "ramal": "2348", "email": "suevellyn.pascoal@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "controladoria-postos",
+          "nome": "CONTROLADORIA DE POSTOS",
+          "piso": "3",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Diego Danton", "ramal": "2346", "email": "diego.danton@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Luan Pereira", "ramal": "2343", "email": "luan.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "João Carlos Ferreira", "ramal": "2349", "email": "joaocarlos.ferreira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Natália Oliveira", "ramal": "2345", "email": "natalia.oliveira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Ana Carolina Oliveira", "ramal": "2351", "email": "anacarolina.oliveira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Adriana Moura", "ramal": "2344", "email": "adriana.moura@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "coordenadoria",
+          "nome": "COORDENADORIA",
+          "piso": "3",
+          "email_principal": "coordenadores@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Daniel Pereira", "ramal": "2373", "email": "daniel.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": "Postos" },
+            { "nome": "Henrique Xavier", "ramal": "2372", "email": "henrique.xavier@rededompedro.com", "cargo": null, "telefone": null, "subsetor": "Postos" },
+            { "nome": "Maciel Almeida", "ramal": "2372", "email": "maciel.almeida@rededompedro.com", "cargo": null, "telefone": null, "subsetor": "Postos" },
+            { "nome": "Newton Noronha", "ramal": "2374", "email": "newton.noronha@rededompedro.com", "cargo": null, "telefone": null, "subsetor": "Postos" }
+          ]
+        },
+        {
+          "id": "assessora-executiva",
+          "nome": "ASSESSORA EXECUTIVA",
+          "piso": "3",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Thais Paschoal", "ramal": "2376", "email": "thais.paschoal@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "gestora-recebiveis",
+          "nome": "GESTORA DE RECEBÍVEIS",
+          "piso": "3",
+          "email_principal": "gestao.recebiveis@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Talita Pereira", "ramal": "2375", "email": "talita.pereira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "financeiro",
+          "nome": "FINANCEIRO",
+          "piso": "3",
+          "email_principal": "financeiro@rededompedro.com",
+          "telefone_principal": "35 3462-2107",
+          "colaboradores": [
+            { "nome": "Karina de Paula", "ramal": "2363", "email": "karina.paula@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Flávia Noronha", "ramal": "2361", "email": "flavia.noronha@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Marco Antônio", "ramal": "2364", "email": "marco.barbosa@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Johnny Moreira", "ramal": "2371", "email": "johnny.moreira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Maria Canquerine", "ramal": "2368", "email": "maria.canquerine@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Rosana Oliveira", "ramal": "2366", "email": "rosana.oliveira@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Graziele Simões", "ramal": "2365", "email": "graziele.simoes@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Gabriel Souza", "ramal": "2367", "email": "gabriel.souza@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Danielli Santos", "ramal": "2360", "email": "danielli.santos@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "sst",
+          "nome": "SAÚDE SEGURANÇA DO TRABALHO (SST)",
+          "piso": "3",
+          "email_principal": "sst@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Priscilla Crepalde", "ramal": "2370", "email": "priscilla.crepalde@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "orgaos-reguladores",
+          "nome": "ÓRGÃOS REGULADORES",
+          "piso": "3",
+          "email_principal": "orgaosreguladores@rededompedro.com",
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Hélder Pascoal", "ramal": "2369", "email": "helder.pascoal@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        },
+        {
+          "id": "controle-alugueis",
+          "nome": "CONTROLE DE ALUGUÉIS",
+          "piso": "3",
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Alisson Freitas", "ramal": "2132", "email": "alisson.freitas@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Thassiane Souza", "ramal": "2132", "email": "thassiane.souza@rededompedro.com", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "predio-1-xp-transportes",
+      "nome": "PRÉDIO 1 — XP TRANSPORTES",
+      "telefone_principal": "(35) 3462-7135",
+      "sac_cliente": null,
+      "sac_funcionarios": null,
+      "setores": [
+        {
+          "id": "xp-transportes",
+          "nome": "XP TRANSPORTES",
+          "piso": null,
+          "email_principal": null,
+          "telefone_principal": null,
+          "colaboradores": [
+            { "nome": "Angélica Andrade", "ramal": "632", "email": "angelica.andrade@xptransportes.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Charles Almeida", "ramal": "623", "email": "charles.almeida@xptransportes.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Diego Silva", "ramal": "630", "email": "diego.silva@xptransportes.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Luiz Cezar Castro", "ramal": "631", "email": "luizcezar.castro@xptransportes.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Leidiane Gomes", "ramal": "625", "email": "leidiane.gomes@xptransportes.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Monica Lucena", "ramal": "-", "email": "monica.lucena@xptransportes.com", "cargo": "Licença Maternidade", "telefone": null, "subsetor": null },
+            { "nome": "Celia Mendes", "ramal": "633", "email": "celia.scopel@xptransportes.com.br", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Douglas Henrique", "ramal": "641", "email": "douglas.henrique@xptransportes.com.br", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Vandercélio Caetano", "ramal": "626", "email": "vandercelio.caetano@xptransportes.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Wanderley Firmino", "ramal": "627", "email": "wanderley.firmino@xptransportes.com", "cargo": null, "telefone": null, "subsetor": null },
+            { "nome": "Sarah Rosa", "ramal": "620", "email": "sarah.rosa@xptransportes.com.br", "cargo": null, "telefone": null, "subsetor": null }
+          ]
+        }
+      ]
+    }
+  ]
+}
