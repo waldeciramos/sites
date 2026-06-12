@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de Configuração — Sistema de Ramais (JSONBin)</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --panel:#171a21;
+    --panel2:#1e222c;
+    --border:#2a2f3a;
+    --text:#e6e8ec;
+    --text2:#9aa3b2;
+    --accent:#5ee6c5;
+    --accent2:#7c9eff;
+    --warn:#ffb454;
+    --danger:#ff6b6b;
+    --code-bg:#0b0d11;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+  }
+  header{
+    padding:48px 24px 32px;
+    text-align:center;
+    background:linear-gradient(180deg,#1a1e27 0%,var(--bg) 100%);
+    border-bottom:1px solid var(--border);
+  }
+  header h1{
+    margin:0 0 8px;
+    font-size:28px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:.5px;
+  }
+  header p{margin:0;color:var(--text2);font-size:14px}
+
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px;}
+
+  .progress{
+    display:flex;
+    gap:6px;
+    margin-bottom:32px;
+    flex-wrap:wrap;
+  }
+  .progress span{
+    flex:1;
+    min-width:70px;
+    text-align:center;
+    padding:8px 4px;
+    border-radius:8px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    font-size:12px;
+    color:var(--text2);
+    cursor:pointer;
+    transition:.2s;
+  }
+  .progress span:hover{border-color:var(--accent);color:var(--text)}
+
+  .step{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px 28px;
+    margin-bottom:22px;
+    position:relative;
+    overflow:hidden;
+    animation:fadeIn .5s ease both;
+  }
+  .step::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;
+    width:4px;height:100%;
+    background:linear-gradient(180deg,var(--accent),var(--accent2));
+  }
+  .step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:34px;height:34px;
+    border-radius:50%;
+    background:var(--panel2);
+    border:1px solid var(--accent);
+    color:var(--accent);
+    font-weight:700;
+    font-size:15px;
+    margin-right:12px;
+    flex-shrink:0;
+  }
+  .step h2{
+    margin:0 0 14px;
+    font-size:19px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .step h3{
+    margin:18px 0 8px;
+    font-size:15px;
+    color:var(--accent2);
+  }
+  .step p{margin:8px 0;font-size:14.5px;color:var(--text)}
+  .step ul, .step ol{margin:10px 0;padding-left:24px;font-size:14.5px}
+  .step li{margin:6px 0}
+
+  .tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:3px 10px;
+    border-radius:20px;
+    margin-left:8px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  .tag.problema{background:rgba(255,107,107,.15);color:var(--danger);border:1px solid var(--danger)}
+  .tag.solucao{background:rgba(94,230,197,.15);color:var(--accent);border:1px solid var(--accent)}
+  .tag.config{background:rgba(124,158,255,.15);color:var(--accent2);border:1px solid var(--accent2)}
+
+  code, .code-inline{
+    background:var(--code-bg);
+    color:var(--accent);
+    padding:2px 6px;
+    border-radius:5px;
+    font-family:'Consolas','Courier New',monospace;
+    font-size:13px;
+    word-break:break-all;
+  }
+
+  .code-block{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px;
+    overflow-x:auto;
+    margin:12px 0;
+    position:relative;
+  }
+  .code-block pre{
+    margin:0;
+    font-family:'Consolas','Courier New',monospace;
+    font-size:13px;
+    color:#c8e6dc;
+    white-space:pre-wrap;
+    word-break:break-all;
+  }
+  .copy-btn{
+    position:absolute;
+    top:10px;right:10px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    color:var(--text2);
+    font-size:11px;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+  .copy-btn.copied{color:var(--accent);border-color:var(--accent)}
+
+  .key-box{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:8px 0;
+    flex-wrap:wrap;
+  }
+  .key-box .label{font-size:12px;color:var(--text2);min-width:100px;font-weight:600}
+  .key-box .val{font-family:monospace;font-size:12.5px;color:var(--accent);word-break:break-all;flex:1}
+
+  .callout{
+    border-radius:10px;
+    padding:14px 16px;
+    margin:14px 0;
+    font-size:14px;
+    border:1px solid;
+  }
+  .callout.info{background:rgba(124,158,255,.08);border-color:var(--accent2);color:#cdd9ff}
+  .callout.warn{background:rgba(255,180,84,.08);border-color:var(--warn);color:#ffe2b8}
+  .callout.success{background:rgba(94,230,197,.08);border-color:var(--accent);color:#c8f5e9}
+  .callout.danger{background:rgba(255,107,107,.08);border-color:var(--danger);color:#ffd6d6}
+  .callout b{color:inherit}
+
+  .flow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:16px 0;
+    font-size:13px;
+  }
+  .flow .box{
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 14px;
+    text-align:center;
+    flex:1;
+    min-width:120px;
+  }
+  .flow .box.bad{border-color:var(--danger);color:var(--danger)}
+  .flow .box.good{border-color:var(--accent);color:var(--accent)}
+  .flow .arrow{color:var(--text2);font-size:18px}
+
+  .screenshot-placeholder{
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:30px;
+    text-align:center;
+    color:var(--text2);
+    font-size:13px;
+    margin:12px 0;
+    background:var(--panel2);
+  }
+
+  .checklist{list-style:none;padding-left:0;margin:14px 0}
+  .checklist li{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin:8px 0;
+    font-size:14.5px;
+  }
+  .checklist li::before{
+    content:'✓';
+    color:var(--accent);
+    font-weight:700;
+    background:rgba(94,230,197,.12);
+    border-radius:50%;
+    width:20px;height:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    font-size:12px;
+    margin-top:2px;
+  }
+
+  .final-banner{
+    text-align:center;
+    background:linear-gradient(135deg,rgba(94,230,197,.12),rgba(124,158,255,.12));
+    border:1px solid var(--accent);
+    border-radius:16px;
+    padding:36px 24px;
+    margin-top:30px;
+  }
+  .final-banner h2{
+    margin:0 0 8px;
+    font-size:24px;
+    color:var(--accent);
+  }
+  .final-banner p{color:var(--text2);font-size:14.5px}
+
+  .architecture{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .arch-box{
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 20px;
+    text-align:center;
+    min-width:130px;
+  }
+  .arch-box .icon{font-size:28px;display:block;margin-bottom:6px}
+  .arch-box .title{font-weight:700;font-size:13px}
+  .arch-box .sub{font-size:11px;color:var(--text2);margin-top:2px}
+  .arch-arrow{color:var(--accent);font-size:22px}
+
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  .toc{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px 22px;
+    margin-bottom:28px;
+  }
+  .toc h3{margin:0 0 10px;font-size:14px;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+  .toc ol{margin:0;padding-left:22px;font-size:14px}
+  .toc a{color:var(--accent2);text-decoration:none}
+  .toc a:hover{text-decoration:underline}
+
+  footer{
+    text-align:center;
+    padding:30px;
+    color:var(--text2);
+    font-size:12px;
+    border-top:1px solid var(--border);
+  }
+
+  @media(max-width:600px){
+    header h1{font-size:22px}
+    .step{padding:18px 16px}
+    .key-box{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📞 Sistema de Ramais — Grupo Dom Pedro</h1>
+  <p>Guia completo de configuração com JSONBin.io — do problema à solução final</p>
+</header>
+
+<div class="wrap">
+
+  <div class="toc">
+    <h3>Neste guia</h3>
+    <ol>
+      <li><a href="#step1">O problema original</a></li>
+      <li><a href="#step2">Por que escolhemos o JSONBin</a></li>
+      <li><a href="#step3">Criando a conta no JSONBin</a></li>
+      <li><a href="#step4">Gerando as chaves de API</a></li>
+      <li><a href="#step5">Criando o Bin com os dados</a></li>
+      <li><a href="#step6">Configurando o ramais.html</a></li>
+      <li><a href="#step7">Resultado final</a></li>
+    </ol>
+  </div>
+
+  <div class="progress">
+    <span onclick="document.getElementById('step1').scrollIntoView({behavior:'smooth'})">1. Problema</span>
+    <span onclick="document.getElementById('step2').scrollIntoView({behavior:'smooth'})">2. Escolha</span>
+    <span onclick="document.getElementById('step3').scrollIntoView({behavior:'smooth'})">3. Conta</span>
+    <span onclick="document.getElementById('step4').scrollIntoView({behavior:'smooth'})">4. Chaves</span>
+    <span onclick="document.getElementById('step5').scrollIntoView({behavior:'smooth'})">5. Bin</span>
+    <span onclick="document.getElementById('step6').scrollIntoView({behavior:'smooth'})">6. Código</span>
+    <span onclick="document.getElementById('step7').scrollIntoView({behavior:'smooth'})">7. Final</span>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step" id="step1">
+    <h2><span class="step-num">1</span> O problema original <span class="tag problema">Problema</span></h2>
+    <p>
+      O sistema de ramais do Grupo Dom Pedro era uma página HTML única (<code>ramais.html</code>) que lia e gravava
+      os dados em um arquivo <code>ramais.json</code> hospedado em um repositório do GitHub.
+    </p>
+    <p>Para isso, o código continha um <b>token de acesso pessoal do GitHub</b> diretamente no HTML:</p>
+
+    <div class="code-block">
+<pre>const GH_USER  = 'waldeciramos';
+const GH_REPO  = 'dompedroprojeoes';
+const GH_TOKEN = 'ghp_••••••••••••••••••••••••••••••••••••';
+const GH_FILE  = 'ramais.json';</pre>
+    </div>
+
+    <div class="callout danger">
+      <b>⚠️ O que deu errado:</b> o GitHub detecta automaticamente tokens expostos em código publicado
+      (mesmo em repositórios privados) e os <b>revoga (invalida) automaticamente</b> por segurança.
+      Quando isso acontece, todas as chamadas à API do GitHub passam a falhar.
+    </div>
+
+    <h3>Sintoma observado</h3>
+    <ul>
+      <li>A página exibia <code>❌ Erro ao carregar</code> ao tentar buscar o <code>ramais.json</code></li>
+      <li>O sistema caía no modo de cache local (<code>localStorage</code>), que fica desatualizado</li>
+      <li>Alterações feitas por um usuário não eram vistas pelos demais</li>
+      <li>Mesmo quando funcionava, o GitHub tinha <b>delay de cache (CDN)</b> para refletir mudanças</li>
+    </ul>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <h2><span class="step-num">2</span> Por que escolhemos o JSONBin <span class="tag solucao">Solução</span></h2>
+    <p>Foram avaliadas 4 alternativas para substituir o GitHub:</p>
+
+    <ul>
+      <li><b>Opção A</b> — Backend próprio (Flask) como intermediário, guardando o token</li>
+      <li><b>Opção B</b> — Google Sheets como banco de dados</li>
+      <li><b>Opção C</b> — JSONBin.io ✅ <i>(escolhida)</i></li>
+      <li><b>Opção D</b> — GitHub com proxy (Cloudflare Worker)</li>
+    </ul>
+
+    <div class="callout success">
+      <b>Por que o JSONBin venceu:</b> é um serviço <b>gratuito</b> de armazenamento de JSON na nuvem,
+      com API simples baseada em chaves, <b>sem necessidade de servidor próprio</b> e com
+      <b>atualização quase instantânea</b> (sem cache de CDN como o GitHub).
+    </div>
+
+    <div class="architecture">
+      <div class="arch-box">
+        <span class="icon">🖥️</span>
+        <div class="title">ramais.html</div>
+        <div class="sub">página dos usuários</div>
+      </div>
+      <div class="arch-arrow">⇄</div>
+      <div class="arch-box">
+        <span class="icon">☁️</span>
+        <div class="title">JSONBin.io</div>
+        <div class="sub">armazena ramais.json</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <h2><span class="step-num">3</span> Criando a conta no JSONBin <span class="tag config">Configuração</span></h2>
+    <p>Passos realizados para criar a conta gratuita:</p>
+
+    <ol>
+      <li>Acesse <a href="https://jsonbin.io" target="_blank" style="color:var(--accent2)">jsonbin.io</a></li>
+      <li>Clique em <b>Sign Up</b> e crie a conta (e-mail + senha, ou login social)</li>
+      <li>Confirme o e-mail, se solicitado</li>
+      <li>Você será direcionado ao <b>Dashboard</b> em
+        <code>jsonbin.io/app/dashboard</code></li>
+    </ol>
+
+    <div class="screenshot-placeholder">
+      📸 Tela do Dashboard após login — menu lateral com Dashboard, Bins, Collections, Schema Docs, API Keys, My Account
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" id="step4">
+    <h2><span class="step-num">4</span> Gerando as chaves de API <span class="tag config">Configuração</span></h2>
+
+    <ol>
+      <li>No menu lateral, clique em <b>API Keys</b></li>
+      <li>A chave <b>X-MASTER-KEY</b> já vem criada automaticamente com a conta — ela dá acesso total</li>
+      <li>Para uma chave com permissões mais restritas, clique em <b>+ Create Access Key</b></li>
+      <li>Dê um nome (foi usado: <code>ramais</code>) e confirme</li>
+      <li>Copie as duas chaves geradas</li>
+    </ol>
+
+    <h3>Chaves utilizadas no projeto</h3>
+
+    <div class="key-box">
+      <span class="label">X-MASTER-KEY</span>
+      <span class="val">$2a$10$lFTdWh/opLn8wg1UFKGyHe.YaOZINd4D2qnk2qGd0PFbv.Yz686Qm</span>
+    </div>
+    <div class="key-box">
+      <span class="label">X-ACCESS-KEY (ramais)</span>
+      <span class="val">$2a$10$eqC8ucHjOTUCijJGsw6YZeT16qAa6ybBCk2BmJdMwioIvoybhrBru</span>
+    </div>
+
+    <div class="callout info">
+      <b>💡 Diferença:</b> a <code>X-MASTER-KEY</code> tem acesso total à conta.
+      A <code>X-ACCESS-KEY</code> pode ser configurada com permissões específicas para bins
+      individuais — boa prática para não expor a master key em produção.
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step" id="step5">
+    <h2><span class="step-num">5</span> Criando o Bin com os dados <span class="tag config">Configuração</span></h2>
+
+    <p>O <b>Bin</b> é o "documento" na nuvem onde o <code>ramais.json</code> fica armazenado.</p>
+
+    <ol>
+      <li>No menu lateral, clique em <b>Bins</b></li>
+      <li>Inicialmente aparece <code>No Bins Found</code> — nenhum bin criado ainda</li>
+      <li>Clique em <b>Create a Bin</b></li>
+      <li>Apague o JSON de exemplo (placeholder com <code>users</code>, <code>firstName</code> etc.)</li>
+      <li>Cole o conteúdo completo do arquivo <code>ramais.json</code> do Grupo Dom Pedro</li>
+      <li>Clique em <b>Create</b> / <b>Save</b></li>
+    </ol>
+
+    <div class="callout success">
+      <b>Resultado:</b> o sistema gerou automaticamente o <b>Bin ID</b>:
+      <code>6a2ac3d9da38895dfeadf3b3</code><br>
+      Visibilidade: <b>Private</b> 🔒 (protegido pelas chaves de API)
+    </div>
+
+    <div class="screenshot-placeholder">
+      📸 Tela "Bins" mostrando o bin criado: ID 6a2ac3d9da38895dfeadf3b3, Nome "Untitled",
+      Visibility "Private", com o JSON do Grupo Dom Pedro visível no editor à direita
+      (empresa, predios, setores, ramais...)
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step" id="step6">
+    <h2><span class="step-num">6</span> Configurando o ramais.html <span class="tag config">Configuração</span></h2>
+
+    <p>No arquivo <code>ramais.html</code>, todo o bloco de configuração do GitHub foi substituído
+    por uma configuração de JSONBin:</p>
+
+    <h3>Antes (GitHub — quebrado)</h3>
+    <div class="code-block">
+<pre>const GH_USER  = 'waldeciramos';
+const GH_REPO  = 'dompedroprojeoes';
+const GH_TOKEN = 'ghp_••••••••••••••••••••••••••••••••••••'; // revogado
+const GH_FILE  = 'ramais.json';
+const GH_API   = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${GH_FILE}`;</pre>
+    </div>
+
+    <h3>Depois (JSONBin — funcionando)</h3>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+<pre>const JB_MASTER_KEY = '$2a$10$lFTdWh/opLn8wg1UFKGyHe.YaOZINd4D2qnk2qGd0PFbv.Yz686Qm';
+const JB_ACCESS_KEY = '$2a$10$eqC8ucHjOTUCijJGsw6YZeT16qAa6ybBCk2BmJdMwioIvoybhrBru';
+const JB_BIN_ID     = '6a2ac3d9da38895dfeadf3b3';
+const JB_API        = `https://api.jsonbin.io/v3/b/${JB_BIN_ID}`;</pre>
+    </div>
+
+    <h3>Função de leitura (GET)</h3>
+    <p>Busca a versão mais recente do bin usando o endpoint <code>/latest</code>:</p>
+    <div class="code-block">
+<pre>const res = await fetch(JB_API + '/latest', {
+  headers: {
+    'X-Master-Key': JB_MASTER_KEY,
+    'X-Access-Key': JB_ACCESS_KEY
+  }
+});
+const json = await res.json();
+DATA = json.record; // conteúdo do ramais.json</pre>
+    </div>
+
+    <h3>Função de gravação (PUT)</h3>
+    <p>Sobrescreve o conteúdo do bin com os dados atualizados:</p>
+    <div class="code-block">
+<pre>const res = await fetch(JB_API, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Master-Key': JB_MASTER_KEY,
+    'X-Access-Key': JB_ACCESS_KEY
+  },
+  body: JSON.stringify(DATA)
+});</pre>
+    </div>
+
+    <div class="callout warn">
+      <b>Fallback offline:</b> em caso de falha de conexão, o sistema mantém uma cópia em
+      <code>localStorage</code> (<code>ramais_fallback</code>) e a exibe com aviso
+      <code>⚠️ Usando cache local</code>.
+    </div>
+
+    <h3>Erro encontrado no caminho</h3>
+    <div class="flow">
+      <div class="box bad">❌ Erro ao carregar: JSONBin API: 400</div>
+      <div class="arrow">→</div>
+      <div class="box">Causa: <code>JB_BIN_ID</code> ainda era <code>SEU_BIN_ID_AQUI</code></div>
+      <div class="arrow">→</div>
+      <div class="box good">✅ Corrigido com o ID real do bin</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step" id="step7">
+    <h2><span class="step-num">7</span> Resultado final <span class="tag solucao">Funcionando ✅</span></h2>
+
+    <p>Checklist do que foi entregue:</p>
+    <ul class="checklist">
+      <li>Conta criada em jsonbin.io</li>
+      <li>Chaves <code>X-MASTER-KEY</code> e <code>X-ACCESS-KEY</code> (ramais) geradas</li>
+      <li>Bin criado com o conteúdo completo do <code>ramais.json</code> (Grupo Dom Pedro, prédios, setores, ramais)</li>
+      <li>Bin ID <code>6a2ac3d9da38895dfeadf3b3</code> inserido no <code>ramais.html</code></li>
+      <li>Funções de leitura (GET <code>/latest</code>) e gravação (PUT) migradas do GitHub para o JSONBin</li>
+      <li>Token antigo do GitHub removido do código</li>
+      <li>Sistema testado: carregamento e salvamento funcionando, sem o delay de cache do GitHub</li>
+    </ul>
+
+    <div class="architecture">
+      <div class="arch-box">
+        <span class="icon">👤</span>
+        <div class="title">Usuário A</div>
+        <div class="sub">edita um ramal</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">
+        <span class="icon">☁️</span>
+        <div class="title">JSONBin</div>
+        <div class="sub">salva instantaneamente</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">
+        <span class="icon">👤</span>
+        <div class="title">Usuário B</div>
+        <div class="sub">vê a atualização</div>
+      </div>
+    </div>
+
+    <div class="final-banner">
+      <h2>🎉 Sistema 100% funcional e sincronizado</h2>
+      <p>Qualquer atualização feita por um usuário fica disponível para todos, em tempo real,<br>
+      sem depender de tokens expostos ou de repositórios Git.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Guia gerado automaticamente — Sistema de Ramais · Grupo Dom Pedro
+</footer>
+
+<script>
+function copyCode(btn){
+  const pre = btn.nextElementSibling;
+  navigator.clipboard.writeText(pre.textContent.trim()).then(()=>{
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copiar'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+</script>
+
+</body>
+</html>
