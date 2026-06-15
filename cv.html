@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waldeci de Andrade Ramos - Currículo Profissional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-sidebar: #1a202c;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-light: #718096;
+            --accent-color: #3182ce;
+            --accent-hover: #2c5282;
+            --border-color: #e2e8f0;
+            --highlight-bg: #ebf8ff;
+            --highlight-border: #4299e1;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --bg-sidebar: #0f1419;
+            --text-primary: #e2e8f0;
+            --text-secondary: #cbd5e0;
+            --text-light: #a0aec0;
+            --border-color: #4a5568;
+            --highlight-bg: #2c5282;
+            --highlight-border: #63b3ed;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-secondary);
+            transition: all 0.3s ease;
+        }
+
+        /* HEADER */
+        .top-header {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+            color: white;
+            padding: 25px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .header-text p {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .download-btn {
+            padding: 12px 24px;
+            background: white;
+            color: var(--accent-color);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        /* MAIN CONTAINER */
+        .resume-wrapper {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .resume-container {
+            background: var(--bg-primary);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            transition: all 0.3s ease;
+        }
+
+        /* LEFT SIDEBAR */
+        .sidebar {
+            background: var(--bg-sidebar);
+            color: white;
+            padding: 40px 30px;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .profile-photo {
+            width: 100%;
+            max-width: 260px;
+            height: 320px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0 auto 20px;
+            border: 4px solid rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: #2d3748;
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .profile-role {
+            font-size: 14px;
+            color: #63b3ed;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .profile-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+            color: #63b3ed;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #63b3ed, transparent);
+            border-radius: 2px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 12px;
+            gap: 12px;
+        }
+
+        .contact-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(99, 179, 237, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #63b3ed;
+            flex-shrink: 0;
+        }
+
+        .contact-text {
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        .contact-link {
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-link:hover {
+            color: #63b3ed;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            flex: 1;
+            min-width: 45px;
+            height: 45px;
+            background: rgba(99, 179, 237, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #63b3ed;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            background: rgba(99, 179, 237, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .education-item {
+            margin-bottom: 20px;
+            padding-left: 16px;
+            border-left: 2px solid rgba(99, 179, 237, 0.3);
+        }
+
+        .edu-title {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+            line-height: 1.4;
+            color: white;
+        }
+
+        .edu-institution {
+            font-size: 11px;
+            color: #cbd5e0;
+            margin-bottom: 3px;
+        }
+
+        .edu-year {
+            font-size: 10px;
+            color: #a0aec0;
+        }
+
+        .skill-item {
+            background: rgba(99, 179, 237, 0.1);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #e2e8f0;
+        }
+
+        .skill-icon {
+            color: #63b3ed;
+            font-size: 12px;
+        }
+
+        /* RIGHT CONTENT */
+        .main-content {
+            padding: 35px 40px;
+        }
+
+        .intro-section {
+            margin-bottom: 30px;
+        }
+
+        .intro-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .intro-subtitle {
+            font-size: 18px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .intro-text {
+            font-size: 12px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            text-align: justify;
+            margin-bottom: 12px;
+        }
+
+        /* AI HIGHLIGHT BOX */
+        .ai-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .ai-highlight-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-highlight-text {
+            font-size: 11px;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .main-section-title {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .main-section-title::before {
+            content: '';
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--accent-color), var(--accent-hover));
+            border-radius: 2px;
+        }
+
+        .experience-item {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-color);
+            transition: all 0.3s;
+        }
+
+        .experience-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .exp-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .exp-period {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            background: var(--highlight-bg);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .exp-company {
+            font-size: 12px;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .exp-description {
+            font-size: 12px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            text-align: justify;
+        }
+
+        .progression-highlight {
+            background: var(--highlight-bg);
+            border-left: 3px solid var(--highlight-border);
+            padding: 12px 16px;
+            margin-top: 12px;
+            font-size: 11px;
+            color: var(--accent-hover);
+            font-weight: 600;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.6;
+        }
+
+        /* Texto mais claro no modo claro */
+        :root .progression-highlight {
+            color: #2c5282;
+        }
+
+        /* Texto claro no modo escuro */
+        [data-theme="dark"] .progression-highlight {
+            color: #e2e8f0 !important;
+            background: #2c5282 !important;
+            border-left-color: #63b3ed !important;
+        }
+
+        .progression-highlight i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Modo escuro - garantir visibilidade da progressão */
+        [data-theme="dark"] .progression-highlight {
+            background: #2c5282;
+            border-left-color: #63b3ed;
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .progression-highlight i {
+            color: #63b3ed;
+        }
+
+        /* FOOTER */
+        .footer {
+            background: var(--bg-sidebar);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(99, 179, 237, 0.15);
+            padding: 12px 24px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            line-height: 1.8;
+            color: #cbd5e0;
+            margin-bottom: 15px;
+        }
+
+        .footer-signature {
+            font-size: 11px;
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .resume-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                padding: 30px 25px;
+            }
+
+            .main-content {
+                padding: 30px 25px;
+            }
+
+            .profile-photo {
+                max-width: 220px;
+                height: 280px;
+            }
+
+            .progression-highlight {
+                display: flex !important;
+                font-size: 12px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-title {
+                flex-direction: column;
+            }
+
+            .top-header {
+                padding: 20px;
+            }
+
+            .resume-wrapper {
+                margin: 15px auto;
+            }
+
+            .resume-container {
+                border-radius: 15px;
+            }
+
+            .main-content {
+                padding: 25px 20px;
+            }
+
+            .intro-title {
+                font-size: 26px;
+            }
+
+            .profile-photo {
+                max-width: 200px;
+                height: 260px;
+            }
+
+            .progression-highlight {
+                font-size: 12px !important;
+                padding: 14px 16px !important;
+                margin-top: 12px !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+                line-height: 1.7 !important;
+            }
+
+            .progression-highlight i {
+                font-size: 16px !important;
+                margin-top: 3px;
+            }
+
+            .experience-item {
+                padding: 16px !important;
+                margin-bottom: 20px !important;
+            }
+
+            .exp-description {
+                font-size: 13px !important;
+                line-height: 1.8 !important;
+                margin-bottom: 10px !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                padding: 25px 20px;
+            }
+
+            .main-content {
+                padding: 25px 20px;
+            }
+
+            .profile-photo {
+                max-width: 180px;
+                height: 240px;
+            }
+
+            .intro-title {
+                font-size: 24px;
+            }
+
+            .intro-subtitle {
+                font-size: 16px;
+            }
+
+            .progression-highlight {
+                font-size: 13px !important;
+                padding: 16px !important;
+                margin-top: 15px !important;
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                line-height: 1.8 !important;
+            }
+
+            .experience-item {
+                padding: 18px !important;
+                margin-bottom: 22px !important;
+            }
+
+            .exp-title {
+                font-size: 14px !important;
+            }
+
+            .exp-description {
+                font-size: 13px !important;
+                line-height: 1.9 !important;
+            }
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .top-header,
+            .theme-toggle,
+            .download-btn {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .resume-wrapper {
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .resume-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+                grid-template-columns: 270px 1fr !important;
+                page-break-inside: avoid !important;
+            }
+
+            .sidebar {
+                padding: 25px 20px !important;
+                page-break-inside: avoid !important;
+            }
+
+            .main-content {
+                padding: 25px 30px !important;
+                page-break-inside: avoid !important;
+            }
+
+            .profile-photo {
+                max-width: 220px !important;
+                height: 280px !important;
+            }
+
+            .section {
+                page-break-inside: avoid !important;
+                margin-bottom: 25px !important;
+            }
+
+            .experience-item {
+                page-break-inside: avoid !important;
+                margin-bottom: 18px !important;
+                padding: 15px !important;
+            }
+
+            .intro-section {
+                page-break-inside: avoid !important;
+                margin-bottom: 20px !important;
+            }
+
+            .ai-highlight {
+                page-break-inside: avoid !important;
+                margin: 15px 0 !important;
+                padding: 18px !important;
+            }
+
+            .footer {
+                page-break-inside: avoid !important;
+                padding: 20px !important;
+                margin-top: 15px !important;
+            }
+
+            .intro-title {
+                font-size: 28px !important;
+            }
+
+            .intro-subtitle {
+                font-size: 16px !important;
+            }
+
+            .intro-text,
+            .exp-description {
+                font-size: 11px !important;
+                line-height: 1.6 !important;
+            }
+
+            .main-section-title {
+                font-size: 18px !important;
+                margin-bottom: 18px !important;
+            }
+
+            .ai-highlight-title {
+                font-size: 14px !important;
+            }
+
+            .ai-highlight-text {
+                font-size: 11px !important;
+                line-height: 1.6 !important;
+            }
+
+            .footer-text {
+                font-size: 11px !important;
+            }
+
+            /* Força quebra de página antes do rodapé se necessário */
+            .footer {
+                page-break-before: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="top-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="header-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Waldeci de Andrade Ramos</h1>
+                    <p>Analista de Processos Internos | Especialista em Automação com IA</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="download-btn" onclick="window.print()">
+                    <i class="fas fa-download"></i>
+                    Baixar PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="resume-wrapper">
+        <div class="resume-container">
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+                <!-- PHOTO -->
+                <div class="profile-section">
+                    <div class="profile-photo">
+                        <img src="foto.jpg" alt="Waldeci de Andrade Ramos" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22320%22%3E%3Crect fill=%22%232d3748%22 width=%22260%22 height=%22320%22/%3E%3Ctext fill=%22%23fff%22 font-family=%22Poppins%22 font-size=%2280%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3EWR%3C/text%3E%3C/svg%3E'">
+                    </div>
+                    <h2 class="profile-name">Waldeci de Andrade Ramos</h2>
+                    <p class="profile-role">Analista de Processos Internos</p>
+                    <span class="profile-badge">
+                        <i class="fas fa-robot"></i> Especialista em IA
+                    </span>
+                </div>
+
+                <!-- CONTACT -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <i class="fas fa-address-book"></i> Contato
+                    </h3>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-text">
+                            <a href="https://wa.me/5535984016706?text=Olá%20Waldeci!%20Gostamos%20muito%20do%20seu%20currículo%20e%20gostaríamos%20de%20marcar%20uma%20entrevista%20com%20você.%20Você%20tem%20disponibilidade%20para%20conversarmos%3F" class="contact-link" target="_blank">(35) 98401-6706</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-text">
+                            <a href="mailto:waldeciramos@gmail.com" class="contact-link">waldeciramos@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-text">Estiva, Minas Gerais</div>
+                    </div>
+                </div>
+
+                <!-- SOCIAL MEDIA -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <i class="fas fa-share-alt"></i> Redes Sociais
+                    </h3>
+                    <div class="social-links">
+                        <a href="https://instagram.com/waldeciramosfotos" class="social-btn" target="_blank" title="Instagram Pessoal">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                       
+                        <a href="https://facebook.com/waldeciramos" class="social-btn" target="_blank" title="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://wa.me/5535984016706" class="social-btn" target="_blank" title="WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- EDUCATION -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <i class="fas fa-graduation-cap"></i> Formação
+                    </h3>
+                    <div class="education-item">
+                        <div class="edu-title">Técnico em Contabilidade</div>
+                        <div class="edu-institution">Escola Estadual Professor Antonio Dutra</div>
+                        <div class="edu-year">Itatiba/SP</div>
+                    </div>
+                    <div class="education-item">
+                        <div class="edu-title">Educador Social</div>
+                        <div class="edu-institution">Institutula Cursos</div>
+                        <div class="edu-year">2025 - 60 horas</div>
+                    </div>
+                    <div class="education-item">
+                        <div class="edu-title">Rede Windows Server & Linux</div>
+                        <div class="edu-institution">Green Informática</div>
+                    </div>
+                    <div class="education-item">
+                        <div class="edu-title">Hardware & Manutenção</div>
+                        <div class="edu-institution">Escola Impacta</div>
+                    </div>
+                    <div class="education-item">
+                        <div class="edu-title">Web Designer</div>
+                        <div class="edu-institution">Curso Livre</div>
+                    </div>
+                </div>
+
+                <!-- SKILLS -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <i class="fas fa-star"></i> Competências
+                    </h3>
+                    <div class="skill-item">
+                        <i class="fas fa-robot skill-icon"></i>
+                        Desenvolvimento com IA
+                    </div>
+                    <div class="skill-item">
+                        <i class="fas fa-cogs skill-icon"></i>
+                        Automação de Processos
+                    </div>
+                    <div class="skill-item">
+                        <i class="fas fa-file-excel skill-icon"></i>
+                        Microsoft Office Avançado
+                    </div>
+                    <div class="skill-item">
+                        <i class="fas fa-network-wired skill-icon"></i>
+                        Redes & Infraestrutura
+                    </div>
+                    <div class="skill-item">
+                        <i class="fas fa-palette skill-icon"></i>
+                        Adobe Creative Suite
+                    </div>
+                    <div class="skill-item">
+                        <i class="fas fa-camera skill-icon"></i>
+                        Fotografia Profissional
+                    </div>
+                    <div class="skill-item">
+                        <i class="fas fa-chart-line skill-icon"></i>
+                        Análise Fiscal
+                    </div>
+                    <div class="skill-item">
+                        <i class="fas fa-check-circle skill-icon"></i>
+                        Controle de Qualidade
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+                <!-- INTRO -->
+                <section class="intro-section">
+                    <h1 class="intro-title">Olá, eu sou Waldeci! 👋</h1>
+                    <p class="intro-subtitle">Analista de Processos Internos | Inovador em Automação com IA</p>
+                    <p class="intro-text">
+                        Profissional com mais de 38 anos de experiência no mercado de trabalho e 31 anos de carteira assinada, iniciando minha trajetória aos 13 anos. Expertise consolidada em Tecnologia da Informação, Análise Fiscal, Controle de Qualidade e Educação Social. Trajetória caracterizada pela versatilidade, comprometimento e capacidade de adaptação a diferentes desafios profissionais.
+                    </p>
+                </section>
+
+                <!-- AI HIGHLIGHT -->
+                <div class="ai-highlight">
+                    <div class="ai-highlight-title">
+                        <i class="fas fa-brain"></i>
+                        Diferencial Competitivo: Habilidades com Inteligência Artificial
+                    </div>
+                    <div class="ai-highlight-text">
+                        <strong>🚀 Força de Vontade & Aprendizado Contínuo:</strong> Busco constantemente melhorias e novos conhecimentos para otimizar fluxos de trabalho. Desenvolvi expertise em automação com IA, criando ferramentas inovadoras para análise fiscal, leitura de XML e otimização de processos.
+                        <br><br>
+                        <strong>💡 Carismático & Focado:</strong> Profissional dedicado com foco absoluto naquilo que faço. Combino conhecimento técnico com habilidades interpessoais para entregar resultados excepcionais. Expertise em Adobe Illustrator, Photoshop, Lightroom e fotografia profissional complementam minha atuação multidisciplinar.
+                    </div>
+                </div>
+
+                <!-- EXPERIENCE -->
+                <section>
+                    <h2 class="main-section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Experiência Profissional
+                    </h2>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">ANALISTA DE SERVIÇOS INTERNOS</h3>
+                            <span class="exp-period">2019 - ATUAL (6 ANOS)</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            Rede Dom Pedro de Postos Ltda | Estiva, MG
+                        </div>
+                        <p class="exp-description">
+                            Desenvolvimento de soluções tecnológicas inovadoras com criação de ferramentas auxiliadas por IA para análise fiscal, incluindo leitores de XML, localizadores de receitas para PIS/COFINS e sistemas automatizados de detecção de erros em documentação fiscal. Desenvolvimento de planilhas avançadas para integração e otimização de processos. Responsável pela análise e controle de estoque de combustíveis, incluindo drenagem, aferição e garantia da qualidade dos produtos. Elaboração de relatórios gerenciais estratégicos e suporte à tomada de decisões.
+                        </p>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">TÉCNICO DE INFORMÁTICA</h3>
+                            <span class="exp-period">JUN 2007 - ABR 2014</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            Estivanet Informática Ltda | Estiva, MG
+                        </div>
+                        <p class="exp-description">
+                            Manutenção preventiva e corretiva de equipamentos de informática. Suporte técnico em hardware e software. Diagnóstico e resolução de problemas técnicos complexos. Atendimento a clientes corporativos e residenciais com foco em excelência e continuidade dos serviços.
+                        </p>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">HELPDESK - SUPORTE TÉCNICO</h3>
+                            <span class="exp-period">JUN 2008 - JUN 2009</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            CIWAL Acessórios Industriais Ltda | Itatiba, SP
+                        </div>
+                        <p class="exp-description">
+                            Responsável pela manutenção da qualidade de servidores e rede. Atuação na estrutura de software e hardware, garantindo disponibilidade e performance dos sistemas. Suporte técnico especializado aos usuários internos.
+                        </p>
+                        <div class="progression-highlight">
+                            <i class="fas fa-trophy"></i>
+                            PROGRESSÃO DE CARREIRA: Iniciou como Helpdesk Junior e foi promovido a Senior devido ao excelente desempenho técnico e capacidade de resolução de problemas complexos.
+                        </div>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">ANALISTA DE SUPORTE DE SISTEMAS</h3>
+                            <span class="exp-period">MAI 2004 - JUL 2004</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            World Online Internet | São Paulo, SP
+                        </div>
+                        <p class="exp-description">
+                            Suporte técnico a redes e usuários. Implementação de soluções tecnológicas customizadas, atuação tercerizada em empresa de publicidade (Octopus - Santo André SP), trabalho com plataformas Mac e Linux.
+                        </p>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">TÉCNICO DE COMUNICAÇÃO DE DADOS</h3>
+                            <span class="exp-period">ABR 2003 - NOV 2003</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            Super High Frequency Telecomunicações Ltda | São Paulo, SP
+                        </div>
+                        <p class="exp-description">
+                            Instalação e configuração de infraestrutura de rede. Manutenção de sistemas de comunicação de dados via satélite. Suporte técnico especializado a clientes e usuários.
+                        </p>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">AUXILIAR DE ESCRITÓRIO</h3>
+                            <span class="exp-period">OUT 1996 - MAI 2002</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            Rede Dom Pedro de Postos Ltda | Estiva, MG
+                        </div>
+                        <p class="exp-description">
+                            Controle de estoque e qualidade de combustíveis. Atividades administrativas e gestão documental. Atendimento a fornecedores e clientes internos.
+                        </p>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">OPERÁRIO DE PRODUÇÃO</h3>
+                            <span class="exp-period">MAR 1994 - DEZ 1995</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            Sociedade Anônima Fabril Scavone | São Paulo, SP
+                        </div>
+                        <p class="exp-description">
+                            Atividades operacionais na linha de produção fabril. Preparação de materiais e auxílio nos processos de fabricação.
+                        </p>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <h3 class="exp-title">AUXILIAR DE PRODUÇÃO</h3>
+                            <span class="exp-period">JUN 1987 - AGO 1991</span>
+                        </div>
+                        <div class="exp-company">
+                            <i class="fas fa-building"></i>
+                            Laticínios Vernizzi Ltda | Itatiba, SP
+                        </div>
+                        <p class="exp-description">
+                            Serviços gerais e produção de queijos e ricotas. Início da trajetória profissional aos 13 anos, desenvolvendo senso de responsabilidade e comprometimento desde cedo.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- FOOTER -->
+                <footer class="footer">
+                    <div class="footer-content">
+                        <div class="footer-badge">
+                            <i class="fas fa-robot"></i>
+                            Currículo desenvolvido utilizando habilidades com IA
+                        </div>
+                        <p class="footer-text">
+                            Este currículo foi criado aplicando conhecimentos avançados em inteligência artificial, 
+                            demonstrando minha capacidade de utilizar tecnologia de ponta para criar soluções inovadoras 
+                            e eficientes. Além do conhecimento técnico em IA, possuo força de vontade, carisma e foco 
+                            absoluto em sempre buscar melhorias e aprendizado contínuo para otimizar fluxos de trabalho.
+                        </p>
+                        <p class="footer-signature">
+                            © 2025 Waldeci de Andrade Ramos - Todos os direitos reservados
+                        </p>
+                    </div>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // THEME TOGGLE
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                html.removeAttribute('data-theme');
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const icon = document.getElementById('themeIcon');
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-sun';
+            }
+        });
+    </script>
+</body>
+</html>
