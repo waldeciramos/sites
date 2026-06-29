@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netboot.xyz + Samba Ubuntu Server - Instalação Windows pela Rede (Guia Unificado)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #0f0f23;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .badge-header {
+            display: inline-block;
+            background: #ffd966cc;
+            color: #1e2a3a;
+            padding: 5px 15px;
+            border-radius: 40px;
+            font-weight: bold;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            background: #1a1a3e;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.7em;
+            border-bottom: 1px solid #334;
+            padding-bottom: 8px;
+        }
+
+        .section h3 {
+            color: #a8b2ff;
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        .code-block {
+            background: #0a0a1a;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 1px solid #2a2a4a;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #5a67d8;
+        }
+
+        .note {
+            background: #2d2d5e;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #3e2a2a;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success {
+            background: #1a3e2a;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .step {
+            background: #25254f;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .step-number {
+            background: #667eea;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a4a;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        .footer {
+            background: #0a0a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            border-top: 1px solid #2a2a4a;
+        }
+
+        .badge {
+            background: #2c5282;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .grid-2 {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 15px;
+            }
+            .section {
+                padding: 15px;
+            }
+            .code-block {
+                font-size: 12px;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📡 netboot.xyz + Samba Ubuntu Server</h1>
+        <p>Guia completo para instalar Windows via rede (PXE + WinPE + SMB) usando seu servidor Linux</p>
+        <div class="badge-header"><i class="fas fa-network-wired"></i> Boot pela rede | ISO Windows | Scripts automáticos</div>
+    </div>
+
+    <div class="content">
+        <!-- INFORMAÇÕES INTEGRADAS -->
+        <div class="section">
+            <h2>📊 Dados do Servidor (Samba + Netboot)</h2>
+            <table>
+                <tr><th>Item</th><th>Valor / Configuração</th></tr>
+                <tr><td>Sistema</td><td>Ubuntu Server 20.04 / 22.04 / 24.04</td></tr>
+                <tr><td>IP do Servidor</td><td><code id="server-ip">192.168.2.156</code> <button onclick="copyText(document.getElementById('server-ip').innerText)" style="background:#667eea; border:none; border-radius:8px; padding:2px 10px; margin-left:8px;">Copiar IP</button></td></tr>
+                <tr><td>Usuário Samba / Linux</td><td><code>waldeci</code></td></tr>
+                <tr><td>Senha Samba (pasta waldeci)</td><td><code>1</code></td></tr>
+                <tr><td>Pasta pública (sem senha)</td><td><code>/srv/samba/publico</code></td></tr>
+                <tr><td>Pasta privada waldeci</td><td><code>/home/waldeci/samba-share</code></td></tr>
+                <tr><td>Pasta principal para ISOs Windows</td><td><code>/opt/netboot/samba/windows_iso</code></td></tr>
+                <tr><td>Compartilhamento SMB para instalação</td><td><code>\\192.168.2.156\wininstall</code> (guest ou waldeci)</td></tr>
+            </table>
+            <div class="note">✅ O mesmo Samba será usado tanto para arquivos do dia a dia quanto para servir a instalação do Windows via rede (WinPE acessará o share <strong>wininstall</strong>).</div>
+        </div>
+
+        <!-- ================= PARTE 1: SAMBA COMPLETO (INTEGRADO) ================= -->
+        <div class="section">
+            <h2>🔧 1. Configuração do Samba (Base + Acesso para WinPE)</h2>
+            <p>Esta etapa une seu manual Samba existente com os compartilhamentos extras necessários para o netboot.xyz. Toda a instalação e configuração do Samba fica otimizada.</p>
+
+            <div class="step">
+                <h3><span class="step-number">1</span> Remover qualquer instalação anterior</h3>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>sudo systemctl stop smbd nmbd 2>/dev/null
+sudo apt-get remove --purge -y samba samba-common smbclient
+sudo rm -rf /etc/samba /var/lib/samba /var/log/samba /srv/samba /home/waldeci/samba-share /opt/netboot</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">2</span> Instalar Samba + Utilitários (inclui docker para netboot)</h3>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>sudo apt-get update -y
+sudo apt-get install -y samba smbclient docker.io docker-compose rsync wget
+sudo systemctl enable --now docker</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">3</span> Criar estrutura de pastas (Samba pessoal + pasta wininstall)</h3>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>sudo mkdir -p /srv/samba/publico
+sudo mkdir -p /home/waldeci/samba-share
+sudo mkdir -p /opt/netboot/samba/windows_iso
+sudo mkdir -p /opt/netboot/samba/configs
+sudo mkdir -p /opt/netboot/assets/WinPE/x64
+sudo chmod 777 /srv/samba/publico
+sudo chown waldeci:waldeci /home/waldeci/samba-share
+sudo chmod 755 /home/waldeci/samba-share
+sudo chmod -R 775 /opt/netboot/samba</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">4</span> Configuração unificada do smb.conf (pastas + wininstall)</h3>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>sudo tee /etc/samba/smb.conf << 'EOF'
+[global]
+workgroup = WORKGROUP
+server string = Servidor Samba + PXE
+security = user
+map to guest = Bad User
+guest account = nobody
+log file = /var/log/samba/log.%m
+max log size = 1000
+
+[publico]
+path = /srv/samba/publico
+browseable = yes
+read only = no
+guest ok = yes
+writable = yes
+create mask = 0777
+directory mask = 0777
+
+[waldeci]
+path = /home/waldeci/samba-share
+browseable = yes
+read only = no
+guest ok = no
+valid users = waldeci
+create mask = 0755
+directory mask = 0755
+
+[wininstall]
+path = /opt/netboot/samba
+browseable = yes
+read only = yes
+guest ok = yes
+force user = nobody
+; Para maior compatibilidade com Windows PE, permitimos guest
+EOF</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">5</span> Criar usuário waldeci no Samba (senha 1)</h3>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>sudo smbpasswd -a waldeci
+# Digite a senha: 1 (duas vezes)
+sudo smbpasswd -e waldeci
+sudo systemctl restart smbd
+sudo systemctl enable smbd</pre>
+                </div>
+                <div class="success">✅ Samba ativo com três compartilhamentos: <strong>publico</strong>, <strong>waldeci</strong> e <strong>wininstall</strong> (para instalação Windows).</div>
+            </div>
+        </div>
+
+        <!-- ================= PARTE 2: NETBOOT.XYZ COM DOCKER ================= -->
+        <div class="section">
+            <h2>🐳 2. netboot.xyz - Servidor PXE/iPXE (Docker)</h2>
+            <p>Usamos a imagem oficial do netboot.xyz para servir o boot via rede (HTTP/TFTP). O cliente fará PXE, carregará o menu e depois o WinPE montará o compartilhamento SMB.</p>
+
+            <div class="step">
+                <h3><span class="step-number">1</span> Baixar e executar contêiner netboot.xyz</h3>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>docker run -d \
+  --name netbootxyz \
+  --restart unless-stopped \
+  -p 80:80 \
+  -p 69:69/udp \
+  -p 4011:4011/udp \
+  -v /opt/netboot/assets:/config/assets \
+  -v /opt/netboot/config:/config \
+  -e NGINX_PORT=80 \
+  ghcr.io/netbootxyz/netbootxyz:latest</pre>
+                </div>
+                <div class="note">🔍 Portas: 80 (web/assets), 69/udp (TFTP), 4011 (proxyDHCP). Certifique-se que não há conflito com outros serviços web.</div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">2</span> Ajustar permissões e preparar WinPE customizado</h3>
+                <p>Extraia o conteúdo da sua ISO do Windows dentro da pasta <code>/opt/netboot/samba/windows_iso</code> — assim o Samba compartilhará os arquivos de instalação.</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre># Exemplo de extração da ISO (substitua pelo caminho da sua ISO)
+sudo mount -o loop /caminho/para/Windows.iso /mnt/win_iso
+sudo rsync -av /mnt/win_iso/ /opt/netboot/samba/windows_iso/
+sudo umount /mnt/win_iso
+
+# Agora copie o boot.wim para o diretório de assets do netboot (WinPE boot)
+sudo cp /opt/netboot/samba/windows_iso/sources/boot.wim /opt/netboot/assets/WinPE/x64/boot.wim</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">3</span> Criar script de automação para WinPE (montar SMB automaticamente)</h3>
+                <p>Dentro da pasta de configurações, criamos <code>winpeshl.ini</code> e <code>configure.bat</code> para que o Windows PE monte o share e execute o setup.exe sozinho.</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>sudo mkdir -p /opt/netboot/assets/configs/winpe_mount
+sudo tee /opt/netboot/assets/configs/winpe_mount/winpeshl.ini << 'EOF'
+[LaunchApp]
+AppPath = X:\Windows\System32\configure.bat
+EOF
+
+sudo tee /opt/netboot/assets/configs/winpe_mount/configure.bat << 'EOF'
+@echo off
+wpeinit
+timeout /t 3 /nobreak > nul
+:loop
+ping -n 1 192.168.2.156 > nul
+if errorlevel 1 goto loop
+net use Z: \\192.168.2.156\wininstall /user:guest ""
+Z:\windows_iso\setup.exe
+exit
+EOF</pre>
+                </div>
+                <div class="warning">⚠️ Substitua o IP <code>192.168.2.156</code> pelo IP real do seu servidor. Caso use autenticação, ajuste o net use com usuário/senha (ex: waldeci/1).</div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">4</span> Customizar menu netboot.xyz para apontar ao WinPE local</h3>
+                <p>Crie um arquivo de override <code>local-vars.ipxe</code> para que o netboot.xyz sirva o WinPE com os scripts.</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <pre>sudo tee /opt/netboot/config/assets/local-vars.ipxe << 'EOF'
+# Configuração para Windows PE customizado
+set win_base_url http://192.168.2.80/WinPE
+set win_pe_boot boot.wim
+echo netboot.xyz + Samba integrado: WinPE pronto
+EOF
+# Ajuste o IP para o IP do servidor (porta 80 é a do container)
+# Em alguns casos, use http://SEU_IP/WinPE/boot.wim
+sudo tee /opt/netboot/config/assets/menu/win-custom.ipxe << 'EOM'
+#!ipxe
+goto win_custom_chain
+:win_custom_chain
+kernel wimboot
+initrd ${win_base_url}/boot.wim boot.wim
+boot
+EOM</pre>
+                </div>
+                <div class="note">Para usar diretamente via menu, após a inicialização do netboot.xyz acesse "Windows Installer" e coloque o URL. Mas a abordagem acima já deixa os assets acessíveis.</div>
+            </div>
+        </div>
+
+        <!-- ================= PARTE 3: INSTALAÇÃO AUTOMÁTICA (autounattend.xml) ================= -->
+        <div class="section">
+            <h2>🤖 3. Instalação desatendida do Windows (Resposta Automática)</h2>
+            <p>Coloque o arquivo <code>autounattend.xml</code> dentro da pasta da ISO (<code>/opt/netboot/samba/windows_iso/</code>) para que o setup reconheça automaticamente e ignore perguntas.</p>
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                <pre>sudo tee /opt/netboot/samba/windows_iso/autounattend.xml << 'EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64">
+            <DiskConfiguration>
+                <Disk wcm:action="add">
+                    <CreatePartitions>
+                        <CreatePartition Order="1" Type="Primary" Size="100" />
+                        <CreatePartition Order="2" Type="Primary" Extend="true" />
+                    </CreatePartitions>
+                    <ModifyPartitions>
+                        <ModifyPartition Order="1" Format="NTFS" Letter="S" />
+                        <ModifyPartition Order="2" Format="NTFS" Letter="C" />
+                    </ModifyPartitions>
+                    <DiskID>0</DiskID>
+                    <WillWipeDisk>true</WillWipeDisk>
+                </Disk>
+            </DiskConfiguration>
+            <ImageInstall>
+                <OSImage>
+                    <InstallFrom>
+                        <MetaData wcm:action="add">
+                            <Key>/IMAGE/INDEX</Key>
+                            <Value>6</Value> <!-- Edição Pro, ajuste conforme sua ISO -->
+                        </MetaData>
+                    </InstallFrom>
+                    <InstallTo>
+                        <DiskID>0</DiskID>
+                        <PartitionID>2</PartitionID>
+                    </InstallTo>
+                </OSImage>
+            </ImageInstall>
+            <UserData>
+                <ProductKey>
+                    <WillShowUI>OnError</WillShowUI>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+            </UserData>
+        </component>
+    </settings>
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64">
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
+            </OOBE>
+            <AutoLogon>
+                <Username>Administrator</Username>
+                <Enabled>true</Enabled>
+            </AutoLogon>
+        </component>
+    </settings>
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup">
+            <ComputerName>PC-REDE</ComputerName>
+        </component>
+    </settings>
+</unattend>
+EOF</pre>
+                </div>
+            <div class="warning">Para Windows 11, adicione <code>&lt;BypassTPMCheck&gt;true&lt;/BypassTPMCheck&gt;</code> e <code>&lt;BypassSecureBootCheck&gt;true&lt;/BypassSecureBootCheck&gt;</code> na fase windowsPE.</div>
+        </div>
+
+        <!-- ================= PARTE 4: TESTES E COMANDOS ÚTEIS ================= -->
+        <div class="section">
+            <h2>🧪 4. Verificação e boot do cliente</h2>
+            <div class="grid-2">
+                <div class="step" style="flex:1">
+                    <h3>✅ Testes locais no Linux</h3>
+                    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <pre># Verificar se o container está rodando
+docker ps | grep netbootxyz
+# Testar acesso ao Samba wininstall
+smbclient //localhost/wininstall -N -c 'ls'
+# Testar boot.wim acessível via HTTP
+curl http://localhost/WinPE/x64/boot.wim --output /dev/null -s -w "%{http_code}"</pre>
+                    </div>
+                </div>
+                <div class="step" style="flex:1">
+                    <h3>🖥️ Cliente Windows: boot PXE</h3>
+                    <p>1. Na BIOS/UEFI ative o boot pela rede (PXE).<br>
+                    2. O cliente receberá IP do DHCP (certifique-se que o servidor DHCP aponta o next-server para o IP do seu Ubuntu, porta 4011 se necessário).<br>
+                    3. Menu netboot.xyz aparecerá → escolha "Windows" → ambiente WinPE.<br>
+                    4. O script <code>configure.bat</code> montará <code>\\192.168.2.156\wininstall</code> e iniciará o setup.exe automático.<br>
+                    ✔️ Instalação fluirá sem intervenção.</p>
+                </div>
+            </div>
+            <div class="note"><strong>Dica DHCP:</strong> Caso seu roteador não permita opção 66, você pode usar o dnsmasq em modo proxy. Exemplo rápido:<br>
+            <code>sudo apt install dnsmasq -y && sudo tee /etc/dnsmasq.d/netboot.conf <<< "dhcp-range=192.168.2.100,192.168.2.200,12h\ndhcp-option=66,192.168.2.156\ndhcp-option=67,undionly.kpxe" && sudo systemctl restart dnsmasq</code></div>
+        </div>
+
+        <!-- ================= COMANDO ÚNICO (SAMBA + NETBOOT) ================= -->
+        <div class="section">
+            <h2>⚡ Comando Unificado (Configuração total em um bloco)</h2>
+            <p>Copie e execute este comando gigante para configurar Samba + netboot.xyz + estrutura WinPE de uma só vez (substitua IP se necessário).</p>
+            <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                <pre>sudo bash -c 'set -e; apt update; apt install -y samba docker.io rsync; systemctl enable --now docker; mkdir -p /opt/netboot/{assets/{WinPE/x64,configs/winpe_mount},samba/windows_iso}; mkdir -p /srv/samba/publico /home/waldeci/samba-share; chmod 777 /srv/samba/publico; chown waldeci:waldeci /home/waldeci/samba-share; tee /etc/samba/smb.conf << "SMBEOF"
+[global]
+workgroup=WORKGROUP
+map to guest=Bad User
+[publico]
+path=/srv/samba/publico
+guest ok=yes
+read only=no
+[waldeci]
+path=/home/waldeci/samba-share
+valid users=waldeci
+[wininstall]
+path=/opt/netboot/samba
+guest ok=yes
+read only=yes
+SMBEOF
+echo -e "1\n1" | smbpasswd -a waldeci -s; systemctl restart smbd; docker run -d --name netbootxyz --restart unless-stopped -p 80:80 -p 69:69/udp -p 4011:4011/udp -v /opt/netboot/assets:/config/assets -v /opt/netboot/config:/config ghcr.io/netbootxyz/netbootxyz:latest; echo "Sistema pronto!"'</pre>
+                </div>
+            <div class="warning">Após o comando, não se esqueça de extrair a ISO do Windows dentro de <code>/opt/netboot/samba/windows_iso</code> e copiar o boot.wim para assets.</div>
+        </div>
+
+        <!-- ================= ACESSO PELO WINDOWS (CLIENTE FINAL) ================= -->
+        <div class="section">
+            <h2>🪟 Acesso aos Compartilhamentos (Windows Cliente)</h2>
+            <div class="step">
+                <p>1. No explorador de arquivos digite: <code>\\192.168.2.156</code><br>
+                2. Pastas disponíveis: <strong>publico</strong> (acesso livre), <strong>waldeci</strong> (senha: 1), <strong>wininstall</strong> (onde está a ISO extraída).<br>
+                3. Para testar se o caminho está correto para o setup do Windows: dentro da rede o cliente verá <code>\\192.168.2.156\wininstall\windows_iso\setup.exe</code>.
+                </p>
+                <div class="note"><i class="fas fa-terminal"></i> Limpar credenciais antigas no Windows: <code>net use * /delete</code> e <code>cmdkey /delete:192.168.2.156</code>.</div>
+            </div>
+        </div>
+
+        <!-- ================= RESOLUÇÃO DE PROBLEMAS ================= -->
+        <div class="section">
+            <h2>🔧 Troubleshooting integrado (Samba + netboot)</h2>
+            <div class="warning">
+                <strong>❌ Cliente não faz PXE:</strong> Verifique se o firewall liberou UDP 67,68,69,4011. Execute <code>sudo ufw allow 69/udp; sudo ufw allow 4011/udp; sudo ufw allow 80/tcp</code>.
+            </div>
+            <div class="warning">
+                <strong>❌ WinPE não enxerga o compartilhamento wininstall:</strong> Teste manualmente no WinPE pressionando Shift+F10, digite <code>net use Z: \\192.168.2.156\wininstall</code>. Se der erro, confira permissões e firewall SMB (portas 139,445 liberadas).
+            </div>
+            <div class="warning">
+                <strong>❌ Setup não encontra disco (VMware/VirtualBox):</strong> Injete drivers virtIO no boot.wim usando DISM: <code>dism /Mount-Image /ImageFile:boot.wim /MountDir:./mount</code> e adicione os drivers.
+            </div>
+            <div class="success">✔️ Para testar o netboot.xyz sem PXE, use a ISO bootável: <a href="https://netboot.xyz/downloads/" target="_blank" style="color:#a8b2ff;">Baixar netboot.xyz.iso</a> e boot via pendrive — útil para testes.</div>
+        </div>
+
+        <div class="footer">
+            <p>📦 Manual completo unificado - Samba + netboot.xyz | Instalação Windows pela rede com scripts automáticos, pasta pública, pasta waldeci e share wininstall. | Servidor Linux Ubuntu 🐧</p>
+            <p>⚡ netboot.xyz + Samba integrados com sucesso — copie os blocos, extraia sua ISO e inicie os clientes via PXE.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyCode(button) {
+        const codeBlock = button.parentElement;
+        const code = codeBlock.querySelector('pre').innerText;
+        copyText(code);
+    }
+
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Comando/configuração copiado!');
+        }).catch(() => {
+            alert('❌ Erro ao copiar, selecione manualmente.');
+        });
+    }
+</script>
+</body>
+</html>
