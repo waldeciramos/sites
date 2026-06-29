@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel SSH — Cloudflare Tunnel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface2: #f0f2f5;
+    --border: #e2e5ea;
+    --border2: #cdd1d8;
+    --text: #111827;
+    --text2: #4b5563;
+    --text3: #9ca3af;
+    --accent: #1d4ed8;
+    --accent-light: #eff6ff;
+    --accent-border: #bfdbfe;
+    --green: #15803d;
+    --green-light: #f0fdf4;
+    --green-border: #bbf7d0;
+    --red: #b91c1c;
+    --red-light: #fef2f2;
+    --red-border: #fecaca;
+    --orange: #b45309;
+    --orange-light: #fffbeb;
+    --orange-border: #fde68a;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* TOPO */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .header-icon {
+    width: 38px; height: 38px;
+    background: var(--accent);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px;
+  }
+
+  .header-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .header-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+  .header-status {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 500;
+  }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-green { background: #22c55e; box-shadow: 0 0 0 3px #dcfce7; }
+  .dot-red { background: #ef4444; }
+  .dot-orange { background: #f59e0b; }
+
+  /* MAIN */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface2);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text2);
+  }
+
+  .card-body { padding: 1.25rem; }
+
+  /* IP INPUT */
+  .ip-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .ip-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .ip-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+
+  .btn {
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #1e40af; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--border); color: var(--text); }
+
+  /* INFO GRID */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 580px) { .info-grid { grid-template-columns: 1fr; } }
+
+  .info-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem;
+  }
+
+  .info-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text3);
+    margin-bottom: 5px;
+  }
+
+  .info-value {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    word-break: break-all;
+    cursor: pointer;
+  }
+  .info-value:hover { color: var(--accent); }
+
+  .info-item.highlight {
+    border-color: var(--accent-border);
+    background: var(--accent-light);
+  }
+  .info-item.highlight .info-value { color: var(--accent); }
+
+  /* COMANDO */
+  .cmd-box {
+    background: #1e2433;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .cmd-header {
+    padding: 6px 12px;
+    background: #161b27;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cmd-label { font-family: var(--mono); font-size: 11px; color: #6b7280; }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: #2d3547;
+    border: 1px solid #3d4a63;
+    color: #9ca3af;
+    padding: 2px 9px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: #374159; color: #e5e7eb; }
+
+  .cmd-text {
+    padding: 0.9rem 1rem;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #a5f3ae;
+    line-height: 1.9;
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+
+  /* ALERTA */
+  .alert {
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+  }
+  .alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .alert-info { background: var(--accent-light); border: 1px solid var(--accent-border); color: #1e40af; }
+  .alert-ok { background: var(--green-light); border: 1px solid var(--green-border); color: var(--green); }
+  .alert-err { background: var(--red-light); border: 1px solid var(--red-border); color: var(--red); }
+  .alert-warn { background: var(--orange-light); border: 1px solid var(--orange-border); color: var(--orange); }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+
+  .step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 24px; height: 24px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-content { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  /* LOG */
+  .log-area {
+    background: #1e2433;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    max-height: 130px;
+    overflow-y: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .l-ok { color: #4ade80; }
+  .l-err { color: #f87171; }
+  .l-info { color: #60a5fa; }
+  .l-warn { color: #fbbf24; }
+  .l-gray { color: #6b7280; }
+
+  /* ESTADO VAZIO */
+  .empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .empty-title { font-size: 14px; font-weight: 500; color: var(--text2); margin-bottom: 4px; }
+  .empty-desc { font-size: 12px; }
+
+  .hidden { display: none; }
+  .fade-in { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">⚡</div>
+  <div>
+    <div class="header-title">Painel SSH — Cloudflare Tunnel</div>
+    <div class="header-sub">Acesso remoto via CGNAT · Debian</div>
+  </div>
+  <div class="header-status">
+    <span class="dot dot-red" id="hdr-dot"></span>
+    <span id="hdr-status">Desconectado</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- COMO USAR -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">Como usar</span></div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Execute o script no Debian remoto</div>
+            <div class="step-desc">Conecte-se ao servidor Debian e rode <code style="font-family:monospace;background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:11px">bash /root/tunnel-start.sh</code>. O script inicia o túnel e disponibiliza as informações de acesso na porta 9999.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Obtenha a URL pública do painel</div>
+            <div class="step-desc">Após rodar o script, rode no Debian: <code style="font-family:monospace;background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:11px">nohup cloudflared tunnel --url http://localhost:9999 > /tmp/cf-painel.log 2>&1 & sleep 10 && grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cf-painel.log | tail -1</code>. Cole a URL gerada no campo abaixo.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Copie e use no MobaXterm ou CMD</div>
+            <div class="step-desc">O painel exibirá o Remote Host, Username e o comando completo pronto para colar no MobaXterm ou no terminal.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONEXÃO -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">Conectar ao servidor</span></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+      <div class="ip-row">
+        <input class="ip-input" id="server-ip" type="text" placeholder="IP local (192.168.70.10) ou URL pública (xxx.trycloudflare.com)" value="">
+        <button class="btn btn-primary" onclick="conectar()">Conectar</button>
+        <button class="btn btn-ghost" onclick="limpar()">Limpar</button>
+      </div>
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ</span>
+        <span><strong>Rede local:</strong> informe o IP do Debian (ex: 192.168.70.10). <strong>Rede externa:</strong> informe a URL pública do segundo túnel (ex: xxx.trycloudflare.com). O script <strong>tunnel-start.sh</strong> deve estar em execução.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="card hidden fade-in" id="result-card">
+    <div class="card-header">
+      <span class="card-title">Dados de acesso SSH</span>
+      <span style="font-size:11px;color:var(--green);font-weight:500" id="result-time"></span>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+
+      <div class="info-grid">
+        <div class="info-item highlight">
+          <div class="info-label">Remote Host (MobaXterm)</div>
+          <div class="info-value" id="r-host" title="clique para copiar" onclick="cp(this.innerText,'Host copiado')">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Username</div>
+          <div class="info-value" id="r-user" title="clique para copiar" onclick="cp(this.innerText,'Usuário copiado')">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Port</div>
+          <div class="info-value" id="r-port">22</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">ProxyCommand (campo SSH Gateway)</div>
+          <div class="info-value" id="r-proxy" title="clique para copiar" onclick="cp(this.innerText,'ProxyCommand copiado')" style="font-size:11px">—</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Comando SSH — Terminal / CMD</div>
+        <div class="cmd-box">
+          <div class="cmd-header">
+            <span class="cmd-label">cole no MobaXterm (terminal local) ou CMD</span>
+            <button class="copy-btn" onclick="cpCmd('ssh-cmd','Comando SSH copiado')">copiar</button>
+          </div>
+          <div class="cmd-text" id="ssh-cmd">—</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Comando completo — MobaXterm (terminal local)</div>
+        <div class="cmd-box">
+          <div class="cmd-header">
+            <span class="cmd-label">configura ProxyCommand e conecta em um passo</span>
+            <button class="copy-btn" onclick="cpCmd('moba-cmd','Comando MobaXterm copiado')">copiar</button>
+          </div>
+          <div class="cmd-text" id="moba-cmd">—</div>
+        </div>
+      </div>
+
+      <div class="alert alert-ok" id="ok-banner">
+        <span class="alert-icon">✓</span>
+        <span id="ok-text">Dados obtidos com sucesso.</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ERRO -->
+  <div class="card hidden" id="error-card">
+    <div class="card-body">
+      <div class="alert alert-err">
+        <span class="alert-icon">✗</span>
+        <span id="error-msg">Não foi possível conectar.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Log de atividade</span>
+      <button class="copy-btn" style="font-size:10px;padding:2px 8px" onclick="limparLog()">limpar</button>
+    </div>
+    <div class="card-body" style="padding:0.75rem">
+      <div class="log-area" id="log-area">
+        <div class="l-gray">[sistema] Painel iniciado. Aguardando conexão.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var savedIp = localStorage.getItem('server_ip') || '';
+if (savedIp) document.getElementById('server-ip').value = savedIp;
+
+function log(msg, type) {
+  type = type || 'info';
+  var box = document.getElementById('log-area');
+  var d = new Date();
+  var t = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0') + ':' + d.getSeconds().toString().padStart(2,'0');
+  var el = document.createElement('div');
+  el.className = 'l-' + type;
+  el.textContent = '[' + t + '] ' + msg;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+function setHeader(s) {
+  var dot = document.getElementById('hdr-dot');
+  var lbl = document.getElementById('hdr-status');
+  if (s === 'ok') { dot.className = 'dot dot-green'; lbl.textContent = 'Túnel ativo'; lbl.style.color = '#15803d'; }
+  else if (s === 'loading') { dot.className = 'dot dot-orange'; lbl.textContent = 'Conectando...'; lbl.style.color = '#b45309'; }
+  else { dot.className = 'dot dot-red'; lbl.textContent = 'Desconectado'; lbl.style.color = '#9ca3af'; }
+}
+
+function conectar() {
+  var input = document.getElementById('server-ip').value.trim();
+  if (!input) { log('Informe o IP ou URL do servidor.', 'warn'); return; }
+  localStorage.setItem('server_ip', input);
+
+  // Detecta se é URL pública (contém ponto e letras) ou IP local
+  var url;
+  if (input.startsWith('http://') || input.startsWith('https://')) {
+    url = input; // URL completa informada
+  } else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(input)) {
+    url = 'http://' + input + ':9999'; // IP local
+  } else {
+    url = 'https://' + input; // URL pública do Cloudflare (sem https://)
+  }
+
+  document.getElementById('result-card').classList.add('hidden');
+  document.getElementById('error-card').classList.add('hidden');
+  setHeader('loading');
+  log('Conectando a ' + url + ' ...', 'info');
+
+  fetch(url, { signal: AbortSignal.timeout(10000) })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      if (!data.host || !data.host.includes('trycloudflare')) throw new Error('Resposta inválida');
+      preencherResultado(data);
+    })
+    .catch(function(e) {
+      setHeader('off');
+      var msg = 'Não foi possível conectar a ' + url + '. Verifique se o tunnel-start.sh e o segundo túnel (porta 9999) estão em execução no Debian.';
+      document.getElementById('error-msg').textContent = msg;
+      document.getElementById('error-card').classList.remove('hidden');
+      log(msg, 'err');
+    });
+}
+
+function preencherResultado(d) {
+  setHeader('ok');
+
+  document.getElementById('r-host').textContent = d.host;
+  document.getElementById('r-user').textContent = d.user;
+  document.getElementById('r-port').textContent = d.port || '22';
+  document.getElementById('r-proxy').textContent = d.proxy_command;
+  document.getElementById('ssh-cmd').textContent = d.ssh_cmd;
+  document.getElementById('moba-cmd').textContent = d.moba_cmd.replace(/\\n/g, '\n');
+
+  var now = new Date();
+  var t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  document.getElementById('result-time').textContent = 'Atualizado às ' + t;
+  document.getElementById('ok-text').textContent = 'Túnel ativo em ' + d.host + ' · IP local do servidor: ' + d.local_ip;
+
+  var card = document.getElementById('result-card');
+  card.classList.remove('hidden');
+  card.classList.add('fade-in');
+
+  log('Dados obtidos com sucesso. Host: ' + d.host, 'ok');
+  log('Use o Remote Host e Username no MobaXterm, ou copie o comando completo.', 'info');
+}
+
+function limpar() {
+  document.getElementById('result-card').classList.add('hidden');
+  document.getElementById('error-card').classList.add('hidden');
+  setHeader('off');
+  log('Painel limpo.', 'gray');
+}
+
+function cp(text, msg) {
+  navigator.clipboard.writeText(text).then(function() { log(msg + ': ' + text, 'ok'); });
+}
+
+function cpCmd(id, msg) {
+  var text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(function() { log(msg + '.', 'ok'); });
+}
+
+function limparLog() {
+  document.getElementById('log-area').innerHTML = '<div class="l-gray">[sistema] Log limpo.</div>';
+}
+</script>
+</body>
+</html>
