@@ -3,16 +3,15 @@
 "use strict";
 
 const state = {
-  wrapper: null,       // paciente atual (objeto completo do storage)
+  wrapper: null,
   calibStep: 1,
-  calibHandSeen: false, calibFaceSeen: false,
-  calibBlinkGroup: null,
+  calibHandSeen: false,
   calibHandOpenSeen: false, calibHandCloseSeen: false,
   currentExerciseId: null,
   currentNivel: 1,
-  sessionStart: null,
   sessionExercicios: [],
-  cameraStarted: false,
+  sessionReps: 10,
+  sessionRepsLocked: false,
 };
 
 // ---------- Som ----------
@@ -20,7 +19,8 @@ window.NM_SOUND = (function(){
   let ctx = null;
   function ac(){ if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)(); return ctx; }
   function beep(type){
-    if(!document.getElementById('toggleSound').checked) return;
+    const toggle = document.getElementById('toggleSound');
+    if(toggle && !toggle.checked) return;
     try{
       const c = ac();
       const o = c.createOscillator(), g = c.createGain();
@@ -40,13 +40,14 @@ window.NM_SOUND = (function(){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.getElementById('globalNav').style.display = (id==='screen-home')?'none':'flex';
+  document.getElementById('globalNav').style.display = (id==='screen-home'||id==='screen-login')?'none':'flex';
 }
 
 // ---------- HOME / lista de pacientes ----------
-function renderPatientList(){
-  const list = Storage.all();
+async function renderPatientList(){
   const el = document.getElementById('patientList');
+  el.innerHTML = '<div class="empty">Carregando…</div>';
+  const list = await Storage.all();
   if(!list.length){ el.innerHTML = '<div class="empty">Nenhum paciente cadastrado ainda.</div>'; return; }
   el.innerHTML = '';
   list.sort((a,b)=> new Date(b.paciente.dataCadastro)-new Date(a.paciente.dataCadastro));
@@ -61,8 +62,8 @@ function renderPatientList(){
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function openPatient(id){
-  state.wrapper = Storage.get(id);
+async function openPatient(id){
+  state.wrapper = await Storage.get(id);
   if(!state.wrapper) return;
   goToMenu();
 }
@@ -86,7 +87,7 @@ document.getElementById('fSensibilidade').addEventListener('input', (e)=>{
   document.getElementById('fSensibilidadeVal').textContent = parseFloat(e.target.value).toFixed(2);
 });
 document.getElementById('btnCancelCadastro').addEventListener('click', ()=>showScreen('screen-home'));
-document.getElementById('btnSaveCadastro').addEventListener('click', ()=>{
+document.getElementById('btnSaveCadastro').addEventListener('click', async ()=>{
   const nome = document.getElementById('fNome').value.trim();
   if(!nome){ alert('Informe o nome do paciente.'); return; }
   const dados = {
@@ -102,18 +103,17 @@ document.getElementById('btnSaveCadastro').addEventListener('click', ()=>{
     sensibilidade: parseFloat(document.getElementById('fSensibilidade').value)||1.0,
   };
   state.wrapper = Storage.novoPaciente(dados);
-  Storage.upsert(state.wrapper);
+  await Storage.upsert(state.wrapper); // já cria o cadastro.json (ou entrada local) na hora do cadastro
   startCalibration();
 });
 
-// ---------- CALIBRAÇÃO ----------
+// ---------- CALIBRAÇÃO (só mão) ----------
 let calibCtx, calibVideoEl;
 
 async function startCalibration(){
   showScreen('screen-calib');
   state.calibStep = 1;
-  state.calibHandSeen = false; state.calibFaceSeen = false;
-  state.calibBlinkGroup = null;
+  state.calibHandSeen = false;
   state.calibHandOpenSeen = false; state.calibHandCloseSeen = false;
   renderCalibStep();
 
@@ -121,11 +121,10 @@ async function startCalibration(){
   const overlay = document.getElementById('calibOverlay');
   calibCtx = overlay.getContext('2d');
 
-  if(typeof Hands === 'undefined' || typeof FaceMesh === 'undefined'){
+  if(typeof Hands === 'undefined'){
     document.getElementById('calibStepText').textContent =
-      'Não foi possível carregar o MediaPipe (bibliotecas de visão computacional). ' +
-      'Isso acontece quando a página é aberta dentro do preview do Claude.ai. ' +
-      'Baixe os arquivos e abra localmente ou hospede no GitHub Pages para funcionar.';
+      'Não foi possível carregar o MediaPipe Hands. Isso acontece quando a página é aberta ' +
+      'dentro do preview do Claude.ai. Rode local (http://localhost) ou publique no GitHub Pages.';
     return;
   }
 
@@ -136,15 +135,6 @@ async function startCalibration(){
     return;
   }
   resizeCanvas(overlay, document.getElementById('calibStage'));
-
-  Tracking.on('eyeSideBlink', (d)=>{
-    if(state.calibStep===2 && !state.calibBlinkGroup){
-      state.calibBlinkGroup = d.group;
-      document.getElementById('calibStepText').textContent = 'Piscada detectada! Toque em "Continuar".';
-      document.getElementById('btnCalibNext').disabled = false;
-    }
-  });
-
   Tracking.start(onCalibFrame);
 }
 
@@ -152,12 +142,11 @@ function resizeCanvas(canvas, stage){
   canvas.width = stage.clientWidth; canvas.height = stage.clientHeight;
 }
 
-function onCalibFrame({hand, face}){
+function onCalibFrame({hand}){
   const ctx = calibCtx, w=ctx.canvas.width, h=ctx.canvas.height;
   ctx.clearRect(0,0,w,h);
 
   document.getElementById('handChip').textContent = 'mão: ' + (hand ? (hand.open?'aberta ✋':'fechada ✊') : 'não detectada');
-  document.getElementById('faceChip').textContent = 'rosto: ' + (face ? 'detectado' : 'não detectado');
 
   if(hand){
     state.calibHandSeen = true;
@@ -165,13 +154,12 @@ function onCalibFrame({hand, face}){
     ctx.beginPath(); ctx.arc(hand.x*w, hand.y*h, 16, 0, Math.PI*2);
     ctx.strokeStyle = hand.open ? '#3E8E6B' : '#F2A93B'; ctx.lineWidth=3; ctx.stroke();
   }
-  if(face) state.calibFaceSeen = true;
 
-  if(state.calibStep===1 && state.calibHandSeen && state.calibFaceSeen){
-    document.getElementById('calibStepText').textContent = 'Mão e rosto detectados. Toque em "Continuar".';
+  if(state.calibStep===1 && state.calibHandSeen){
+    document.getElementById('calibStepText').textContent = 'Mão detectada. Toque em "Continuar".';
     document.getElementById('btnCalibNext').disabled = false;
   }
-  if(state.calibStep===3 && state.calibHandOpenSeen && state.calibHandCloseSeen){
+  if(state.calibStep===2 && state.calibHandOpenSeen && state.calibHandCloseSeen){
     document.getElementById('calibStepText').textContent = 'Gestos confirmados. Toque em "Continuar" para concluir.';
     document.getElementById('btnCalibNext').disabled = false;
   }
@@ -183,13 +171,10 @@ function renderCalibStep(){
   document.getElementById('btnCalibNext').disabled = true;
   if(state.calibStep===1){
     title.textContent = 'Passo 1 — Detecção';
-    text.textContent = 'Posicione o rosto e uma mão dentro do quadro, com boa iluminação.';
+    text.textContent = 'Posicione a mão dentro do quadro, com boa iluminação.';
   } else if(state.calibStep===2){
-    title.textContent = 'Passo 2 — Lateralidade dos olhos';
-    text.textContent = 'Feche apenas o olho ESQUERDO e pisque uma vez, olhando para a câmera.';
-  } else if(state.calibStep===3){
-    title.textContent = 'Passo 3 — Confirmar gestos da mão';
-    text.textContent = 'Abra e feche a mão diante da câmera para confirmar a detecção.';
+    title.textContent = 'Passo 2 — Confirmar gestos';
+    text.textContent = 'Abra e feche a mão diante da câmera para confirmar a detecção do gesto de agarrar/soltar.';
   }
 }
 
@@ -198,13 +183,8 @@ document.getElementById('btnCalibBack').addEventListener('click', ()=>{
   else { Tracking.stop(); showScreen('screen-home'); renderPatientList(); }
 });
 document.getElementById('btnCalibNext').addEventListener('click', ()=>{
-  if(state.calibStep===2 && state.calibBlinkGroup){
-    Tracking.setGroupAIsLeftEye(state.calibBlinkGroup==='A');
-  }
-  if(state.calibStep<3){ state.calibStep++; renderCalibStep(); }
+  if(state.calibStep<2){ state.calibStep++; renderCalibStep(); }
   else {
-    state.wrapper.paciente.calibracaoOlhos = {groupAIsLeftEye: Tracking.getGroupAIsLeftEye()};
-    Storage.upsert(state.wrapper);
     Tracking.stop();
     goToMenu();
   }
@@ -216,7 +196,9 @@ function goToMenu(){
   const p = state.wrapper.paciente;
   document.getElementById('menuPatientName').textContent = p.nome;
   document.getElementById('menuPatientMeta').textContent =
-    `${p.sessoes.length} sessão(ões) registrada(s) · pontuação média ${p.historico.mediaDesempenho} pts · dificuldade atual ${p.configuracoes.dificuldadeInicial}`;
+    `${p.sessoes.length} sessão(ões) registrada(s) · pontuação média ${p.historico.mediaDesempenho} pts` +
+    (Storage.usandoApi() ? ' · salvando em arquivo no servidor' : ' · salvando neste navegador');
+
   const grid = document.getElementById('exerciseGrid');
   grid.innerHTML = '';
   EXERCISE_DEFS.forEach(ex=>{
@@ -226,22 +208,40 @@ function goToMenu(){
     card.addEventListener('click', ()=>chooseNivelAndStart(ex));
     grid.appendChild(card);
   });
-  state.sessionExercicios = [];
+
+  if(state.sessionExercicios.length===0 && !state.sessionRepsLocked){
+    state.sessionReps = EXERCISE_DEFS[0].repsDefault;
+  }
+  const repsInput = document.getElementById('sessionReps');
+  repsInput.value = state.sessionReps;
+  repsInput.disabled = state.sessionRepsLocked;
+  document.getElementById('sessionRepsHint').textContent = state.sessionRepsLocked
+    ? 'Repetições fixadas para esta sessão (definidas no primeiro exercício).'
+    : 'Vale para todos os exercícios desta sessão. Pode ajustar antes do primeiro exercício.';
 }
+document.getElementById('sessionReps').addEventListener('change', (e)=>{
+  const v = parseInt(e.target.value)||10;
+  state.sessionReps = Math.max(3, Math.min(30, v));
+  e.target.value = state.sessionReps;
+});
+
 document.getElementById('btnGoHistory').addEventListener('click', renderHistory);
 document.getElementById('btnRecalibrate').addEventListener('click', startCalibration);
 document.getElementById('btnGoHome').addEventListener('click', ()=>{
-  state.wrapper = null; renderPatientList(); showScreen('screen-home');
+  state.wrapper = null;
+  state.sessionExercicios = [];
+  state.sessionRepsLocked = false;
+  renderPatientList(); showScreen('screen-home');
 });
 
 function chooseNivelAndStart(ex){
-  const nivel = state.wrapper.paciente.configuracoes.dificuldadeInicial>=ex.niveis ? ex.niveis :
-    Math.max(1, Math.min(ex.niveis, state.wrapper.paciente.configuracoes.dificuldadeInicial));
+  const nivel = Math.max(1, Math.min(ex.niveis, state.wrapper.paciente.configuracoes.dificuldadeInicial));
+  state.sessionRepsLocked = true; // a partir do 1º exercício, trava a config de repetições da sessão
   startExercise(ex.id, nivel);
 }
 
 // ---------- JOGO ----------
-let gameVideoEl, gameCtx, gameStage, gameRafId=null, gameStartWallTime=0;
+let gameVideoEl, gameCtx, gameStage, gameStartWallTime=0, lastFrameT=0;
 
 async function startExercise(id, nivel){
   state.currentExerciseId = id;
@@ -253,29 +253,26 @@ async function startExercise(id, nivel){
   gameStage = document.getElementById('gameStage');
   document.getElementById('gamePrompt').innerHTML='';
 
-  if(typeof Hands==='undefined'){ return; } // já avisado na calibração
+  if(typeof Hands==='undefined'){ return; }
   try{ await Tracking.init(gameVideoEl); }catch(e){ return; }
   resizeCanvas(overlay, gameStage);
 
   const sens = state.wrapper.paciente.configuracoes.sensibilidade || 1.0;
-  const inst = ExerciseEngine.start(id, nivel, sens);
+  const inst = ExerciseEngine.start(id, nivel, sens, state.sessionReps);
   inst.onFeedback = showFeedback;
   inst.onFinish = ()=>endExercise(inst);
   gameStartWallTime = performance.now();
+  lastFrameT = performance.now();
 
   document.getElementById('statHits').textContent='0';
   document.getElementById('statErr').textContent='0';
   document.getElementById('statReact').textContent='—';
-  document.getElementById('statBlinks').textContent='0';
-
-  Tracking.on('blinkSingle', ()=>{ inst.blinks++; });
-  Tracking.on('blinkDouble', ()=>{ inst.blinks++; });
+  document.getElementById('statRep').textContent='0/'+state.sessionReps;
 
   Tracking.start(onGameFrame);
 }
 
-let lastFrameT = performance.now();
-function onGameFrame({hand, face}){
+function onGameFrame({hand}){
   const inst = ExerciseEngine.instance;
   if(!inst || inst.done) return;
   const now = performance.now();
@@ -283,7 +280,7 @@ function onGameFrame({hand, face}){
 
   const w = gameCtx.canvas.width, h = gameCtx.canvas.height;
   gameCtx.clearRect(0,0,w,h);
-  inst.update(hand, face, dt, gameCtx, w, h);
+  inst.update(hand, dt, gameCtx, w, h);
 
   document.getElementById('handStateChip').textContent = hand ? (hand.open?'✋ aberta':'✊ fechada') : '— sem mão';
   document.getElementById('gameTimer').textContent = fmtTimer((now-gameStartWallTime)/1000);
@@ -291,7 +288,7 @@ function onGameFrame({hand, face}){
   document.getElementById('statHits').textContent = inst.correct;
   document.getElementById('statErr').textContent = inst.incorrect;
   document.getElementById('statReact').textContent = inst.reactionTimes.length ? Math.round(inst.reactionTimes[inst.reactionTimes.length-1]) : '—';
-  document.getElementById('statBlinks').textContent = inst.blinks;
+  document.getElementById('statRep').textContent = (inst.correct+inst.incorrect)+'/'+state.sessionReps;
 }
 
 function fmtTimer(sec){
@@ -328,12 +325,12 @@ function endExercise(inst){
 }
 
 function askContinueOrFinish(){
-  const cont = confirm('Exercício concluído! Deseja realizar outro exercício nesta sessão?\n\nOK = escolher outro exercício\nCancelar = encerrar sessão e ver relatório');
+  const cont = confirm('Exercício concluído! Deseja realizar outro exercício nesta sessão?\n\nOK = escolher outro exercício\nCancelar = encerrar sessão e ver o relatório final');
   if(cont){ goToMenu(); }
   else { finalizeSession(); }
 }
 
-function finalizeSession(){
+async function finalizeSession(){
   if(!state.sessionExercicios.length){ goToMenu(); return; }
   const duracaoTotal = state.sessionExercicios.reduce((a,e)=>a+e.duracao,0);
   const scoresAnteriores = state.wrapper.paciente.sessoes.flatMap(s=>s.exerciciosRealizados.map(e=>e.pontuacao));
@@ -344,28 +341,25 @@ function finalizeSession(){
     data: new Date().toISOString(),
     duracaoTotal,
     exerciciosRealizados: state.sessionExercicios,
-    progresso: {
-      melhoriaTempo: null,
-      melhoriaPrecisao: null,
-      nivelAtual: state.currentNivel,
-    }
+    repeticoesConfiguradas: state.sessionReps,
+    progresso: { melhoriaPrecisao: null, nivelAtual: state.currentNivel }
   };
   if(mediaAnterior!=null){
     sessao.progresso.melhoriaPrecisao = Math.round(((novaMedia-mediaAnterior)/Math.max(1,mediaAnterior))*100);
   }
 
-  registrarSessao(state.wrapper, sessao);
+  await registrarSessao(state.wrapper, sessao);
 
   if(mediaAnterior!=null && novaMedia>mediaAnterior){
-    showGlobalMessage(`Parabéns! Desempenho médio melhorou ${sessao.progresso.melhoriaPrecisao}% em relação às sessões anteriores.`);
+    setTimeout(()=>alert(`Parabéns! Desempenho médio melhorou ${sessao.progresso.melhoriaPrecisao}% em relação às sessões anteriores.`), 100);
   }
 
   document.getElementById('reportBody').innerHTML = Report.build(state.wrapper, sessao);
   state.lastSessao = sessao;
+  state.sessionExercicios = [];
+  state.sessionRepsLocked = false;
   showScreen('screen-report');
 }
-
-function showGlobalMessage(msg){ setTimeout(()=>alert(msg), 100); }
 
 document.getElementById('btnPrintReport').addEventListener('click', ()=>window.print());
 document.getElementById('btnExportSessionJson').addEventListener('click', ()=>{
@@ -418,6 +412,49 @@ function closeSettings(){
 document.getElementById('toggleContrast').addEventListener('change', (e)=>document.body.classList.toggle('contrast', e.target.checked));
 document.getElementById('toggleFontSize').addEventListener('change', (e)=>document.body.classList.toggle('bigfont', e.target.checked));
 
+// ---------- Login ----------
+const NM_LOGIN_KEY = 'neuromove_logado';
+
+async function checkCredenciais(usuario, senha){
+  try{
+    const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.basePath}/senha.json`;
+    const r = await fetch(url, {cache:'no-store'});
+    if(!r.ok) return false;
+    const j = await r.json();
+    return j.usuario===usuario && j.senha===senha;
+  }catch(e){ console.warn('checkCredenciais falhou', e); return false; }
+}
+
+document.getElementById('btnLogin').addEventListener('click', doLogin);
+document.getElementById('loginPass').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doLogin(); });
+
+async function doLogin(){
+  const btn = document.getElementById('btnLogin');
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  btn.disabled = true; btn.textContent = 'Verificando…';
+  const ok = await checkCredenciais(user, pass);
+  btn.disabled = false; btn.textContent = 'Entrar';
+  if(ok){
+    sessionStorage.setItem(NM_LOGIN_KEY, '1');
+    showScreen('screen-home');
+    renderPatientList();
+  } else {
+    errEl.textContent = 'Usuário ou senha incorretos.';
+  }
+}
+
+document.getElementById('btnLogout').addEventListener('click', ()=>{
+  sessionStorage.removeItem(NM_LOGIN_KEY);
+  closeSettings();
+  state.wrapper = null;
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  showScreen('screen-login');
+});
+
 // ---------- Init ----------
 window.addEventListener('resize', ()=>{
   if(document.getElementById('screen-calib').classList.contains('active')){
@@ -428,5 +465,10 @@ window.addEventListener('resize', ()=>{
   }
 });
 
-renderPatientList();
+if(sessionStorage.getItem(NM_LOGIN_KEY)==='1'){
+  showScreen('screen-home');
+  renderPatientList();
+} else {
+  showScreen('screen-login');
+}
 })();

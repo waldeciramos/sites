@@ -75,6 +75,11 @@ button:disabled{opacity:.4;cursor:not-allowed;}
 .feedback-toast.show{opacity:1;}
 .feedback-toast.bad{background:rgba(193,80,46,.85);}
 
+.reps-panel{padding:14px 16px;}
+.reps-label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--ink);}
+.reps-label input[type=number]{width:90px;padding:9px 10px;border-radius:8px;border:1px solid #c4d3cd;font-size:15px;font-family:var(--mono);}
+.reps-label input:disabled{opacity:.6;}
+
 .exercise-grid{display:flex;flex-direction:column;gap:10px;}
 .ex-card{background:var(--paper);color:var(--ink);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;border:2px solid transparent;}
 .ex-card:active{border-color:var(--amber);}
