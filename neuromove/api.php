@@ -31,6 +31,24 @@ switch($action){
     echo json_encode(['ok'=>true, 'servidor'=>'NeuroMove Rehab API']);
     break;
 
+  case 'login':
+    // Lê usuario/senha do POST (nunca da URL, pra não parar em logs de acesso).
+    $body = json_decode(file_get_contents('php://input'), true);
+    $usuario = $body['usuario'] ?? '';
+    $senha   = $body['senha'] ?? '';
+    $senhaFile = __DIR__ . '/data/senha.json';
+    if(!file_exists($senhaFile)){
+      http_response_code(500);
+      echo json_encode(['ok'=>false, 'error'=>'senha.json não encontrado no servidor']);
+      break;
+    }
+    $cred = json_decode(file_get_contents($senhaFile), true);
+    $ok = $cred && isset($cred['usuario'], $cred['senha'])
+          && hash_equals((string)$cred['usuario'], (string)$usuario)
+          && hash_equals((string)$cred['senha'], (string)$senha);
+    echo json_encode(['ok'=>$ok]);
+    break;
+
   case 'list':
     $out = [];
     foreach(glob($baseDir.'/*/cadastro.json') as $f){

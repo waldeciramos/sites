@@ -416,6 +416,22 @@ document.getElementById('toggleFontSize').addEventListener('change', (e)=>docume
 const NM_LOGIN_KEY = 'neuromove_logado';
 
 async function checkCredenciais(usuario, senha){
+  // 1) Tenta o api.php (servidor com PHP) — a senha fica no servidor, nunca
+  //    aparece no navegador nem precisa de token do GitHub.
+  try{
+    const r = await fetch('api.php?action=login', {
+      method:'POST', cache:'no-store',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({usuario, senha})
+    });
+    if(r.ok){
+      const j = await r.json();
+      return !!j.ok;
+    }
+  }catch(e){ /* sem PHP disponível (ex.: GitHub Pages) — tenta o fallback abaixo */ }
+
+  // 2) Fallback: GitHub Pages (estático, sem PHP) — só funciona se GITHUB_CONFIG
+  //    estiver preenchido em config.js.
   try{
     const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.basePath}/senha.json`;
     const r = await fetch(url, {cache:'no-store'});
