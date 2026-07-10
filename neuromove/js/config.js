@@ -19,5 +19,5 @@ const GITHUB_CONFIG = {
   repo: 'sites',
   branch: 'main',
   basePath: 'neuromove/data',
-  token: '' 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,
+  token: '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',
 };
