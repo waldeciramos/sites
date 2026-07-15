@@ -76,6 +76,18 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
 }
 .voice-toggle .dot{width:8px; height:8px; border-radius:50%; background:#8FC9C0;}
 .voice-toggle.off .dot{background:#8a8a8a;}
+.voice-config{
+  margin-top:.9rem; display:flex; gap:1.4rem; flex-wrap:wrap; align-items:center;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+  border-radius:10px; padding:.7rem 1rem;
+}
+.voice-config-row{display:flex; align-items:center; gap:.5rem;}
+.voice-config-row label{font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.05em; color:#9FD3CB; text-transform:uppercase;}
+.voice-config select{
+  background:#0E2033; color:#EFF3F1; border:1px solid #3E5A70; border-radius:6px;
+  padding:.35rem .5rem; font-family:'IBM Plex Sans',sans-serif; font-size:.82rem; max-width:220px;
+}
+.voice-config input[type="range"]{width:110px;}
 
 /* aviso de fonte */
 .aviso-fonte{
@@ -346,6 +358,20 @@ footer{text-align:center; padding:2.4rem 1rem; color:var(--muted); font-size:.85
     <button class="voice-toggle off" id="voice-toggle" onclick="toggleVoiceInfo()">
       <span class="dot"></span> <span id="voice-toggle-label">Narração por voz do navegador (clique para testar)</span>
     </button>
+    <div class="voice-config" id="voice-config">
+      <div class="voice-config-row">
+        <label for="voice-select">Voz</label>
+        <select id="voice-select" onchange="selecionarVoz(this.value)"></select>
+      </div>
+      <div class="voice-config-row">
+        <label for="voice-rate">Velocidade</label>
+        <input type="range" id="voice-rate" min="0.7" max="1.2" step="0.05" value="0.92" oninput="ajustarRate(this.value)">
+      </div>
+      <div class="voice-config-row">
+        <label for="voice-pitch">Tom</label>
+        <input type="range" id="voice-pitch" min="0.6" max="1.3" step="0.05" value="0.85" oninput="ajustarPitch(this.value)">
+      </div>
+    </div>
   </div>
 </header>
 
@@ -425,13 +451,60 @@ document.getElementById('data-prova').textContent = new Date().toLocaleDateStrin
    NARRAÇÃO POR VOZ (Web Speech API — 100% local no navegador)
    ========================================================= */
 let vozAtual = null;
-function escolherVozPt(){
-  const vozes = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-  return vozes.find(v => v.lang && v.lang.toLowerCase().startsWith('pt')) || vozes[0] || null;
+let taxaAtual = 0.92;   // um pouco mais lento que o padrão soa mais natural/grave
+let tomAtual = 0.85;    // tom mais baixo ajuda a soar menos "robótico" e mais masculino
+
+// nomes que costumam identificar vozes masculinas nos motores mais comuns (Google, Microsoft, Apple)
+const PISTAS_VOZ_MASCULINA = ['daniel','ricardo','antonio','antônio','felipe','diego','male','homem','masculin','miguel','joão','joao','carlos','paulo','pedro'];
+
+function pontuarVozPt(v){
+  const lang = (v.lang || '').toLowerCase();
+  const nome = (v.name || '').toLowerCase();
+  if (!lang.startsWith('pt')) return -1;
+  let pontos = 10;
+  if (lang === 'pt-br') pontos += 5;
+  if (PISTAS_VOZ_MASCULINA.some(p => nome.includes(p))) pontos += 20;
+  if (nome.includes('female') || nome.includes('mulher') || nome.includes('feminin')) pontos -= 15;
+  return pontos;
 }
+function listarVozesPt(){
+  const vozes = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  return vozes.filter(v => (v.lang || '').toLowerCase().startsWith('pt'))
+              .sort((a,b) => pontuarVozPt(b) - pontuarVozPt(a));
+}
+function popularSeletorVozes(){
+  const select = document.getElementById('voice-select');
+  if (!select) return;
+  const vozesPt = listarVozesPt();
+  const lista = vozesPt.length ? vozesPt : (window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
+  if (!lista.length) return;
+  select.innerHTML = '';
+  lista.forEach(function(v, i){
+    const opt = document.createElement('option');
+    opt.value = v.name;
+    opt.textContent = v.name + (v.lang ? ' (' + v.lang + ')' : '');
+    select.appendChild(opt);
+  });
+  if (!vozAtual || !lista.some(v => v.name === vozAtual.name)) {
+    vozAtual = lista[0];
+  }
+  select.value = vozAtual.name;
+}
+function escolherVozPt(){
+  const vozesPt = listarVozesPt();
+  return vozesPt[0] || (window.speechSynthesis ? window.speechSynthesis.getVoices()[0] : null) || null;
+}
+function selecionarVoz(nome){
+  const vozes = window.speechSynthesis.getVoices();
+  const v = vozes.find(x => x.name === nome);
+  if (v) { vozAtual = v; narrar('Voz selecionada. Assim vou narrar as explicações das questões.'); }
+}
+function ajustarRate(v){ taxaAtual = parseFloat(v); }
+function ajustarPitch(v){ tomAtual = parseFloat(v); }
 if ('speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = function(){ vozAtual = escolherVozPt(); };
+  window.speechSynthesis.onvoiceschanged = function(){ vozAtual = escolherVozPt(); popularSeletorVozes(); };
   vozAtual = escolherVozPt();
+  setTimeout(popularSeletorVozes, 300);
 }
 function narrar(texto, btn){
   if (!('speechSynthesis' in window)) {
@@ -443,7 +516,8 @@ function narrar(texto, btn){
   const utter = new SpeechSynthesisUtterance(texto);
   utter.lang = 'pt-BR';
   if (vozAtual) utter.voice = vozAtual;
-  utter.rate = 1;
+  utter.rate = taxaAtual;
+  utter.pitch = tomAtual;
   if (btn) {
     btn.dataset.label = btn.dataset.label || btn.textContent;
     btn.textContent = '⏹ Parar narração';
