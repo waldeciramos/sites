@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caderno de Provas · Fisioterapia · ABC Concursos Públicos</title>
+<title>Caderno de Provas · Fisioterapia · Concurso</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -59,8 +59,8 @@ header.capa::after{
 }
 .capa-eyebrow span{border-left:2px solid #3E5A70; padding-left:.6rem;}
 .capa-eyebrow span:first-child{border-left:none; padding-left:0;}
-header.capa h1{font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight:600; max-width: 780px;}
-header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:660px;}
+header.capa h1{font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight:600; max-width: 820px;}
+header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:700px;}
 .selo{
   position:absolute; top:0; right:0; width:104px; height:104px;
   border:2px solid #8FC9C0; border-radius:50%;
@@ -68,11 +68,29 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
   transform:rotate(8deg); font-family:'IBM Plex Mono',monospace; font-size:.62rem;
   letter-spacing:.08em; color:#8FC9C0; line-height:1.3; text-transform:uppercase;
 }
+.voice-toggle{
+  position:relative; margin-top:1.2rem; display:inline-flex; align-items:center; gap:.6rem;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.25); color:#EFF3F1;
+  padding:.5rem .9rem; border-radius:99px; font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+  cursor:pointer;
+}
+.voice-toggle .dot{width:8px; height:8px; border-radius:50%; background:#8FC9C0;}
+.voice-toggle.off .dot{background:#8a8a8a;}
+
+/* aviso de fonte */
+.aviso-fonte{
+  max-width:1180px; margin:1.2rem auto 0; padding:0 1.5rem;
+}
+.aviso-fonte .box{
+  background:var(--amber-soft); border:1px solid #E4CFA0; border-radius:8px;
+  padding:.85rem 1.1rem; font-size:.85rem; color:#6E4E14;
+}
+.aviso-fonte .box strong{color:#4F3708;}
 
 /* ---------- TOP TABS ---------- */
 .top-tabs{
   max-width:1180px; margin:0 auto; padding:0 1.5rem;
-  display:flex; gap:.6rem; margin-top:1.4rem;
+  display:flex; gap:.6rem; margin-top:1.4rem; flex-wrap:wrap;
 }
 .tab-btn{
   font-family:'IBM Plex Mono',monospace; font-size:.8rem; letter-spacing:.04em;
@@ -87,10 +105,23 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
 .view{display:none;}
 .view.active{display:block;}
 
+/* ---------- SIMULADO PILLS ---------- */
+.sim-pills{display:flex; gap:.6rem; margin:1.4rem 0 0; flex-wrap:wrap;}
+.sim-pill{
+  background:var(--card); border:1.4px solid var(--line); color:var(--navy);
+  font-family:'IBM Plex Sans',sans-serif; font-weight:600; font-size:.85rem;
+  padding:.6rem 1rem; border-radius:8px; cursor:pointer; text-align:left;
+}
+.sim-pill small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:.68rem; color:var(--muted); margin-top:.15rem;}
+.sim-pill.active{background:var(--teal); border-color:var(--teal); color:#fff;}
+.sim-pill.active small{color:#E4F1EF;}
+.sim-section{display:none;}
+.sim-section.active{display:block;}
+
 /* ---------- DASHBOARD ---------- */
 .dashboard{
   background:var(--card); border:1px solid var(--line); border-radius:0 var(--radius) var(--radius) var(--radius);
-  padding:1.3rem 1.5rem; position:relative; z-index:2;
+  padding:1.3rem 1.5rem; position:relative; z-index:2; margin-top:1rem;
   box-shadow:0 10px 24px -18px rgba(14,32,51,.45);
   display:flex; gap:2rem; flex-wrap:wrap; align-items:center;
 }
@@ -108,7 +139,7 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
 }
 .block-header h2{font-size:1.35rem; color:var(--navy);}
 
-.grid{display:grid; grid-template-columns: 1fr 268px; gap:2rem; align-items:start; margin-top:2rem;}
+.grid{display:grid; grid-template-columns: 1fr 268px; gap:2rem; align-items:start; margin-top:1.4rem;}
 @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
 
 .q-card{
@@ -120,7 +151,7 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
   0%{box-shadow:0 0 0 0 rgba(46,139,130,.55);}
   100%{box-shadow:0 0 0 14px rgba(46,139,130,0);}
 }
-.q-meta{display:flex; align-items:center; gap:.7rem; margin-bottom:.7rem;}
+.q-meta{display:flex; align-items:center; gap:.7rem; margin-bottom:.7rem; flex-wrap:wrap;}
 .q-num{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--navy); font-size:.85rem;}
 .q-tag{
   font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.08em;
@@ -154,20 +185,25 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
   border-left:3px solid var(--teal); background:#FAFBF7; border-radius:0 8px 8px 0;
 }
 .feedback.show{display:block;}
-.feedback-title{font-weight:600; font-size:.88rem; margin-bottom:.55rem; font-family:'IBM Plex Mono',monospace; letter-spacing:.02em;}
+.feedback-title-row{display:flex; align-items:center; justify-content:space-between; gap:.6rem; flex-wrap:wrap; margin-bottom:.55rem;}
+.feedback-title{font-weight:600; font-size:.88rem; font-family:'IBM Plex Mono',monospace; letter-spacing:.02em;}
 .feedback-title.ok{color:var(--correct);}
 .feedback-title.no{color:var(--incorrect);}
 .resumo{font-size:.9rem; color:var(--ink);}
 .resumo strong{color:var(--navy);}
 .resumo ul{margin:.4rem 0 0; padding-left:1.15rem;}
 .resumo li{margin-bottom:.35rem;}
-.ver-materia{
-  display:inline-flex; align-items:center; gap:.35rem; margin-top:.85rem;
+.q-actions{display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.9rem;}
+.ver-materia, .btn-narrar{
+  display:inline-flex; align-items:center; gap:.35rem;
   font-family:'IBM Plex Mono',monospace; font-size:.76rem; letter-spacing:.03em;
   color:var(--navy); background:var(--amber-soft); border:1px solid #E4CFA0;
   padding:.4rem .7rem; border-radius:6px; cursor:pointer; text-decoration:none;
 }
 .ver-materia:hover{background:#EFE0BC;}
+.btn-narrar{background:var(--teal-soft); border-color:#B9DFDA; color:var(--navy);}
+.btn-narrar:hover{background:#D4EAE6;}
+.btn-narrar.speaking{background:var(--teal); color:#fff; border-color:var(--teal);}
 
 .gabarito-panel{
   position:sticky; top:1.2rem; background:var(--card); border:1px solid var(--line);
@@ -240,6 +276,7 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
   padding:2rem 2.1rem; margin-bottom:1.6rem; scroll-margin-top:1.2rem;
 }
 .materia-content article.flash{animation: flashPulse 1.6s ease;}
+.materia-eyebrow-row{display:flex; align-items:center; justify-content:space-between; gap:.8rem; flex-wrap:wrap;}
 .materia-eyebrow{
   font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
   color:var(--teal); margin-bottom:.35rem;
@@ -267,6 +304,30 @@ header.capa p.sub{margin:.6rem 0 0; color:#C7D6D2; font-size:1.02rem; max-width:
 }
 .chip:hover{background:var(--teal); color:#fff;}
 
+/* ---------- PLANO DE ESTUDOS ---------- */
+.plano-hero{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:1.6rem 1.8rem; margin-top:2rem;}
+.plano-hero h2{color:var(--navy); font-size:1.5rem;}
+.plano-hero p{color:var(--muted); margin-top:.5rem; max-width:760px;}
+.peso-table{margin-top:1.2rem;}
+.peso-bar-track{background:var(--teal-soft); border-radius:99px; height:10px; width:100%; overflow:hidden;}
+.peso-bar-fill{background:var(--teal); height:100%;}
+.plano-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; margin-top:1.4rem;}
+.semana-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:1.3rem 1.4rem;}
+.semana-card .num{font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:var(--teal); letter-spacing:.08em;}
+.semana-card h4{color:var(--navy); font-size:1.05rem; margin:.35rem 0 .6rem;}
+.semana-card ul{padding-left:1.1rem; font-size:.87rem; margin:0;}
+.semana-card li{margin-bottom:.35rem;}
+.checklist{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:1.4rem 1.6rem; margin-top:1.4rem;}
+.checklist h3{color:var(--navy); font-size:1.1rem; margin-bottom:.8rem;}
+.checklist label{display:flex; align-items:flex-start; gap:.6rem; font-size:.9rem; margin-bottom:.6rem; cursor:pointer;}
+.checklist input{margin-top:.2rem;}
+.rotina{background:var(--navy); color:#EFF3F1; border-radius:var(--radius); padding:1.4rem 1.6rem; margin-top:1.4rem;}
+.rotina h3{font-size:1.05rem; margin-bottom:.7rem;}
+.rotina-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.9rem;}
+.rotina-item{background:rgba(255,255,255,.08); border-radius:8px; padding:.8rem .9rem;}
+.rotina-item .h{font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:#9FD3CB; letter-spacing:.06em;}
+.rotina-item .t{font-size:.92rem; margin-top:.3rem;}
+
 footer{text-align:center; padding:2.4rem 1rem; color:var(--muted); font-size:.85rem;}
 </style>
 </head>
@@ -274,81 +335,42 @@ footer{text-align:center; padding:2.4rem 1rem; color:var(--muted); font-size:.85
 
 <header class="capa">
   <div class="capa-inner">
-    <div class="selo">EDITAL<br>FISIOTERAPIA<br>ABCP</div>
+    <div class="selo">EDITAL<br>FISIOTERAPIA<br>CONCURSO</div>
     <div class="capa-eyebrow">
-      <span>Banca: ABC Concursos Públicos</span>
       <span>Cargo: Fisioterapeuta</span>
-      <span>Bloco I + Bloco II</span>
+      <span>2 Simulados + Apostila + Plano</span>
       <span id="data-prova"></span>
     </div>
-    <h1>Caderno de Provas — Simulado Comentado</h1>
-    <p class="sub">30 questões no perfil literal e objetivo da banca ABCP, com apostila de estudo dedicada, organizada por matéria, para revisão antes e depois do simulado.</p>
+    <h1>Caderno de Provas — Simulados Comentados com Narração</h1>
+    <p class="sub">Questões organizadas por matéria, com apostila de estudo, plano semanal e narração por voz da resposta e da explicação de cada questão.</p>
+    <button class="voice-toggle off" id="voice-toggle" onclick="toggleVoiceInfo()">
+      <span class="dot"></span> <span id="voice-toggle-label">Narração por voz do navegador (clique para testar)</span>
+    </button>
   </div>
 </header>
 
+<div class="aviso-fonte">
+  <div class="box">
+    <strong>Sobre a origem das questões:</strong> não é possível copiar ou reproduzir aqui as provas originais de bancas
+    (elas são conteúdo protegido de sites como Qconcursos/TecConcursos/Instituto Quadrix). O Simulado 01 e o Simulado 02
+    são questões <strong>inéditas, escritas do zero</strong> no estilo do que costuma cair em provas de Fisioterapeuta,
+    e o Simulado 02 segue de propósito a <strong>proporção real</strong> de matérias observada em provas recentes da banca
+    Quadrix para a Fundação do ABC/2025 (forte peso em Português/Interpretação de Texto, Fisioterapia e Saúde Pública).
+    Para treinar com as provas literais, use o link para a prova oficial na aba <em>Plano de Estudos</em>.
+  </div>
+</div>
+
 <nav class="top-tabs">
-  <button class="tab-btn active" id="tab-simulado" onclick="mudarView('simulado')">📝 Simulado <span class="count">30 questões</span></button>
+  <button class="tab-btn active" id="tab-simulado" onclick="mudarView('simulado')">📝 Simulados <span class="count">2</span></button>
   <button class="tab-btn" id="tab-materia" onclick="mudarView('materia')">📚 Material de Estudo <span class="count">10 matérias</span></button>
+  <button class="tab-btn" id="tab-plano" onclick="mudarView('plano')">🗓️ Plano de Estudos</button>
 </nav>
 
 <div class="wrap">
 
   <section id="view-simulado" class="view active">
-
-    <div class="dashboard">
-      <div class="dash-item">
-        <div class="dash-num" id="dash-respondidas">0/30</div>
-        <div class="dash-label">Respondidas</div>
-      </div>
-      <div class="dash-item">
-        <div class="dash-num" id="dash-acertos">0</div>
-        <div class="dash-label">Acertos</div>
-      </div>
-      <div class="dash-item">
-        <div class="dash-num" id="dash-nota">--</div>
-        <div class="dash-label">Nota parcial</div>
-      </div>
-      <div class="progress-track">
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div id="questions-col"></div>
-
-      <aside class="gabarito-panel">
-        <h3>Cartão-Resposta</h3>
-        <div class="gabarito-sub">clique numa bolha para ir à questão</div>
-        <div id="gabarito-blocos"></div>
-        <div class="legenda">
-          <span><i class="dot gray"></i>não respondida</span>
-          <span><i class="dot green"></i>correta</span>
-          <span><i class="dot red"></i>incorreta</span>
-        </div>
-        <button class="btn-finalizar" onclick="finalizar()">Finalizar e ver nota</button>
-      </aside>
-    </div>
-
-    <div class="resultado" id="resultado">
-      <div class="carimbo" id="carimbo">APROVADO</div>
-      <h2>Resultado do Simulado</h2>
-      <div class="nota-grande" id="nota-final-grande">0.0</div>
-      <div class="res-grid">
-        <div class="res-block">
-          <div class="lab">Fisioterapia específica</div>
-          <div class="val" id="res-fisio">0/20</div>
-        </div>
-        <div class="res-block">
-          <div class="lab">Conhecimentos gerais</div>
-          <div class="val" id="res-cg">0/10</div>
-        </div>
-        <div class="res-block">
-          <div class="lab">Aproveitamento geral</div>
-          <div class="val" id="res-total">0%</div>
-        </div>
-      </div>
-    </div>
-
+    <div class="sim-pills" id="sim-pills"></div>
+    <div id="simulados-container"></div>
   </section>
 
   <section id="view-materia" class="view">
@@ -360,157 +382,341 @@ footer{text-align:center; padding:2.4rem 1rem; color:var(--muted); font-size:.85
     </div>
   </section>
 
+  <section id="view-plano" class="view">
+    <div class="plano-hero">
+      <h2>Plano de Estudos — 6 semanas</h2>
+      <p>Baseado na proporção real de disciplinas observada em provas recentes da banca Quadrix para cargos de nível
+      superior da área da saúde na Fundação do ABC (edição 2025): forte peso em Português/Interpretação de Texto,
+      seguido por Fisioterapia (com destaque para Fisioterapia Neurológica) e Saúde Pública/Legislação do SUS.</p>
+      <div class="peso-table" id="peso-table"></div>
+    </div>
+
+    <div class="plano-grid" id="semanas-grid"></div>
+
+    <div class="rotina">
+      <h3>Rotina semanal sugerida (adaptável à sua agenda)</h3>
+      <div class="rotina-grid">
+        <div class="rotina-item"><div class="h">SEG / QUA / SEX</div><div class="t">50 min de Fisioterapia específica + 20 min de questões comentadas com narração</div></div>
+        <div class="rotina-item"><div class="h">TER / QUI</div><div class="t">40 min de Português (interpretação de texto) + 20 min de Saúde Pública/Legislação</div></div>
+        <div class="rotina-item"><div class="h">SÁBADO</div><div class="t">1 simulado completo cronometrado + revisão de erros na apostila</div></div>
+        <div class="rotina-item"><div class="h">DOMINGO</div><div class="t">Descanso ou revisão leve (ouvir as explicações narradas enquanto dirige/caminha)</div></div>
+      </div>
+    </div>
+
+    <div class="checklist">
+      <h3>Checklist antes da prova</h3>
+      <label><input type="checkbox"> Refiz os dois simulados até acertar 80%+ em cada bloco</label>
+      <label><input type="checkbox"> Revisei a apostila completa (10 matérias) pelo menos duas vezes</label>
+      <label><input type="checkbox"> Ouvi a narração das explicações das questões que errei</label>
+      <label><input type="checkbox"> Li o edital oficial do concurso e conferi o conteúdo programático exato</label>
+      <label><input type="checkbox"> Treinei questões reais da banca organizadora (site oficial / bancos pagos de questões)</label>
+      <label><input type="checkbox"> Separei documentos e local de prova com 1 dia de antecedência</label>
+    </div>
+  </section>
+
 </div>
 
-<footer>Simulado e apostila gerados para estudo dirigido — revise sempre a literalidade do COFFITO e dos manuais do Ministério da Saúde.</footer>
+<footer>Simulados e apostila gerados para estudo dirigido — revise sempre a literalidade do COFFITO, dos manuais do Ministério da Saúde e do edital oficial do seu concurso.</footer>
 
 <script>
 document.getElementById('data-prova').textContent = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
 
-const BLOCOS = [
+/* =========================================================
+   NARRAÇÃO POR VOZ (Web Speech API — 100% local no navegador)
+   ========================================================= */
+let vozAtual = null;
+function escolherVozPt(){
+  const vozes = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  return vozes.find(v => v.lang && v.lang.toLowerCase().startsWith('pt')) || vozes[0] || null;
+}
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = function(){ vozAtual = escolherVozPt(); };
+  vozAtual = escolherVozPt();
+}
+function narrar(texto, btn){
+  if (!('speechSynthesis' in window)) {
+    alert('Seu navegador não suporta narração por voz (Web Speech API). Tente no Chrome ou Edge.');
+    return;
+  }
+  document.querySelectorAll('.btn-narrar.speaking').forEach(function(b){ b.classList.remove('speaking'); b.textContent = b.dataset.label; });
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(texto);
+  utter.lang = 'pt-BR';
+  if (vozAtual) utter.voice = vozAtual;
+  utter.rate = 1;
+  if (btn) {
+    btn.dataset.label = btn.dataset.label || btn.textContent;
+    btn.textContent = '⏹ Parar narração';
+    btn.classList.add('speaking');
+    utter.onend = function(){ btn.textContent = btn.dataset.label; btn.classList.remove('speaking'); };
+    utter.onerror = function(){ btn.textContent = btn.dataset.label; btn.classList.remove('speaking'); };
+  }
+  window.speechSynthesis.speak(utter);
+}
+function pararNarracao(){
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  document.querySelectorAll('.btn-narrar.speaking').forEach(function(b){ b.classList.remove('speaking'); b.textContent = b.dataset.label; });
+}
+function textoLimpo(html){
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent.replace(/\s+/g,' ').trim();
+}
+function toggleVoiceInfo(){
+  narrar('Esta é a voz que será usada para narrar as respostas e explicações de cada questão. Clique no botão ouvir explicação, dentro de cada questão, para escutar por que a alternativa correta é a resposta certa.');
+  const t = document.getElementById('voice-toggle');
+  const l = document.getElementById('voice-toggle-label');
+  t.classList.remove('off');
+  l.textContent = 'Narração ativa — clique em qualquer questão em "Ouvir explicação"';
+}
+
+/* =========================================================
+   DADOS: SIMULADOS
+   ========================================================= */
+const SIMULADOS = [
 {
-  codigo:"BLOCO I",
-  titulo:"Fisioterapia Específica",
-  questoes:[
-    {tag:"Ortopedia", topico:"ortopedia", enun:"Durante a avaliação de um atleta com dor no ombro, o fisioterapeuta posiciona o braço em abdução a 90° no plano escapular, rotação interna máxima (polegar para baixo) e aplica força descendente enquanto o paciente resiste. Esse teste avalia principalmente:",
-    alts:{A:"O músculo supraespinhal (Teste de Jobe / Empty Can).",B:"O Ligamento Cruzado Anterior.",C:"A cabeça longa do bíceps braquial.",D:"O nervo mediano no punho."}, correta:"A",
-    resumo:"<strong>Testes do manguito rotador:</strong><ul><li><strong>Jobe (Empty Can):</strong> abdução 90°, rotação interna, isola o supraespinhal.</li><li><strong>Neer:</strong> elevação passiva forçada em rotação interna — avalia impacto subacromial.</li><li><strong>Hawkins-Kennedy:</strong> ombro e cotovelo a 90°, rotação interna forçada — também impacto subacromial.</li></ul>"},
+  id:'sim1', nome:'Simulado 01', sub:'30 questões · geral',
+  blocos:[
+    {
+      codigo:"BLOCO I", titulo:"Fisioterapia Específica",
+      questoes:[
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Durante a avaliação de um atleta com dor no ombro, o fisioterapeuta posiciona o braço em abdução a 90° no plano escapular, rotação interna máxima (polegar para baixo) e aplica força descendente enquanto o paciente resiste. Esse teste avalia principalmente:",
+        alts:{A:"O músculo supraespinhal (Teste de Jobe / Empty Can).",B:"O Ligamento Cruzado Anterior.",C:"A cabeça longa do bíceps braquial.",D:"O nervo mediano no punho."}, correta:"A",
+        resumo:"<strong>Testes do manguito rotador:</strong><ul><li><strong>Jobe (Empty Can):</strong> abdução 90°, rotação interna, isola o supraespinhal.</li><li><strong>Neer:</strong> elevação passiva forçada em rotação interna — avalia impacto subacromial.</li><li><strong>Hawkins-Kennedy:</strong> ombro e cotovelo a 90°, rotação interna forçada — também impacto subacromial.</li></ul>"},
 
-    {tag:"Ortopedia", topico:"ortopedia", enun:"No exame de um joelho após entorse em rotação, o fisioterapeuta flexiona o joelho, aplica rotação interna/externa da tíbia associada a estresse em valgo/varo enquanto estende o joelho, buscando um estalido (click) doloroso. Esse teste é:",
-    alts:{A:"Teste de Lachman.",B:"Teste de McMurray.",C:"Teste de Apley (compressão).",D:"Teste da Gaveta Posterior."}, correta:"B",
-    resumo:"<strong>Testes meniscais x ligamentares (joelho):</strong><ul><li><strong>McMurray:</strong> rotação + estresse em valgo/varo durante extensão, buscando click doloroso — meniscos.</li><li><strong>Apley:</strong> paciente em decúbito ventral, compressão axial com rotação — dor sugere lesão meniscal; distração com rotação sugere lesão ligamentar.</li><li><strong>Lachman/Gaveta:</strong> avaliam LCA e LCP, não os meniscos.</li></ul>"},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"No exame de um joelho após entorse em rotação, o fisioterapeuta flexiona o joelho, aplica rotação interna/externa da tíbia associada a estresse em valgo/varo enquanto estende o joelho, buscando um estalido (click) doloroso. Esse teste é:",
+        alts:{A:"Teste de Lachman.",B:"Teste de McMurray.",C:"Teste de Apley (compressão).",D:"Teste da Gaveta Posterior."}, correta:"B",
+        resumo:"<strong>Testes meniscais x ligamentares (joelho):</strong><ul><li><strong>McMurray:</strong> rotação + estresse em valgo/varo durante extensão, buscando click doloroso — meniscos.</li><li><strong>Apley:</strong> paciente em decúbito ventral, compressão axial com rotação — dor sugere lesão meniscal; distração com rotação sugere lesão ligamentar.</li><li><strong>Lachman/Gaveta:</strong> avaliam LCA e LCP, não os meniscos.</li></ul>"},
 
-    {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente em decúbito dorsal na borda da maca, quadril e joelho contralaterais fletidos e trazidos ao tórax. Se o membro testado eleva-se da maca ou o joelho não se mantém a 90°, o teste é positivo para encurtamento de flexores de quadril. Trata-se do:",
-    alts:{A:"Teste de Ober.",B:"Teste de Thomas.",C:"Teste de Patrick (FABER).",D:"Teste de Trendelenburg."}, correta:"B",
-    resumo:"<strong>Testes de quadril:</strong><ul><li><strong>Thomas:</strong> avalia encurtamento do iliopsoas e reto femoral.</li><li><strong>Ober:</strong> avalia encurtamento da banda iliotibial/tensor da fáscia lata.</li><li><strong>FABER/Patrick:</strong> dor sugere disfunção sacroilíaca ou coxofemoral.</li><li><strong>Trendelenburg:</strong> avalia fraqueza do glúteo médio.</li></ul>"},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente em decúbito dorsal na borda da maca, quadril e joelho contralaterais fletidos e trazidos ao tórax. Se o membro testado eleva-se da maca ou o joelho não se mantém a 90°, o teste é positivo para encurtamento de flexores de quadril. Trata-se do:",
+        alts:{A:"Teste de Ober.",B:"Teste de Thomas.",C:"Teste de Patrick (FABER).",D:"Teste de Trendelenburg."}, correta:"B",
+        resumo:"<strong>Testes de quadril:</strong><ul><li><strong>Thomas:</strong> avalia encurtamento do iliopsoas e reto femoral.</li><li><strong>Ober:</strong> avalia encurtamento da banda iliotibial/tensor da fáscia lata.</li><li><strong>FABER/Patrick:</strong> dor sugere disfunção sacroilíaca ou coxofemoral.</li><li><strong>Trendelenburg:</strong> avalia fraqueza do glúteo médio.</li></ul>"},
 
-    {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente chega ao pronto-socorro após trauma indireto na panturrilha durante corrida, com dor súbita e incapacidade de plantiflexão contra resistência. Ao comprimir a panturrilha do paciente em decúbito ventral e não observar plantiflexão do pé, confirma-se suspeita de:",
-    alts:{A:"Entorse de tornozelo grau II.",B:"Ruptura do tendão de Aquiles (sinal de Thompson positivo).",C:"Síndrome do compartimento anterior.",D:"Fascite plantar aguda."}, correta:"B",
-    resumo:"<strong>Sinal de Thompson (squeeze test):</strong> a compressão da panturrilha deve gerar plantiflexão reflexa pela integridade do tendão de Aquiles. Ausência de movimento = teste positivo, indicando ruptura total do tendão."},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente chega ao pronto-socorro após trauma indireto na panturrilha durante corrida, com dor súbita e incapacidade de plantiflexão contra resistência. Ao comprimir a panturrilha do paciente em decúbito ventral e não observar plantiflexão do pé, confirma-se suspeita de:",
+        alts:{A:"Entorse de tornozelo grau II.",B:"Ruptura do tendão de Aquiles (sinal de Thompson positivo).",C:"Síndrome do compartimento anterior.",D:"Fascite plantar aguda."}, correta:"B",
+        resumo:"<strong>Sinal de Thompson (squeeze test):</strong> a compressão da panturrilha deve gerar plantiflexão reflexa pela integridade do tendão de Aquiles. Ausência de movimento = teste positivo, indicando ruptura total do tendão."},
 
-    {tag:"Ortopedia", topico:"ortopedia", enun:"Em uma triagem escolar de coluna, o examinador solicita que a criança flexione o tronco anteriormente com os braços pendentes, observando por trás uma possível assimetria/giba costal. Esse rastreamento é chamado de:",
-    alts:{A:"Teste de Schober.",B:"Sinal de Adams (Adams Forward Bend Test).",C:"Teste de Valsalva.",D:"Teste de Slump."}, correta:"B",
-    resumo:"<strong>Teste de Adams:</strong> rastreamento clássico para escoliose estrutural — a flexão do tronco evidencia a giba costal causada pela rotação vertebral."},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Em uma triagem escolar de coluna, o examinador solicita que a criança flexione o tronco anteriormente com os braços pendentes, observando por trás uma possível assimetria/giba costal. Esse rastreamento é chamado de:",
+        alts:{A:"Teste de Schober.",B:"Sinal de Adams (Adams Forward Bend Test).",C:"Teste de Valsalva.",D:"Teste de Slump."}, correta:"B",
+        resumo:"<strong>Teste de Adams:</strong> rastreamento clássico para escoliose estrutural — a flexão do tronco evidencia a giba costal causada pela rotação vertebral."},
 
-    {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente com lombalgia refere dor irradiada para a face posterior da coxa e perna. Ao elevar passivamente o membro inferior estendido entre 30° e 70°, há reprodução da dor ciática. Esse achado caracteriza teste positivo de:",
-    alts:{A:"Lasègue (Straight Leg Raise).",B:"Slump Test negativo.",C:"Teste de Ober.",D:"Sinal de Kernig isolado, sem valor lombar."}, correta:"A",
-    resumo:"<strong>Lasègue / SLR:</strong> sugere tensão da raiz nervosa/ciático, comum em hérnia discal lombar. Positivo classicamente entre 30° e 70° de elevação."},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente com lombalgia refere dor irradiada para a face posterior da coxa e perna. Ao elevar passivamente o membro inferior estendido entre 30° e 70°, há reprodução da dor ciática. Esse achado caracteriza teste positivo de:",
+        alts:{A:"Lasègue (Straight Leg Raise).",B:"Slump Test negativo.",C:"Teste de Ober.",D:"Sinal de Kernig isolado, sem valor lombar."}, correta:"A",
+        resumo:"<strong>Lasègue / SLR:</strong> sugere tensão da raiz nervosa/ciático, comum em hérnia discal lombar. Positivo classicamente entre 30° e 70° de elevação."},
 
-    {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente refere dor na borda radial do punho ao segurar objetos e realizar movimentos de pinça. No exame, o polegar é posicionado dentro da mão fechada (fist) e o punho é desviado para o lado ulnar, reproduzindo dor intensa. Esse teste é característico de:",
-    alts:{A:"Síndrome do Túnel do Carpo.",B:"Tenossinovite de De Quervain (Teste de Finkelstein).",C:"Epicondilite lateral.",D:"Contratura de Dupuytren."}, correta:"B",
-    resumo:"<strong>Teste de Finkelstein:</strong> específico para tenossinovite de De Quervain, que acomete os tendões do abdutor longo e extensor curto do polegar."},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Paciente refere dor na borda radial do punho ao segurar objetos e realizar movimentos de pinça. No exame, o polegar é posicionado dentro da mão fechada (fist) e o punho é desviado para o lado ulnar, reproduzindo dor intensa. Esse teste é característico de:",
+        alts:{A:"Síndrome do Túnel do Carpo.",B:"Tenossinovite de De Quervain (Teste de Finkelstein).",C:"Epicondilite lateral.",D:"Contratura de Dupuytren."}, correta:"B",
+        resumo:"<strong>Teste de Finkelstein:</strong> específico para tenossinovite de De Quervain, que acomete os tendões do abdutor longo e extensor curto do polegar."},
 
-    {tag:"Ortopedia", topico:"ortopedia", enun:"Trabalhador com formigamento noturno em polegar, indicador e médio realiza flexão máxima e sustentada dos punhos por 60 segundos, com reprodução dos sintomas. Esse achado é típico do teste de:",
-    alts:{A:"Tinel no punho.",B:"Phalen.",C:"Yergason.",D:"Speed."}, correta:"B",
-    resumo:"<strong>Síndrome do Túnel do Carpo:</strong> Phalen (flexão sustentada) e Tinel (percussão) reproduzem os sintomas do território do nervo mediano. Yergason/Speed avaliam a cabeça longa do bíceps."},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Trabalhador com formigamento noturno em polegar, indicador e médio realiza flexão máxima e sustentada dos punhos por 60 segundos, com reprodução dos sintomas. Esse achado é típico do teste de:",
+        alts:{A:"Tinel no punho.",B:"Phalen.",C:"Yergason.",D:"Speed."}, correta:"B",
+        resumo:"<strong>Síndrome do Túnel do Carpo:</strong> Phalen (flexão sustentada) e Tinel (percussão) reproduzem os sintomas do território do nervo mediano. Yergason/Speed avaliam a cabeça longa do bíceps."},
 
-    {tag:"Neurologia", topico:"neurologia", enun:"Paciente pós-AVC apresenta, na avaliação do tônus do bíceps braquial, aumento marcante do tônus na maior parte da amplitude de movimento, porém o segmento ainda é movido facilmente pelo examinador. Segundo a Escala de Ashworth Modificada, esse achado corresponde ao grau:",
-    alts:{A:"Grau 1",B:"Grau 1+",C:"Grau 2",D:"Grau 3"}, correta:"C",
-    resumo:"<strong>Escala de Ashworth Modificada:</strong> Grau 2 — aumento marcante na maior parte da amplitude, mas o segmento se move facilmente. Veja a tabela completa na apostila."},
+        {tag:"Neurologia", topico:"neurologia", enun:"Paciente pós-AVC apresenta, na avaliação do tônus do bíceps braquial, aumento marcante do tônus na maior parte da amplitude de movimento, porém o segmento ainda é movido facilmente pelo examinador. Segundo a Escala de Ashworth Modificada, esse achado corresponde ao grau:",
+        alts:{A:"Grau 1",B:"Grau 1+",C:"Grau 2",D:"Grau 3"}, correta:"C",
+        resumo:"<strong>Escala de Ashworth Modificada:</strong> Grau 2 — aumento marcante na maior parte da amplitude, mas o segmento se move facilmente. Veja a tabela completa na apostila."},
 
-    {tag:"Neurologia", topico:"neurologia", enun:"O conceito neuroevolutivo (Bobath) utilizado na reabilitação de pacientes com lesão do neurônio motor superior tem como estratégia central:",
-    alts:{A:"O uso exclusivo de padrões de movimento em massa reflexos.",B:"A inibição de padrões anormais de tônus/postura e a facilitação de movimentos funcionais normais, por meio de pontos-chave de controle.",C:"O fortalecimento muscular isolado com sobrecarga progressiva máxima.",D:"A imobilização precoce do segmento acometido para evitar espasticidade."}, correta:"B",
-    resumo:"<strong>Conceito Bobath (NDT):</strong> inibe padrões anormais de tônus/movimento e facilita padrões próximos do normal, usando pontos-chave de controle proximais e distais."},
+        {tag:"Neurologia", topico:"neurologia", enun:"O conceito neuroevolutivo (Bobath) utilizado na reabilitação de pacientes com lesão do neurônio motor superior tem como estratégia central:",
+        alts:{A:"O uso exclusivo de padrões de movimento em massa reflexos.",B:"A inibição de padrões anormais de tônus/postura e a facilitação de movimentos funcionais normais, por meio de pontos-chave de controle.",C:"O fortalecimento muscular isolado com sobrecarga progressiva máxima.",D:"A imobilização precoce do segmento acometido para evitar espasticidade."}, correta:"B",
+        resumo:"<strong>Conceito Bobath (NDT):</strong> inibe padrões anormais de tônus/movimento e facilita padrões próximos do normal, usando pontos-chave de controle proximais e distais."},
 
-    {tag:"Neurologia", topico:"neurologia", enun:"Na Escala de Coma de Glasgow, a pontuação máxima de 15 pontos é obtida pela soma das respostas em quais três domínios?",
-    alts:{A:"Abertura ocular, resposta verbal e resposta motora.",B:"Reflexos pupilares, força muscular e sensibilidade.",C:"Orientação temporoespacial, memória e linguagem.",D:"Frequência respiratória, cardíaca e nível de consciência."}, correta:"A",
-    resumo:"<strong>Escala de Coma de Glasgow:</strong> Abertura ocular (1-4) + Resposta verbal (1-5) + Resposta motora (1-6) = 3 a 15 pontos."},
+        {tag:"Neurologia", topico:"neurologia", enun:"Na Escala de Coma de Glasgow, a pontuação máxima de 15 pontos é obtida pela soma das respostas em quais três domínios?",
+        alts:{A:"Abertura ocular, resposta verbal e resposta motora.",B:"Reflexos pupilares, força muscular e sensibilidade.",C:"Orientação temporoespacial, memória e linguagem.",D:"Frequência respiratória, cardíaca e nível de consciência."}, correta:"A",
+        resumo:"<strong>Escala de Coma de Glasgow:</strong> Abertura ocular (1-4) + Resposta verbal (1-5) + Resposta motora (1-6) = 3 a 15 pontos."},
 
-    {tag:"Neurologia", topico:"neurologia", enun:"O método de Facilitação Neuromuscular Proprioceptiva (FNP/Kabat) utiliza como característica central de seus exercícios:",
-    alts:{A:"Movimentos exclusivamente em um único plano anatômico.",B:"Padrões de movimento diagonais e espirais, combinando flexão/extensão com rotação, associados a técnicas de resistência e estiramento.",C:"Ausência total de resistência manual durante a execução.",D:"Trabalho isolado de um único grupo muscular por vez, sem irradiação."}, correta:"B",
-    resumo:"<strong>FNP (Kabat):</strong> padrões diagonais D1 e D2, combinando flexão/extensão, abdução/adução e rotação, com irradiação, estiramento prévio e resistência manual."},
+        {tag:"Neurologia", topico:"neurologia", enun:"O método de Facilitação Neuromuscular Proprioceptiva (FNP/Kabat) utiliza como característica central de seus exercícios:",
+        alts:{A:"Movimentos exclusivamente em um único plano anatômico.",B:"Padrões de movimento diagonais e espirais, combinando flexão/extensão com rotação, associados a técnicas de resistência e estiramento.",C:"Ausência total de resistência manual durante a execução.",D:"Trabalho isolado de um único grupo muscular por vez, sem irradiação."}, correta:"B",
+        resumo:"<strong>FNP (Kabat):</strong> padrões diagonais D1 e D2, combinando flexão/extensão, abdução/adução e rotação, com irradiação, estiramento prévio e resistência manual."},
 
-    {tag:"Eletroterapia", topico:"eletroterapia", enun:"Para promover analgesia por liberação de opioides endógenos (mecanismo mais lento e duradouro), o fisioterapeuta deve configurar o TENS com:",
-    alts:{A:"Alta frequência (80-120 Hz) e baixa largura de pulso (50-80 µs).",B:"Baixa frequência (1-5 Hz) e alta largura de pulso (200-300 µs).",C:"Frequência fixa de 50 Hz e largura de pulso de 20 µs.",D:"Corrente contínua sem modulação de frequência."}, correta:"B",
-    resumo:"<strong>TENS acupuntura-like:</strong> baixa frequência + alta largura de pulso, com contração muscular visível e efeito analgésico mais lento e duradouro (endorfinas)."},
+        {tag:"Eletroterapia", topico:"eletroterapia", enun:"Para promover analgesia por liberação de opioides endógenos (mecanismo mais lento e duradouro), o fisioterapeuta deve configurar o TENS com:",
+        alts:{A:"Alta frequência (80-120 Hz) e baixa largura de pulso (50-80 µs).",B:"Baixa frequência (1-5 Hz) e alta largura de pulso (200-300 µs).",C:"Frequência fixa de 50 Hz e largura de pulso de 20 µs.",D:"Corrente contínua sem modulação de frequência."}, correta:"B",
+        resumo:"<strong>TENS acupuntura-like:</strong> baixa frequência + alta largura de pulso, com contração muscular visível e efeito analgésico mais lento e duradouro (endorfinas)."},
 
-    {tag:"Eletroterapia", topico:"eletroterapia", enun:"Para fortalecimento do quadríceps femoral em paciente com gonartrose, o fisioterapeuta opta pela Corrente Russa. A configuração clássica dessa corrente é:",
-    alts:{A:"Portadora de 2500 Hz modulada em bursts de 50 Hz.",B:"Portadora de 4000 Hz modulada em bursts de 150 Hz.",C:"Portadora de 1000 Hz modulada em bursts de 5 Hz.",D:"Corrente contínua pura, sem modulação em bursts."}, correta:"A",
-    resumo:"<strong>Corrente Russa:</strong> portadora clássica de 2500 Hz, modulação em bursts de 50-80 Hz para fortalecimento muscular."},
+        {tag:"Eletroterapia", topico:"eletroterapia", enun:"Para fortalecimento do quadríceps femoral em paciente com gonartrose, o fisioterapeuta opta pela Corrente Russa. A configuração clássica dessa corrente é:",
+        alts:{A:"Portadora de 2500 Hz modulada em bursts de 50 Hz.",B:"Portadora de 4000 Hz modulada em bursts de 150 Hz.",C:"Portadora de 1000 Hz modulada em bursts de 5 Hz.",D:"Corrente contínua pura, sem modulação em bursts."}, correta:"A",
+        resumo:"<strong>Corrente Russa:</strong> portadora clássica de 2500 Hz, modulação em bursts de 50-80 Hz para fortalecimento muscular."},
 
-    {tag:"Eletroterapia", topico:"eletroterapia", enun:"São contraindicações absolutas ao uso da corrente galvânica (contínua) na prática fisioterapêutica, EXCETO:",
-    alts:{A:"Presença de marcapasso cardíaco na região de aplicação.",B:"Neoplasias na área a ser tratada.",C:"Feridas abertas extensas ou lesões de pele na área dos eletrodos.",D:"Encurtamento muscular leve sem alteração de sensibilidade."}, correta:"D",
-    resumo:"<strong>Contraindicações gerais à eletroterapia:</strong> marcapasso, neoplasias, gestação (abdome/lombar), tromboflebite, feridas abertas ou sensibilidade alterada na área. Encurtamento muscular isolado não é contraindicação."},
+        {tag:"Eletroterapia", topico:"eletroterapia", enun:"São contraindicações absolutas ao uso da corrente galvânica (contínua) na prática fisioterapêutica, EXCETO:",
+        alts:{A:"Presença de marcapasso cardíaco na região de aplicação.",B:"Neoplasias na área a ser tratada.",C:"Feridas abertas extensas ou lesões de pele na área dos eletrodos.",D:"Encurtamento muscular leve sem alteração de sensibilidade."}, correta:"D",
+        resumo:"<strong>Contraindicações gerais à eletroterapia:</strong> marcapasso, neoplasias, gestação (abdome/lombar), tromboflebite, feridas abertas ou sensibilidade alterada na área. Encurtamento muscular isolado não é contraindicação."},
 
-    {tag:"Respiratória", topico:"respiratoria", enun:"A capacidade pulmonar correspondente à soma do Volume de Reserva Expiratório (VRE) com o Volume Residual (VR), representando o volume de ar que permanece nos pulmões após uma expiração basal, é a:",
-    alts:{A:"Capacidade Vital (CV).",B:"Capacidade Inspiratória (CI).",C:"Capacidade Residual Funcional (CRF).",D:"Capacidade Pulmonar Total (CPT)."}, correta:"C",
-    resumo:"<strong>CRF = VRE + VR.</strong> Volume ao final de expiração basal. Veja a tabela completa de volumes/capacidades na apostila."},
+        {tag:"Respiratória", topico:"respiratoria", enun:"A capacidade pulmonar correspondente à soma do Volume de Reserva Expiratório (VRE) com o Volume Residual (VR), representando o volume de ar que permanece nos pulmões após uma expiração basal, é a:",
+        alts:{A:"Capacidade Vital (CV).",B:"Capacidade Inspiratória (CI).",C:"Capacidade Residual Funcional (CRF).",D:"Capacidade Pulmonar Total (CPT)."}, correta:"C",
+        resumo:"<strong>CRF = VRE + VR.</strong> Volume ao final de expiração basal. Veja a tabela completa de volumes/capacidades na apostila."},
 
-    {tag:"Respiratória", topico:"respiratoria", enun:"Em paciente sob Ventilação Mecânica, a aplicação da PEEP (Pressão Positiva ao Final da Expiração) tem como principal objetivo fisiológico:",
-    alts:{A:"Aumentar a frequência respiratória do paciente.",B:"Evitar o colapso alveolar ao final da expiração, recrutando e mantendo alvéolos abertos para melhorar as trocas gasosas.",C:"Reduzir o volume corrente ofertado ao paciente.",D:"Substituir a necessidade de fração inspirada de oxigênio (FiO2)."}, correta:"B",
-    resumo:"<strong>PEEP:</strong> mantém pressão positiva residual ao final da expiração, prevenindo colabamento alveolar e recrutando unidades alveolares — muito usada em SDRA."},
+        {tag:"Respiratória", topico:"respiratoria", enun:"Em paciente sob Ventilação Mecânica, a aplicação da PEEP (Pressão Positiva ao Final da Expiração) tem como principal objetivo fisiológico:",
+        alts:{A:"Aumentar a frequência respiratória do paciente.",B:"Evitar o colapso alveolar ao final da expiração, recrutando e mantendo alvéolos abertos para melhorar as trocas gasosas.",C:"Reduzir o volume corrente ofertado ao paciente.",D:"Substituir a necessidade de fração inspirada de oxigênio (FiO2)."}, correta:"B",
+        resumo:"<strong>PEEP:</strong> mantém pressão positiva residual ao final da expiração, prevenindo colabamento alveolar e recrutando unidades alveolares — muito usada em SDRA."},
 
-    {tag:"Cardiovascular", topico:"cardiovascular", enun:"Durante teste ergométrico, o Duplo Produto (DP), indicador indireto do consumo de oxigênio pelo miocárdio, é calculado pela multiplicação entre:",
-    alts:{A:"Frequência Cardíaca e Pressão Arterial Diastólica.",B:"Pressão Arterial Sistólica e Pressão Arterial Diastólica.",C:"Frequência Respiratória e Frequência Cardíaca de Reserva.",D:"Frequência Cardíaca e Pressão Arterial Sistólica."}, correta:"D",
-    resumo:"<strong>Duplo Produto (DP) = FC × PAS.</strong> Melhor preditor indireto do trabalho cardíaco/consumo de O2 miocárdico durante o esforço."},
+        {tag:"Cardiovascular", topico:"cardiovascular", enun:"Durante teste ergométrico, o Duplo Produto (DP), indicador indireto do consumo de oxigênio pelo miocárdio, é calculado pela multiplicação entre:",
+        alts:{A:"Frequência Cardíaca e Pressão Arterial Diastólica.",B:"Pressão Arterial Sistólica e Pressão Arterial Diastólica.",C:"Frequência Respiratória e Frequência Cardíaca de Reserva.",D:"Frequência Cardíaca e Pressão Arterial Sistólica."}, correta:"D",
+        resumo:"<strong>Duplo Produto (DP) = FC × PAS.</strong> Melhor preditor indireto do trabalho cardíaco/consumo de O2 miocárdico durante o esforço."},
 
-    {tag:"Saúde Pública", topico:"saude-publica", enun:"São considerados princípios doutrinários do Sistema Único de Saúde (SUS), conforme a Lei nº 8.080/1990:",
-    alts:{A:"Descentralização, regionalização e hierarquização.",B:"Universalidade, equidade e integralidade.",C:"Participação social e controle externo.",D:"Financiamento tripartite e municipalização."}, correta:"B",
-    resumo:"<strong>Princípios doutrinários do SUS:</strong> Universalidade, Equidade e Integralidade. Veja a tabela comparativa completa (doutrinários x organizativos) na apostila."},
+        {tag:"Saúde Pública", topico:"saude-publica", enun:"São considerados princípios doutrinários do Sistema Único de Saúde (SUS), conforme a Lei nº 8.080/1990:",
+        alts:{A:"Descentralização, regionalização e hierarquização.",B:"Universalidade, equidade e integralidade.",C:"Participação social e controle externo.",D:"Financiamento tripartite e municipalização."}, correta:"B",
+        resumo:"<strong>Princípios doutrinários do SUS:</strong> Universalidade, Equidade e Integralidade. Veja a tabela comparativa completa (doutrinários x organizativos) na apostila."},
 
-    {tag:"Ética/COFFITO", topico:"etica", enun:"De acordo com o Código de Ética e Deontologia da Fisioterapia (Resolução COFFITO nº 424/2013), constitui infração ética:",
-    alts:{A:"Prescrever órteses e próteses necessárias à reabilitação do paciente.",B:"Registrar em prontuário todas as condutas e evoluções clínicas realizadas.",C:"Divulgar, em redes sociais, imagens ou vídeos da evolução clínica de pacientes com finalidade de autopromoção comercial, mesmo com autorização genérica.",D:"Solicitar exames complementares para fundamentar o diagnóstico cinesiológico funcional."}, correta:"C",
-    resumo:"<strong>COFFITO 424/2013:</strong> o fisioterapeuta tem autonomia diagnóstica e de prescrição. É vedada a exposição de pacientes/imagens para autopromoção ou mercantilização da profissão."},
+        {tag:"Ética/COFFITO", topico:"etica", enun:"De acordo com o Código de Ética e Deontologia da Fisioterapia (Resolução COFFITO nº 424/2013), constitui infração ética:",
+        alts:{A:"Prescrever órteses e próteses necessárias à reabilitação do paciente.",B:"Registrar em prontuário todas as condutas e evoluções clínicas realizadas.",C:"Divulgar, em redes sociais, imagens ou vídeos da evolução clínica de pacientes com finalidade de autopromoção comercial, mesmo com autorização genérica.",D:"Solicitar exames complementares para fundamentar o diagnóstico cinesiológico funcional."}, correta:"C",
+        resumo:"<strong>COFFITO 424/2013:</strong> o fisioterapeuta tem autonomia diagnóstica e de prescrição. É vedada a exposição de pacientes/imagens para autopromoção ou mercantilização da profissão."},
+      ]
+    },
+    {
+      codigo:"BLOCO II", titulo:"Conhecimentos Gerais",
+      questoes:[
+        {tag:"Português", topico:"portugues", enun:"Assinale a alternativa em que a concordância verbal está de acordo com a norma-padrão:",
+        alts:{A:"Fazem dois anos que iniciei o tratamento.",B:"Faz dois anos que iniciei o tratamento.",C:"Fazem dois anos que iniciamos os tratamentos.",D:"Houveram muitos pacientes na fila hoje."}, correta:"B",
+        resumo:"<strong>Verbos impessoais:</strong> \"fazer\" e \"haver\", indicando tempo decorrido ou existência, ficam na 3ª pessoa do singular: \"Faz dois anos...\", \"Havia muitos pacientes...\"."},
+
+        {tag:"Português", topico:"portugues", enun:"Assinale a alternativa em que o uso do acento indicativo de crase está correto:",
+        alts:{A:"Cheguei à clínica às 8 horas da manhã.",B:"Entreguei o laudo à ele.",C:"O tratamento se refere à situações específicas.",D:"Vou à pé até o consultório."}, correta:"A",
+        resumo:"<strong>Crase:</strong> fusão da preposição \"a\" com o artigo feminino \"a(s)\". Não há crase antes de pronome pessoal, antes de plural indeterminado ou antes de palavra masculina."},
+
+        {tag:"Português", topico:"portugues", enun:"Segundo a norma culta, a regência do verbo “assistir” no sentido de “ver, presenciar” exige a preposição:",
+        alts:{A:"Assistir o filme (sem preposição).",B:"Assistir ao filme (com a preposição \"a\").",C:"Assistir no filme.",D:"Assistir para o filme."}, correta:"B",
+        resumo:"<strong>Regência — \"assistir\":</strong> no sentido de \"presenciar\", é transitivo indireto: \"assisti ao jogo\". No sentido de \"prestar assistência\", pode variar."},
+
+        {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Observe a sequência: 3, 7, 15, 31, 63, ... O próximo número da sequência é:",
+        alts:{A:"95",B:"111",C:"127",D:"126"}, correta:"C",
+        resumo:"<strong>Padrão:</strong> cada termo é o dobro do anterior somado a 1 (an+1 = 2·an + 1). 63×2+1 = 127."},
+
+        {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Em uma unidade de saúde, 40% dos 150 pacientes atendidos no mês eram do sexo masculino. Quantos pacientes do sexo feminino foram atendidos?",
+        alts:{A:"60",B:"90",C:"100",D:"110"}, correta:"B",
+        resumo:"<strong>Cálculo:</strong> se 40% são homens, 60% são mulheres. 60% de 150 = 90."},
+
+        {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Considere a proposição: “Todo paciente com espasticidade apresenta AVC prévio.” A negação lógica correta dessa proposição é:",
+        alts:{A:"Nenhum paciente com espasticidade apresenta AVC prévio.",B:"Todo paciente sem espasticidade não teve AVC prévio.",C:"Existe pelo menos um paciente com espasticidade que não apresenta AVC prévio.",D:"Todo paciente com AVC prévio apresenta espasticidade."}, correta:"C",
+        resumo:"<strong>Negação de \"Todo A é B\":</strong> é \"Existe pelo menos um A que não é B\" — não \"Nenhum A é B\"."},
+
+        {tag:"Informática", topico:"informatica", enun:"Em um computador com sistema operacional Windows, o atalho de teclado utilizado para desfazer a última ação realizada é:",
+        alts:{A:"Ctrl + Y",B:"Ctrl + Z",C:"Ctrl + X",D:"Ctrl + V"}, correta:"B",
+        resumo:"<strong>Atalhos comuns:</strong> Ctrl+Z (desfazer), Ctrl+Y (refazer), Ctrl+X (recortar), Ctrl+C (copiar), Ctrl+V (colar)."},
+
+        {tag:"Informática", topico:"informatica", enun:"O armazenamento de arquivos em serviços como Google Drive ou OneDrive, acessíveis remotamente pela internet a partir de qualquer dispositivo conectado, é conhecido como armazenamento:",
+        alts:{A:"Em nuvem (cloud storage).",B:"Em cache local.",C:"Em backup incremental.",D:"Em memória RAM compartilhada."}, correta:"A",
+        resumo:"<strong>Armazenamento em nuvem:</strong> dados hospedados remotamente, acessíveis via internet — diferente de cache (temporário local) e RAM (memória volátil)."},
+
+        {tag:"Legislação SUS", topico:"saude-publica", enun:"São diretrizes organizativas do Sistema Único de Saúde (SUS), previstas na Lei nº 8.080/1990:",
+        alts:{A:"Universalidade e integralidade.",B:"Equidade e gratuidade.",C:"Descentralização, regionalização/hierarquização e participação da comunidade.",D:"Beneficência e não maleficência."}, correta:"C",
+        resumo:"<strong>Diretrizes organizativas do SUS:</strong> Descentralização, Regionalização/Hierarquização e Participação da Comunidade — diferentes dos princípios doutrinários."},
+
+        {tag:"Legislação SUS", topico:"saude-publica", enun:"A Lei nº 8.142/1990 dispõe sobre a participação da comunidade na gestão do SUS, instituindo como instâncias colegiadas de participação social:",
+        alts:{A:"Os Conselhos Regionais de Fisioterapia e Terapia Ocupacional.",B:"As Conferências de Saúde e os Conselhos de Saúde.",C:"Os Colegiados de Gestão das Secretarias Municipais.",D:"As Ouvidorias do SUS exclusivamente."}, correta:"B",
+        resumo:"<strong>Lei 8.142/1990:</strong> Conferências de Saúde (periódicas, avaliam e propõem diretrizes) e Conselhos de Saúde (permanentes, deliberativos, paritários)."},
+      ]
+    }
   ]
 },
 {
-  codigo:"BLOCO II",
-  titulo:"Conhecimentos Gerais",
-  questoes:[
-    {tag:"Português", topico:"portugues", enun:"Assinale a alternativa em que a concordância verbal está de acordo com a norma-padrão:",
-    alts:{A:"Fazem dois anos que iniciei o tratamento.",B:"Faz dois anos que iniciei o tratamento.",C:"Fazem dois anos que iniciamos os tratamentos.",D:"Houveram muitos pacientes na fila hoje."}, correta:"B",
-    resumo:"<strong>Verbos impessoais:</strong> \"fazer\" e \"haver\", indicando tempo decorrido ou existência, ficam na 3ª pessoa do singular: \"Faz dois anos...\", \"Havia muitos pacientes...\"."},
+  id:'sim2', nome:'Simulado 02', sub:'20 questões · proporção real Quadrix/Fundação ABC 2025',
+  blocos:[
+    {
+      codigo:"BLOCO I", titulo:"Fisioterapia (peso real ≈ 32%)",
+      questoes:[
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Para diferenciar tendinite bicipital de lesão do manguito rotador, o fisioterapeuta pede flexão de cotovelo associada à supinação do antebraço contra resistência, reproduzindo dor no sulco bicipital. Esse é o teste de:",
+        alts:{A:"Speed.",B:"Neer.",C:"Ober.",D:"Trendelenburg."}, correta:"A",
+        resumo:"<strong>Teste de Speed:</strong> flexão de ombro com cotovelo estendido e antebraço supinado contra resistência — dor no sulco bicipital sugere tendinite da cabeça longa do bíceps."},
 
-    {tag:"Português", topico:"portugues", enun:"Assinale a alternativa em que o uso do acento indicativo de crase está correto:",
-    alts:{A:"Cheguei à clínica às 8 horas da manhã.",B:"Entreguei o laudo à ele.",C:"O tratamento se refere à situações específicas.",D:"Vou à pé até o consultório."}, correta:"A",
-    resumo:"<strong>Crase:</strong> fusão da preposição \"a\" com o artigo feminino \"a(s)\". Não há crase antes de pronome pessoal, antes de plural indeterminado ou antes de palavra masculina."},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Ao percutir sobre o trajeto do nervo ulnar na goteira epitrócleo-olecraniana e reproduzir formigamento no 4º e 5º dedos, o fisioterapeuta está realizando o:",
+        alts:{A:"Teste de Finkelstein.",B:"Sinal de Tinel para o nervo ulnar no cotovelo.",C:"Teste de Yergason.",D:"Teste de Apley."}, correta:"B",
+        resumo:"<strong>Sinal de Tinel:</strong> percussão sobre um trajeto nervoso comprimido reproduz parestesia no território inervado — no cotovelo, indica compressão do nervo ulnar (síndrome do túnel cubital)."},
 
-    {tag:"Português", topico:"portugues", enun:"Segundo a norma culta, a regência do verbo “assistir” no sentido de “ver, presenciar” exige a preposição:",
-    alts:{A:"Assistir o filme (sem preposição).",B:"Assistir ao filme (com a preposição \"a\").",C:"Assistir no filme.",D:"Assistir para o filme."}, correta:"B",
-    resumo:"<strong>Regência — \"assistir\":</strong> no sentido de \"presenciar\", é transitivo indireto: \"assisti ao jogo\". No sentido de \"prestar assistência\", pode variar."},
+        {tag:"Ortopedia", topico:"ortopedia", enun:"Na avaliação da amplitude de movimento articular com goniômetro, o eixo do instrumento deve ser posicionado:",
+        alts:{A:"Sobre o eixo de movimento da articulação avaliada.",B:"No ventre muscular do agonista.",C:"Distalmente à articulação, sem relação com o eixo de movimento.",D:"Sempre no plano frontal, independentemente do movimento medido."}, correta:"A",
+        resumo:"<strong>Goniometria:</strong> o eixo (fulcro) do goniômetro deve coincidir com o eixo de movimento da articulação; os braços fixo e móvel acompanham os segmentos ósseos proximal e distal."},
 
-    {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Observe a sequência: 3, 7, 15, 31, 63, ... O próximo número da sequência é:",
-    alts:{A:"95",B:"111",C:"127",D:"126"}, correta:"C",
-    resumo:"<strong>Padrão:</strong> cada termo é o dobro do anterior somado a 1 (an+1 = 2·an + 1). 63×2+1 = 127."},
+        {tag:"Neurologia", topico:"neurologia", enun:"O Índice de Barthel é um instrumento utilizado na prática fisioterapêutica para avaliar principalmente:",
+        alts:{A:"O grau de espasticidade muscular.",B:"O nível de consciência do paciente.",C:"A independência funcional do paciente nas atividades básicas de vida diária (alimentação, banho, vestir-se, mobilidade).",D:"A força muscular segmentar em escala de 0 a 5."}, correta:"C",
+        resumo:"<strong>Índice de Barthel:</strong> mede independência funcional em 10 atividades básicas de vida diária, pontuando de 0 (totalmente dependente) a 100 (independente)."},
 
-    {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Em uma unidade de saúde, 40% dos 150 pacientes atendidos no mês eram do sexo masculino. Quantos pacientes do sexo feminino foram atendidos?",
-    alts:{A:"60",B:"90",C:"100",D:"110"}, correta:"B",
-    resumo:"<strong>Cálculo:</strong> se 40% são homens, 60% são mulheres. 60% de 150 = 90."},
+        {tag:"Neurologia", topico:"neurologia", enun:"A Escala de Rankin Modificada é amplamente usada em pacientes pós-AVC para classificar:",
+        alts:{A:"O grau de incapacidade/dependência global, de 0 (sem sintomas) a 6 (óbito).",B:"Apenas a força muscular do membro superior parético.",C:"Exclusivamente o nível de dor referida.",D:"O tônus muscular em escala de 0 a 4."}, correta:"A",
+        resumo:"<strong>Rankin Modificada:</strong> escala de 0 a 6 que resume o grau de incapacidade funcional global após AVC — muito usada em estudos e na prática clínica para acompanhar evolução."},
 
-    {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Considere a proposição: “Todo paciente com espasticidade apresenta AVC prévio.” A negação lógica correta dessa proposição é:",
-    alts:{A:"Nenhum paciente com espasticidade apresenta AVC prévio.",B:"Todo paciente sem espasticidade não teve AVC prévio.",C:"Existe pelo menos um paciente com espasticidade que não apresenta AVC prévio.",D:"Todo paciente com AVC prévio apresenta espasticidade."}, correta:"C",
-    resumo:"<strong>Negação de \"Todo A é B\":</strong> é \"Existe pelo menos um A que não é B\" — não \"Nenhum A é B\"."},
+        {tag:"Eletroterapia", topico:"eletroterapia", enun:"O ultrassom terapêutico aplicado com frequência de 3 MHz, em comparação ao de 1 MHz, é indicado principalmente para:",
+        alts:{A:"Estruturas mais profundas, pois penetra mais.",B:"Estruturas mais superficiais, pois tem menor profundidade de penetração e maior absorção nos tecidos superficiais.",C:"Efeitos exclusivamente não térmicos, sem qualquer aquecimento tecidual.",D:"Substituir totalmente a necessidade de gel condutor."}, correta:"B",
+        resumo:"<strong>Ultrassom terapêutico:</strong> 1 MHz penetra mais (tecidos profundos, 3-5 cm); 3 MHz é absorvido mais rapidamente e é indicado para tecidos superficiais (1-2 cm)."},
 
-    {tag:"Informática", topico:"informatica", enun:"Em um computador com sistema operacional Windows, o atalho de teclado utilizado para desfazer a última ação realizada é:",
-    alts:{A:"Ctrl + Y",B:"Ctrl + Z",C:"Ctrl + X",D:"Ctrl + V"}, correta:"B",
-    resumo:"<strong>Atalhos comuns:</strong> Ctrl+Z (desfazer), Ctrl+Y (refazer), Ctrl+X (recortar), Ctrl+C (copiar), Ctrl+V (colar)."},
+        {tag:"Eletroterapia", topico:"eletroterapia", enun:"A fotobiomodulação (laser de baixa potência) atua na reparação tecidual principalmente por meio de:",
+        alts:{A:"Efeito exclusivamente térmico intenso sobre o tecido.",B:"Estímulo à atividade mitocondrial e à produção de ATP nas células, favorecendo reparo tecidual e efeito anti-inflamatório.",C:"Bloqueio mecânico direto da condução nervosa.",D:"Ação exclusivamente bactericida por radiação ionizante."}, correta:"B",
+        resumo:"<strong>Laser de baixa potência (LBP):</strong> efeito não térmico (atérmico); estimula a cadeia respiratória mitocondrial, aumentando produção de ATP e modulando processos inflamatórios e de reparo."},
 
-    {tag:"Informática", topico:"informatica", enun:"O armazenamento de arquivos em serviços como Google Drive ou OneDrive, acessíveis remotamente pela internet a partir de qualquer dispositivo conectado, é conhecido como armazenamento:",
-    alts:{A:"Em nuvem (cloud storage).",B:"Em cache local.",C:"Em backup incremental.",D:"Em memória RAM compartilhada."}, correta:"A",
-    resumo:"<strong>Armazenamento em nuvem:</strong> dados hospedados remotamente, acessíveis via internet — diferente de cache (temporário local) e RAM (memória volátil)."},
+        {tag:"Respiratória", topico:"respiratoria", enun:"Na ausculta pulmonar, ruídos adventícios descontínuos, semelhantes a estalidos, ouvidos principalmente na fase inspiratória e associados a abertura súbita de vias aéreas colapsadas, são chamados de:",
+        alts:{A:"Sibilos.",B:"Estertores crepitantes (creptos).",C:"Atrito pleural.",D:"Roncos."}, correta:"B",
+        resumo:"<strong>Ausculta pulmonar:</strong> estertores crepitantes = ruídos descontínuos, tipo \"velcro\", na inspiração (ex.: fibrose, EAP). Sibilos = contínuos, agudos, por estreitamento de vias aéreas (asma, DPOC). Roncos = contínuos, graves, por secreção em vias maiores."},
 
-    {tag:"Legislação SUS", topico:"saude-publica", enun:"São diretrizes organizativas do Sistema Único de Saúde (SUS), previstas na Lei nº 8.080/1990:",
-    alts:{A:"Universalidade e integralidade.",B:"Equidade e gratuidade.",C:"Descentralização, regionalização/hierarquização e participação da comunidade.",D:"Beneficência e não maleficência."}, correta:"C",
-    resumo:"<strong>Diretrizes organizativas do SUS:</strong> Descentralização, Regionalização/Hierarquização e Participação da Comunidade — diferentes dos princípios doutrinários."},
+        {tag:"Respiratória", topico:"respiratoria", enun:"A Escala de Borg Modificada (CR-10), usada para monitorar a intensidade do esforço percebido durante exercícios respiratórios ou reabilitação cardiopulmonar, varia tipicamente de:",
+        alts:{A:"0 (nenhum esforço) a 10 (esforço máximo).",B:"1 a 5, apenas.",C:"0 a 100, em porcentagem.",D:"-5 a +5."}, correta:"A",
+        resumo:"<strong>Borg CR-10:</strong> escala de percepção subjetiva de esforço/dispneia, de 0 (nenhum esforço) a 10 (esforço máximo), muito usada para dosar intensidade de exercício em reabilitação pulmonar e cardíaca."},
 
-    {tag:"Legislação SUS", topico:"saude-publica", enun:"A Lei nº 8.142/1990 dispõe sobre a participação da comunidade na gestão do SUS, instituindo como instâncias colegiadas de participação social:",
-    alts:{A:"Os Conselhos Regionais de Fisioterapia e Terapia Ocupacional.",B:"As Conferências de Saúde e os Conselhos de Saúde.",C:"Os Colegiados de Gestão das Secretarias Municipais.",D:"As Ouvidorias do SUS exclusivamente."}, correta:"B",
-    resumo:"<strong>Lei 8.142/1990:</strong> Conferências de Saúde (periódicas, avaliam e propõem diretrizes) e Conselhos de Saúde (permanentes, deliberativos, paritários)."},
+        {tag:"Cardiovascular", topico:"cardiovascular", enun:"A Classificação Funcional da New York Heart Association (NYHA), usada para estadiar a limitação de pacientes com insuficiência cardíaca, define a Classe II como:",
+        alts:{A:"Nenhuma limitação: atividade física habitual não causa sintomas.",B:"Leve limitação da atividade física: confortável em repouso, mas atividade habitual causa sintomas.",C:"Incapacidade de realizar qualquer atividade física sem desconforto, com sintomas em repouso.",D:"Limitação acentuada: mesmo atividades menores que as habituais causam sintomas."}, correta:"B",
+        resumo:"<strong>NYHA:</strong> Classe I (sem limitação), Classe II (limitação leve), Classe III (limitação acentuada, atividades menores que as habituais já causam sintomas), Classe IV (sintomas em repouso)."},
+
+        {tag:"Cardiovascular", topico:"cardiovascular", enun:"Para estimar a frequência cardíaca máxima teórica de um paciente de 50 anos pela fórmula clássica de Karvonen/Fox, o valor aproximado é:",
+        alts:{A:"220 − idade = 170 bpm.",B:"200 + idade = 250 bpm.",C:"180 − idade = 130 bpm.",D:"220 + idade = 270 bpm."}, correta:"A",
+        resumo:"<strong>FC máx. teórica = 220 − idade</strong> (fórmula de Fox), amplamente usada para prescrição de intensidade de exercício, apesar de suas limitações individuais."},
+
+        {tag:"Saúde Pública", topico:"saude-publica", enun:"A organização da Atenção Primária à Saúde como \"porta de entrada preferencial\" e ordenadora do cuidado dentro das Redes de Atenção à Saúde (RAS) do SUS reflete o atributo da:",
+        alts:{A:"Integralidade exclusivamente hospitalar.",B:"Coordenação do cuidado pela Atenção Básica.",C:"Municipalização financeira exclusiva.",D:"Regionalização sem hierarquização."}, correta:"B",
+        resumo:"<strong>Redes de Atenção à Saúde (RAS):</strong> a Atenção Primária/Básica atua como coordenadora do cuidado e porta de entrada preferencial, organizando o fluxo do usuário pelos demais pontos de atenção (média e alta complexidade)."},
+
+        {tag:"Ética/COFFITO", topico:"etica", enun:"Conforme os princípios éticos da profissão, as informações contidas no prontuário do paciente atendido pelo fisioterapeuta são protegidas por:",
+        alts:{A:"Sigilo profissional, podendo ser quebrado apenas em situações previstas em lei ou justa causa.",B:"Domínio público, podendo ser divulgadas livremente para fins de marketing.",C:"Propriedade exclusiva do paciente, sendo vedado ao fisioterapeuta mantê-las arquivadas.",D:"Nenhuma proteção, pois não é considerado documento legal."}, correta:"A",
+        resumo:"<strong>Sigilo profissional:</strong> as informações do prontuário são protegidas por sigilo, quebrado apenas por justa causa, dever legal ou autorização expressa do paciente — dever ético e também legal."},
+
+        {tag:"Ortopedia", topico:"ortopedia", enun:"O teste de Trendelenburg, utilizado na avaliação da marcha e do quadril, é considerado positivo quando, durante o apoio unipodal, observa-se:",
+        alts:{A:"Elevação da pelve do lado de apoio.",B:"Queda da pelve do lado oposto ao membro de apoio, indicando fraqueza do glúteo médio ipsilateral ao apoio.",C:"Flexão excessiva do joelho de apoio, sem relação pélvica.",D:"Rotação externa exagerada do quadril de apoio, sem queda pélvica."}, correta:"B",
+        resumo:"<strong>Trendelenburg positivo:</strong> ao ficar em apoio unipodal, a pelve do lado que NÃO está apoiado cai, por fraqueza do glúteo médio do lado que está apoiando o peso."},
+      ]
+    },
+    {
+      codigo:"BLOCO II", titulo:"Português, Saúde Pública e Informática (peso real ≈ 44% + 8%)",
+      questoes:[
+        {tag:"Português", topico:"portugues", enun:"“O fisioterapeuta aspira a um cargo de coordenação no serviço.” Nessa frase, o verbo “aspirar” está empregado no sentido de “desejar”, exigindo a preposição “a”. Assinale a alternativa que respeita a MESMA regência:",
+        alts:{A:"Ele aspira o cargo com dedicação.",B:"Ele aspira ao cargo com dedicação.",C:"Ele aspira sobre o cargo com dedicação.",D:"Ele aspira para o cargo com dedicação."}, correta:"B",
+        resumo:"<strong>Regência de \"aspirar\":</strong> no sentido de \"desejar, almejar\", é transitivo indireto e pede a preposição \"a\": \"aspirar a um cargo\". No sentido de \"inalar\", é transitivo direto: \"aspirar o ar\"."},
+
+        {tag:"Português", topico:"portugues", enun:"Assinale a alternativa em que a crase está corretamente empregada antes de expressão de tempo:",
+        alts:{A:"O atendimento começará à noite.",B:"O atendimento começará a tarde, se necessário.",C:"Chegarei à qualquer hora da tarde.",D:"Voltarei à casa amanhã de manhã, sem falta."}, correta:"A",
+        resumo:"<strong>Crase em expressões de tempo:</strong> usa-se antes de palavras femininas determinadas, como \"à noite\", \"à tarde\" (quando determinada por artigo), \"às 8h\". Não há crase antes de \"qualquer\" (pronome indefinido) nem, em regra, antes de \"casa\" sem determinante."},
+
+        {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Em uma progressão aritmética de razão 4, o primeiro termo é 5. Qual é o oitavo termo dessa sequência?",
+        alts:{A:"33",B:"37",C:"41",D:"45"}, correta:"A",
+        resumo:"<strong>PA:</strong> an = a1 + (n-1)·r → a8 = 5 + (8-1)×4 = 5 + 28 = 33."},
+
+        {tag:"Raciocínio Lógico", topico:"raciocinio", enun:"Considere a proposição composta: “O paciente tem espasticidade E apresenta AVC prévio.” Essa proposição composta é FALSA quando:",
+        alts:{A:"Ambas as afirmações forem verdadeiras.",B:"Pelo menos uma das duas afirmações for falsa.",C:"Apenas a primeira for verdadeira e a segunda também.",D:"Nunca é falsa, independente do caso."}, correta:"B",
+        resumo:"<strong>Conectivo \"E\" (conjunção):</strong> só é verdadeiro quando AMBAS as proposições são verdadeiras; basta uma ser falsa para a composta toda ser falsa."},
+
+        {tag:"Informática", topico:"informatica", enun:"Em um navegador de internet (como Chrome ou Edge), o atalho de teclado Ctrl + P é normalmente utilizado para:",
+        alts:{A:"Abrir uma nova aba.",B:"Imprimir a página atual.",C:"Pesquisar na página atual.",D:"Fechar o navegador."}, correta:"B",
+        resumo:"<strong>Atalhos de navegador:</strong> Ctrl+P (imprimir), Ctrl+T (nova aba), Ctrl+F (localizar/pesquisar na página), Ctrl+W (fechar aba)."},
+
+        {tag:"Legislação SUS", topico:"saude-publica", enun:"O processo pelo qual a gestão e a execução de ações e serviços de saúde são transferidas progressivamente da esfera federal para estados e, principalmente, municípios, é um exemplo da diretriz do SUS conhecida como:",
+        alts:{A:"Universalidade.",B:"Descentralização (municipalização).",C:"Integralidade.",D:"Equidade."}, correta:"B",
+        resumo:"<strong>Descentralização:</strong> diretriz organizativa do SUS que transfere responsabilidades de gestão para estados e, sobretudo, municípios, com direção única em cada esfera de governo (municipalização)."},
+      ]
+    }
   ]
 }
 ];
 
+/* =========================================================
+   DADOS: APOSTILA (MATÉRIAS)
+   ========================================================= */
 const MATERIAS = [
 {id:"ortopedia", grupo:"Fisioterapia Específica", icone:"🦴", titulo:"Fisioterapia Traumato-Ortopédica",
- lead:"A banca ABCP costuma descrever a execução do teste e pedir o nome/estrutura avaliada — decore a tríade: nome do teste, estrutura testada e como é executado.",
+ lead:"Provas costumam descrever a execução do teste e pedir o nome/estrutura avaliada — decore a tríade: nome do teste, estrutura testada e como é executado.",
  html:`
  <h4>Testes especiais por região</h4>
  <table class="materia-table">
   <tr><th>Região</th><th>Teste</th><th>Estrutura avaliada</th><th>Execução resumida</th></tr>
-  <tr><td rowspan="4">Ombro</td><td>Neer</td><td>Impacto subacromial</td><td>Elevação passiva forçada em rotação interna</td></tr>
+  <tr><td rowspan="5">Ombro</td><td>Neer</td><td>Impacto subacromial</td><td>Elevação passiva forçada em rotação interna</td></tr>
   <tr><td>Hawkins-Kennedy</td><td>Impacto subacromial</td><td>Ombro/cotovelo a 90°, rotação interna forçada</td></tr>
   <tr><td>Jobe (Empty Can)</td><td>Supraespinhal</td><td>Abdução 90° no plano escapular, rotação interna, resistência</td></tr>
-  <tr><td>Yergason / Speed</td><td>Cabeça longa do bíceps</td><td>Supinação/flexão de cotovelo contra resistência</td></tr>
+  <tr><td>Yergason</td><td>Cabeça longa do bíceps / estabilidade do tendão</td><td>Supinação de antebraço contra resistência, cotovelo a 90°</td></tr>
+  <tr><td>Speed</td><td>Cabeça longa do bíceps (tendinite)</td><td>Flexão de ombro, cotovelo estendido, antebraço supinado, contra resistência</td></tr>
   <tr><td rowspan="4">Joelho</td><td>Lachman</td><td>LCA (mais sensível)</td><td>Flexão 20-30°, translação anterior da tíbia</td></tr>
   <tr><td>Gaveta anterior/posterior</td><td>LCA / LCP</td><td>Flexão 90°, tração/empurrão da tíbia</td></tr>
   <tr><td>McMurray</td><td>Meniscos</td><td>Rotação + valgo/varo durante extensão, buscando click</td></tr>
@@ -518,18 +724,20 @@ const MATERIAS = [
   <tr><td rowspan="4">Quadril</td><td>Thomas</td><td>Encurtamento do iliopsoas/reto femoral</td><td>Joelho contralateral ao tórax, observa elevação do membro testado</td></tr>
   <tr><td>Ober</td><td>Banda iliotibial</td><td>Decúbito lateral, abdução/extensão do quadril</td></tr>
   <tr><td>FABER / Patrick</td><td>Articulação sacroilíaca/coxofemoral</td><td>Flexão + abdução + rotação externa</td></tr>
-  <tr><td>Trendelenburg</td><td>Glúteo médio</td><td>Apoio unipodal, observa queda da pelve contralateral</td></tr>
+  <tr><td>Trendelenburg</td><td>Glúteo médio</td><td>Apoio unipodal, observa queda da pelve contralateral ao apoio</td></tr>
   <tr><td rowspan="3">Punho/Mão</td><td>Phalen</td><td>Nervo mediano (Túnel do Carpo)</td><td>Flexão sustentada do punho por 60s</td></tr>
-  <tr><td>Tinel</td><td>Nervo mediano</td><td>Percussão sobre o nervo no punho</td></tr>
+  <tr><td>Tinel</td><td>Nervo mediano (punho) / nervo ulnar (cotovelo)</td><td>Percussão sobre o trajeto do nervo</td></tr>
   <tr><td>Finkelstein</td><td>De Quervain (1º compartimento extensor)</td><td>Polegar dentro do punho fechado + desvio ulnar</td></tr>
   <tr><td rowspan="2">Tornozelo/Coluna</td><td>Thompson</td><td>Tendão de Aquiles</td><td>Compressão da panturrilha em decúbito ventral</td></tr>
   <tr><td>Lasègue (SLR) / Adams / Schober</td><td>Ciático / Escoliose / Mobilidade lombar</td><td>Elevação de MMII em extensão / flexão de tronco / medida de distração de pontos lombares</td></tr>
  </table>
- <div class="dica"><strong>Dica de prova ABCP:</strong> a banca gosta de trocar o nome do teste mantendo a descrição correta (ou vice-versa). Treine reconhecer a execução sem o nome, e o nome sem a execução.</div>
+ <h4>Goniometria — regra de ouro</h4>
+ <p>O eixo (fulcro) do goniômetro sempre coincide com o eixo de movimento da articulação avaliada; o braço fixo acompanha o segmento proximal (estável) e o braço móvel acompanha o segmento distal (que se move).</p>
+ <div class="dica"><strong>Dica de prova:</strong> a banca gosta de trocar o nome do teste mantendo a descrição correta (ou vice-versa). Treine reconhecer a execução sem o nome, e o nome sem a execução.</div>
 `},
 
 {id:"neurologia", grupo:"Fisioterapia Específica", icone:"🧠", titulo:"Fisioterapia Neurofuncional",
- lead:"Foco em escalas de avaliação padronizadas (Ashworth, Glasgow) e nos conceitos/técnicas de reabilitação neurológica (Bobath, Kabat/FNP).",
+ lead:"Foco em escalas de avaliação padronizadas (Ashworth, Glasgow, Barthel, Rankin) e nos conceitos/técnicas de reabilitação neurológica (Bobath, Kabat/FNP).",
  html:`
  <h4>Escala de Ashworth Modificada (espasticidade)</h4>
  <table class="materia-table">
@@ -549,11 +757,17 @@ const MATERIAS = [
   <tr><td>Resposta motora</td><td>1 a 6 pontos</td></tr>
   <tr><td>Total</td><td>3 (pior) a 15 (melhor)</td></tr>
  </table>
+ <h4>Índice de Barthel x Escala de Rankin Modificada</h4>
+ <table class="materia-table">
+  <tr><th>Instrumento</th><th>O que mede</th><th>Faixa</th></tr>
+  <tr><td>Índice de Barthel</td><td>Independência em atividades básicas de vida diária (alimentação, banho, vestir-se, etc.)</td><td>0 (dependente) a 100 (independente)</td></tr>
+  <tr><td>Rankin Modificada</td><td>Grau global de incapacidade/dependência, principalmente pós-AVC</td><td>0 (sem sintomas) a 6 (óbito)</td></tr>
+ </table>
  <h4>Conceito Bobath (NDT)</h4>
  <p>Inibe padrões anormais de tônus/postura e facilita movimentos funcionais próximos do normal, por meio de pontos-chave de controle (proximais e distais).</p>
  <h4>FNP / Kabat</h4>
  <p>Utiliza padrões diagonais (D1 e D2, membros superiores e inferiores), combinando flexão/extensão com rotação, e princípios de irradiação, estiramento prévio e resistência manual máxima.</p>
- <div class="dica"><strong>Dica de prova ABCP:</strong> decore os limites exatos de cada grau da Ashworth (principalmente a diferença entre 1, 1+ e 2) — é a pegadinha mais comum.</div>
+ <div class="dica"><strong>Dica de prova:</strong> decore os limites exatos de cada grau da Ashworth (principalmente a diferença entre 1, 1+ e 2), e não confunda Barthel (função) com Rankin (incapacidade global) — é a pegadinha mais comum.</div>
 `},
 
 {id:"eletroterapia", grupo:"Fisioterapia Específica", icone:"⚡", titulo:"Eletrotermofototerapia",
@@ -567,6 +781,14 @@ const MATERIAS = [
  </table>
  <h4>Corrente Russa</h4>
  <p>Corrente alternada de média frequência, portadora clássica de <strong>2500 Hz</strong>, liberada em bursts. Para fortalecimento muscular, a modulação (burst) fica entre <strong>50-80 Hz</strong>, gerando contração tetânica eficiente.</p>
+ <h4>Ultrassom terapêutico</h4>
+ <table class="materia-table">
+  <tr><th>Frequência</th><th>Penetração</th><th>Indicação</th></tr>
+  <tr><td>1 MHz</td><td>Maior (3-5 cm)</td><td>Tecidos profundos</td></tr>
+  <tr><td>3 MHz</td><td>Menor (1-2 cm)</td><td>Tecidos superficiais</td></tr>
+ </table>
+ <h4>Laser de baixa potência (fotobiomodulação)</h4>
+ <p>Efeito atérmico (não térmico): estimula a atividade mitocondrial e a produção de ATP celular, favorecendo reparo tecidual e modulação da inflamação.</p>
  <h4>Contraindicações gerais à eletroterapia</h4>
  <ul>
    <li>Marcapasso cardíaco ou dispositivos eletrônicos implantados na área.</li>
@@ -574,11 +796,11 @@ const MATERIAS = [
    <li>Gestação (região abdominal/lombar).</li>
    <li>Tromboflebite, feridas abertas extensas ou alteração de sensibilidade na área.</li>
  </ul>
- <div class="dica"><strong>Dica de prova ABCP:</strong> encurtamento muscular isolado, sem alteração de sensibilidade ou pele, NÃO é contraindicação — cuidado com alternativas "pegadinha" desse tipo.</div>
+ <div class="dica"><strong>Dica de prova:</strong> encurtamento muscular isolado, sem alteração de sensibilidade ou pele, NÃO é contraindicação — cuidado com alternativas "pegadinha" desse tipo.</div>
 `},
 
 {id:"respiratoria", grupo:"Fisioterapia Específica", icone:"🫁", titulo:"Fisioterapia Respiratória",
- lead:"Volumes e capacidades pulmonares aparecem quase sempre em forma de soma — grave as fórmulas, não decore números fixos.",
+ lead:"Volumes e capacidades pulmonares aparecem quase sempre em forma de soma — grave as fórmulas, não decore números fixos. Ausculta e escalas de esforço também são recorrentes.",
  html:`
  <h4>Volumes e capacidades pulmonares</h4>
  <table class="materia-table">
@@ -592,13 +814,22 @@ const MATERIAS = [
   <tr><td>CRF = VRE + VR</td><td>Capacidade Residual Funcional</td></tr>
   <tr><td>CPT = CV + VR</td><td>Capacidade Pulmonar Total</td></tr>
  </table>
+ <h4>Ausculta pulmonar — ruídos adventícios</h4>
+ <table class="materia-table">
+  <tr><th>Ruído</th><th>Tipo</th><th>Sugestivo de</th></tr>
+  <tr><td>Estertores crepitantes</td><td>Descontínuo, tipo "velcro", inspiratório</td><td>Fibrose pulmonar, edema agudo de pulmão</td></tr>
+  <tr><td>Sibilos</td><td>Contínuo, agudo</td><td>Broncoespasmo (asma, DPOC)</td></tr>
+  <tr><td>Roncos</td><td>Contínuo, grave</td><td>Secreção em vias aéreas de maior calibre</td></tr>
+ </table>
+ <h4>Escala de Borg Modificada (CR-10)</h4>
+ <p>Vai de 0 (nenhum esforço) a 10 (esforço máximo) e é usada para dosar a intensidade percebida do exercício ou da dispneia em reabilitação pulmonar/cardíaca.</p>
  <h4>PEEP (Pressão Positiva ao Final da Expiração)</h4>
  <p>Mantém pressão positiva residual nas vias aéreas ao final da expiração, evitando o colabamento alveolar e recrutando unidades previamente colapsadas — melhora a relação ventilação/perfusão. Muito usada em SDRA e pós-operatório de grandes cirurgias.</p>
- <div class="dica"><strong>Dica de prova ABCP:</strong> a CRF é a mais cobrada — lembre-se: é o que "sobra" no pulmão depois de uma expiração normal (não forçada).</div>
+ <div class="dica"><strong>Dica de prova:</strong> a CRF é a mais cobrada — lembre-se: é o que "sobra" no pulmão depois de uma expiração normal (não forçada).</div>
 `},
 
 {id:"cardiovascular", grupo:"Fisioterapia Específica", icone:"❤️", titulo:"Fisioterapia Cardiovascular",
- lead:"Reabilitação cardíaca em fases e o cálculo do Duplo Produto são os pontos mais recorrentes.",
+ lead:"Reabilitação cardíaca em fases, o cálculo do Duplo Produto e a Classificação da NYHA são os pontos mais recorrentes.",
  html:`
  <h4>Fases da reabilitação cardíaca</h4>
  <table class="materia-table">
@@ -609,16 +840,26 @@ const MATERIAS = [
  </table>
  <h4>Duplo Produto (DP)</h4>
  <p><strong>DP = Frequência Cardíaca × Pressão Arterial Sistólica.</strong> É o melhor preditor indireto do trabalho cardíaco e do consumo de oxigênio pelo miocárdio (MVO2) durante o esforço físico.</p>
- <div class="dica"><strong>Dica de prova ABCP:</strong> não confunda o Duplo Produto com a Pressão de Pulso (PAS − PAD) — são conceitos diferentes e a banca gosta de misturar as fórmulas nas alternativas.</div>
+ <h4>Frequência Cardíaca Máxima Teórica</h4>
+ <p><strong>FC máx. = 220 − idade</strong> (fórmula de Fox), base para prescrever a intensidade de exercício em % da FC máxima ou pela fórmula de Karvonen (FC de reserva).</p>
+ <h4>Classificação Funcional NYHA (Insuficiência Cardíaca)</h4>
+ <table class="materia-table">
+  <tr><th>Classe</th><th>Limitação</th></tr>
+  <tr><td>I</td><td>Nenhuma: atividade habitual não causa sintomas</td></tr>
+  <tr><td>II</td><td>Leve: confortável em repouso, sintomas na atividade habitual</td></tr>
+  <tr><td>III</td><td>Acentuada: sintomas em atividades menores que as habituais</td></tr>
+  <tr><td>IV</td><td>Sintomas presentes mesmo em repouso</td></tr>
+ </table>
+ <div class="dica"><strong>Dica de prova:</strong> não confunda o Duplo Produto com a Pressão de Pulso (PAS − PAD) — são conceitos diferentes e a banca gosta de misturar as fórmulas nas alternativas.</div>
 `},
 
 {id:"saude-publica", grupo:"Fisioterapia Específica", icone:"🏥", titulo:"Saúde Pública e Legislação do SUS",
- lead:"Decore a diferença entre princípios doutrinários e diretrizes organizativas do SUS, e o papel de cada instância de participação social.",
+ lead:"Decore a diferença entre princípios doutrinários e diretrizes organizativas do SUS, o papel de cada instância de participação social e a lógica das Redes de Atenção à Saúde.",
  html:`
  <h4>Lei nº 8.080/1990</h4>
  <table class="materia-table">
   <tr><th>Princípios doutrinários</th><th>Diretrizes organizativas</th></tr>
-  <tr><td>Universalidade</td><td>Descentralização político-administrativa</td></tr>
+  <tr><td>Universalidade</td><td>Descentralização político-administrativa (municipalização)</td></tr>
   <tr><td>Equidade</td><td>Regionalização e Hierarquização da rede</td></tr>
   <tr><td>Integralidade</td><td>Participação da Comunidade</td></tr>
  </table>
@@ -628,11 +869,13 @@ const MATERIAS = [
   <tr><td>Conferência de Saúde</td><td>Periódica (a cada 4 anos, em regra)</td><td>Avaliar a situação de saúde e propor diretrizes</td></tr>
   <tr><td>Conselho de Saúde</td><td>Permanente e deliberativo</td><td>Formular estratégias e controlar a execução da política de saúde, com composição paritária de usuários</td></tr>
  </table>
- <div class="dica"><strong>Dica de prova ABCP:</strong> a banca cobra a literalidade da lei — releia os artigos originais das leis 8.080/90 e 8.142/90, não apenas resumos.</div>
+ <h4>Redes de Atenção à Saúde (RAS)</h4>
+ <p>A Atenção Primária/Básica funciona como <strong>porta de entrada preferencial</strong> e <strong>coordenadora do cuidado</strong>, organizando o fluxo do paciente entre os diferentes pontos de atenção (unidades básicas, ambulatórios especializados, hospitais).</p>
+ <div class="dica"><strong>Dica de prova:</strong> a banca cobra a literalidade da lei — releia os artigos originais das leis 8.080/90 e 8.142/90, não apenas resumos.</div>
 `},
 
 {id:"etica", grupo:"Fisioterapia Específica", icone:"⚖️", titulo:"Ética e Legislação Profissional (COFFITO)",
- lead:"A Resolução COFFITO nº 424/2013 é a espinha dorsal das questões de ética — foco em autonomia profissional e uso de imagem de pacientes.",
+ lead:"A Resolução COFFITO nº 424/2013 é a espinha dorsal das questões de ética — foco em autonomia profissional, sigilo e uso de imagem de pacientes.",
  html:`
  <h4>Autonomia do fisioterapeuta</h4>
  <ul>
@@ -641,23 +884,26 @@ const MATERIAS = [
    <li>Solicitar exames complementares para fundamentar sua conduta.</li>
    <li>Dar alta fisioterapêutica ao paciente.</li>
  </ul>
+ <h4>Sigilo profissional</h4>
+ <p>As informações do prontuário são protegidas por sigilo profissional. A quebra só é admitida por justa causa, dever legal ou autorização expressa do paciente.</p>
  <h4>Vedações éticas</h4>
  <ul>
    <li>Divulgar imagens/vídeos de pacientes em redes sociais com finalidade de autopromoção ou mercantilização da profissão, mesmo com autorização genérica.</li>
    <li>Deixar de registrar em prontuário as condutas e evoluções clínicas realizadas.</li>
    <li>Assumir condutas fora de sua área de competência sem qualificação comprovada.</li>
  </ul>
- <p>A divulgação de imagens com fins estritamente acadêmicos/científicos é permitida, desde que haja autorização expressa (TCLE) e não exponha/identifique o paciente de forma indevida.</p>
- <div class="dica"><strong>Dica de prova ABCP:</strong> quase toda questão de ética tem uma alternativa sobre "autonomia" (correta) e outra sobre "uso de imagem para autopromoção" (incorreta/vedada) — são os dois polos mais cobrados.</div>
+ <div class="dica"><strong>Dica de prova:</strong> quase toda questão de ética tem uma alternativa sobre "autonomia" (correta) e outra sobre "uso de imagem para autopromoção" (incorreta/vedada) — são os dois polos mais cobrados.</div>
 `},
 
 {id:"portugues", grupo:"Conhecimentos Gerais", icone:"📘", titulo:"Língua Portuguesa",
- lead:"Concordância, crase e regência são os três pilares mais cobrados em provas objetivas de nível médio/superior.",
+ lead:"É a matéria de MAIOR peso nas provas recentes (interpretação de texto sozinha já responde por cerca de 1/4 da prova). Concordância, crase e regência completam o essencial.",
  html:`
+ <h4>Interpretação de texto — o maior peso da prova</h4>
+ <p>Leia o enunciado com calma, identifique a ideia central de cada parágrafo e desconfie de alternativas com termos absolutos ("sempre", "nunca", "exclusivamente") — costumam estar erradas por excesso de generalização.</p>
  <h4>Concordância verbal</h4>
  <p>Os verbos <strong>haver</strong> (no sentido de existir) e <strong>fazer</strong> (indicando tempo decorrido) são impessoais e permanecem na 3ª pessoa do singular: "Havia muitos pacientes", "Faz dois anos".</p>
  <h4>Crase</h4>
- <p>Ocorre na fusão da preposição "a" com o artigo feminino "a(s)". Não ocorre crase antes de pronomes pessoais, antes de palavra masculina, nem antes de verbo.</p>
+ <p>Ocorre na fusão da preposição "a" com o artigo feminino "a(s)". Não ocorre crase antes de pronomes pessoais, antes de palavra masculina, antes de verbo, nem antes de pronome indefinido como "qualquer".</p>
  <h4>Regência verbal — casos clássicos</h4>
  <table class="materia-table">
   <tr><th>Verbo</th><th>Regência correta</th></tr>
@@ -666,28 +912,29 @@ const MATERIAS = [
   <tr><td>Preferir</td><td>preferir uma coisa <strong>a</strong> outra (sem "do que")</td></tr>
   <tr><td>Obedecer</td><td>obedecer <strong>às</strong> normas</td></tr>
  </table>
- <div class="dica"><strong>Dica de prova ABCP:</strong> revise regência de 8 a 10 verbos clássicos de concurso (assistir, aspirar, preferir, obedecer, visar, implicar) — costumam se repetir de prova em prova.</div>
+ <div class="dica"><strong>Dica de prova:</strong> revise regência de 8 a 10 verbos clássicos de concurso (assistir, aspirar, preferir, obedecer, visar, implicar) — costumam se repetir de prova em prova. Como Português costuma valer quase metade da nota, priorize esta matéria.</div>
 `},
 
 {id:"raciocinio", grupo:"Conhecimentos Gerais", icone:"🧮", titulo:"Raciocínio Lógico-Matemático",
- lead:"Sequências numéricas, porcentagem e lógica proposicional básica são os temas mais recorrentes nesse bloco.",
+ lead:"Sequências numéricas, progressões, porcentagem e lógica proposicional básica são os temas mais recorrentes nesse bloco.",
  html:`
- <h4>Sequências numéricas</h4>
- <p>Procure primeiro a diferença entre termos consecutivos; se não for constante, teste razão (multiplicação) ou fórmula recursiva (ex.: an+1 = 2·an + 1).</p>
+ <h4>Sequências numéricas e progressões</h4>
+ <p>Procure primeiro a diferença entre termos consecutivos; se não for constante, teste razão (multiplicação), fórmula recursiva, ou reconheça uma Progressão Aritmética: <strong>an = a1 + (n-1)·r</strong>.</p>
  <h4>Porcentagem</h4>
  <p>Transforme a porcentagem em fração decimal e multiplique pelo total. Ex.: 40% de 150 = 0,4 × 150 = 60. O complementar (100% − 40% = 60%) dá a outra parte.</p>
- <h4>Negação de proposições</h4>
+ <h4>Negação de proposições e conectivos</h4>
  <table class="materia-table">
   <tr><th>Proposição</th><th>Negação lógica</th></tr>
   <tr><td>Todo A é B</td><td>Existe (pelo menos um) A que não é B</td></tr>
   <tr><td>Algum A é B</td><td>Nenhum A é B</td></tr>
   <tr><td>Nenhum A é B</td><td>Algum A é B</td></tr>
  </table>
- <div class="dica"><strong>Dica de prova ABCP:</strong> a negação de "Todo A é B" nunca é "Nenhum A é B" — essa é a pegadinha número um de lógica proposicional em concursos.</div>
+ <p><strong>Conjunção (E):</strong> só é verdadeira se ambas as partes forem verdadeiras. <strong>Disjunção (OU):</strong> é verdadeira se pelo menos uma das partes for verdadeira.</p>
+ <div class="dica"><strong>Dica de prova:</strong> a negação de "Todo A é B" nunca é "Nenhum A é B" — essa é a pegadinha número um de lógica proposicional em concursos.</div>
 `},
 
 {id:"informatica", grupo:"Conhecimentos Gerais", icone:"💻", titulo:"Informática Básica",
- lead:"Atalhos de teclado e conceitos de armazenamento/backup são os temas mais objetivos e fáceis de garantir pontos.",
+ lead:"Atalhos de teclado (Windows e navegador) e conceitos de armazenamento/backup são os temas mais objetivos e fáceis de garantir pontos.",
  html:`
  <h4>Atalhos de teclado (Windows)</h4>
  <table class="materia-table">
@@ -696,7 +943,14 @@ const MATERIAS = [
   <tr><td>Ctrl + Y</td><td>Refazer</td></tr>
   <tr><td>Ctrl + C / Ctrl + V</td><td>Copiar / Colar</td></tr>
   <tr><td>Ctrl + X</td><td>Recortar</td></tr>
-  <tr><td>Ctrl + P</td><td>Imprimir</td></tr>
+ </table>
+ <h4>Atalhos em navegadores</h4>
+ <table class="materia-table">
+  <tr><th>Atalho</th><th>Ação</th></tr>
+  <tr><td>Ctrl + P</td><td>Imprimir a página atual</td></tr>
+  <tr><td>Ctrl + T</td><td>Abrir nova aba</td></tr>
+  <tr><td>Ctrl + F</td><td>Localizar/pesquisar na página</td></tr>
+  <tr><td>Ctrl + W</td><td>Fechar aba atual</td></tr>
  </table>
  <h4>Armazenamento de dados</h4>
  <ul>
@@ -704,78 +958,156 @@ const MATERIAS = [
    <li><strong>Cache local:</strong> armazenamento temporário no próprio dispositivo, para acelerar acessos futuros.</li>
    <li><strong>RAM:</strong> memória volátil, perdida ao desligar o equipamento.</li>
  </ul>
- <h4>Tipos de backup</h4>
- <p><strong>Completo:</strong> copia todos os dados. <strong>Incremental:</strong> copia apenas o que mudou desde o último backup (mais rápido). <strong>Diferencial:</strong> copia tudo que mudou desde o último backup completo.</p>
- <div class="dica"><strong>Dica de prova ABCP:</strong> não confunda "nuvem" com "cache" — a nuvem é remota e acessível de qualquer lugar; o cache é local e temporário.</div>
+ <div class="dica"><strong>Dica de prova:</strong> não confunda "nuvem" com "cache" — a nuvem é remota e acessível de qualquer lugar; o cache é local e temporário.</div>
 `},
 ];
 
+/* =========================================================
+   RENDER: SIMULADOS
+   ========================================================= */
+const simPills = document.getElementById('sim-pills');
+const simContainer = document.getElementById('simulados-container');
 const TOPICO_QUESTOES = {};
 MATERIAS.forEach(m => TOPICO_QUESTOES[m.id] = []);
-
-// ---------- Render Simulado ----------
-const questionsCol = document.getElementById('questions-col');
-const gabaritoBlocos = document.getElementById('gabarito-blocos');
-let totalQ = 0;
-BLOCOS.forEach(b => totalQ += b.questoes.length);
-
 const state = {};
-let globalIndex = 0;
 
-BLOCOS.forEach((bloco, bIdx) => {
-  const blockHeader = document.createElement('div');
-  blockHeader.className = 'block-header';
-  blockHeader.innerHTML = '<span class="block-tag">' + bloco.codigo + '</span><h2>' + bloco.titulo + '</h2>';
-  questionsCol.appendChild(blockHeader);
+SIMULADOS.forEach(function(sim, sIdx){
+  // pill
+  const pill = document.createElement('button');
+  pill.className = 'sim-pill' + (sIdx === 0 ? ' active' : '');
+  pill.id = 'pill-' + sim.id;
+  pill.innerHTML = sim.nome + '<small>' + sim.sub + '</small>';
+  pill.onclick = function(){ mudarSimulado(sim.id); };
+  simPills.appendChild(pill);
 
-  const bolhasWrap = document.createElement('div');
-  bolhasWrap.className = 'bolhas-bloco';
-  bolhasWrap.innerHTML = '<div class="bolhas-bloco-label">' + bloco.codigo + '</div><div class="bolhas" id="bolhas-' + bIdx + '"></div>';
-  gabaritoBlocos.appendChild(bolhasWrap);
-  const bolhasContainer = bolhasWrap.querySelector('.bolhas');
+  // section
+  const section = document.createElement('div');
+  section.className = 'sim-section' + (sIdx === 0 ? ' active' : '');
+  section.id = 'simsec-' + sim.id;
 
-  bloco.questoes.forEach((q, qIdx) => {
-    globalIndex++;
-    const qid = 'q' + bIdx + '_' + qIdx;
-    state[qid] = {chosen:null, correct:null, bloco:bIdx};
-    if (TOPICO_QUESTOES[q.topico]) TOPICO_QUESTOES[q.topico].push({qid:qid, num:globalIndex});
+  let totalQ = 0;
+  sim.blocos.forEach(b => totalQ += b.questoes.length);
 
-    const card = document.createElement('div');
-    card.className = 'q-card';
-    card.id = qid;
+  section.innerHTML =
+    '<div class="dashboard">' +
+      '<div class="dash-item"><div class="dash-num" id="dash-resp-'+sim.id+'">0/'+totalQ+'</div><div class="dash-label">Respondidas</div></div>' +
+      '<div class="dash-item"><div class="dash-num" id="dash-acertos-'+sim.id+'">0</div><div class="dash-label">Acertos</div></div>' +
+      '<div class="dash-item"><div class="dash-num" id="dash-nota-'+sim.id+'">--</div><div class="dash-label">Nota parcial</div></div>' +
+      '<div class="progress-track"><div class="progress-bar"><div class="progress-fill" id="progress-'+sim.id+'"></div></div></div>' +
+    '</div>' +
+    '<div class="grid">' +
+      '<div id="qcol-'+sim.id+'"></div>' +
+      '<aside class="gabarito-panel">' +
+        '<h3>Cartão-Resposta</h3>' +
+        '<div class="gabarito-sub">clique numa bolha para ir à questão</div>' +
+        '<div id="bolhas-container-'+sim.id+'"></div>' +
+        '<div class="legenda"><span><i class="dot gray"></i>não respondida</span><span><i class="dot green"></i>correta</span><span><i class="dot red"></i>incorreta</span></div>' +
+        '<button class="btn-finalizar" onclick="finalizar(\''+sim.id+'\')">Finalizar e ver nota</button>' +
+      '</aside>' +
+    '</div>' +
+    '<div class="resultado" id="resultado-'+sim.id+'">' +
+      '<div class="carimbo" id="carimbo-'+sim.id+'">APROVADO</div>' +
+      '<h2>Resultado — '+sim.nome+'</h2>' +
+      '<div class="nota-grande" id="nota-final-'+sim.id+'">0.0</div>' +
+      '<div class="res-grid">' +
+        '<div class="res-block"><div class="lab">Bloco I — Fisioterapia</div><div class="val" id="res-b0-'+sim.id+'">0</div></div>' +
+        '<div class="res-block"><div class="lab">Bloco II — Gerais</div><div class="val" id="res-b1-'+sim.id+'">0</div></div>' +
+        '<div class="res-block"><div class="lab">Aproveitamento geral</div><div class="val" id="res-total-'+sim.id+'">0%</div></div>' +
+      '</div>' +
+    '</div>';
 
-    let altsHtml = '';
-    Object.entries(q.alts).forEach(function(entry){
-      const k = entry[0], v = entry[1];
-      altsHtml += '<button class="alt-btn" data-key="' + k + '" onclick="responder(\'' + qid + '\',\'' + k + '\')"><span class="alt-key">' + k + '</span><span>' + v + '</span></button>';
+  simContainer.appendChild(section);
+
+  const qcol = section.querySelector('#qcol-'+sim.id);
+  const bolhasContainer = section.querySelector('#bolhas-container-'+sim.id);
+
+  let globalIndex = 0;
+  sim.blocos.forEach(function(bloco, bIdx){
+    const blockHeader = document.createElement('div');
+    blockHeader.className = 'block-header';
+    blockHeader.innerHTML = '<span class="block-tag">' + bloco.codigo + '</span><h2>' + bloco.titulo + '</h2>';
+    qcol.appendChild(blockHeader);
+
+    const bolhasWrap = document.createElement('div');
+    bolhasWrap.className = 'bolhas-bloco';
+    bolhasWrap.innerHTML = '<div class="bolhas-bloco-label">' + bloco.codigo + '</div><div class="bolhas" id="bolhas-'+sim.id+'-'+bIdx+'"></div>';
+    bolhasContainer.appendChild(bolhasWrap);
+    const bolhasEl = bolhasWrap.querySelector('.bolhas');
+
+    bloco.questoes.forEach(function(q, qIdx){
+      globalIndex++;
+      const qid = sim.id + '_b' + bIdx + '_q' + qIdx;
+      state[qid] = {chosen:null, correct:null, bloco:bIdx, sim:sim.id};
+      if (TOPICO_QUESTOES[q.topico]) TOPICO_QUESTOES[q.topico].push({qid:qid, num:globalIndex, simNome:sim.nome});
+
+      const card = document.createElement('div');
+      card.className = 'q-card';
+      card.id = qid;
+
+      let altsHtml = '';
+      Object.entries(q.alts).forEach(function(entry){
+        const k = entry[0], v = entry[1];
+        altsHtml += '<button class="alt-btn" data-key="' + k + '" onclick="responder(\''+qid+'\',\''+k+'\')"><span class="alt-key">' + k + '</span><span>' + v + '</span></button>';
+      });
+
+      card.innerHTML =
+        '<div class="q-meta"><span class="q-num">'+sim.nome.replace('Simulado ','S')+' · Q' + String(globalIndex).padStart(2,'0') + '</span>' +
+        '<span class="q-tag" onclick="irParaMateria(\''+q.topico+'\')">' + q.tag + '</span></div>' +
+        '<div class="q-enun">' + q.enun + '</div>' +
+        '<div class="alts">' + altsHtml + '</div>' +
+        '<div class="feedback" id="fb-' + qid + '">' +
+          '<div class="feedback-title-row"><div class="feedback-title" id="fbtitle-' + qid + '"></div></div>' +
+          '<div class="resumo">' + q.resumo + '</div>' +
+          '<div class="q-actions">' +
+            '<button class="ver-materia" onclick="irParaMateria(\''+q.topico+'\')">📚 Ver matéria completa sobre este assunto →</button>' +
+            '<button class="btn-narrar" data-label="🔊 Ouvir explicação" onclick="narrarQuestao(\''+qid+'\', this)">🔊 Ouvir explicação</button>' +
+          '</div>' +
+        '</div>';
+      qcol.appendChild(card);
+
+      const bolha = document.createElement('div');
+      bolha.className = 'bolha';
+      bolha.id = 'bolha-' + qid;
+      bolha.textContent = globalIndex;
+      bolha.onclick = function(){ document.getElementById(qid).scrollIntoView({behavior:'smooth', block:'center'}); };
+      bolhasEl.appendChild(bolha);
     });
-
-    card.innerHTML =
-      '<div class="q-meta"><span class="q-num">Q' + String(globalIndex).padStart(2,'0') + '</span>' +
-      '<span class="q-tag" onclick="irParaMateria(\'' + q.topico + '\',null)">' + q.tag + '</span></div>' +
-      '<div class="q-enun">' + q.enun + '</div>' +
-      '<div class="alts">' + altsHtml + '</div>' +
-      '<div class="feedback" id="fb-' + qid + '">' +
-        '<div class="feedback-title" id="fbtitle-' + qid + '"></div>' +
-        '<div class="resumo">' + q.resumo + '</div>' +
-        '<button class="ver-materia" onclick="irParaMateria(\'' + q.topico + '\',null)">📚 Ver matéria completa sobre este assunto →</button>' +
-      '</div>';
-    questionsCol.appendChild(card);
-
-    const bolha = document.createElement('div');
-    bolha.className = 'bolha';
-    bolha.id = 'bolha-' + qid;
-    bolha.textContent = globalIndex;
-    bolha.onclick = function(){ document.getElementById(qid).scrollIntoView({behavior:'smooth', block:'center'}); };
-    bolhasContainer.appendChild(bolha);
   });
 });
 
+function mudarSimulado(simId){
+  document.querySelectorAll('.sim-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('pill-'+simId).classList.add('active');
+  document.querySelectorAll('.sim-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('simsec-'+simId).classList.add('active');
+  pararNarracao();
+}
+
+function narrarQuestao(qid, btn){
+  const parts = qid.split('_');
+  const simId = parts[0];
+  const bIdx = Number(parts[1].replace('b',''));
+  const qIdx = Number(parts[2].replace('q',''));
+  const sim = SIMULADOS.find(s => s.id === simId);
+  const q = sim.blocos[bIdx].questoes[qIdx];
+  const st = state[qid];
+  let texto;
+  if (st.chosen) {
+    texto = (st.correct ? 'Você acertou. ' : 'Você errou. ') + 'A resposta correta é a alternativa ' + q.correta + ': ' + q.alts[q.correta] + '. Por quê: ' + textoLimpo(q.resumo);
+  } else {
+    texto = 'A resposta correta é a alternativa ' + q.correta + ': ' + q.alts[q.correta] + '. Por quê: ' + textoLimpo(q.resumo);
+  }
+  narrar(texto, btn);
+}
+
 function responder(qid, chosenKey) {
   if (state[qid].chosen) return;
-  const parts = qid.replace('q','').split('_');
-  const bIdx = Number(parts[0]), qIdx = Number(parts[1]);
-  const q = BLOCOS[bIdx].questoes[qIdx];
+  const parts = qid.split('_');
+  const simId = parts[0];
+  const bIdx = Number(parts[1].replace('b',''));
+  const qIdx = Number(parts[2].replace('q',''));
+  const sim = SIMULADOS.find(s => s.id === simId);
+  const q = sim.blocos[bIdx].questoes[qIdx];
   const correta = q.correta;
   const isCorrect = chosenKey === correta;
 
@@ -798,45 +1130,57 @@ function responder(qid, chosenKey) {
   const bolha = document.getElementById('bolha-' + qid);
   bolha.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
 
-  atualizarDashboard();
+  // narra automaticamente a explicação assim que a questão é respondida
+  const narrarBtn = fb.querySelector('.btn-narrar');
+  narrarQuestao(qid, narrarBtn);
+
+  atualizarDashboard(simId);
 }
 
-function atualizarDashboard() {
-  const respondidas = Object.values(state).filter(function(s){ return s.chosen !== null; });
-  const acertos = respondidas.filter(function(s){ return s.correct; }).length;
-  document.getElementById('dash-respondidas').textContent = respondidas.length + '/' + totalQ;
-  document.getElementById('dash-acertos').textContent = acertos;
-  document.getElementById('dash-nota').textContent = respondidas.length ? ((acertos/totalQ)*10).toFixed(1) : '--';
-  document.getElementById('progress-fill').style.width = (respondidas.length/totalQ)*100 + '%';
+function atualizarDashboard(simId) {
+  const respondidas = Object.entries(state).filter(([k,s]) => s.sim === simId && s.chosen !== null);
+  const acertos = respondidas.filter(([k,s]) => s.correct).length;
+  const sim = SIMULADOS.find(s => s.id === simId);
+  let totalQ = 0; sim.blocos.forEach(b => totalQ += b.questoes.length);
+  document.getElementById('dash-resp-'+simId).textContent = respondidas.length + '/' + totalQ;
+  document.getElementById('dash-acertos-'+simId).textContent = acertos;
+  document.getElementById('dash-nota-'+simId).textContent = respondidas.length ? ((acertos/totalQ)*10).toFixed(1) : '--';
+  document.getElementById('progress-'+simId).style.width = (respondidas.length/totalQ)*100 + '%';
 }
 
-function finalizar() {
-  const respondidas = Object.values(state).filter(function(s){ return s.chosen !== null; });
+function finalizar(simId) {
+  const sim = SIMULADOS.find(s => s.id === simId);
+  let totalQ = 0; sim.blocos.forEach(b => totalQ += b.questoes.length);
+  const respondidas = Object.entries(state).filter(([k,s]) => s.sim === simId && s.chosen !== null);
   if (respondidas.length < totalQ) {
     const faltam = totalQ - respondidas.length;
-    if (!confirm('Você ainda não respondeu ' + faltam + ' questão(ões). Deseja finalizar mesmo assim?')) return;
+    if (!confirm('Você ainda não respondeu ' + faltam + ' questão(ões) deste simulado. Deseja finalizar mesmo assim?')) return;
   }
 
-  const acertosFisio = Object.values(state).filter(function(s){ return s.bloco === 0 && s.correct; }).length;
-  const acertosCG = Object.values(state).filter(function(s){ return s.bloco === 1 && s.correct; }).length;
-  const totalAcertos = acertosFisio + acertosCG;
+  const acertosB0 = Object.entries(state).filter(([k,s]) => s.sim === simId && s.bloco === 0 && s.correct).length;
+  const acertosB1 = Object.entries(state).filter(([k,s]) => s.sim === simId && s.bloco === 1 && s.correct).length;
+  const totalAcertos = acertosB0 + acertosB1;
   const nota = (totalAcertos/totalQ)*10;
+  const totalB0 = sim.blocos[0].questoes.length;
+  const totalB1 = sim.blocos[1].questoes.length;
 
-  document.getElementById('nota-final-grande').textContent = nota.toFixed(1);
-  document.getElementById('res-fisio').textContent = acertosFisio + '/20';
-  document.getElementById('res-cg').textContent = acertosCG + '/10';
-  document.getElementById('res-total').textContent = ((totalAcertos/totalQ)*100).toFixed(0) + '%';
+  document.getElementById('nota-final-'+simId).textContent = nota.toFixed(1);
+  document.getElementById('res-b0-'+simId).textContent = acertosB0 + '/' + totalB0;
+  document.getElementById('res-b1-'+simId).textContent = acertosB1 + '/' + totalB1;
+  document.getElementById('res-total-'+simId).textContent = ((totalAcertos/totalQ)*100).toFixed(0) + '%';
 
-  const carimbo = document.getElementById('carimbo');
+  const carimbo = document.getElementById('carimbo-'+simId);
   if (nota >= 7) { carimbo.textContent = 'APROVADO'; carimbo.classList.remove('reprovado'); }
   else { carimbo.textContent = 'REVISAR'; carimbo.classList.add('reprovado'); }
 
-  const painel = document.getElementById('resultado');
+  const painel = document.getElementById('resultado-'+simId);
   painel.classList.add('show');
   painel.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-// ---------- Render Matéria ----------
+/* =========================================================
+   RENDER: MATÉRIA
+   ========================================================= */
 const materiaMenu = document.getElementById('materia-menu');
 const materiaContent = document.getElementById('materia-content');
 const grupos = {};
@@ -850,7 +1194,7 @@ Object.keys(grupos).forEach(function(g){
   groupWrap.className = 'materia-menu-group';
   let linksHtml = '<div class="materia-menu-group-label">' + g + '</div>';
   grupos[g].forEach(function(m){
-    linksHtml += '<button class="materia-link" id="menu-' + m.id + '" onclick="irParaMateria(\'' + m.id + '\',this)"><span class="ico">' + m.icone + '</span>' + m.titulo + '</button>';
+    linksHtml += '<button class="materia-link" id="menu-' + m.id + '" onclick="irParaMateria(\'' + m.id + '\')"><span class="ico">' + m.icone + '</span>' + m.titulo + '</button>';
   });
   groupWrap.innerHTML = linksHtml;
   materiaMenu.appendChild(groupWrap);
@@ -862,28 +1206,40 @@ MATERIAS.forEach(function(m){
   const relacionadas = TOPICO_QUESTOES[m.id] || [];
   let chipsHtml = '';
   if (relacionadas.length) {
-    chipsHtml = '<div class="chips-relacionadas"><div class="lab">Questões relacionadas no simulado</div><div class="chips">';
+    chipsHtml = '<div class="chips-relacionadas"><div class="lab">Questões relacionadas nos simulados</div><div class="chips">';
     relacionadas.forEach(function(r){
-      chipsHtml += '<button class="chip" onclick="irParaQuestao(\'' + r.qid + '\')">Q' + String(r.num).padStart(2,'0') + '</button>';
+      chipsHtml += '<button class="chip" onclick="irParaQuestao(\'' + r.qid + '\')">' + r.simNome.replace('Simulado ','S') + ' · Q' + String(r.num).padStart(2,'0') + '</button>';
     });
     chipsHtml += '</div></div>';
   }
   article.innerHTML =
-    '<div class="materia-eyebrow">' + m.grupo + '</div>' +
+    '<div class="materia-eyebrow-row">' +
+      '<div class="materia-eyebrow">' + m.grupo + '</div>' +
+      '<button class="btn-narrar" data-label="🔊 Ouvir resumo da matéria" onclick="narrarMateria(\''+m.id+'\', this)">🔊 Ouvir resumo da matéria</button>' +
+    '</div>' +
     '<h3>' + m.icone + ' ' + m.titulo + '</h3>' +
     '<p class="materia-lead">' + m.lead + '</p>' +
     m.html + chipsHtml;
   materiaContent.appendChild(article);
 });
 
+function narrarMateria(materiaId, btn){
+  const m = MATERIAS.find(x => x.id === materiaId);
+  const texto = m.titulo + '. ' + m.lead + ' ' + textoLimpo(m.html);
+  narrar(texto, btn);
+}
+
 function mudarView(view) {
   document.getElementById('view-simulado').classList.toggle('active', view === 'simulado');
   document.getElementById('view-materia').classList.toggle('active', view === 'materia');
+  document.getElementById('view-plano').classList.toggle('active', view === 'plano');
   document.getElementById('tab-simulado').classList.toggle('active', view === 'simulado');
   document.getElementById('tab-materia').classList.toggle('active', view === 'materia');
+  document.getElementById('tab-plano').classList.toggle('active', view === 'plano');
+  pararNarracao();
 }
 
-function irParaMateria(topicoId, btn) {
+function irParaMateria(topicoId) {
   mudarView('materia');
   document.querySelectorAll('.materia-link').forEach(function(l){ l.classList.remove('active'); });
   const menuLink = document.getElementById('menu-' + topicoId);
@@ -900,13 +1256,15 @@ function irParaMateria(topicoId, btn) {
 
 function irParaQuestao(qid) {
   mudarView('simulado');
+  const simId = qid.split('_')[0];
+  mudarSimulado(simId);
   const card = document.getElementById(qid);
   if (card) {
     setTimeout(function(){
       card.scrollIntoView({behavior:'smooth', block:'center'});
       card.classList.add('flash');
       setTimeout(function(){ card.classList.remove('flash'); }, 1600);
-    }, 60);
+    }, 80);
   }
 }
 
@@ -923,6 +1281,68 @@ const observer = new IntersectionObserver(function(entries){
   });
 }, {root:null, rootMargin:'-20% 0px -70% 0px', threshold:0});
 articles.forEach(function(a){ observer.observe(a); });
+
+/* =========================================================
+   RENDER: PLANO DE ESTUDOS
+   ========================================================= */
+const PESOS = [
+  {materia:"Português (interpretação, sintaxe, morfologia)", peso:36},
+  {materia:"Fisioterapia (com destaque para Neurológica)", peso:32},
+  {materia:"Saúde Pública / Legislação do SUS", peso:16},
+  {materia:"Informática Básica", peso:8},
+  {materia:"Ética / COFFITO", peso:5},
+  {materia:"Raciocínio Lógico", peso:3},
+];
+const pesoTableEl = document.getElementById('peso-table');
+let pesoHtml = '<table class="materia-table"><tr><th>Disciplina</th><th>Peso aproximado</th><th></th></tr>';
+PESOS.forEach(function(p){
+  pesoHtml += '<tr><td>'+p.materia+'</td><td>'+p.peso+'%</td><td><div class="peso-bar-track"><div class="peso-bar-fill" style="width:'+p.peso+'%"></div></div></td></tr>';
+});
+pesoHtml += '</table>';
+pesoTableEl.innerHTML = pesoHtml;
+
+const SEMANAS = [
+  {num:"SEMANA 1-2", titulo:"Base de Português + Fisioterapia Ortopédica/Neurológica", itens:[
+    "Revisar regência, crase e concordância (apostila + Simulado 01, questões de Português)",
+    "Estudar testes especiais ortopédicos (tabela completa da apostila)",
+    "Estudar escalas neurológicas: Ashworth, Glasgow, Barthel, Rankin",
+    "Refazer o Bloco I do Simulado 01 até acertar 80%+"
+  ]},
+  {num:"SEMANA 3", titulo:"Interpretação de texto + Eletroterapia/Respiratória", itens:[
+    "Treinar interpretação de textos diariamente (20-30 min)",
+    "Estudar parâmetros de TENS, Corrente Russa, Ultrassom e Laser",
+    "Revisar volumes/capacidades pulmonares e ausculta pulmonar",
+    "Ouvir a narração das explicações das questões de Eletroterapia/Respiratória"
+  ]},
+  {num:"SEMANA 4", titulo:"Cardiovascular + Saúde Pública/SUS", itens:[
+    "Estudar Duplo Produto, FC máxima e Classificação NYHA",
+    "Revisar Leis 8.080/90 e 8.142/90 (princípios x diretrizes)",
+    "Fazer o Simulado 02 completo (proporção real de disciplinas)",
+    "Revisar erros pela apostila, usando a narração por voz"
+  ]},
+  {num:"SEMANA 5", titulo:"Ética/COFFITO + Informática + Raciocínio Lógico", itens:[
+    "Estudar Resolução COFFITO 424/2013 (autonomia e vedações)",
+    "Revisar atalhos de teclado (Windows e navegador)",
+    "Treinar sequências numéricas, PA e negação de proposições",
+    "Refazer as questões erradas dos dois simulados"
+  ]},
+  {num:"SEMANA 6", titulo:"Revisão geral e simulados cronometrados", itens:[
+    "Refazer os dois simulados completos, cronometrados",
+    "Ouvir a narração de todas as questões que ainda geram dúvida",
+    "Revisar o edital oficial e o conteúdo programático do seu concurso",
+    "Descansar bem na véspera da prova"
+  ]},
+];
+const semanasGrid = document.getElementById('semanas-grid');
+SEMANAS.forEach(function(s){
+  const card = document.createElement('div');
+  card.className = 'semana-card';
+  let itensHtml = '<ul>';
+  s.itens.forEach(function(i){ itensHtml += '<li>'+i+'</li>'; });
+  itensHtml += '</ul>';
+  card.innerHTML = '<div class="num">'+s.num+'</div><h4>'+s.titulo+'</h4>'+itensHtml;
+  semanasGrid.appendChild(card);
+});
 </script>
 </body>
 </html>
