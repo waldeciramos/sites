@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barracão do Henrique — Controle de Entradas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --kraft:#EFE6D3;
+  --paper:#FBF7EF;
+  --green:#2F4A3C;
+  --green-dk:#213329;
+  --sage:#DCE6D0;
+  --straw:#C1432B;
+  --straw-dk:#9C331F;
+  --mustard:#D9A441;
+  --ink:#2B2620;
+  --ink-soft:#5B5348;
+  --line:#D8CDB3;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--kraft);color:var(--ink);font-family:'Inter',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;margin:0;letter-spacing:-.01em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+button{font-family:'Inter',sans-serif;cursor:pointer;}
+input,select{font-family:'Inter',sans-serif;}
+
+/* ---- layout ---- */
+#app{display:flex;min-height:100vh;}
+.sidebar{
+  width:230px;flex-shrink:0;background:var(--green);color:#EFE9DC;
+  padding:28px 18px;position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;
+  box-shadow:2px 0 18px rgba(33,51,41,.18);
+}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:34px;}
+.brand-mark{
+  width:38px;height:38px;border-radius:50%;background:var(--straw);
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+  border:2px solid #E9C9A2;flex-shrink:0;
+}
+.brand h1{font-size:18px;color:#fff;line-height:1.15;}
+.brand span{font-size:11px;color:#B9C7B7;letter-spacing:.08em;text-transform:uppercase;}
+nav{display:flex;flex-direction:column;gap:3px;flex:1;}
+nav button{
+  all:unset;cursor:pointer;padding:10px 12px;border-radius:8px;font-size:14px;
+  color:#D9E1D3;display:flex;align-items:center;gap:10px;transition:background .15s;
+}
+nav button:hover{background:rgba(255,255,255,.06);}
+nav button.active{background:var(--straw);color:#fff;font-weight:600;}
+.sidebar-foot{font-size:11px;color:#8FA491;line-height:1.5;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);}
+
+.content-col{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 40px;background:var(--paper);border-bottom:1px solid var(--line);
+  font-size:12.5px;color:var(--ink-soft);
+}
+.topbar-date{font-weight:600;color:var(--ink);text-transform:capitalize;}
+.topbar-status{display:flex;align-items:center;gap:6px;}
+.topbar-status .dot{width:7px;height:7px;border-radius:50%;background:#5C9464;display:inline-block;box-shadow:0 0 0 3px rgba(92,148,100,.18);}
+main{flex:1;padding:34px 40px;max-width:1200px;}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px;flex-wrap:wrap;gap:14px;}
+.page-head h2{font-size:28px;}
+.page-head p{color:var(--ink-soft);font-size:14px;margin-top:4px;}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--straw);font-weight:700;margin-bottom:6px;}
+
+/* ---- cards / grid ---- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px;}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;
+  box-shadow:0 1px 2px rgba(43,38,32,.04), 0 6px 16px -10px rgba(43,38,32,.12);
+  border-left:3px solid var(--line);transition:transform .15s, box-shadow .15s;}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(43,38,32,.05), 0 10px 22px -10px rgba(43,38,32,.18);}
+.card .label{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
+.card .value{font-family:'Fraunces',serif;font-size:30px;font-weight:700;margin-top:4px;}
+.card.straw{border-left-color:var(--straw);}
+.card.straw .value{color:var(--straw);}
+.card.green{border-left-color:var(--green);}
+.card.green .value{color:var(--green);}
+
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:22px;
+  box-shadow:0 1px 2px rgba(43,38,32,.03), 0 8px 22px -14px rgba(43,38,32,.14);}
+.panel h3{font-size:17px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+.grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;}
+@media (max-width:900px){.grid-2{grid-template-columns:1fr;}}
+
+/* ---- forms ---- */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
+.field input, .field select{
+  width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
+  background:#fff;font-size:14px;color:var(--ink);
+}
+.field input:focus, .field select:focus{outline:2px solid var(--mustard);outline-offset:1px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+.btn{
+  border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;
+  display:inline-flex;align-items:center;gap:7px;transition:transform .1s, box-shadow .15s, background .15s;
+}
+.btn-primary{background:var(--straw);color:#fff;box-shadow:0 3px 10px -4px rgba(193,67,43,.6);}
+.btn-primary:hover{background:var(--straw-dk);}
+.btn-outline{background:transparent;border:1px solid var(--line);color:var(--ink);}
+.btn-outline:hover{background:var(--sage);border-color:var(--green);}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 3px 10px -4px rgba(47,74,60,.55);}
+.btn-green:hover{background:var(--green-dk);}
+.btn-sm{padding:6px 12px;font-size:12.5px;}
+.btn[disabled]{opacity:.4;pointer-events:none;}
+.btn:active{transform:translateY(1px);}
+
+/* ---- table ---- */
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);padding:8px 10px;border-bottom:2px solid var(--line);}
+td{padding:10px 10px;border-bottom:1px solid var(--line);}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(217,164,65,.08);}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.tag.pend{background:#F5DCC9;color:var(--straw-dk);}
+.tag.pago{background:var(--sage);color:var(--green-dk);}
+.empty{padding:30px;text-align:center;color:var(--ink-soft);font-size:13.5px;}
+
+/* ---- receipt / comanda ---- */
+.receipt-wrap{display:flex;justify-content:center;padding:10px 0;}
+.receipt{
+  width:340px;background:var(--paper);border:2px solid var(--ink);border-radius:4px;
+  padding:22px 20px 26px;position:relative;
+  background-image:
+    repeating-linear-gradient(to bottom, transparent, transparent 27px, rgba(43,38,32,.05) 27px, rgba(43,38,32,.05) 28px);
+}
+.receipt::before, .receipt::after{
+  content:"";position:absolute;left:0;right:0;height:14px;
+  background-image:radial-gradient(circle, var(--kraft) 5px, transparent 5.5px);
+  background-size:16px 16px;background-position:0 -8px;
+}
+.receipt::before{top:-7px;}
+.receipt::after{bottom:-7px;background-position:0 2px;}
+.r-head{display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:12px;}
+.r-head .r-mark{width:30px;height:30px;border-radius:50%;background:var(--straw);flex-shrink:0;}
+.r-head h3{font-size:16px;line-height:1.1;}
+.r-head span{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;}
+.r-stamp{
+  position:absolute;top:60px;right:18px;border:3px solid var(--straw);color:var(--straw);
+  border-radius:50%;width:76px;height:76px;display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-weight:900;font-size:12px;text-align:center;line-height:1.1;
+  transform:rotate(-14deg);opacity:.85;
+}
+.r-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.r-row b{font-weight:700;}
+.r-line{border-top:1px dashed var(--ink-soft);margin:12px 0;}
+.r-total{display:flex;justify-content:space-between;font-size:19px;font-weight:700;font-family:'Fraunces',serif;margin-top:8px;}
+.r-foot{margin-top:16px;font-size:10.5px;color:var(--ink-soft);text-align:center;}
+.receipt-actions{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+
+/* ---- modal ---- */
+.modal-bg{position:fixed;inset:0;background:rgba(43,38,32,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal{background:var(--kraft);border-radius:16px;padding:28px;max-width:420px;width:100%;max-height:90vh;overflow:auto;}
+.modal-close{float:right;border:none;background:none;font-size:18px;color:var(--ink-soft);}
+
+.hidden{display:none !important;}
+.chart-box{position:relative;height:260px;}
+
+@media print{
+  body *{visibility:hidden;}
+  #print-area, #print-area *{visibility:visible;}
+  #print-area{position:absolute;top:0;left:0;width:100%;display:flex;justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🍓</div>
+      <div>
+        <h1>Barracão<br>do Henrique</h1>
+        <span>Controle de Entradas</span>
+      </div>
+    </div>
+    <nav id="nav">
+      <button data-page="dashboard">📊 Painel</button>
+      <button data-page="entrada">📥 Nova Entrada</button>
+      <button data-page="estoque">📦 Estoque</button>
+      <button data-page="financeiro">💰 Financeiro</button>
+      <button data-page="produtores">👤 Produtores</button>
+      <button data-page="produtos">🍓 Produtos</button>
+      <button data-page="relatorios">📈 Relatórios</button>
+    </nav>
+    <div class="sidebar-foot">Protótipo de demonstração<br>Desenvolvido por Waldeci Ramos</div>
+  </aside>
+
+  <div class="content-col">
+    <header class="topbar">
+      <div class="topbar-date" id="topbar-date"></div>
+      <div class="topbar-status"><span class="dot"></span> Sistema local · dados salvos neste computador</div>
+    </header>
+    <main id="main"></main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+/* ============================================================
+   DADOS (localStorage simulando o banco)
+============================================================ */
+const DB = {
+  get(key){ return JSON.parse(localStorage.getItem(key) || '[]'); },
+  set(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+};
+const KEYS = { produtores:'bh_produtores_v2', produtos:'bh_produtos_v2', entradas:'bh_entradas_v2', pagamentos:'bh_pagamentos_v2', saidas:'bh_saidas_v2' };
+
+function seedIfEmpty(){
+  if(DB.get(KEYS.produtores).length) return;
+  const produtores = [
+    {id:'p1', nome:'João da Silva', telefone:'5535999990001', cidade:'Estiva - MG', pix:'joao.silva@pix'},
+    {id:'p2', nome:'Maria Aparecida', telefone:'5535999990002', cidade:'Sapucaí-Mirim - MG', pix:'11122233344'},
+    {id:'p3', nome:'Sebastião Ramos', telefone:'5535999990003', cidade:'Estiva - MG', pix:'sebastiao@pix'},
+    {id:'p4', nome:'Antônio Carlos Ferreira', telefone:'5535999990004', cidade:'Cambuí - MG', pix:'toninho.ferreira@pix'},
+    {id:'p5', nome:'Rosana Batista', telefone:'5535999990005', cidade:'Estiva - MG', pix:'22233344455'},
+  ];
+  const produtos = [
+    {id:'pr1', nome:'Morango 123', categoria:'Morango', unidade:'Caixa'},
+    {id:'pr2', nome:'Morango Albion', categoria:'Morango', unidade:'Caixa'},
+    {id:'pr3', nome:'Morango Congelado', categoria:'Morango', unidade:'Kg'},
+    {id:'pr4', nome:'Brócolis', categoria:'Hortaliça', unidade:'Caixa'},
+    {id:'pr5', nome:'Alface', categoria:'Hortaliça', unidade:'Caixa'},
+    {id:'pr6', nome:'Couve-flor', categoria:'Hortaliça', unidade:'Caixa'},
+  ];
+  const hoje = new Date();
+  const d = (n)=>{ const x=new Date(hoje); x.setDate(x.getDate()-n); return x.toISOString().slice(0,10); };
+
+  // Simula uma semana cheia de movimento: entradas já fechadas e pagas (semana passada)
+  // e entradas da semana atual ainda pendentes, prontas pra testar o fechamento no Financeiro.
+  const entradas = [
+    {id:'e1',  produtorId:'p1', produtoId:'pr1', quantidade:10, valorUnit:35, total:350,  data:d(9), status:'pago', pagamentoId:'pg1'},
+    {id:'e2',  produtorId:'p1', produtoId:'pr2', quantidade:8,  valorUnit:40, total:320,  data:d(8), status:'pago', pagamentoId:'pg1'},
+    {id:'e3',  produtorId:'p3', produtoId:'pr3', quantidade:30, valorUnit:9,  total:270,  data:d(9), status:'pago', pagamentoId:'pg2'},
+    {id:'e4',  produtorId:'p2', produtoId:'pr4', quantidade:18, valorUnit:20, total:360,  data:d(7), status:'pago', pagamentoId:'pg3'},
+    {id:'e5',  produtorId:'p4', produtoId:'pr1', quantidade:12, valorUnit:35, total:420,  data:d(8), status:'pago', pagamentoId:'pg4'},
+
+    {id:'e6',  produtorId:'p1', produtoId:'pr2', quantidade:6,  valorUnit:42, total:252,  data:d(3), status:'pendente'},
+    {id:'e7',  produtorId:'p1', produtoId:'pr1', quantidade:9,  valorUnit:37, total:333,  data:d(1), status:'pendente'},
+    {id:'e8',  produtorId:'p2', produtoId:'pr5', quantidade:12, valorUnit:18, total:216,  data:d(2), status:'pendente'},
+    {id:'e9',  produtorId:'p2', produtoId:'pr6', quantidade:9,  valorUnit:25, total:225,  data:d(0), status:'pendente'},
+    {id:'e10', produtorId:'p3', produtoId:'pr1', quantidade:8,  valorUnit:37, total:296,  data:d(1), status:'pendente'},
+    {id:'e11', produtorId:'p3', produtoId:'pr3', quantidade:22, valorUnit:9,  total:198,  data:d(4), status:'pendente'},
+    {id:'e12', produtorId:'p4', produtoId:'pr2', quantidade:10, valorUnit:42, total:420,  data:d(2), status:'pendente'},
+    {id:'e13', produtorId:'p5', produtoId:'pr4', quantidade:20, valorUnit:20, total:400,  data:d(3), status:'pendente'},
+    {id:'e14', produtorId:'p5', produtoId:'pr1', quantidade:14, valorUnit:37, total:518,  data:d(0), status:'pendente'},
+  ];
+  const pagamentos = [
+    {id:'pg1', produtorId:'p1', entradaIds:['e1','e2'], total:670, data:d(6), forma:'PIX'},
+    {id:'pg2', produtorId:'p3', entradaIds:['e3'],      total:270, data:d(6), forma:'PIX'},
+    {id:'pg3', produtorId:'p2', entradaIds:['e4'],      total:360, data:d(5), forma:'Dinheiro'},
+    {id:'pg4', produtorId:'p4', entradaIds:['e5'],      total:420, data:d(6), forma:'Transferência'},
+  ];
+  DB.set(KEYS.produtores, produtores);
+  DB.set(KEYS.produtos, produtos);
+  DB.set(KEYS.entradas, entradas);
+  DB.set(KEYS.pagamentos, pagamentos);
+  DB.set(KEYS.saidas, [{id:'s1', produtoId:'pr1', quantidade:6, motivo:'Venda direta - feira central', data:d(2)}]);
+}
+seedIfEmpty();
+
+const fmt = (v)=> 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = (iso)=> { const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
+const uid = ()=> Math.random().toString(36).slice(2,9);
+const getProdutor = (id)=> DB.get(KEYS.produtores).find(p=>p.id===id);
+const getProduto = (id)=> DB.get(KEYS.produtos).find(p=>p.id===id);
+
+/* ============================================================
+   NAVEGAÇÃO
+============================================================ */
+let currentPage = 'dashboard';
+const pages = {
+  dashboard: renderDashboard,
+  entrada: renderEntrada,
+  estoque: renderEstoque,
+  financeiro: renderFinanceiro,
+  produtores: renderProdutores,
+  produtos: renderProdutos,
+  relatorios: renderRelatorios,
+};
+
+document.getElementById('nav').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-page]');
+  if(!btn) return;
+  navigate(btn.dataset.page);
+});
+
+function navigate(page){
+  currentPage = page;
+  document.querySelectorAll('#nav button').forEach(b=> b.classList.toggle('active', b.dataset.page===page));
+  pages[page]();
+}
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+function estoquePorProduto(){
+  const entradas = DB.get(KEYS.entradas);
+  const saidas = DB.get(KEYS.saidas);
+  const produtos = DB.get(KEYS.produtos);
+  return produtos.map(pr=>{
+    const entrado = entradas.filter(e=>e.produtoId===pr.id).reduce((s,e)=>s+Number(e.quantidade),0);
+    const saido = saidas.filter(s=>s.produtoId===pr.id).reduce((s,x)=>s+Number(x.quantidade),0);
+    return {...pr, estoque: entrado - saido};
+  });
+}
+
+function renderDashboard(){
+  const entradas = DB.get(KEYS.entradas);
+  const produtores = DB.get(KEYS.produtores);
+  const pendentes = entradas.filter(e=>e.status==='pendente');
+  const totalPendente = pendentes.reduce((s,e)=>s+e.total,0);
+  const estoque = estoquePorProduto();
+  const totalCaixas = estoque.filter(e=>e.unidade==='Caixa').reduce((s,e)=>s+e.estoque,0);
+  const totalKg = estoque.filter(e=>e.unidade==='Kg').reduce((s,e)=>s+e.estoque,0);
+
+  main().innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">Visão geral</div><h2>Painel do Barracão</h2><p>Resumo de estoque e pagamentos pendentes.</p></div>
+      <button class="btn btn-primary" onclick="navigate('entrada')">+ Nova entrada</button>
+    </div>
+    <div class="cards">
+      <div class="card straw"><div class="label">A pagar aos produtores</div><div class="value mono">${fmt(totalPendente)}</div></div>
+      <div class="card green"><div class="label">Caixas em estoque</div><div class="value mono">${totalCaixas}</div></div>
+      <div class="card green"><div class="label">Kg em estoque</div><div class="value mono">${totalKg}</div></div>
+      <div class="card"><div class="label">Produtores cadastrados</div><div class="value mono">${produtores.length}</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Estoque por produto</h3>
+        <div class="chart-box"><canvas id="chartEstoque"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>Últimas entradas</h3>
+        <table><thead><tr><th>Data</th><th>Produtor</th><th>Produto</th><th>Qtd</th><th>Status</th></tr></thead>
+        <tbody>${[...entradas].reverse().slice(0,6).map(rowEntradaMini).join('') || '<tr><td colspan=5 class="empty">Sem entradas</td></tr>'}</tbody></table>
+      </div>
+    </div>
+  `;
+  drawEstoqueChart(estoque);
+}
+function rowEntradaMini(e){
+  const pr = getProduto(e.produtoId), pd = getProdutor(e.produtorId);
+  return `<tr><td>${fmtDate(e.data)}</td><td>${pd?.nome||'—'}</td><td>${pr?.nome||'—'}</td><td class="mono">${e.quantidade} ${pr?.unidade}</td>
+  <td><span class="tag ${e.status==='pago'?'pago':'pend'}">${e.status==='pago'?'Pago':'Pendente'}</span></td></tr>`;
+}
+function drawEstoqueChart(estoque){
+  const ctx = document.getElementById('chartEstoque');
+  if(!ctx) return;
+  if(window._chartEstoque) window._chartEstoque.destroy();
+  window._chartEstoque = new Chart(ctx, {
+    type:'bar',
+    data:{ labels: estoque.map(e=>e.nome),
+      datasets:[{ label:'Estoque', data: estoque.map(e=>e.estoque),
+        backgroundColor: estoque.map(e=> e.categoria==='Morango' ? '#C1432B' : '#2F4A3C'),
+        borderRadius:6 }]},
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:'#EAE1CC'}}, x:{grid:{display:false}} } }
+  });
+}
+
+/* ============================================================
+   PRODUTORES
+============================================================ */
+function renderProdutores(){
+  const produtores = DB.get(KEYS.produtores);
+  main().innerHTML = `
+    <div class="page-head"><div><div class="eyebrow">Cadastro</div><h2>Produtores</h2><p>Quem entrega para o barracão.</p></div></div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Novo produtor</h3>
+        <div class="field"><label>Nome completo</label><input id="f-nome"></div>
+        <div class="row2">
+          <div class="field"><label>WhatsApp (DDI+DDD+número)</label><input id="f-tel" placeholder="5535999990000"></div>
+          <div class="field"><label>Cidade</label><input id="f-cidade"></div>
+        </div>
+        <div class="field"><label>Chave PIX</label><input id="f-pix"></div>
+        <button class="btn btn-primary" onclick="salvarProdutor()">Salvar produtor</button>
+      </div>
+      <div class="panel">
+        <h3>Produtores cadastrados (${produtores.length})</h3>
+        <table><thead><tr><th>Nome</th><th>Cidade</th><th>WhatsApp</th></tr></thead>
+        <tbody>${produtores.map(p=>`<tr><td>${p.nome}</td><td>${p.cidade||'—'}</td><td class="mono">${p.telefone||'—'}</td></tr>`).join('') || '<tr><td colspan=3 class="empty">Nenhum produtor ainda</td></tr>'}</tbody></table>
+      </div>
+    </div>
+  `;
+}
+function salvarProdutor(){
+  const nome = val('f-nome'); if(!nome){ alert('Informe o nome'); return; }
+  const produtores = DB.get(KEYS.produtores);
+  produtores.push({id:uid(), nome, telefone:val('f-tel'), cidade:val('f-cidade'), pix:val('f-pix')});
+  DB.set(KEYS.produtores, produtores);
+  renderProdutores();
+}
+
+/* ============================================================
+   PRODUTOS
+============================================================ */
+function renderProdutos(){
+  const produtos = DB.get(KEYS.produtos);
+  main().innerHTML = `
+    <div class="page-head"><div><div class="eyebrow">Cadastro</div><h2>Produtos</h2><p>Tipos de morango e hortaliças que o barracão recebe.</p></div></div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Novo produto</h3>
+        <div class="field"><label>Nome do produto</label><input id="p-nome" placeholder="Ex: Morango Camarosa"></div>
+        <div class="row2">
+          <div class="field"><label>Categoria</label>
+            <select id="p-cat"><option>Morango</option><option>Hortaliça</option><option>Outro</option></select>
+          </div>
+          <div class="field"><label>Unidade de venda</label>
+            <select id="p-un"><option>Caixa</option><option>Kg</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="salvarProduto()">Salvar produto</button>
+      </div>
+      <div class="panel">
+        <h3>Produtos cadastrados (${produtos.length})</h3>
+        <table><thead><tr><th>Produto</th><th>Categoria</th><th>Unidade</th></tr></thead>
+        <tbody>${produtos.map(p=>`<tr><td>${p.nome}</td><td>${p.categoria}</td><td>${p.unidade}</td></tr>`).join('') || '<tr><td colspan=3 class="empty">Nenhum produto ainda</td></tr>'}</tbody></table>
+      </div>
+    </div>
+  `;
+}
+function salvarProduto(){
+  const nome = val('p-nome'); if(!nome){ alert('Informe o nome do produto'); return; }
+  const produtos = DB.get(KEYS.produtos);
+  produtos.push({id:uid(), nome, categoria:val('p-cat'), unidade:val('p-un')});
+  DB.set(KEYS.produtos, produtos);
+  renderProdutos();
+}
+
+/* ============================================================
+   NOVA ENTRADA (comanda)
+============================================================ */
+function renderEntrada(){
+  const produtores = DB.get(KEYS.produtores);
+  const produtos = DB.get(KEYS.produtos);
+  main().innerHTML = `
+    <div class="page-head"><div><div class="eyebrow">Recebimento</div><h2>Nova Entrada</h2><p>Preencha como uma comanda: produtor, produto, quantidade e valor do dia.</p></div></div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Dados da entrega</h3>
+        <div class="field"><label>Produtor</label>
+          <select id="e-produtor">${produtores.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('') || '<option disabled>Cadastre um produtor primeiro</option>'}</select>
+        </div>
+        <div class="field"><label>Produto</label>
+          <select id="e-produto" onchange="atualizaResumoEntrada()">${produtos.map(p=>`<option value="${p.id}">${p.nome} (${p.unidade})</option>`).join('') || '<option disabled>Cadastre um produto primeiro</option>'}</select>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Quantidade</label><input id="e-qtd" type="number" min="0" step="0.01" value="1" oninput="atualizaResumoEntrada()"></div>
+          <div class="field"><label>Valor do dia (unitário)</label><input id="e-valor" type="number" min="0" step="0.01" value="0" oninput="atualizaResumoEntrada()"></div>
+        </div>
+        <div class="field"><label>Data</label><input id="e-data" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="panel" style="background:var(--sage);border:none;padding:14px 18px;margin-bottom:16px;">
+          <div class="r-row"><span>Total a receber:</span><b id="e-resumo" class="mono">R$ 0,00</b></div>
+        </div>
+        <button class="btn btn-primary" onclick="salvarEntrada()">Registrar entrada e gerar comprovante</button>
+      </div>
+      <div class="panel">
+        <h3>Entradas de hoje</h3>
+        <table><thead><tr><th>Produtor</th><th>Produto</th><th>Qtd</th><th>Total</th></tr></thead>
+        <tbody id="entradas-hoje"></tbody></table>
+      </div>
+    </div>
+  `;
+  atualizaResumoEntrada();
+  renderEntradasHoje();
+}
+function atualizaResumoEntrada(){
+  const qtd = parseFloat(val('e-qtd'))||0;
+  const valor = parseFloat(val('e-valor'))||0;
+  document.getElementById('e-resumo').textContent = fmt(qtd*valor);
+}
+function renderEntradasHoje(){
+  const hoje = new Date().toISOString().slice(0,10);
+  const entradas = DB.get(KEYS.entradas).filter(e=>e.data===hoje);
+  const tbody = document.getElementById('entradas-hoje');
+  if(!tbody) return;
+  tbody.innerHTML = entradas.map(e=>{
+    const pr=getProduto(e.produtoId), pd=getProdutor(e.produtorId);
+    return `<tr><td>${pd?.nome}</td><td>${pr?.nome}</td><td class="mono">${e.quantidade} ${pr?.unidade}</td><td class="mono">${fmt(e.total)}</td></tr>`;
+  }).join('') || '<tr><td colspan=4 class="empty">Nenhuma entrada hoje ainda</td></tr>';
+}
+function salvarEntrada(){
+  const produtorId = val('e-produtor'), produtoId = val('e-produto');
+  if(!produtorId || !produtoId){ alert('Cadastre produtor e produto antes de lançar uma entrada.'); return; }
+  const quantidade = parseFloat(val('e-qtd'))||0;
+  const valorUnit = parseFloat(val('e-valor'))||0;
+  if(quantidade<=0){ alert('Informe uma quantidade válida'); return; }
+  const entrada = { id:uid(), produtorId, produtoId, quantidade, valorUnit, total: quantidade*valorUnit, data: val('e-data'), status:'pendente' };
+  const entradas = DB.get(KEYS.entradas); entradas.push(entrada); DB.set(KEYS.entradas, entradas);
+  renderEntradasHoje();
+  abrirComprovanteEntrega(entrada.id);
+}
+
+/* ============================================================
+   ESTOQUE
+============================================================ */
+function renderEstoque(){
+  const estoque = estoquePorProduto();
+  const produtos = DB.get(KEYS.produtos);
+  main().innerHTML = `
+    <div class="page-head"><div><div class="eyebrow">Controle</div><h2>Estoque do Barracão</h2><p>Quantidade disponível por produto.</p></div></div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Situação atual</h3>
+        <table><thead><tr><th>Produto</th><th>Categoria</th><th>Em estoque</th></tr></thead>
+        <tbody>${estoque.map(e=>`<tr><td>${e.nome}</td><td>${e.categoria}</td><td class="mono">${e.estoque} ${e.unidade}</td></tr>`).join('')}</tbody></table>
+      </div>
+      <div class="panel">
+        <h3>Registrar saída (venda/uso)</h3>
+        <div class="field"><label>Produto</label>
+          <select id="s-produto">${produtos.map(p=>`<option value="${p.id}">${p.nome} (${p.unidade})</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Quantidade</label><input id="s-qtd" type="number" min="0" step="0.01" value="1"></div>
+        <div class="field"><label>Motivo</label><input id="s-motivo" placeholder="Ex: venda no mercado central"></div>
+        <button class="btn btn-outline" onclick="registrarSaida()">Registrar saída</button>
+      </div>
+    </div>
+  `;
+}
+function registrarSaida(){
+  const produtoId = val('s-produto'); const quantidade = parseFloat(val('s-qtd'))||0;
+  if(quantidade<=0){ alert('Informe a quantidade'); return; }
+  const saidas = DB.get(KEYS.saidas);
+  saidas.push({id:uid(), produtoId, quantidade, motivo:val('s-motivo'), data:new Date().toISOString().slice(0,10)});
+  DB.set(KEYS.saidas, saidas);
+  renderEstoque();
+}
+
+/* ============================================================
+   FINANCEIRO
+============================================================ */
+function renderFinanceiro(){
+  const produtores = DB.get(KEYS.produtores);
+  main().innerHTML = `
+    <div class="page-head"><div><div class="eyebrow">Ficha do produtor</div><h2>Financeiro</h2><p>Busque o produtor para ver o que ele tem a receber.</p></div></div>
+    <div class="panel">
+      <div class="field" style="max-width:340px;"><label>Selecione o produtor</label>
+        <select id="fin-produtor" onchange="renderFichaProdutor()">${produtores.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div id="ficha-area"></div>
+  `;
+  renderFichaProdutor();
+}
+function renderFichaProdutor(){
+  const produtorId = val('fin-produtor');
+  const produtor = getProdutor(produtorId);
+  const entradas = DB.get(KEYS.entradas).filter(e=>e.produtorId===produtorId);
+  const pendentes = entradas.filter(e=>e.status==='pendente');
+  const pagas = entradas.filter(e=>e.status==='pago');
+  const totalPendente = pendentes.reduce((s,e)=>s+e.total,0);
+  const area = document.getElementById('ficha-area');
+  if(!produtor){ area.innerHTML = '<div class="panel empty">Cadastre um produtor primeiro.</div>'; return; }
+  area.innerHTML = `
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Pendente de pagamento — ${produtor.nome}</h3>
+        <table><thead><tr><th></th><th>Data</th><th>Produto</th><th>Qtd</th><th>Total</th></tr></thead>
+        <tbody>${pendentes.map(e=>{
+          const pr=getProduto(e.produtoId);
+          return `<tr><td><input type="checkbox" class="chk-pag" value="${e.id}" checked></td><td>${fmtDate(e.data)}</td><td>${pr?.nome}</td><td class="mono">${e.quantidade} ${pr?.unidade}</td><td class="mono">${fmt(e.total)}</td></tr>`;
+        }).join('') || '<tr><td colspan=5 class="empty">Sem pendências 🎉</td></tr>'}</tbody></table>
+        ${pendentes.length ? `
+        <div class="r-line"></div>
+        <div class="r-row" style="font-size:16px;"><span>Total selecionado:</span><b class="mono" id="fin-total">${fmt(totalPendente)}</b></div>
+        <div class="field" style="margin-top:14px;max-width:220px;"><label>Forma de pagamento</label>
+          <select id="fin-forma"><option>PIX</option><option>Dinheiro</option><option>Transferência</option></select>
+        </div>
+        <button class="btn btn-green" onclick="pagarProdutor('${produtorId}')">Dar baixa e pagar</button>
+        ` : ''}
+      </div>
+      <div class="panel">
+        <h3>Histórico já pago (${pagas.length})</h3>
+        <table><thead><tr><th>Data</th><th>Produto</th><th>Qtd</th><th>Total</th></tr></thead>
+        <tbody>${pagas.map(e=>{
+          const pr=getProduto(e.produtoId);
+          return `<tr><td>${fmtDate(e.data)}</td><td>${pr?.nome}</td><td class="mono">${e.quantidade} ${pr?.unidade}</td><td class="mono">${fmt(e.total)}</td></tr>`;
+        }).join('') || '<tr><td colspan=4 class="empty">Ainda sem histórico</td></tr>'}</tbody></table>
+      </div>
+    </div>
+  `;
+  document.querySelectorAll('.chk-pag').forEach(chk=> chk.addEventListener('change', ()=>{
+    const ids = [...document.querySelectorAll('.chk-pag:checked')].map(c=>c.value);
+    const total = entradas.filter(e=>ids.includes(e.id)).reduce((s,e)=>s+e.total,0);
+    const totalEl = document.getElementById('fin-total'); if(totalEl) totalEl.textContent = fmt(total);
+  }));
+}
+function pagarProdutor(produtorId){
+  const ids = [...document.querySelectorAll('.chk-pag:checked')].map(c=>c.value);
+  if(!ids.length){ alert('Selecione pelo menos uma entrega para pagar'); return; }
+  const entradas = DB.get(KEYS.entradas);
+  const selecionadas = entradas.filter(e=>ids.includes(e.id));
+  const total = selecionadas.reduce((s,e)=>s+e.total,0);
+  const pagamento = { id:uid(), produtorId, entradaIds:ids, total, data:new Date().toISOString().slice(0,10), forma: val('fin-forma') };
+  const pagamentos = DB.get(KEYS.pagamentos); pagamentos.push(pagamento); DB.set(KEYS.pagamentos, pagamentos);
+  entradas.forEach(e=>{ if(ids.includes(e.id)){ e.status='pago'; e.pagamentoId = pagamento.id; }});
+  DB.set(KEYS.entradas, entradas);
+  renderFichaProdutor();
+  abrirComprovantePagamento(pagamento.id);
+}
+
+/* ============================================================
+   RELATÓRIOS
+============================================================ */
+function renderRelatorios(){
+  const entradas = DB.get(KEYS.entradas);
+  const produtores = DB.get(KEYS.produtores);
+  const ranking = produtores.map(p=>({
+    nome:p.nome,
+    total: entradas.filter(e=>e.produtorId===p.id).reduce((s,e)=>s+e.total,0)
+  })).sort((a,b)=>b.total-a.total);
+
+  main().innerHTML = `
+    <div class="page-head"><div><div class="eyebrow">Análise</div><h2>Relatórios</h2><p>Estoque, ranking de produtores e movimentação.</p></div></div>
+    <div class="grid-2">
+      <div class="panel"><h3>Estoque por categoria</h3><div class="chart-box"><canvas id="chartCat"></canvas></div></div>
+      <div class="panel"><h3>Ranking de produtores (total entregue)</h3><div class="chart-box"><canvas id="chartRank"></canvas></div></div>
+    </div>
+  `;
+  const estoque = estoquePorProduto();
+  const morango = estoque.filter(e=>e.categoria==='Morango').reduce((s,e)=>s+e.estoque,0);
+  const horta = estoque.filter(e=>e.categoria==='Hortaliça').reduce((s,e)=>s+e.estoque,0);
+  new Chart(document.getElementById('chartCat'), {
+    type:'doughnut',
+    data:{ labels:['Morango','Hortaliça'], datasets:[{ data:[morango,horta], backgroundColor:['#C1432B','#2F4A3C'] }] },
+    options:{ plugins:{legend:{position:'bottom'}} }
+  });
+  new Chart(document.getElementById('chartRank'), {
+    type:'bar',
+    data:{ labels:ranking.map(r=>r.nome), datasets:[{ data:ranking.map(r=>r.total), backgroundColor:'#D9A441', borderRadius:6 }]},
+    options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{color:'#EAE1CC'}}} }
+  });
+}
+
+/* ============================================================
+   COMPROVANTES (entrega e pagamento)
+============================================================ */
+function abrirComprovanteEntrega(entradaId){
+  const e = DB.get(KEYS.entradas).find(x=>x.id===entradaId);
+  const pr = getProduto(e.produtoId), pd = getProdutor(e.produtorId);
+  const whatsappTexto = `Comprovante de Entrega - Barracão do Henrique%0A${fmtDate(e.data)}%0AProdutor: ${pd.nome}%0AProduto: ${pr.nome}%0AQuantidade: ${e.quantidade} ${pr.unidade}%0AValor unitário: ${fmt(e.valorUnit)}%0ATotal a receber: ${fmt(e.total)}%0A%0AObrigado pela entrega! 🍓`;
+  abrirModalComprovante(`
+    <div class="r-head"><div class="r-mark"></div><div><h3>Barracão do Henrique</h3><span>Comprovante de Entrega</span></div></div>
+    <div class="r-stamp">ENTRE-<br>GUE</div>
+    <div class="r-row"><span>Data</span><b>${fmtDate(e.data)}</b></div>
+    <div class="r-row"><span>Produtor</span><b>${pd.nome}</b></div>
+    <div class="r-line"></div>
+    <div class="r-row"><span>Produto</span><b>${pr.nome}</b></div>
+    <div class="r-row"><span>Quantidade</span><b class="mono">${e.quantidade} ${pr.unidade}</b></div>
+    <div class="r-row"><span>Valor do dia</span><b class="mono">${fmt(e.valorUnit)}</b></div>
+    <div class="r-line"></div>
+    <div class="r-total"><span>A receber</span><span>${fmt(e.total)}</span></div>
+    <div class="r-foot">Este valor entra na sua ficha e será pago no fechamento.</div>
+  `, pd.telefone, whatsappTexto);
+}
+function abrirComprovantePagamento(pagamentoId){
+  const pg = DB.get(KEYS.pagamentos).find(x=>x.id===pagamentoId);
+  const pd = getProdutor(pg.produtorId);
+  const entradas = DB.get(KEYS.entradas).filter(e=>pg.entradaIds.includes(e.id));
+  const itensTexto = entradas.map(e=>{ const pr=getProduto(e.produtoId); return `${pr.nome}: ${e.quantidade} ${pr.unidade}`; }).join('%0A');
+  const whatsappTexto = `Comprovante de Pagamento - Barracão do Henrique%0A${fmtDate(pg.data)}%0AProdutor: ${pd.nome}%0AForma: ${pg.forma}%0A%0AItens pagos:%0A${itensTexto}%0A%0ATotal pago: ${fmt(pg.total)}%0A%0AObrigado pela parceria! 🍓`;
+  abrirModalComprovante(`
+    <div class="r-head"><div class="r-mark"></div><div><h3>Barracão do Henrique</h3><span>Recibo de Pagamento</span></div></div>
+    <div class="r-stamp">PAGO</div>
+    <div class="r-row"><span>Data</span><b>${fmtDate(pg.data)}</b></div>
+    <div class="r-row"><span>Produtor</span><b>${pd.nome}</b></div>
+    <div class="r-row"><span>Forma</span><b>${pg.forma}</b></div>
+    <div class="r-line"></div>
+    ${entradas.map(e=>{ const pr=getProduto(e.produtoId); return `<div class="r-row"><span>${pr.nome}</span><b class="mono">${e.quantidade} ${pr.unidade} · ${fmt(e.total)}</b></div>`; }).join('')}
+    <div class="r-line"></div>
+    <div class="r-total"><span>Total pago</span><span>${fmt(pg.total)}</span></div>
+    <div class="r-foot">Recibo gerado automaticamente pelo sistema do barracão.</div>
+  `, pd.telefone, whatsappTexto);
+}
+function abrirModalComprovante(innerHtml, telefone, whatsappTexto){
+  const root = document.getElementById('modal-root');
+  root.innerHTML = `
+    <div class="modal-bg" onclick="if(event.target===this) fecharModal()">
+      <div class="modal">
+        <button class="modal-close" onclick="fecharModal()">✕</button>
+        <div id="print-area">
+          <div class="receipt-wrap"><div class="receipt" id="receipt-content">${innerHtml}</div></div>
+        </div>
+        <div class="receipt-actions">
+          <button class="btn btn-green btn-sm" onclick="window.print()">🖨️ Imprimir</button>
+          <button class="btn btn-primary btn-sm" onclick="window.open('https://wa.me/${telefone||''}?text=${whatsappTexto}','_blank')">💬 Abrir WhatsApp</button>
+          <button class="btn btn-outline btn-sm" onclick="baixarComprovanteImagem()">⬇️ Baixar imagem</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function fecharModal(){ document.getElementById('modal-root').innerHTML=''; }
+function baixarComprovanteImagem(){
+  html2canvas(document.getElementById('receipt-content'), {backgroundColor:'#FBF7EF', scale:2}).then(canvas=>{
+    const link = document.createElement('a');
+    link.download = 'comprovante-barracao.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+/* ============================================================
+   helpers
+============================================================ */
+function main(){ return document.getElementById('main'); }
+function val(id){ const el = document.getElementById(id); return el ? el.value : ''; }
+
+/* start */
+document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+navigate('dashboard');
+</script>
+</body>
+</html>
