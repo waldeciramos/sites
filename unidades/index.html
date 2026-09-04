@@ -57,6 +57,24 @@
         .stat-card .stat-label { font-size:.65rem; text-transform:uppercase; font-weight:700; color:var(--orange-600); letter-spacing:.5px; }
         .stat-card .stat-value { font-size:1.5rem; font-weight:800; color:var(--gray-800); line-height:1.1; margin-top:.1rem; }
 
+        /* ===== CONFIG TOKEN ===== */
+        .token-config {
+            background:#FFFBEB; border:1px solid #FDE68A; border-radius:var(--radius-md);
+            padding:1rem 1.5rem; margin-bottom:1rem;
+            display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+        }
+        .token-config .tc-label { font-weight:600; color:#92400E; font-size:.85rem; display:flex; align-items:center; gap:.5rem; }
+        .token-config input { flex:1; min-width:200px; padding:.5rem .8rem; border:2px solid #FDE68A; border-radius:var(--radius-sm); font-size:.85rem; background:#FFFBEB; font-family:monospace; }
+        .token-config input:focus { outline:none; border-color:var(--orange-400); background:#fff; }
+        .token-config .tc-status { font-size:.8rem; color:var(--gray-500); }
+        .token-config .tc-status.success { color:#16A34A; }
+        .token-config .tc-status.error { color:#DC2626; }
+        .token-config .tc-status.loading { color:var(--orange-500); }
+
+        .btn-github { background:#24292F; color:#fff; border:none; padding:.5rem 1.2rem; border-radius:2rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; font-size:.82rem; }
+        .btn-github:hover { background:#1F242A; }
+        .btn-github:disabled { opacity:.6; cursor:not-allowed; }
+
         /* ===== FILTROS ===== */
         .controls-bar {
             display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;
@@ -98,9 +116,6 @@
 
         .btn-success { background:#16A34A; color:#fff; border:none; padding:.6rem 1.4rem; border-radius:2rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; font-size:.82rem; box-shadow:0 8px 16px -6px rgba(22,163,74,.4); }
         .btn-success:hover { background:#15803D; transform:translateY(-2px); }
-
-        .btn-secondary { background:var(--gray-700); color:#fff; border:none; padding:.6rem 1.4rem; border-radius:2rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; font-size:.82rem; }
-        .btn-secondary:hover { background:var(--gray-800); }
 
         .active-tags { display:flex; flex-wrap:wrap; gap:.6rem; margin-bottom:1rem; min-height:2rem; }
         .tag {
@@ -236,6 +251,7 @@
             .filters-group { flex-wrap:wrap; }
             .modal-body .detail-row { grid-template-columns:1fr; }
             .modal-edit .form-row { grid-template-columns:1fr; }
+            .token-config { flex-direction:column; align-items:stretch; }
         }
 
         .no-results { text-align:center; padding:3rem; color:var(--gray-400); }
@@ -290,6 +306,14 @@
         </div>
     </div>
 
+    <!-- ===== CONFIGURAÇÃO DO TOKEN ===== -->
+    <div class="token-config" id="tokenConfig">
+        <span class="tc-label"><i class="fab fa-github"></i> Token do GitHub:</span>
+        <input type="password" id="githubToken" placeholder="Cole seu token pessoal aqui (ghp_...)" />
+        <button class="btn-github" id="testTokenBtn"><i class="fas fa-check"></i> Testar</button>
+        <span class="tc-status" id="tokenStatus">⚠️ Configure seu token para salvar no GitHub</span>
+    </div>
+
     <!-- ===== CONTROLES ===== -->
     <div class="controls-bar">
         <div class="filters-group">
@@ -312,7 +336,10 @@
         </div>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
             <button class="btn-primary" id="exportBtn"><i class="fas fa-download"></i> Exportar CSV</button>
-            <button class="btn-success" id="saveJsonBtn"><i class="fas fa-save"></i> Salvar JSON</button>
+            <button class="btn-success" id="saveGithubBtn"><i class="fab fa-github"></i> Salvar no GitHub</button>
+            <button class="btn-secondary" id="downloadJsonBtn" style="background:var(--gray-700);color:#fff;border:none;padding:.6rem 1.4rem;border-radius:2rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;">
+                <i class="fas fa-file-download"></i> Baixar JSON
+            </button>
             <div class="view-toggle">
                 <button class="view-btn active" id="viewTableBtn"><i class="fas fa-table"></i> Tabela</button>
                 <button class="view-btn" id="viewCardsBtn"><i class="fas fa-id-card"></i> Cards</button>
@@ -449,6 +476,17 @@
 
 <script>
 // ============================================================
+// CONFIGURAÇÃO DO GITHUB - ALTERE AQUI COM SEUS DADOS!
+// ============================================================
+const GITHUB_CONFIG = {
+    owner: 'waldeciramos',        // Ex: 'joaosilva'
+    repo: 'unidades
+',     // Ex: 'sites'
+    path: 'postos_dompedro_2026-09-04.json',  // nome do arquivo
+    branch: 'main'               // ou 'master'
+};
+
+// ============================================================
 // VARIÁVEIS GLOBAIS
 // ============================================================
 let postosData = [];
@@ -456,7 +494,7 @@ let filteredData = [];
 let currentView = 'table';
 let sortColumn = null;
 let sortAsc = true;
-let dataLoaded = false;
+let fileSha = '';
 
 // ============================================================
 // ELEMENTOS DOM
@@ -466,7 +504,8 @@ const estadoSelect = document.getElementById('estadoSelect');
 const showInativosCheck = document.getElementById('showInativosCheck');
 const clearBtn = document.getElementById('clearFiltersBtn');
 const exportBtn = document.getElementById('exportBtn');
-const saveJsonBtn = document.getElementById('saveJsonBtn');
+const saveGithubBtn = document.getElementById('saveGithubBtn');
+const downloadJsonBtn = document.getElementById('downloadJsonBtn');
 const viewTableBtn = document.getElementById('viewTableBtn');
 const viewCardsBtn = document.getElementById('viewCardsBtn');
 const tableView = document.getElementById('tableView');
@@ -477,6 +516,9 @@ const resultMeta = document.getElementById('resultMeta');
 const activeTags = document.getElementById('activeTags');
 const dataStatus = document.getElementById('dataStatus');
 const loadingOverlay = document.getElementById('loadingOverlay');
+const githubTokenInput = document.getElementById('githubToken');
+const tokenStatus = document.getElementById('tokenStatus');
+const testTokenBtn = document.getElementById('testTokenBtn');
 
 // ============================================================
 // TOAST
@@ -488,71 +530,208 @@ function showToast(message, type = 'success') {
     toastMsg.textContent = message;
     toast.classList.add('show');
     clearTimeout(toast._hide);
-    toast._hide = setTimeout(() => toast.classList.remove('show'), 3500);
+    toast._hide = setTimeout(() => toast.classList.remove('show'), 4000);
 }
 
 // ============================================================
-// CARREGAR DADOS
+// CARREGAR DADOS DO GITHUB
 // ============================================================
-async function loadData() {
+async function loadFromGitHub() {
     loadingOverlay.classList.remove('hidden');
-    try {
-        // Tenta carregar do localStorage primeiro (cache)
-        const cached = localStorage.getItem('postosData');
-        if (cached) {
-            try {
-                const parsed = JSON.parse(cached);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    postosData = parsed;
-                    dataLoaded = true;
-                    dataStatus.textContent = `✅ ${postosData.length} postos carregados (cache)`;
-                    loadingOverlay.classList.add('hidden');
-                    initApp();
-                    return;
-                }
-            } catch(e) {}
-        }
+    const token = githubTokenInput.value.trim();
 
-        // Tenta carregar do arquivo JSON (mesmo diretório)
-        const response = await fetch('postos_dompedro_2026-09-04.json');
-        if (response.ok) {
-            const data = await response.json();
-            if (Array.isArray(data) && data.length > 0) {
-                postosData = data;
-                // Salva no localStorage como cache
-                localStorage.setItem('postosData', JSON.stringify(data));
-                dataLoaded = true;
-                dataStatus.textContent = `✅ ${postosData.length} postos carregados (JSON)`;
+    // Tenta carregar do localStorage primeiro (cache)
+    const cached = localStorage.getItem('postosData');
+    if (cached && !token) {
+        try {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                postosData = parsed;
+                dataStatus.textContent = `📦 ${postosData.length} postos carregados (cache local)`;
                 loadingOverlay.classList.add('hidden');
                 initApp();
                 return;
             }
-        }
-    } catch (e) {
-        console.warn('Erro ao carregar JSON:', e);
+        } catch(e) {}
     }
 
-    // Fallback: dados embutidos no código
-    postosData = getFallbackData();
-    localStorage.setItem('postosData', JSON.stringify(postosData));
-    dataLoaded = true;
-    dataStatus.textContent = `⚠️ ${postosData.length} postos carregados (fallback)`;
+    if (!token) {
+        loadingOverlay.classList.add('hidden');
+        dataStatus.textContent = '⚠️ Token não configurado. Use o cache ou configure o token.';
+        showToast('Token do GitHub não configurado!', 'error');
+        if (postosData.length === 0) {
+            postosData = getFallbackData();
+            initApp();
+        }
+        return;
+    }
+
+    try {
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (response.status === 404) {
+            loadingOverlay.classList.add('hidden');
+            dataStatus.textContent = '📄 Arquivo não encontrado. Criando novo...';
+            showToast('Arquivo não encontrado no GitHub. Criando novo...', 'warning');
+            postosData = getFallbackData();
+            fileSha = '';
+            initApp();
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        fileSha = data.sha;
+
+        const content = atob(data.content);
+        const jsonData = JSON.parse(content);
+
+        if (Array.isArray(jsonData) && jsonData.length > 0) {
+            postosData = jsonData;
+            localStorage.setItem('postosData', JSON.stringify(postosData));
+            dataStatus.textContent = `✅ ${postosData.length} postos carregados do GitHub`;
+            tokenStatus.textContent = '✅ Conectado ao GitHub';
+            tokenStatus.className = 'tc-status success';
+            showToast(`Dados carregados do GitHub! ${postosData.length} postos`, 'success');
+        } else {
+            throw new Error('Dados inválidos no arquivo');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar do GitHub:', error);
+        dataStatus.textContent = `⚠️ Erro: ${error.message}`;
+        tokenStatus.textContent = '❌ Erro ao conectar';
+        tokenStatus.className = 'tc-status error';
+        showToast(`Erro ao carregar: ${error.message}`, 'error');
+        if (postosData.length === 0) {
+            postosData = getFallbackData();
+        }
+    }
+
     loadingOverlay.classList.add('hidden');
     initApp();
 }
 
 // ============================================================
-// DADOS FALLBACK (embutidos no código)
+// SALVAR NO GITHUB
+// ============================================================
+async function saveToGitHub() {
+    const token = githubTokenInput.value.trim();
+
+    if (!token) {
+        showToast('Configure seu token do GitHub primeiro!', 'error');
+        return;
+    }
+
+    const jsonContent = JSON.stringify(postosData, null, 2);
+    const contentBase64 = btoa(unescape(encodeURIComponent(jsonContent)));
+
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+
+    const body = {
+        message: `Atualização automática - ${new Date().toLocaleString()}`,
+        content: contentBase64,
+        branch: GITHUB_CONFIG.branch || 'main'
+    };
+
+    if (fileSha) {
+        body.sha = fileSha;
+    }
+
+    try {
+        saveGithubBtn.disabled = true;
+        saveGithubBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Erro ${response.status}`);
+        }
+
+        const result = await response.json();
+        fileSha = result.content.sha;
+        localStorage.setItem('postosData', JSON.stringify(postosData));
+
+        dataStatus.textContent = `💾 ${postosData.length} postos salvos no GitHub (${new Date().toLocaleTimeString()})`;
+        showToast('✅ Dados salvos no GitHub com sucesso!', 'success');
+
+    } catch (error) {
+        console.error('Erro ao salvar:', error);
+        showToast(`❌ Erro ao salvar: ${error.message}`, 'error');
+    } finally {
+        saveGithubBtn.disabled = false;
+        saveGithubBtn.innerHTML = '<i class="fab fa-github"></i> Salvar no GitHub';
+    }
+}
+
+// ============================================================
+// TESTAR TOKEN
+// ============================================================
+async function testToken() {
+    const token = githubTokenInput.value.trim();
+    if (!token) {
+        tokenStatus.textContent = '❌ Digite um token';
+        tokenStatus.className = 'tc-status error';
+        return;
+    }
+
+    tokenStatus.textContent = '⏳ Testando...';
+    tokenStatus.className = 'tc-status loading';
+
+    try {
+        const response = await fetch('https://api.github.com/user', {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (response.ok) {
+            const user = await response.json();
+            tokenStatus.textContent = `✅ Conectado como ${user.login}`;
+            tokenStatus.className = 'tc-status success';
+            showToast(`Token válido! Conectado como ${user.login}`, 'success');
+            localStorage.setItem('github_token', token);
+            // Recarrega os dados
+            loadFromGitHub();
+        } else {
+            tokenStatus.textContent = '❌ Token inválido';
+            tokenStatus.className = 'tc-status error';
+            showToast('Token inválido!', 'error');
+        }
+    } catch (error) {
+        tokenStatus.textContent = '❌ Erro ao testar token';
+        tokenStatus.className = 'tc-status error';
+        showToast(`Erro: ${error.message}`, 'error');
+    }
+}
+
+// ============================================================
+// DADOS FALLBACK
 // ============================================================
 function getFallbackData() {
-    // Aqui entram os dados do JSON que você enviou
-    // Estou incluindo os primeiros como exemplo, mas você deve colocar todos
     return [
         {codigo:1, razaoSocial:"MG - REDE DOM PEDRO DE POSTOS LTDA", nomeReduzido:"REDE DOM PEDRO DE POSTOS LTD", cnpj:"20.415.295/0001-74", ie:"245068303002", im:"237950644", endereco:"ROD FERNAO DIAS, SN - SN", bairro:"ESPRAIADO", cidade:"ESTIVA", cep:"37.542-0", estado:"MG", municipio:"ESTIVA", pais:"BRASIL", fone:"", fax:"", contato:"DIRCEU", ativo:true, observacoes:"Matriz administrativa"},
         {codigo:2, razaoSocial:"MG S - REDE DOM PEDRO DE POSTOS LTDA (DP 1)", nomeReduzido:"DP 1", cnpj:"20.415.295/0001-74", ie:"245068303002", im:"2450291", endereco:"ROD FERNAO DIAS KM 880,", bairro:"ESPRAIADO", cidade:"ESTIVA", cep:"37.542-0", estado:"MG", municipio:"ESTIVA", pais:"BRASIL", fone:"35 34621188", fax:"35 34621188", contato:"DIRCEU", ativo:true, observacoes:"Posto 1 - Estiva"},
-        // ... (todos os outros postos do JSON)
-        // Para não estourar o tamanho, vou adicionar um placeholder
-        // Mas você deve colocar TODOS os dados do JSON aqui
+        {codigo:3, razaoSocial:"MG - REDE DOM PEDRO DE POSTOS LTDA (DP ITATIAIUCU)", nomeReduzido:"DP ITATIAIUCU", cnpj:"20.415.295/0009-21", ie:"245068303093", im:"167", endereco:"ROD BR 381, SN - KM 57", bairro:"PINHEIROS", cidade:"ITATIAIUCU", cep:"35.685-0", estado:"MG", municipio:"TATIAIUCU", pais:"BRASIL", fone:"3534622135", fax:"3534622136", contato:"VANDERCELIO", ativo:true, observacoes:"Unidade com maior movimento"}
     ];
 }
 
@@ -560,7 +739,6 @@ function getFallbackData() {
 // INICIALIZAR APLICAÇÃO
 // ============================================================
 function initApp() {
-    // Garantir que todos os postos tenham campo observacoes
     postosData.forEach(p => {
         if (!p.observacoes) p.observacoes = '';
     });
@@ -862,10 +1040,10 @@ function setupExport() {
 }
 
 // ============================================================
-// SALVAR JSON
+// DOWNLOAD JSON
 // ============================================================
-function setupSaveJson() {
-    saveJsonBtn.addEventListener('click', () => {
+function setupDownloadJson() {
+    downloadJsonBtn.addEventListener('click', () => {
         const json = JSON.stringify(postosData, null, 2);
         const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
         const link = document.createElement('a');
@@ -876,11 +1054,7 @@ function setupSaveJson() {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-
-        // Salva no localStorage também
-        localStorage.setItem('postosData', JSON.stringify(postosData));
-        dataStatus.textContent = `💾 ${postosData.length} postos salvos (JSON + cache)`;
-        showToast('JSON salvo com sucesso!', 'success');
+        showToast('JSON baixado com sucesso!', 'success');
     });
 }
 
@@ -988,14 +1162,13 @@ document.getElementById('editForm').addEventListener('submit', (e) => {
     posto.ativo = document.getElementById('editStatus').value === 'true';
     posto.observacoes = document.getElementById('editObservacoes').value.trim();
 
-    // Salva no localStorage automaticamente
     localStorage.setItem('postosData', JSON.stringify(postosData));
 
     closeEditModal();
     refreshDisplay();
     updateStats();
-    dataStatus.textContent = `✏️ ${postosData.length} postos (editado: ${posto.nomeReduzido}) - clique em Salvar JSON para persistir`;
-    showToast(`Posto "${posto.nomeReduzido}" atualizado com sucesso!`, 'success');
+    dataStatus.textContent = `✏️ Editado: ${posto.nomeReduzido} - clique em "Salvar no GitHub" para persistir`;
+    showToast(`Posto "${posto.nomeReduzido}" atualizado!`, 'success');
 });
 
 // ============================================================
@@ -1006,13 +1179,23 @@ function setupEventListeners() {
     setupFilters();
     setupSorting();
     setupExport();
-    setupSaveJson();
+    setupDownloadJson();
+
+    testTokenBtn.addEventListener('click', testToken);
+    saveGithubBtn.addEventListener('click', saveToGitHub);
+
+    const savedToken = localStorage.getItem('github_token');
+    if (savedToken) {
+        githubTokenInput.value = savedToken;
+        // Testa automaticamente se houver token salvo
+        setTimeout(testToken, 500);
+    }
 }
 
 // ============================================================
 // INICIAR
 // ============================================================
-loadData();
+loadFromGitHub();
 </script>
 </body>
 </html>
