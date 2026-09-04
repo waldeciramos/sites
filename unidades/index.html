@@ -319,7 +319,7 @@
         <button class="login-close" id="loginClose">&times;</button>
         <div class="logo">
             <i class="fas fa-gas-pump"></i>
-            <h1>ACESSO ADMIN</h1>
+            <h1>ACESSO ÀS FERRAMENTAS</h1>
             <p>Configuração do token do GitHub</p>
         </div>
         <div class="login-error" id="loginError">Usuário ou senha inválidos!</div>
@@ -356,9 +356,9 @@
         </div>
     </header>
 
-    <!-- ===== BOTÃO ADMIN ===== -->
+    <!-- ===== BOTÃO FERRAMENTAS ===== -->
     <div class="admin-toggle-area">
-        <button class="admin-toggle-btn" id="adminToggleBtn"><i class="fas fa-user-cog"></i> Admin</button>
+        <button class="admin-toggle-btn" id="adminToggleBtn"><i class="fas fa-tools"></i> Ferramentas</button>
     </div>
 
     <!-- ===== STATS ===== -->
@@ -568,7 +568,7 @@ const GITHUB_CONFIG = {
 // ============================================================
 const ADMIN_CREDENTIALS = {
     user: 'waldeci',
-    pass: 'DP@789123'
+    pass: 'DP@123456'
 };
 
 // ============================================================
@@ -642,9 +642,10 @@ function handleLogin() {
         loginModal.classList.remove('show');
         tokenConfig.classList.add('show');
         adminToggleBtn.classList.add('active');
-        adminToggleBtn.innerHTML = '<i class="fas fa-user-cog"></i> Admin (logado)';
+        adminToggleBtn.innerHTML = '<i class="fas fa-tools"></i> Ferramentas (logado)';
         loginError.classList.remove('show');
         localStorage.setItem('isAdmin', 'true');
+        refreshDisplay();
         // Carrega os dados com o token salvo
         loadData();
         showToast('Login realizado com sucesso!', 'success');
@@ -662,8 +663,9 @@ function handleLogout() {
     isAdmin = false;
     tokenConfig.classList.remove('show');
     adminToggleBtn.classList.remove('active');
-    adminToggleBtn.innerHTML = '<i class="fas fa-user-cog"></i> Admin';
+    adminToggleBtn.innerHTML = '<i class="fas fa-tools"></i> Ferramentas';
     localStorage.removeItem('isAdmin');
+    refreshDisplay();
     showToast('Desconectado!', 'error');
 }
 
@@ -908,7 +910,10 @@ function initApp() {
 
     updateStats();
     refreshDisplay();
-  
+    // setupEventListeners() NÃO é chamado aqui de propósito: ele já roda uma
+    // única vez no carregamento da página. Chamá-lo de novo a cada loadData()
+    // criava um loop infinito (loadData -> initApp -> setupEventListeners -> loadData...)
+    // que travava a tela em "Carregando dados...".
 }
 
 // ============================================================
@@ -1043,7 +1048,9 @@ function renderTable(data) {
             <td style="font-size:.75rem;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${posto.observacoes || ''}">${posto.observacoes || '-'}</td>
             <td class="td-actions">
                 <button class="icon-btn" onclick="viewDetails(${posto.codigo})" title="Ver detalhes"><i class="fas fa-eye"></i></button>
-                <button class="icon-btn edit" onclick="openEditModal(${posto.codigo})" title="Editar"><i class="fas fa-edit"></i></button>
+                ${isAdmin
+                    ? `<button class="icon-btn edit" onclick="openEditModal(${posto.codigo})" title="Editar"><i class="fas fa-edit"></i></button>`
+                    : `<button class="icon-btn" onclick="requestAdminLogin()" title="Faça login em Ferramentas para editar"><i class="fas fa-lock"></i></button>`}
             </td>
         `;
         tableBody.appendChild(tr);
@@ -1086,7 +1093,9 @@ function renderCards(data) {
             </div>
             <div class="card-footer">
                 <button class="card-btn" onclick="viewDetails(${posto.codigo})"><i class="fas fa-search"></i> Detalhes</button>
-                <button class="card-btn" onclick="openEditModal(${posto.codigo})"><i class="fas fa-edit"></i> Editar</button>
+                ${isAdmin
+                    ? `<button class="card-btn" onclick="openEditModal(${posto.codigo})"><i class="fas fa-edit"></i> Editar</button>`
+                    : `<button class="card-btn" onclick="requestAdminLogin()"><i class="fas fa-lock"></i> Editar</button>`}
             </div>
         `;
         cardsContainer.appendChild(card);
@@ -1376,11 +1385,25 @@ window.addEventListener('click', e => {
 });
 
 // ============================================================
+// PEDIR LOGIN (usado pelos cadeados quando não está logado)
+// ============================================================
+window.requestAdminLogin = () => {
+    showToast('Faça login em "Ferramentas" para poder editar.', 'error');
+    loginModal.classList.add('show');
+    loginUser.focus();
+};
+
+// ============================================================
 // MODAL DE EDIÇÃO
 // ============================================================
 let editingCodigo = null;
 
 window.openEditModal = (codigo) => {
+    if (!isAdmin) {
+        requestAdminLogin();
+        return;
+    }
+
     const posto = postosData.find(p => p.codigo === codigo);
     if (!posto) return;
 
@@ -1484,7 +1507,7 @@ function setupEventListeners() {
         isAdmin = true;
         tokenConfig.classList.add('show');
         adminToggleBtn.classList.add('active');
-        adminToggleBtn.innerHTML = '<i class="fas fa-user-cog"></i> Admin (logado)';
+        adminToggleBtn.innerHTML = '<i class="fas fa-tools"></i> Ferramentas (logado)';
         loadData();
     } else {
         loadData();
