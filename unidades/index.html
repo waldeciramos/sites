@@ -6,9 +6,6 @@
     <title>Rede Dom Pedro · Gestão de Postos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        /* ============================================================
-           DESIGN SYSTEM
-           ============================================================ */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root {
             --orange-50:#FFF7ED; --orange-100:#FFEDD5; --orange-200:#FED7AA; --orange-300:#FDBA74;
@@ -23,7 +20,6 @@
         body { font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#FFF7F0; color:#2D2A24; line-height:1.5; }
         .app-container { max-width:1600px; margin:0 auto; padding:1.5rem; }
 
-        /* ===== HEADER ===== */
         .header {
             position:relative; overflow:hidden;
             background:linear-gradient(135deg, #7C2D12 0%, #C2410C 50%, #EA580C 100%);
@@ -44,7 +40,6 @@
         .header-stats .hs-val { font-weight:700; font-size:1.1rem; }
         .header-stats .hs-lbl { font-size:.6rem; text-transform:uppercase; opacity:.8; letter-spacing:.5px; }
 
-        /* ===== STAT CARDS ===== */
         .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem; }
         .stat-card {
             background:#fff; border-radius:var(--radius-md); padding:1.2rem;
@@ -57,7 +52,6 @@
         .stat-card .stat-label { font-size:.65rem; text-transform:uppercase; font-weight:700; color:var(--orange-600); letter-spacing:.5px; }
         .stat-card .stat-value { font-size:1.5rem; font-weight:800; color:var(--gray-800); line-height:1.1; margin-top:.1rem; }
 
-        /* ===== CONFIG TOKEN ===== */
         .token-config {
             background:#FFFBEB; border:1px solid #FDE68A; border-radius:var(--radius-md);
             padding:1rem 1.5rem; margin-bottom:1rem;
@@ -75,7 +69,6 @@
         .btn-github:hover { background:#1F242A; }
         .btn-github:disabled { opacity:.6; cursor:not-allowed; }
 
-        /* ===== FILTROS ===== */
         .controls-bar {
             display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;
             background:#fff; border-radius:var(--radius-lg); padding:1.2rem 1.5rem;
@@ -88,7 +81,6 @@
             cursor:pointer; font-size:.85rem; transition:all .15s;
         }
         .filter-badge:hover { border-color:var(--orange-400); background:var(--orange-50); }
-        .filter-badge.active { background:var(--orange-500); border-color:var(--orange-500); color:#fff; }
         .filter-badge input[type="checkbox"] { accent-color:var(--orange-500); width:1rem; height:1rem; cursor:pointer; }
         .filter-badge select { background:transparent; border:none; font-size:.85rem; outline:none; cursor:pointer; padding:0; }
         .view-toggle { display:inline-flex; background:var(--gray-50); border:1px solid var(--orange-200); border-radius:2rem; padding:.25rem; gap:.2rem; }
@@ -117,6 +109,9 @@
         .btn-success { background:#16A34A; color:#fff; border:none; padding:.6rem 1.4rem; border-radius:2rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; font-size:.82rem; box-shadow:0 8px 16px -6px rgba(22,163,74,.4); }
         .btn-success:hover { background:#15803D; transform:translateY(-2px); }
 
+        .btn-secondary { background:var(--gray-700); color:#fff; border:none; padding:.6rem 1.4rem; border-radius:2rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; font-size:.82rem; }
+        .btn-secondary:hover { background:var(--gray-800); }
+
         .active-tags { display:flex; flex-wrap:wrap; gap:.6rem; margin-bottom:1rem; min-height:2rem; }
         .tag {
             background:var(--orange-100); color:var(--orange-700); padding:.3rem .8rem; border-radius:2rem; font-size:.75rem; font-weight:600;
@@ -126,7 +121,6 @@
 
         .result-meta { font-size:.85rem; color:var(--gray-500); font-weight:500; padding:.3rem .5rem; }
 
-        /* ===== TABELA ===== */
         .table-wrapper { background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); border:1px solid var(--orange-100); overflow:auto; max-height:680px; }
         .postos-table { width:100%; border-collapse:collapse; font-size:.85rem; min-width:1000px; }
         .postos-table th {
@@ -166,7 +160,6 @@
         .icon-btn:hover { background:var(--orange-100); color:var(--orange-700); }
         .icon-btn.edit:hover { background:#DBEAFE; color:#1D4ED8; }
 
-        /* ===== CARDS ===== */
         .cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:1.1rem; margin-top:.5rem; }
         .posto-card {
             background:#fff; border-radius:var(--radius-lg); padding:1.2rem;
@@ -188,7 +181,6 @@
         }
         .posto-card .card-btn:hover { background:var(--orange-100); }
 
-        /* ===== MODAL ===== */
         .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:2000; justify-content:center; align-items:center; padding:1rem; }
         .modal-card { background:#fff; width:100%; max-width:800px; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); overflow:hidden; animation:modalUp .25s ease; max-height:90vh; display:flex; flex-direction:column; }
         @keyframes modalUp { from { opacity:0; transform:scale(.95) translateY(15px); } to { opacity:1; transform:scale(1) translateY(0); } }
@@ -203,7 +195,6 @@
         .modal-body .detail-label { font-weight:600; color:var(--gray-500); font-size:.7rem; text-transform:uppercase; letter-spacing:.4px; }
         .modal-body .detail-value { font-size:.9rem; color:var(--gray-800); word-break:break-word; }
 
-        /* ===== MODAL DE EDIÇÃO ===== */
         .modal-edit .modal-card { max-width:560px; }
         .modal-edit .modal-body { padding:1.5rem; }
         .modal-edit .form-group { margin-bottom:1.2rem; }
@@ -220,16 +211,12 @@
         .modal-edit .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
         .modal-edit .form-actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--orange-100); }
 
-        /* ===== TOAST ===== */
         .toast { position:fixed; bottom:2rem; right:2rem; background:#1F2937; color:#fff; padding:.8rem 1.5rem; border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:9999; opacity:0; transform:translateY(20px); transition:all .3s ease; display:flex; align-items:center; gap:.7rem; max-width:400px; }
         .toast.show { opacity:1; transform:translateY(0); }
         .toast.success { border-left:4px solid #16A34A; }
         .toast.error { border-left:4px solid #DC2626; }
         .toast i { font-size:1.1rem; }
-        .toast.success i { color:#16A34A; }
-        .toast.error i { color:#DC2626; }
 
-        /* ===== LOADING ===== */
         .loading-overlay {
             position:fixed; inset:0; background:rgba(255,255,255,.85); backdrop-filter:blur(4px);
             display:flex; align-items:center; justify-content:center; z-index:9998;
@@ -239,10 +226,8 @@
         .loading-overlay .spinner { width:48px; height:48px; border:4px solid var(--orange-100); border-top-color:var(--orange-500); border-radius:50%; animation:spin .8s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* ===== FOOTER ===== */
         .footer { text-align:center; padding:1.5rem; color:var(--gray-400); font-size:.7rem; }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width:768px) {
             .app-container { padding:1rem; }
             .header-top { flex-direction:column; align-items:flex-start; }
@@ -476,14 +461,13 @@
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO DO GITHUB - ALTERE AQUI COM SEUS DADOS!
+// CONFIGURAÇÃO DO GITHUB - ALTERE AQUI!
 // ============================================================
 const GITHUB_CONFIG = {
-    owner: 'waldeciramos',        // Ex: 'joaosilva'
-    repo: 'unidades
-',     // Ex: 'sites'
+    owner: 'waldeciramos',           // seu usuário
+    repo: 'sites',                   // seu repositório
     path: 'postos_dompedro_2026-09-04.json',  // nome do arquivo
-    branch: 'main'               // ou 'master'
+    branch: 'main'                   // branch
 };
 
 // ============================================================
@@ -540,14 +524,14 @@ async function loadFromGitHub() {
     loadingOverlay.classList.remove('hidden');
     const token = githubTokenInput.value.trim();
 
-    // Tenta carregar do localStorage primeiro (cache)
+    // Tenta carregar do localStorage primeiro
     const cached = localStorage.getItem('postosData');
     if (cached && !token) {
         try {
             const parsed = JSON.parse(cached);
             if (Array.isArray(parsed) && parsed.length > 0) {
                 postosData = parsed;
-                dataStatus.textContent = `📦 ${postosData.length} postos carregados (cache local)`;
+                dataStatus.textContent = `📦 ${postosData.length} postos carregados (cache)`;
                 loadingOverlay.classList.add('hidden');
                 initApp();
                 return;
@@ -725,13 +709,14 @@ async function testToken() {
 }
 
 // ============================================================
-// DADOS FALLBACK
+// DADOS FALLBACK (se não carregar do GitHub)
 // ============================================================
 function getFallbackData() {
     return [
         {codigo:1, razaoSocial:"MG - REDE DOM PEDRO DE POSTOS LTDA", nomeReduzido:"REDE DOM PEDRO DE POSTOS LTD", cnpj:"20.415.295/0001-74", ie:"245068303002", im:"237950644", endereco:"ROD FERNAO DIAS, SN - SN", bairro:"ESPRAIADO", cidade:"ESTIVA", cep:"37.542-0", estado:"MG", municipio:"ESTIVA", pais:"BRASIL", fone:"", fax:"", contato:"DIRCEU", ativo:true, observacoes:"Matriz administrativa"},
         {codigo:2, razaoSocial:"MG S - REDE DOM PEDRO DE POSTOS LTDA (DP 1)", nomeReduzido:"DP 1", cnpj:"20.415.295/0001-74", ie:"245068303002", im:"2450291", endereco:"ROD FERNAO DIAS KM 880,", bairro:"ESPRAIADO", cidade:"ESTIVA", cep:"37.542-0", estado:"MG", municipio:"ESTIVA", pais:"BRASIL", fone:"35 34621188", fax:"35 34621188", contato:"DIRCEU", ativo:true, observacoes:"Posto 1 - Estiva"},
-        {codigo:3, razaoSocial:"MG - REDE DOM PEDRO DE POSTOS LTDA (DP ITATIAIUCU)", nomeReduzido:"DP ITATIAIUCU", cnpj:"20.415.295/0009-21", ie:"245068303093", im:"167", endereco:"ROD BR 381, SN - KM 57", bairro:"PINHEIROS", cidade:"ITATIAIUCU", cep:"35.685-0", estado:"MG", municipio:"TATIAIUCU", pais:"BRASIL", fone:"3534622135", fax:"3534622136", contato:"VANDERCELIO", ativo:true, observacoes:"Unidade com maior movimento"}
+        {codigo:3, razaoSocial:"MG - REDE DOM PEDRO DE POSTOS LTDA (DP ITATIAIUCU)", nomeReduzido:"DP ITATIAIUCU", cnpj:"20.415.295/0009-21", ie:"245068303093", im:"167", endereco:"ROD BR 381, SN - KM 57", bairro:"PINHEIROS", cidade:"ITATIAIUCU", cep:"35.685-0", estado:"MG", municipio:"TATIAIUCU", pais:"BRASIL", fone:"3534622135", fax:"3534622136", contato:"VANDERCELIO", ativo:true, observacoes:"Unidade com maior movimento"},
+        {codigo:4, razaoSocial:"SP - POSTO DOM PEDRO DE LEME LTDA (DP LEME)", nomeReduzido:"DP LEME", cnpj:"44.740.967/0001-85", ie:"415002666118", im:"ISENTO", endereco:"RODOVIA ANHANGUERA KM 18", bairro:"SERELEPE", cidade:"LEME", cep:"13.610-4", estado:"SP", municipio:"LEME", pais:"BRASIL", fone:"19 35721423", fax:"19 35721423", contato:"EDSON", ativo:true, observacoes:"Primeiro posto em SP"}
     ];
 }
 
@@ -1187,7 +1172,6 @@ function setupEventListeners() {
     const savedToken = localStorage.getItem('github_token');
     if (savedToken) {
         githubTokenInput.value = savedToken;
-        // Testa automaticamente se houver token salvo
         setTimeout(testToken, 500);
     }
 }
