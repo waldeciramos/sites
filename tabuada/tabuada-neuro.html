@@ -127,8 +127,9 @@
   .question-zone{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:10px 0 22px;}
   .q-expr{font-family:'Space Grotesk'; font-weight:700; font-size:52px; color:var(--ink); letter-spacing:-0.01em;}
   .q-sub{margin-top:6px; color:var(--muted); font-size:14px;}
-  .options-grid{display:flex; flex-direction:column; gap:12px; width:100%;}
-  .opt-btn{padding:18px; border-radius:16px; border:1.6px solid var(--border); background:var(--surface); font-family:'Space Grotesk'; font-size:22px; font-weight:600; color:var(--ink); cursor:pointer; transition:all .12s ease;}
+  .options-grid{display:flex; flex-direction:row; justify-content:center; gap:18px; width:100%; flex-wrap:wrap;}
+  .opt-btn{width:92px; height:92px; border-radius:50%; border:2px solid var(--border); background:var(--surface); font-family:'Space Grotesk'; font-size:24px; font-weight:700; color:var(--ink); cursor:pointer; transition:all .12s ease; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px -8px rgba(14,110,110,0.25);}
+  .opt-btn:active{transform:scale(0.94);}
   .opt-btn.correct{background:var(--success-soft); border-color:var(--success); color:var(--success);}
   .opt-btn.wrong{background:var(--error-soft); border-color:var(--error); color:var(--error);}
   .opt-btn[disabled]{opacity:.75;}
@@ -165,6 +166,10 @@
   .sync-pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 12px; border-radius:20px; background:var(--border); color:var(--muted);}
   .sync-pill.ok{background:var(--success-soft); color:var(--success);}
   .sync-pill.off{background:var(--error-soft); color:var(--error);}
+  .sync-pill.status-melhorando{background:var(--success-soft); color:var(--success);}
+  .sync-pill.status-estavel{background:var(--accent-soft); color:#8A5C0B;}
+  .sync-pill.status-piorando{background:var(--error-soft); color:var(--error);}
+  .sync-pill.status-insuficiente{background:var(--border); color:var(--muted);}
   .sync-pill .dot2{width:7px; height:7px; border-radius:50%; background:currentColor;}
 </style>
 </head>
@@ -280,7 +285,7 @@
   <section class="screen" id="screen-patient-form">
     <div class="top-bar">
       <button class="icon-btn" data-back="screen-patient-select"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <h2>Ficha de avaliação</h2>
+      <h2 id="pf-title">Ficha de avaliação</h2>
       <div style="width:40px;"></div>
     </div>
     <div class="card">
@@ -339,7 +344,11 @@
       <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">Cadastrado em</div><div id="view-criado" style="font-weight:700;">—</div></div>
     </div>
     <div class="spacer"></div>
-    <button class="btn btn-primary" id="btn-view-select">Abrir este paciente</button>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-view-select">Abrir este paciente</button>
+      <button class="btn btn-ghost" id="btn-view-edit">Editar ficha</button>
+      <button class="btn btn-danger-ghost" id="btn-view-delete">Excluir paciente</button>
+    </div>
   </section>
 
   <!-- HOME -->
@@ -403,6 +412,19 @@
     </div>
     <div class="spacer"></div>
     <button class="btn btn-primary" id="btn-start-practice" disabled>Começar treino</button>
+  </section>
+
+  <!-- OFFICIAL TEST SETUP -->
+  <section class="screen" id="screen-official-setup">
+    <div class="top-bar">
+      <button class="icon-btn" data-back="screen-home"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Simulado do dia</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <p class="muted">Escolha a tabuada de hoje. O simulado passa primeiro pela múltipla escolha e, ao concluir, segue direto para a resposta livre da mesma tabuada — sem precisar escolher mais nada.</p>
+    <div class="grid-9" id="official-tabuada-grid"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-accent" id="btn-start-official" disabled>Iniciar simulado</button>
   </section>
 
   <!-- QUIZ -->
@@ -513,7 +535,7 @@
       <div class="chart-wrap"><h3 style="margin-bottom:6px;">Precisão por dia (%)</h3><canvas id="chart-precisao" height="180"></canvas></div>
       <div class="chart-wrap"><h3 style="margin-bottom:6px;">Tempo médio por questão (s)</h3><canvas id="chart-tempo" height="180"></canvas></div>
       <div class="chart-wrap"><h3 style="margin-bottom:6px;">Erros por simulado</h3><canvas id="chart-erros" height="180"></canvas></div>
-      <div class="conclusion-box"><h3 style="color:var(--primary-dark);">Análise da evolução</h3><p id="conclusion-text">—</p></div>
+      <div class="conclusion-box"><h3 style="color:var(--primary-dark); display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">Análise da evolução <span class="sync-pill" id="conclusion-label">—</span></h3><p id="conclusion-text">—</p></div>
       <h3 style="margin-top:20px;">Histórico</h3>
       <div style="overflow-x:auto;">
         <table id="history-table"><thead><tr><th>Data</th><th>Mód. A</th><th>Tempo A</th><th>Mód. B</th><th>Tempo B</th></tr></thead><tbody></tbody></table>
@@ -791,7 +813,23 @@
     $('view-whatsapp').textContent = p.whatsappResponsavel || '—';
     $('view-criado').textContent = p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—';
     $('btn-view-select').onclick = ()=>selectPatient(p);
+    $('btn-view-edit').onclick = ()=>openPatientForm(p);
+    $('btn-view-delete').onclick = ()=>deletePatient(p);
     showScreen('screen-patient-view');
+  }
+
+  async function deletePatient(p){
+    const sure = confirm('Excluir "' + p.nomeCompleto + '"? O histórico de exercícios dele continuará salvo no GitHub, mas ele sai da lista de pacientes.');
+    if(!sure) return;
+    patients = patients.filter(x=>x.id !== p.id);
+    await localSet('patients', patients);
+    toast('Excluindo e sincronizando...');
+    const res = await ghPutFile('dados.json', patients, 'Remove paciente ' + p.nomeCompleto);
+    if(res.ok) await ghPutFile('dados_backup.json', patients, 'Backup automático de pacientes');
+    if(res.ok) toast('Paciente excluído e sincronizado.');
+    else if(res.reason !== 'no-config') toast('Excluído localmente. Falha ao sincronizar com o GitHub.');
+    renderPatientList();
+    showScreen('screen-patient-select');
   }
 
   async function selectPatient(p){
@@ -804,13 +842,22 @@
     showScreen('screen-home');
   }
 
-  $('btn-new-patient').addEventListener('click', ()=>{
-    $('pf-nome').value=''; $('pf-nasc').value=''; $('pf-idade').value='';
-    $('pf-cidade').value=''; $('pf-telefone').value=''; $('pf-whatsapp').value='';
-    $('pf-mesmo-whats').checked = true;
-    $('pf-whats-field').style.display = 'none';
+  let editingPatientId = null;
+
+  function openPatientForm(p){
+    editingPatientId = p ? p.id : null;
+    $('pf-title').textContent = p ? 'Editar ficha' : 'Ficha de avaliação';
+    $('pf-nome').value = p ? p.nomeCompleto : '';
+    $('pf-nasc').value = p ? p.dataNascimento : '';
+    $('pf-idade').value = p ? (calcAge(p.dataNascimento) ?? '') : '';
+    $('pf-cidade').value = p ? (p.cidade || '') : '';
+    $('pf-telefone').value = p ? (p.telefoneResponsavel || '') : '';
+    const mesmo = p ? (p.whatsappResponsavel === p.telefoneResponsavel) : true;
+    $('pf-mesmo-whats').checked = mesmo;
+    $('pf-whats-field').style.display = mesmo ? 'none' : 'block';
+    $('pf-whatsapp').value = p ? (p.whatsappResponsavel || '') : '';
     $('pf-error').textContent = '';
-    if(patients.length === 0){
+    if(!p && patients.length === 0){
       $('pf-nome').value = 'Eduardo Pereira Ramos';
       $('pf-nasc').value = '2013-02-04';
       $('pf-idade').value = calcAge('2013-02-04');
@@ -818,7 +865,9 @@
       $('pf-telefone').value = '(35) 98401-6706';
     }
     showScreen('screen-patient-form');
-  });
+  }
+
+  $('btn-new-patient').addEventListener('click', ()=>openPatientForm(null));
 
   $('pf-nasc').addEventListener('input', ()=>{
     const age = calcAge($('pf-nasc').value);
@@ -840,19 +889,24 @@
     if(!nasc){ $('pf-error').textContent = 'Informe a data de nascimento.'; return; }
     if(!telefone){ $('pf-error').textContent = 'Informe o telefone do responsável.'; return; }
 
-    const record = {
-      id: 'p_' + Date.now(),
-      nomeCompleto: nome,
-      dataNascimento: nasc,
-      cidade: cidade,
-      telefoneResponsavel: telefone,
-      whatsappResponsavel: whatsapp,
-      criadoEm: new Date().toISOString()
-    };
-    patients.push(record);
+    let record;
+    if(editingPatientId){
+      const idx = patients.findIndex(x=>x.id === editingPatientId);
+      record = patients[idx];
+      record.nomeCompleto = nome; record.dataNascimento = nasc; record.cidade = cidade;
+      record.telefoneResponsavel = telefone; record.whatsappResponsavel = whatsapp;
+    }else{
+      record = {
+        id: 'p_' + Date.now(),
+        nomeCompleto: nome, dataNascimento: nasc, cidade: cidade,
+        telefoneResponsavel: telefone, whatsappResponsavel: whatsapp,
+        criadoEm: new Date().toISOString()
+      };
+      patients.push(record);
+    }
     await localSet('patients', patients);
     toast('Ficha salva localmente. Sincronizando...');
-    const res = await ghPutFile('dados.json', patients, 'Cadastra paciente ' + nome);
+    const res = await ghPutFile('dados.json', patients, (editingPatientId ? 'Atualiza' : 'Cadastra') + ' paciente ' + nome);
     if(res.ok) await ghPutFile('dados_backup.json', patients, 'Backup automático de pacientes');
     if(res.ok) toast('Ficha sincronizada com o GitHub.');
     else if(res.reason !== 'no-config') toast('Salvo localmente. Falha ao sincronizar com o GitHub.');
@@ -901,14 +955,32 @@
   });
 
   /* ---------------- Official daily test ---------------- */
+  let officialTabuada = null;
+  const officialGrid = $('official-tabuada-grid');
+  for(let n=1;n<=9;n++){
+    const tile = document.createElement('div');
+    tile.className = 'num-tile';
+    tile.textContent = n;
+    tile.addEventListener('click', ()=>{
+      document.querySelectorAll('#official-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+      tile.classList.add('selected');
+      officialTabuada = n;
+      $('btn-start-official').disabled = false;
+    });
+    officialGrid.appendChild(tile);
+  }
   $('tile-official').addEventListener('click', ()=>{
-    const tabsA = shuffle([1,2,3,4,5,6,7,8,9]).slice(0,3);
-    const tabsB = shuffle([1,2,3,4,5,6,7,8,9]).slice(0,3);
+    officialTabuada = null;
+    document.querySelectorAll('#official-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+    $('btn-start-official').disabled = true;
+    showScreen('screen-official-setup');
+  });
+  $('btn-start-official').addEventListener('click', ()=>{
     session = {
       kind:'official',
       modules:[
-        {type:'A', tabuadas:tabsA, questions:buildQuestions(tabsA), idx:0, startTs:null, endTs:null},
-        {type:'B', tabuadas:tabsB, questions:buildQuestions(tabsB), idx:0, startTs:null, endTs:null}
+        {type:'A', tabuadas:[officialTabuada], questions:buildQuestions([officialTabuada]), idx:0, startTs:null, endTs:null},
+        {type:'B', tabuadas:[officialTabuada], questions:buildQuestions([officialTabuada]), idx:0, startTs:null, endTs:null}
       ],
       modIdx:0
     };
@@ -1201,11 +1273,14 @@
       ]}, options:{responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}}
     });
 
-    $('conclusion-text').textContent = buildConclusion(sorted);
+    const analysis = buildConclusion(sorted);
+    $('conclusion-label').textContent = analysis.label;
+    $('conclusion-label').className = 'sync-pill status-' + analysis.cls;
+    $('conclusion-text').textContent = analysis.text;
   }
 
   function buildConclusion(sorted){
-    if(sorted.length < 2) return 'Complete mais simulados em dias diferentes para que a análise de evolução seja gerada.';
+    if(sorted.length < 2) return {cls:'insuficiente', label:'Aguardando mais sessões', text:'Complete mais simulados em dias diferentes para que a análise de evolução seja gerada.'};
     const n = sorted.length;
     const half = Math.max(1, Math.floor(Math.min(3, Math.floor(n/2))));
     const first = sorted.slice(0, half);
@@ -1226,12 +1301,25 @@
     else if(deltaT < -0.3) tempoTxt = `o tempo médio de resposta aumentou de ${tFirst.toFixed(1)}s para ${tLast.toFixed(1)}s`;
     else tempoTxt = `o tempo médio de resposta permaneceu estável, perto de ${tLast.toFixed(1)}s`;
 
-    let veredito;
-    if(deltaP > 3 && deltaT > 0.3) veredito = 'Os dois indicadores caminham juntos na direção esperada, o que é compatível com um efeito positivo do treino sobre a neuromodulação cognitiva.';
-    else if(deltaP > 3 || deltaT > 0.3) veredito = 'Há sinais de melhora em pelo menos um dos indicadores, sugerindo progresso, ainda que seja recomendável continuar o acompanhamento por mais dias para confirmar a tendência.';
-    else veredito = 'Ainda não há uma tendência clara de melhora nos ' + n + ' simulados registrados. Isso não significa ausência de efeito — recomenda-se completar a sequência de 10 dias para uma análise mais conclusiva.';
+    let cls, label, veredito;
+    if(deltaP > 3 && deltaT > 0.3){
+      cls='melhorando'; label='Melhorando';
+      veredito = 'Os dois indicadores caminham juntos na direção esperada, o que é compatível com um efeito positivo do treino sobre a neuromodulação cognitiva.';
+    }else if(deltaP > 3 || deltaT > 0.3){
+      cls='melhorando'; label='Melhorando';
+      veredito = 'Há sinais de melhora em pelo menos um dos indicadores, sugerindo progresso, ainda que seja recomendável continuar o acompanhamento por mais sessões para confirmar a tendência.';
+    }else if(deltaP < -3 && deltaT < -0.3){
+      cls='piorando'; label='Piorando';
+      veredito = 'Os dois indicadores pioraram na comparação entre as sessões. Pode ser oscilação pontual (cansaço, dia ruim) ou uma tendência real — vale observar as próximas sessões com atenção.';
+    }else if(deltaP < -3 || deltaT < -0.3){
+      cls='piorando'; label='Leve piora';
+      veredito = 'Um dos indicadores piorou levemente. Ainda não é conclusivo isoladamente, mas merece acompanhamento nas próximas sessões.';
+    }else{
+      cls='estavel'; label='Sem alteração relevante';
+      veredito = 'Ainda não há uma tendência clara de melhora ou piora nos ' + n + ' simulados registrados. Isso não significa ausência de efeito — recomenda-se completar a sequência de sessões (até 20) para uma análise mais conclusiva.';
+    }
 
-    return `Com base em ${n} simulado(s) registrado(s), ${precisaoTxt}, e ${tempoTxt}. ${veredito}`;
+    return {cls, label, text:`Com base em ${n} simulado(s) registrado(s), ${precisaoTxt}, e ${tempoTxt}. ${veredito}`};
   }
 
   $('btn-export-backup').addEventListener('click', ()=>{
@@ -1313,7 +1401,7 @@
     doc.setFont('helvetica','bold'); doc.setFontSize(11);
     doc.text('Análise da evolução', marginX, y); y += 16;
     doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
-    const lines = doc.splitTextToSize(buildConclusion(sorted), pageW - marginX*2);
+    const lines = doc.splitTextToSize(buildConclusion(sorted).text, pageW - marginX*2);
     doc.text(lines, marginX, y);
 
     const totalPages = doc.internal.getNumberOfPages();
