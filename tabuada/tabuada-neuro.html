@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>NeuroCálculo — Treino de Tabuada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#F4F7F6;
+    --surface:#FFFFFF;
+    --ink:#12241F;
+    --muted:#5C7572;
+    --primary:#0E6E6E;
+    --primary-dark:#0A4F4F;
+    --primary-soft:#DFF0EE;
+    --accent:#F2A93B;
+    --accent-soft:#FCEACB;
+    --success:#3C9D6B;
+    --success-soft:#DFF3E8;
+    --error:#D64550;
+    --error-soft:#FBE2E2;
+    --border:#DCE6E4;
+    --radius:18px;
+    --shadow:0 10px 30px -14px rgba(14,110,110,0.28);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(720px 420px at 85% -10%, var(--primary-soft) 0%, transparent 60%),
+      radial-gradient(600px 500px at -10% 110%, var(--accent-soft) 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Manrope', sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .screen{display:none; flex-direction:column; flex:1; padding:20px 20px 28px;}
+  .screen.active{display:flex;}
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; color:var(--primary-dark);}
+  h1{font-size:26px; font-weight:700; letter-spacing:-0.01em;}
+  h2{font-size:20px; font-weight:600;}
+  h3{font-size:16px; font-weight:600;}
+  p{line-height:1.55; margin:8px 0 0; color:var(--ink);}
+  .muted{color:var(--muted); font-size:14px;}
+  .brand{display:flex; align-items:center; gap:10px; margin-bottom:26px;}
+  .brand-mark{width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, var(--primary), var(--primary-dark)); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .brand-mark svg{width:24px; height:24px;}
+  .brand-text .top{font-family:'Space Grotesk'; font-weight:700; font-size:18px; color:var(--primary-dark); line-height:1.1;}
+  .brand-text .sub{font-size:12px; color:var(--muted);}
+  .field{margin-top:16px;}
+  .field label{display:block; font-size:13px; font-weight:600; color:var(--primary-dark); margin-bottom:6px;}
+  .field input, .field select{width:100%; padding:14px 16px; border-radius:14px; border:1.5px solid var(--border); font-size:16px; font-family:'Manrope'; background:var(--surface); color:var(--ink);}
+  .field input:focus, .field select:focus{outline:none; border-color:var(--primary);}
+  .field .hint{font-size:12px; color:var(--muted); margin-top:5px;}
+  .checkline{display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; color:var(--muted);}
+  .btn{appearance:none; border:none; cursor:pointer; font-family:'Manrope'; font-weight:700; font-size:15px; border-radius:14px; padding:16px 20px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;}
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--primary); color:#fff; box-shadow:var(--shadow);}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-accent{background:var(--accent); color:#3A2703;}
+  .btn-ghost{background:transparent; color:var(--primary-dark); border:1.5px solid var(--border);}
+  .btn-danger-ghost{background:transparent; color:var(--error); border:1.5px solid var(--error-soft);}
+  .btn[disabled]{opacity:.45; cursor:not-allowed;}
+  .stack{display:flex; flex-direction:column; gap:12px; margin-top:16px;}
+  .row{display:flex; gap:12px;}
+  .row > *{flex:1;}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px;}
+  .spacer{flex:1;}
+  .link-text{background:none; border:none; color:var(--muted); font-size:13px; text-decoration:underline; cursor:pointer; padding:6px; font-family:'Manrope';}
+  .error-msg{color:var(--error); font-size:13px; margin-top:10px; min-height:16px;}
+  .top-bar{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; gap:8px;}
+  .icon-btn{background:var(--surface); border:1px solid var(--border); width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;}
+  .icon-btn svg{width:18px; height:18px; stroke:var(--primary-dark);}
+  .hello{font-size:14px; color:var(--muted); margin-bottom:2px;}
+  .top-actions{display:flex; gap:8px;}
+
+  .menu-tile{display:flex; align-items:center; gap:14px; padding:18px; border-radius:var(--radius); border:1px solid var(--border); background:var(--surface); cursor:pointer; text-align:left;}
+  .menu-tile .tile-icon{width:46px; height:46px; border-radius:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .menu-tile .tile-icon svg{width:22px; height:22px;}
+  .menu-tile.primary-tile{background:linear-gradient(135deg, var(--primary), var(--primary-dark)); border:none;}
+  .menu-tile.primary-tile h3, .menu-tile.primary-tile p{color:#fff;}
+  .menu-tile.primary-tile .tile-icon{background:rgba(255,255,255,0.18);}
+  .menu-tile.primary-tile .tile-icon svg{stroke:#fff;}
+  .menu-tile:not(.primary-tile) .tile-icon{background:var(--primary-soft);}
+  .menu-tile:not(.primary-tile) .tile-icon svg{stroke:var(--primary-dark);}
+  .menu-tile p{font-size:13px; margin-top:2px; color:var(--muted);}
+
+  .patient-tile{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:16px; border-radius:16px; border:1.5px solid var(--border); background:var(--surface); cursor:pointer;}
+  .patient-tile .pname{font-family:'Space Grotesk'; font-weight:700; font-size:16px; color:var(--ink);}
+  .patient-tile .pmeta{font-size:12px; color:var(--muted); margin-top:2px;}
+  .patient-tile .chev{stroke:var(--muted); width:18px; height:18px; flex-shrink:0;}
+
+  .grid-9{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
+  .num-tile{aspect-ratio:1; border-radius:16px; border:1.5px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:24px; color:var(--primary-dark); cursor:pointer;}
+  .num-tile.selected{background:var(--primary); border-color:var(--primary); color:#fff;}
+  .mode-choice{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+  .mode-opt{border:1.5px solid var(--border); border-radius:16px; padding:14px 16px; cursor:pointer; background:var(--surface); display:flex; align-items:center; gap:12px;}
+  .mode-opt.selected{border-color:var(--primary); background:var(--primary-soft);}
+  .mode-opt .dot{width:20px; height:20px; border-radius:50%; border:2px solid var(--border); flex-shrink:0;}
+  .mode-opt.selected .dot{border-color:var(--primary); background:var(--primary);}
+
+  .quiz-head{display:flex; align-items:center; justify-content:space-between;}
+  .quiz-tag{font-size:12px; font-weight:700; color:var(--primary-dark); background:var(--primary-soft); padding:5px 10px; border-radius:20px;}
+  .timer-tag{font-family:'Space Grotesk'; font-weight:600; font-size:14px; color:var(--muted);}
+  .neuro-track{display:flex; gap:5px; margin:16px 0 6px; flex-wrap:wrap;}
+  .neuro-track .node{width:9px; height:9px; border-radius:50%; background:var(--border); transition:background .2s;}
+  .neuro-track .node.done-correct{background:var(--success);}
+  .neuro-track .node.done-wrong{background:var(--error);}
+  .neuro-track .node.current{background:var(--accent); transform:scale(1.3);}
+  .question-zone{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:10px 0 22px;}
+  .q-expr{font-family:'Space Grotesk'; font-weight:700; font-size:52px; color:var(--ink); letter-spacing:-0.01em;}
+  .q-sub{margin-top:6px; color:var(--muted); font-size:14px;}
+  .options-grid{display:flex; flex-direction:column; gap:12px; width:100%;}
+  .opt-btn{padding:18px; border-radius:16px; border:1.6px solid var(--border); background:var(--surface); font-family:'Space Grotesk'; font-size:22px; font-weight:600; color:var(--ink); cursor:pointer; transition:all .12s ease;}
+  .opt-btn.correct{background:var(--success-soft); border-color:var(--success); color:var(--success);}
+  .opt-btn.wrong{background:var(--error-soft); border-color:var(--error); color:var(--error);}
+  .opt-btn[disabled]{opacity:.75;}
+  .answer-input-wrap{display:flex; gap:10px; width:100%;}
+  .answer-input-wrap input{flex:1; text-align:center; font-family:'Space Grotesk'; font-size:28px; font-weight:700; padding:14px; border-radius:16px; border:1.6px solid var(--border);}
+  .answer-input-wrap input:focus{outline:none; border-color:var(--primary);}
+  .answer-input-wrap input.input-correct{border-color:var(--success); background:var(--success-soft); color:var(--success);}
+  .answer-input-wrap input.input-wrong{border-color:var(--error); background:var(--error-soft); color:var(--error);}
+  .feedback-banner{margin-top:14px; padding:10px 14px; border-radius:12px; font-weight:700; font-size:14px; width:100%; text-align:center;}
+  .feedback-banner.ok{background:var(--success-soft); color:var(--success);}
+  .feedback-banner.no{background:var(--error-soft); color:var(--error);}
+
+  .stat-row{display:flex; gap:12px; margin-top:16px;}
+  .stat-box{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px; text-align:center;}
+  .stat-box .val{font-family:'Space Grotesk'; font-weight:700; font-size:24px; color:var(--primary-dark);}
+  .stat-box .lbl{font-size:12px; color:var(--muted); margin-top:2px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px; margin-top:8px;}
+  th,td{padding:8px 6px; text-align:center; border-bottom:1px solid var(--border);}
+  th{color:var(--muted); font-weight:600; font-size:11px;}
+  td{font-family:'Space Grotesk'; font-weight:600;}
+  .chart-wrap{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-top:16px;}
+  .chart-wrap canvas{max-width:100%;}
+  .conclusion-box{background:var(--primary-soft); border-radius:var(--radius); padding:16px; margin-top:16px;}
+  .conclusion-box p{color:var(--primary-dark); font-size:14px;}
+
+  .footer-credit{margin-top:22px; text-align:center; font-size:11.5px; color:var(--muted); line-height:1.5;}
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:12px 18px; border-radius:12px; font-size:13px; z-index:50; opacity:0; transition:opacity .25s; pointer-events:none; max-width:90%; text-align:center;}
+  .toast.show{opacity:1;}
+  .empty-state{text-align:center; padding:30px 10px; color:var(--muted);}
+  .badge-module{display:inline-block; font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px;}
+  .badge-a{background:var(--primary-soft); color:var(--primary-dark);}
+  .badge-b{background:var(--accent-soft); color:#8A5C0B;}
+  .sync-pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 12px; border-radius:20px; background:var(--border); color:var(--muted);}
+  .sync-pill.ok{background:var(--success-soft); color:var(--success);}
+  .sync-pill.off{background:var(--error-soft); color:var(--error);}
+  .sync-pill .dot2{width:7px; height:7px; border-radius:50%; background:currentColor;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- LOGIN -->
+  <section class="screen active" id="screen-login">
+    <div class="spacer" style="flex:0.3"></div>
+    <div class="brand" style="flex-direction:column; align-items:center; text-align:center; gap:14px;">
+      <div class="brand-mark" style="width:64px; height:64px; border-radius:18px;">
+        <svg viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;"><path d="M12 3a4 4 0 0 0-4 4v1.2A4.5 4.5 0 0 0 5.5 12 4.5 4.5 0 0 0 8 16.2V17a4 4 0 0 0 8 0v-.8A4.5 4.5 0 0 0 18.5 12 4.5 4.5 0 0 0 16 8.2V7a4 4 0 0 0-4-4Z" stroke="#fff" stroke-width="1.5"/><path d="M9 12h6M12 9v6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="brand-text" style="text-align:center;">
+        <div class="top">NeuroCálculo</div>
+        <div class="sub">Treino cognitivo de tabuada</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px;">
+      <h2>Acesso à aplicação</h2>
+      <p class="muted">Uso restrito à equipe da clínica.</p>
+      <div class="field">
+        <label>Usuário</label>
+        <input type="text" id="login-user" placeholder="Usuário" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="Senha" autocomplete="current-password">
+      </div>
+      <div class="error-msg" id="login-error"></div>
+      <div class="stack">
+        <button class="btn btn-primary" id="btn-login-submit">Entrar</button>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="footer-credit">
+      Desenvolvido por Waldeci Ramos em 2026, com supervisão clínica da<br>Dra. Thaís Pereira Xavier.
+    </div>
+  </section>
+
+  <!-- GITHUB SYNC SETTINGS -->
+  <section class="screen" id="screen-gh-settings">
+    <div class="top-bar">
+      <button class="icon-btn" data-back="screen-patient-select"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Sincronização</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <p class="muted">Os dados de pacientes e exercícios podem ser salvos em um repositório do GitHub, além da cópia local deste dispositivo.</p>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="field" style="margin-top:0;">
+        <label>Usuário / organização</label>
+        <input type="text" id="gh-owner" value="waldeciramos">
+      </div>
+      <div class="field">
+        <label>Repositório</label>
+        <input type="text" id="gh-repo" value="site">
+      </div>
+      <div class="field">
+        <label>Pasta base</label>
+        <input type="text" id="gh-path" value="neuromodulacao">
+      </div>
+      <div class="field">
+        <label>Token de acesso pessoal</label>
+        <input type="password" id="gh-token" placeholder="ghp_...">
+        <div class="hint">O token fica salvo apenas neste dispositivo/navegador, nunca no código da aplicação. Use um token com permissão restrita ao repositório.</div>
+      </div>
+      <div class="error-msg" id="gh-error"></div>
+      <div class="stack">
+        <button class="btn btn-primary" id="btn-gh-save">Salvar e testar conexão</button>
+      </div>
+      <div style="margin-top:14px; text-align:center;">
+        <span class="sync-pill" id="gh-status-pill"><span class="dot2"></span><span id="gh-status-text">Não configurado</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATIENT SELECT -->
+  <section class="screen" id="screen-patient-select">
+    <div class="top-bar">
+      <div>
+        <div class="hello">NeuroCálculo</div>
+        <h1>Pacientes</h1>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="btn-open-gh-settings" title="Sincronização">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 4l16 16M20 4L4 20" stroke-width="0"/><circle cx="12" cy="12" r="3" stroke-width="1.8"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.36a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.64 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.64 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.64a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.36 9c.14.35.5 1 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-logout" title="Sair">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-bottom:10px;">
+      <span class="sync-pill" id="patient-sync-pill"><span class="dot2"></span><span>Local</span></span>
+    </div>
+
+    <div id="patient-list" class="stack"></div>
+    <div id="patient-empty" class="empty-state" style="display:none;">
+      <p>Nenhum paciente cadastrado ainda.<br>Cadastre a primeira ficha de avaliação para começar.</p>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="stack">
+      <button class="btn btn-accent" id="btn-new-patient">Cadastrar novo paciente</button>
+    </div>
+  </section>
+
+  <!-- PATIENT FORM (ficha de avaliação) -->
+  <section class="screen" id="screen-patient-form">
+    <div class="top-bar">
+      <button class="icon-btn" data-back="screen-patient-select"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Ficha de avaliação</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-top:0;">
+        <label>Nome completo</label>
+        <input type="text" id="pf-nome" placeholder="Nome completo do paciente">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Data de nascimento</label>
+          <input type="date" id="pf-nasc">
+        </div>
+        <div class="field">
+          <label>Idade</label>
+          <input type="text" id="pf-idade" placeholder="—" disabled>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cidade</label>
+        <input type="text" id="pf-cidade" placeholder="Cidade - UF">
+      </div>
+      <div class="field">
+        <label>Telefone do responsável</label>
+        <input type="text" id="pf-telefone" placeholder="(35) 90000-0000">
+      </div>
+      <div class="checkline">
+        <input type="checkbox" id="pf-mesmo-whats" checked>
+        <label for="pf-mesmo-whats" style="margin:0;">WhatsApp é o mesmo número acima</label>
+      </div>
+      <div class="field" id="pf-whats-field" style="display:none;">
+        <label>WhatsApp do responsável</label>
+        <input type="text" id="pf-whatsapp" placeholder="(35) 90000-0000">
+      </div>
+      <div class="error-msg" id="pf-error"></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" id="btn-save-patient">Salvar ficha</button>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="top-bar">
+      <div>
+        <div class="hello">Paciente</div>
+        <h1 id="home-patient-name">—</h1>
+        <div class="muted" id="home-patient-meta" style="font-size:12px; margin-top:2px;"></div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="btn-switch-patient" title="Trocar paciente">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-logout-home" title="Sair">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="stack" style="margin-top:4px; gap:14px;">
+      <button class="menu-tile primary-tile" id="tile-official">
+        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <div><h3>Simulado do dia</h3><p>Teste oficial cronometrado — conta para a evolução</p></div>
+      </button>
+      <button class="menu-tile" id="tile-practice">
+        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v6h6" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <div><h3>Treino livre</h3><p>Escolha uma tabuada e pratique sem contar no histórico</p></div>
+      </button>
+      <button class="menu-tile" id="tile-evolution">
+        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke-width="1.8" stroke-linecap="round"/><path d="M7 15l4-5 3 3 5-7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><h3>Evolução do paciente</h3><p>Gráficos, histórico e relatório em PDF</p></div>
+      </button>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="footer-credit">Elaboração: Waldeci Ramos, 2026 · Supervisão: Dra. Thaís Xavier</div>
+  </section>
+
+  <!-- PRACTICE SETUP -->
+  <section class="screen" id="screen-practice-setup">
+    <div class="top-bar">
+      <button class="icon-btn" data-back="screen-home"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Treino livre</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <p class="muted">Escolha a tabuada que deseja treinar.</p>
+    <div class="grid-9" id="practice-tabuada-grid"></div>
+    <div style="margin-top:22px;">
+      <p class="muted" style="margin-top:0;">Como você quer responder?</p>
+      <div class="mode-choice" id="practice-mode-choice">
+        <div class="mode-opt" data-mode="A">
+          <div class="dot"></div>
+          <div><h3 style="font-size:15px;">Múltipla escolha</h3><p style="margin-top:2px;">3 opções para escolher</p></div>
+        </div>
+        <div class="mode-opt" data-mode="B">
+          <div class="dot"></div>
+          <div><h3 style="font-size:15px;">Resposta livre</h3><p style="margin-top:2px;">Digite o resultado</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" id="btn-start-practice" disabled>Começar treino</button>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-head">
+      <span class="quiz-tag" id="quiz-tag">Tabuada do 7</span>
+      <span class="timer-tag" id="quiz-timer">00:00</span>
+    </div>
+    <div class="neuro-track" id="quiz-track"></div>
+    <div class="question-zone">
+      <div class="q-expr" id="q-expr">7 × 4</div>
+      <div class="q-sub" id="q-sub">Questão 3 de 30</div>
+    </div>
+    <div id="quiz-options" class="options-grid"></div>
+    <div id="quiz-input-zone" class="answer-input-wrap" style="display:none;">
+      <input type="tel" inputmode="numeric" id="answer-input" placeholder="?" autocomplete="off">
+    </div>
+    <div class="feedback-banner" id="feedback-banner" style="display:none;"></div>
+  </section>
+
+  <!-- MODULE RESULT -->
+  <section class="screen" id="screen-module-result">
+    <div class="spacer" style="flex:0.15"></div>
+    <h2 id="mod-result-title">Módulo concluído</h2>
+    <p class="muted" id="mod-result-sub">Veja como você se saiu nesta etapa.</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="val" id="mr-acertos">0/0</div><div class="lbl">Acertos</div></div>
+      <div class="stat-box"><div class="val" id="mr-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      <div class="stat-box"><div class="val" id="mr-media">0s</div><div class="lbl">Média/questão</div></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" id="btn-mod-continue">Continuar</button>
+  </section>
+
+  <!-- DAILY SUMMARY -->
+  <section class="screen" id="screen-daily-summary">
+    <div class="spacer" style="flex:0.1"></div>
+    <h2>Simulado do dia concluído</h2>
+    <p class="muted">Confira o resumo antes de fechar o teste de hoje.</p>
+    <div class="card" style="margin-top:16px;">
+      <span class="badge-module badge-a">Módulo A · múltipla escolha</span>
+      <div class="stat-row">
+        <div class="stat-box"><div class="val" id="ds-a-acertos">0/0</div><div class="lbl">Acertos</div></div>
+        <div class="stat-box"><div class="val" id="ds-a-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <span class="badge-module badge-b">Módulo B · resposta livre</span>
+      <div class="stat-row">
+        <div class="stat-box"><div class="val" id="ds-b-acertos">0/0</div><div class="lbl">Acertos</div></div>
+        <div class="stat-box"><div class="val" id="ds-b-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-accent" id="btn-close-test">Fechar teste do dia</button>
+    <p class="muted" style="text-align:center; margin-top:10px;">Isso salva o resultado no histórico de evolução do paciente.</p>
+  </section>
+
+  <!-- SAVED -->
+  <section class="screen" id="screen-saved">
+    <div class="spacer"></div>
+    <div style="text-align:center;">
+      <div class="brand-mark" style="width:64px;height:64px;border-radius:18px;margin:0 auto 18px;">
+        <svg viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>Teste salvo com sucesso</h2>
+      <p class="muted" id="saved-detail">Volte amanhã para continuar a sequência de evolução.</p>
+    </div>
+    <div class="spacer"></div>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-saved-evolution">Ver evolução</button>
+      <button class="btn btn-ghost" id="btn-saved-home">Voltar ao início</button>
+    </div>
+  </section>
+
+  <!-- PRACTICE RESULT -->
+  <section class="screen" id="screen-practice-result">
+    <div class="spacer" style="flex:0.15"></div>
+    <h2>Treino finalizado</h2>
+    <p class="muted" id="pr-sub">Tabuada do 7 · Múltipla escolha</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="val" id="pr-acertos">0/0</div><div class="lbl">Acertos</div></div>
+      <div class="stat-box"><div class="val" id="pr-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      <div class="stat-box"><div class="val" id="pr-media">0s</div><div class="lbl">Média/questão</div></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-practice-again">Treinar outra tabuada</button>
+      <button class="btn btn-ghost" id="btn-practice-home">Voltar ao início</button>
+    </div>
+  </section>
+
+  <!-- EVOLUTION -->
+  <section class="screen" id="screen-evolution">
+    <div class="top-bar">
+      <button class="icon-btn" data-back="screen-home"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Evolução</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <div id="evolution-empty" class="empty-state" style="display:none;">
+      <p>Nenhum simulado fechado ainda para este paciente.<br>Complete o primeiro na tela inicial para começar o acompanhamento.</p>
+    </div>
+    <div id="evolution-content" style="display:none;">
+      <div class="row" style="margin-top:4px;">
+        <div class="stat-box"><div class="val" id="ev-total-testes">0</div><div class="lbl">Simulados feitos</div></div>
+        <div class="stat-box"><div class="val" id="ev-precisao-media">0%</div><div class="lbl">Precisão média</div></div>
+      </div>
+      <div class="chart-wrap"><h3 style="margin-bottom:6px;">Precisão por dia (%)</h3><canvas id="chart-precisao" height="180"></canvas></div>
+      <div class="chart-wrap"><h3 style="margin-bottom:6px;">Tempo médio por questão (s)</h3><canvas id="chart-tempo" height="180"></canvas></div>
+      <div class="chart-wrap"><h3 style="margin-bottom:6px;">Erros por simulado</h3><canvas id="chart-erros" height="180"></canvas></div>
+      <div class="conclusion-box"><h3 style="color:var(--primary-dark);">Análise da evolução</h3><p id="conclusion-text">—</p></div>
+      <h3 style="margin-top:20px;">Histórico</h3>
+      <div style="overflow-x:auto;">
+        <table id="history-table"><thead><tr><th>Data</th><th>Mód. A</th><th>Tempo A</th><th>Mód. B</th><th>Tempo B</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="stack" style="margin-top:20px;">
+        <button class="btn btn-primary" id="btn-export-pdf">Exportar relatório em PDF</button>
+        <button class="btn btn-ghost" id="btn-export-backup">Salvar backup (.json)</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* Deterrente simples: dificulta o acesso casual ao código pelo botão
+     direito ou atalhos de inspeção. Não é segurança real — apenas reduz
+     curiosidade casual; qualquer pessoa com conhecimento técnico ainda
+     consegue ver o código-fonte por outros meios. */
+  document.addEventListener('contextmenu', e=>e.preventDefault());
+  document.addEventListener('keydown', function(e){
+    const k = e.key ? e.key.toLowerCase() : '';
+    const blocked = e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||
+      (e.ctrlKey && k === 'u');
+    if(blocked) e.preventDefault();
+  });
+
+  const HAS_CLAUDE_STORAGE = (typeof window.storage !== 'undefined');
+
+  /* ---------------- Storage abstraction (Claude artifact storage OR localStorage fallback) ---------------- */
+  async function localGet(key){
+    try{
+      if(HAS_CLAUDE_STORAGE){
+        const r = await window.storage.get(key, false);
+        return r ? JSON.parse(r.value) : null;
+      }else{
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      }
+    }catch(e){ return null; }
+  }
+  async function localSet(key, value){
+    try{
+      if(HAS_CLAUDE_STORAGE){
+        await window.storage.set(key, JSON.stringify(value), false);
+      }else{
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+      return true;
+    }catch(e){ console.error('storage set failed', e); return false; }
+  }
+
+  /* ---------------- GitHub sync ---------------- */
+  function b64EncodeUnicode(str){
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m,p1)=>String.fromCharCode('0x'+p1)));
+  }
+  function b64DecodeUnicode(str){
+    return decodeURIComponent(atob(str).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+  }
+  async function ghConfig(){ return await localGet('github-config'); }
+
+  async function ghGetFile(fileName){
+    const cfg = await ghConfig();
+    if(!cfg || !cfg.token) return {ok:false, reason:'no-config'};
+    try{
+      const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.basePath}/${fileName}`;
+      const res = await fetch(url, {headers:{Authorization:`Bearer ${cfg.token}`, Accept:'application/vnd.github+json'}});
+      if(res.status === 404) return {ok:true, sha:null, data:null};
+      if(!res.ok) return {ok:false, reason:'http-'+res.status};
+      const json = await res.json();
+      const content = b64DecodeUnicode(json.content.replace(/\n/g,''));
+      return {ok:true, sha:json.sha, data:JSON.parse(content)};
+    }catch(e){ console.error(e); return {ok:false, reason:'network'}; }
+  }
+
+  async function ghPutFile(fileName, dataObj, message){
+    const cfg = await ghConfig();
+    if(!cfg || !cfg.token) return {ok:false, reason:'no-config'};
+    try{
+      const existing = await ghGetFile(fileName);
+      const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.basePath}/${fileName}`;
+      const body = {
+        message: message || ('Atualização automática — ' + new Date().toISOString()),
+        content: b64EncodeUnicode(JSON.stringify(dataObj, null, 2))
+      };
+      if(existing.ok && existing.sha) body.sha = existing.sha;
+      const res = await fetch(url, {method:'PUT', headers:{Authorization:`Bearer ${cfg.token}`, Accept:'application/vnd.github+json', 'Content-Type':'application/json'}, body:JSON.stringify(body)});
+      if(!res.ok) return {ok:false, reason:'http-'+res.status};
+      return {ok:true};
+    }catch(e){ console.error(e); return {ok:false, reason:'network'}; }
+  }
+
+  async function refreshSyncPill(){
+    const cfg = await ghConfig();
+    if(!cfg || !cfg.token){
+      setPill($('gh-status-pill'), $('gh-status-text'), 'off-state', 'Não configurado');
+      setPatientSyncPill(false);
+      return false;
+    }
+    const test = await ghGetFile('dados.json');
+    if(test.ok){
+      setPill($('gh-status-pill'), $('gh-status-text'), 'ok', 'Conectado ao GitHub');
+      setPatientSyncPill(true);
+      return true;
+    }else{
+      setPill($('gh-status-pill'), $('gh-status-text'), 'off', 'Falha na conexão (' + test.reason + ')');
+      setPatientSyncPill(false);
+      return false;
+    }
+  }
+  function setPill(pillEl, textEl, cls, text){
+    if(!pillEl) return;
+    pillEl.className = 'sync-pill' + (cls === 'ok' ? ' ok' : (cls === 'off' ? ' off' : ''));
+    textEl.textContent = text;
+  }
+  function setPatientSyncPill(connected){
+    const pill = $('patient-sync-pill');
+    if(!pill) return;
+    pill.className = 'sync-pill' + (connected ? ' ok' : '');
+    pill.querySelector('span:last-child').textContent = connected ? 'Sincronizado com GitHub' : 'Somente local neste dispositivo';
+  }
+
+  /* ---------------- App state ---------------- */
+  let patients = [];
+  let activePatient = null;
+  let history = [];
+  let session = null;
+  let quizTimerHandle = null;
+
+  const $ = (id)=>document.getElementById(id);
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    $(id).classList.add('active');
+  }
+  function toast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2400);
+  }
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+  function fmtSeconds(ms){ return (ms/1000).toFixed(1) + "s"; }
+  function fmtClock(ms){
+    const totalSec = Math.floor(ms/1000);
+    const m = Math.floor(totalSec/60).toString().padStart(2,'0');
+    const s = (totalSec%60).toString().padStart(2,'0');
+    return m+":"+s;
+  }
+  function fmtDateBR(dateStr){ const [y,m,d] = dateStr.split('-'); return d+"/"+m+"/"+y; }
+  function calcAge(dobStr){
+    if(!dobStr) return null;
+    const dob = new Date(dobStr+'T00:00:00');
+    const now = new Date();
+    let age = now.getFullYear() - dob.getFullYear();
+    const mDiff = now.getMonth() - dob.getMonth();
+    if(mDiff < 0 || (mDiff === 0 && now.getDate() < dob.getDate())) age--;
+    return age;
+  }
+
+  /* ---------------- Login (fixed credentials) ---------------- */
+  const APP_USER = 'fisioclinica';
+  const APP_PASS = '123';
+
+  $('btn-login-submit').addEventListener('click', async ()=>{
+    $('login-error').textContent = '';
+    const u = $('login-user').value.trim();
+    const p = $('login-pass').value;
+    if(u !== APP_USER || p !== APP_PASS){
+      $('login-error').textContent = 'Usuário ou senha incorretos.';
+      return;
+    }
+    await loadPatients();
+    showScreen('screen-patient-select');
+    refreshSyncPill();
+  });
+
+  function goToLogin(){
+    $('login-user').value=''; $('login-pass').value=''; $('login-error').textContent='';
+    showScreen('screen-login');
+  }
+  $('btn-logout').addEventListener('click', goToLogin);
+  $('btn-logout-home').addEventListener('click', goToLogin);
+  $('btn-switch-patient').addEventListener('click', async ()=>{ await loadPatients(); showScreen('screen-patient-select'); });
+
+  document.querySelectorAll('[data-back]').forEach(btn=>{
+    btn.addEventListener('click', ()=>showScreen(btn.dataset.back));
+  });
+
+  /* ---------------- GitHub settings screen ---------------- */
+  $('btn-open-gh-settings').addEventListener('click', async ()=>{
+    const cfg = await ghConfig();
+    if(cfg){
+      $('gh-owner').value = cfg.owner || 'waldeciramos';
+      $('gh-repo').value = cfg.repo || 'site';
+      $('gh-path').value = cfg.basePath || 'neuromodulacao';
+      $('gh-token').value = cfg.token || '';
+    }
+    showScreen('screen-gh-settings');
+  });
+
+  $('btn-gh-save').addEventListener('click', async ()=>{
+    $('gh-error').textContent = '';
+    const owner = $('gh-owner').value.trim() || 'waldeciramos';
+    const repo = $('gh-repo').value.trim() || 'site';
+    const basePath = $('gh-path').value.trim() || 'neuromodulacao';
+    const token = $('gh-token').value.trim();
+    if(!token){ $('gh-error').textContent = 'Informe um token de acesso pessoal do GitHub.'; return; }
+    await localSet('github-config', {owner, repo, basePath, token});
+    toast('Testando conexão...');
+    const ok = await refreshSyncPill();
+    if(ok){ toast('Conectado ao GitHub com sucesso.'); }
+    else{ $('gh-error').textContent = 'Não foi possível confirmar a conexão. Verifique o token e as permissões do repositório.'; }
+  });
+
+  /* ---------------- Patients ---------------- */
+  async function loadPatients(){
+    const local = (await localGet('patients')) || [];
+    patients = local;
+    const remote = await ghGetFile('dados.json');
+    if(remote.ok && remote.data){
+      patients = remote.data;
+      await localSet('patients', patients);
+    }
+    renderPatientList();
+  }
+
+  function renderPatientList(){
+    const list = $('patient-list');
+    list.innerHTML = '';
+    if(patients.length === 0){
+      $('patient-empty').style.display = 'block';
+      return;
+    }
+    $('patient-empty').style.display = 'none';
+    patients.forEach(p=>{
+      const el = document.createElement('div');
+      el.className = 'patient-tile';
+      const age = calcAge(p.dataNascimento);
+      el.innerHTML = `<div><div class="pname">${p.nomeCompleto}</div><div class="pmeta">${age !== null ? age+' anos · ' : ''}${p.cidade || ''}</div></div><svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      el.addEventListener('click', ()=>selectPatient(p));
+      list.appendChild(el);
+    });
+  }
+
+  async function selectPatient(p){
+    activePatient = p;
+    await localSet('active-patient-id', p.id);
+    const age = calcAge(p.dataNascimento);
+    $('home-patient-name').textContent = p.nomeCompleto;
+    $('home-patient-meta').textContent = (age !== null ? age+' anos · ' : '') + (p.cidade || '');
+    await loadHistoryForActivePatient();
+    showScreen('screen-home');
+  }
+
+  $('btn-new-patient').addEventListener('click', ()=>{
+    $('pf-nome').value=''; $('pf-nasc').value=''; $('pf-idade').value='';
+    $('pf-cidade').value=''; $('pf-telefone').value=''; $('pf-whatsapp').value='';
+    $('pf-mesmo-whats').checked = true;
+    $('pf-whats-field').style.display = 'none';
+    $('pf-error').textContent = '';
+    if(patients.length === 0){
+      $('pf-nome').value = 'Eduardo Pereira Ramos';
+      $('pf-nasc').value = '2013-02-04';
+      $('pf-idade').value = calcAge('2013-02-04');
+      $('pf-cidade').value = 'Estiva - MG';
+      $('pf-telefone').value = '(35) 98401-6706';
+    }
+    showScreen('screen-patient-form');
+  });
+
+  $('pf-nasc').addEventListener('input', ()=>{
+    const age = calcAge($('pf-nasc').value);
+    $('pf-idade').value = age !== null ? age : '';
+  });
+  $('pf-mesmo-whats').addEventListener('change', ()=>{
+    $('pf-whats-field').style.display = $('pf-mesmo-whats').checked ? 'none' : 'block';
+  });
+
+  $('btn-save-patient').addEventListener('click', async ()=>{
+    $('pf-error').textContent = '';
+    const nome = $('pf-nome').value.trim();
+    const nasc = $('pf-nasc').value;
+    const cidade = $('pf-cidade').value.trim();
+    const telefone = $('pf-telefone').value.trim();
+    const mesmo = $('pf-mesmo-whats').checked;
+    const whatsapp = mesmo ? telefone : $('pf-whatsapp').value.trim();
+    if(nome.length < 2){ $('pf-error').textContent = 'Informe o nome completo do paciente.'; return; }
+    if(!nasc){ $('pf-error').textContent = 'Informe a data de nascimento.'; return; }
+    if(!telefone){ $('pf-error').textContent = 'Informe o telefone do responsável.'; return; }
+
+    const record = {
+      id: 'p_' + Date.now(),
+      nomeCompleto: nome,
+      dataNascimento: nasc,
+      cidade: cidade,
+      telefoneResponsavel: telefone,
+      whatsappResponsavel: whatsapp,
+      criadoEm: new Date().toISOString()
+    };
+    patients.push(record);
+    await localSet('patients', patients);
+    toast('Ficha salva localmente. Sincronizando...');
+    const res = await ghPutFile('dados.json', patients, 'Cadastra paciente ' + nome);
+    if(res.ok) await ghPutFile('dados_backup.json', patients, 'Backup automático de pacientes');
+    if(res.ok) toast('Ficha sincronizada com o GitHub.');
+    else if(res.reason !== 'no-config') toast('Salvo localmente. Falha ao sincronizar com o GitHub.');
+    renderPatientList();
+    selectPatient(record);
+  });
+
+  /* ---------------- Practice setup ---------------- */
+  let practiceTabuada = null;
+  let practiceMode = null;
+  const grid = $('practice-tabuada-grid');
+  for(let n=1;n<=9;n++){
+    const tile = document.createElement('div');
+    tile.className = 'num-tile';
+    tile.textContent = n;
+    tile.addEventListener('click', ()=>{
+      document.querySelectorAll('#practice-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+      tile.classList.add('selected');
+      practiceTabuada = n;
+      checkPracticeReady();
+    });
+    grid.appendChild(tile);
+  }
+  document.querySelectorAll('#practice-mode-choice .mode-opt').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('#practice-mode-choice .mode-opt').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+      practiceMode = opt.dataset.mode;
+      checkPracticeReady();
+    });
+  });
+  function checkPracticeReady(){ $('btn-start-practice').disabled = !(practiceTabuada && practiceMode); }
+
+  $('tile-practice').addEventListener('click', ()=>{
+    practiceTabuada = null; practiceMode = null;
+    document.querySelectorAll('#practice-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+    document.querySelectorAll('#practice-mode-choice .mode-opt').forEach(o=>o.classList.remove('selected'));
+    $('btn-start-practice').disabled = true;
+    showScreen('screen-practice-setup');
+  });
+
+  $('btn-start-practice').addEventListener('click', ()=>{
+    const questions = buildQuestions([practiceTabuada]);
+    session = { kind:'practice', modules:[{type:practiceMode, tabuadas:[practiceTabuada], questions, idx:0, startTs:null, endTs:null}], modIdx:0 };
+    startModule(session.modules[0]);
+  });
+
+  /* ---------------- Official daily test ---------------- */
+  $('tile-official').addEventListener('click', ()=>{
+    const tabsA = shuffle([1,2,3,4,5,6,7,8,9]).slice(0,3);
+    const tabsB = shuffle([1,2,3,4,5,6,7,8,9]).slice(0,3);
+    session = {
+      kind:'official',
+      modules:[
+        {type:'A', tabuadas:tabsA, questions:buildQuestions(tabsA), idx:0, startTs:null, endTs:null},
+        {type:'B', tabuadas:tabsB, questions:buildQuestions(tabsB), idx:0, startTs:null, endTs:null}
+      ],
+      modIdx:0
+    };
+    startModule(session.modules[0]);
+  });
+
+  function buildQuestions(tabuadas){
+    const qs = [];
+    tabuadas.forEach(t=>{ for(let m=1;m<=10;m++){ qs.push({tabuada:t, m:m, answer:t*m, userAnswer:null, correct:null, timeMs:0}); } });
+    return qs;
+  }
+
+  /* ---------------- Quiz engine ---------------- */
+  function startModule(mod){
+    mod.startTs = performance.now();
+    mod.idx = 0;
+    renderTrack(mod);
+    startTimerDisplay(mod);
+    renderQuestion(mod);
+    showScreen('screen-quiz');
+  }
+  function renderTrack(mod){
+    const track = $('quiz-track');
+    track.innerHTML = '';
+    mod.questions.forEach((q,i)=>{
+      const n = document.createElement('div');
+      n.className = 'node';
+      n.dataset.i = i;
+      track.appendChild(n);
+    });
+  }
+  function updateTrack(mod){
+    const nodes = $('quiz-track').children;
+    for(let i=0;i<nodes.length;i++){
+      nodes[i].classList.remove('current','done-correct','done-wrong');
+      const q = mod.questions[i];
+      if(q.correct === true) nodes[i].classList.add('done-correct');
+      else if(q.correct === false) nodes[i].classList.add('done-wrong');
+      else if(i === mod.idx) nodes[i].classList.add('current');
+    }
+  }
+  function startTimerDisplay(mod){
+    clearInterval(quizTimerHandle);
+    quizTimerHandle = setInterval(()=>{ $('quiz-timer').textContent = fmtClock(performance.now() - mod.startTs); }, 200);
+  }
+
+  let questionStartTs = 0;
+  function renderQuestion(mod){
+    updateTrack(mod);
+    const q = mod.questions[mod.idx];
+    $('quiz-tag').textContent = 'Tabuada do ' + q.tabuada + (mod.type === 'A' ? ' · múltipla escolha' : ' · resposta livre');
+    $('q-expr').textContent = q.tabuada + ' × ' + q.m;
+    $('q-sub').textContent = 'Questão ' + (mod.idx+1) + ' de ' + mod.questions.length;
+    $('feedback-banner').style.display = 'none';
+
+    if(mod.type === 'A'){
+      $('quiz-options').style.display = 'flex';
+      $('quiz-input-zone').style.display = 'none';
+      const distractors = new Set([q.answer]);
+      while(distractors.size < 3){
+        const delta = (Math.floor(Math.random()*5)+1) * (Math.random()<0.5?-1:1) * (q.tabuada || 1);
+        let candidate = q.answer + delta;
+        if(candidate <= 0) candidate = q.answer + Math.floor(Math.random()*9)+1;
+        distractors.add(candidate);
+      }
+      const options = shuffle(Array.from(distractors));
+      const zone = $('quiz-options');
+      zone.innerHTML = '';
+      options.forEach(opt=>{
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.textContent = opt;
+        b.addEventListener('click', ()=>answerQuestion(mod, opt, b));
+        zone.appendChild(b);
+      });
+    }else{
+      $('quiz-options').style.display = 'none';
+      $('quiz-input-zone').style.display = 'flex';
+      const input = $('answer-input');
+      input.value = '';
+      input.disabled = false;
+      input.classList.remove('input-correct','input-wrong');
+      setTimeout(()=>input.focus(), 50);
+    }
+    questionStartTs = performance.now();
+  }
+
+  function answerQuestion(mod, value, btnEl){
+    const q = mod.questions[mod.idx];
+    if(q.userAnswer !== null) return;
+    const elapsed = performance.now() - questionStartTs;
+    q.userAnswer = value;
+    q.correct = (Number(value) === q.answer);
+    q.timeMs = elapsed;
+
+    const buttons = $('quiz-options').querySelectorAll('.opt-btn');
+    buttons.forEach(b=>{
+      b.disabled = true;
+      if(Number(b.textContent) === q.answer) b.classList.add('correct');
+      else if(b === btnEl) b.classList.add('wrong');
+    });
+    updateTrack(mod);
+    setTimeout(()=>advance(mod), 700);
+  }
+
+  /* Module B: checks automatically while typing, no submit button.
+     Wrong values turn the field red and block progress; only the
+     correct value turns it green and, after 5s to let it sink in,
+     moves on to the next question. */
+  function evaluateTypedInput(force){
+    const mod = session.modules[session.modIdx];
+    const q = mod.questions[mod.idx];
+    if(q.userAnswer !== null) return;
+    const input = $('answer-input');
+    const val = input.value.trim();
+    if(val === '' || isNaN(Number(val))){
+      input.classList.remove('input-correct','input-wrong');
+      $('feedback-banner').style.display = 'none';
+      return;
+    }
+    const digitsNeeded = String(q.answer).length;
+    if(!force && val.length < digitsNeeded) return; // ainda digitando
+    const num = Number(val);
+    if(num === q.answer){
+      const elapsed = performance.now() - questionStartTs;
+      q.userAnswer = num; q.correct = true; q.timeMs = elapsed;
+      input.disabled = true;
+      input.classList.remove('input-wrong');
+      input.classList.add('input-correct');
+      const banner = $('feedback-banner');
+      banner.style.display = 'block'; banner.className = 'feedback-banner ok';
+      banner.textContent = 'Certo! ' + q.tabuada + ' × ' + q.m + ' = ' + q.answer;
+      updateTrack(mod);
+      setTimeout(()=>advance(mod), 5000);
+    }else{
+      input.classList.add('input-wrong');
+      const banner = $('feedback-banner');
+      banner.style.display = 'block'; banner.className = 'feedback-banner no';
+      banner.textContent = 'Ainda não. Corrija o número para continuar.';
+    }
+  }
+  $('answer-input').addEventListener('input', ()=>evaluateTypedInput(false));
+  $('answer-input').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') evaluateTypedInput(true); });
+
+  function advance(mod){
+    mod.idx++;
+    if(mod.idx >= mod.questions.length) finishModule(mod);
+    else renderQuestion(mod);
+  }
+
+  function moduleStats(mod){
+    const total = mod.questions.length;
+    const acertos = mod.questions.filter(q=>q.correct).length;
+    const tempoTotal = mod.endTs - mod.startTs;
+    const tempoMedio = mod.questions.reduce((s,q)=>s+q.timeMs,0) / total;
+    return {total, acertos, erros: total-acertos, tempoTotal, tempoMedio};
+  }
+
+  function finishModule(mod){
+    clearInterval(quizTimerHandle);
+    mod.endTs = performance.now();
+    const stats = moduleStats(mod);
+
+    if(session.kind === 'practice'){
+      $('pr-sub').textContent = 'Tabuada do ' + mod.tabuadas.join(', ') + ' · ' + (mod.type==='A'?'Múltipla escolha':'Resposta livre');
+      $('pr-acertos').textContent = stats.acertos + '/' + stats.total;
+      $('pr-tempo').textContent = fmtSeconds(stats.tempoTotal);
+      $('pr-media').textContent = fmtSeconds(stats.tempoMedio);
+      showScreen('screen-practice-result');
+      return;
+    }
+    if(session.modIdx === 0){
+      $('mod-result-title').textContent = 'Módulo A concluído';
+      $('mod-result-sub').textContent = 'Múltipla escolha — ' + mod.tabuadas.map(t=>'x'+t).join(', ');
+      $('mr-acertos').textContent = stats.acertos + '/' + stats.total;
+      $('mr-tempo').textContent = fmtSeconds(stats.tempoTotal);
+      $('mr-media').textContent = fmtSeconds(stats.tempoMedio);
+      showScreen('screen-module-result');
+    }else{
+      showDailySummary();
+    }
+  }
+
+  $('btn-mod-continue').addEventListener('click', ()=>{
+    session.modIdx = 1;
+    startModule(session.modules[1]);
+  });
+
+  function showDailySummary(){
+    const sa = moduleStats(session.modules[0]);
+    const sb = moduleStats(session.modules[1]);
+    $('ds-a-acertos').textContent = sa.acertos + '/' + sa.total;
+    $('ds-a-tempo').textContent = fmtSeconds(sa.tempoTotal);
+    $('ds-b-acertos').textContent = sb.acertos + '/' + sb.total;
+    $('ds-b-tempo').textContent = fmtSeconds(sb.tempoTotal);
+    showScreen('screen-daily-summary');
+  }
+
+  $('btn-close-test').addEventListener('click', async ()=>{
+    const sa = moduleStats(session.modules[0]);
+    const sb = moduleStats(session.modules[1]);
+    const now = new Date();
+    const record = {
+      id: now.getTime(),
+      date: now.toISOString().slice(0,10),
+      time: now.toTimeString().slice(0,8),
+      moduleA: {tabuadas:session.modules[0].tabuadas, total:sa.total, acertos:sa.acertos, erros:sa.erros, tempoTotalMs:sa.tempoTotal, tempoMedioMs:sa.tempoMedio},
+      moduleB: {tabuadas:session.modules[1].tabuadas, total:sb.total, acertos:sb.acertos, erros:sb.erros, tempoTotalMs:sb.tempoTotal, tempoMedioMs:sb.tempoMedio}
+    };
+    history.push(record);
+    await localSet('history-' + activePatient.id, history);
+    toast('Salvando e sincronizando...');
+    const res = await ghPutFile('historico_' + activePatient.id + '.json', history, 'Atualiza histórico de ' + activePatient.nomeCompleto);
+    if(res.ok) await ghPutFile('historico_' + activePatient.id + '_backup.json', history, 'Backup automático de histórico');
+    $('saved-detail').textContent = 'Simulado nº ' + history.length + ' registrado em ' + fmtDateBR(record.date) + ' às ' + record.time.slice(0,5) + (res.ok ? ' e sincronizado com o GitHub.' : '.');
+    showScreen('screen-saved');
+  });
+
+  $('btn-saved-home').addEventListener('click', ()=>showScreen('screen-home'));
+  $('btn-saved-evolution').addEventListener('click', ()=>openEvolution());
+  $('btn-practice-home').addEventListener('click', ()=>showScreen('screen-home'));
+  $('btn-practice-again').addEventListener('click', ()=>showScreen('screen-practice-setup'));
+
+  /* ---------------- Per-patient history loading ---------------- */
+  async function loadHistoryForActivePatient(){
+    const local = (await localGet('history-' + activePatient.id)) || [];
+    history = local;
+    const remote = await ghGetFile('historico_' + activePatient.id + '.json');
+    if(remote.ok && remote.data){
+      history = remote.data;
+      await localSet('history-' + activePatient.id, history);
+    }
+  }
+
+  /* ---------------- Evolution / Charts / PDF ---------------- */
+  let charts = {};
+  $('tile-evolution').addEventListener('click', openEvolution);
+  function openEvolution(){ renderEvolution(); showScreen('screen-evolution'); }
+
+  function renderEvolution(){
+    if(history.length === 0){
+      $('evolution-empty').style.display = 'block';
+      $('evolution-content').style.display = 'none';
+      return;
+    }
+    $('evolution-empty').style.display = 'none';
+    $('evolution-content').style.display = 'block';
+
+    const sorted = history.slice().sort((a,b)=>a.id-b.id);
+    const labels = sorted.map(r=>fmtDateBR(r.date));
+    const precA = sorted.map(r=>Math.round((r.moduleA.acertos/r.moduleA.total)*100));
+    const precB = sorted.map(r=>Math.round((r.moduleB.acertos/r.moduleB.total)*100));
+    const tempoA = sorted.map(r=>+(r.moduleA.tempoMedioMs/1000).toFixed(1));
+    const tempoB = sorted.map(r=>+(r.moduleB.tempoMedioMs/1000).toFixed(1));
+    const errosA = sorted.map(r=>r.moduleA.erros);
+    const errosB = sorted.map(r=>r.moduleB.erros);
+
+    $('ev-total-testes').textContent = sorted.length;
+    const precisaoGeral = sorted.reduce((s,r)=>s + (r.moduleA.acertos+r.moduleB.acertos)/(r.moduleA.total+r.moduleB.total), 0) / sorted.length;
+    $('ev-precisao-media').textContent = Math.round(precisaoGeral*100) + '%';
+
+    const tbody = document.querySelector('#history-table tbody');
+    tbody.innerHTML = '';
+    sorted.forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${fmtDateBR(r.date)}</td><td>${r.moduleA.acertos}/${r.moduleA.total}</td><td>${fmtSeconds(r.moduleA.tempoTotalMs)}</td><td>${r.moduleB.acertos}/${r.moduleB.total}</td><td>${fmtSeconds(r.moduleB.tempoTotalMs)}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const teal = '#0E6E6E', amber='#F2A93B';
+    if(charts.precisao) charts.precisao.destroy();
+    charts.precisao = new Chart($('chart-precisao'), {
+      type:'line', data:{labels, datasets:[
+        {label:'Módulo A', data:precA, borderColor:teal, backgroundColor:teal, tension:.3},
+        {label:'Módulo B', data:precB, borderColor:amber, backgroundColor:amber, tension:.3}
+      ]}, options:{responsive:true, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}}, plugins:{legend:{position:'bottom'}}}
+    });
+    if(charts.tempo) charts.tempo.destroy();
+    charts.tempo = new Chart($('chart-tempo'), {
+      type:'line', data:{labels, datasets:[
+        {label:'Módulo A', data:tempoA, borderColor:teal, backgroundColor:teal, tension:.3},
+        {label:'Módulo B', data:tempoB, borderColor:amber, backgroundColor:amber, tension:.3}
+      ]}, options:{responsive:true, plugins:{legend:{position:'bottom'}}}
+    });
+    if(charts.erros) charts.erros.destroy();
+    charts.erros = new Chart($('chart-erros'), {
+      type:'bar', data:{labels, datasets:[
+        {label:'Módulo A', data:errosA, backgroundColor:teal},
+        {label:'Módulo B', data:errosB, backgroundColor:amber}
+      ]}, options:{responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}}
+    });
+
+    $('conclusion-text').textContent = buildConclusion(sorted);
+  }
+
+  function buildConclusion(sorted){
+    if(sorted.length < 2) return 'Complete mais simulados em dias diferentes para que a análise de evolução seja gerada.';
+    const n = sorted.length;
+    const half = Math.max(1, Math.floor(Math.min(3, Math.floor(n/2))));
+    const first = sorted.slice(0, half);
+    const last = sorted.slice(n-half, n);
+    function avgPrec(g){ return g.reduce((s,r)=>s+(r.moduleA.acertos+r.moduleB.acertos)/(r.moduleA.total+r.moduleB.total),0)/g.length; }
+    function avgTempo(g){ return g.reduce((s,r)=>s+((r.moduleA.tempoMedioMs+r.moduleB.tempoMedioMs)/2),0)/g.length; }
+    const pFirst = avgPrec(first)*100, pLast = avgPrec(last)*100;
+    const tFirst = avgTempo(first)/1000, tLast = avgTempo(last)/1000;
+    const deltaP = pLast - pFirst;
+    const deltaT = tFirst - tLast;
+
+    let precisaoTxt, tempoTxt;
+    if(deltaP > 3) precisaoTxt = `a precisão média subiu de ${pFirst.toFixed(0)}% para ${pLast.toFixed(0)}%, uma melhora de ${deltaP.toFixed(0)} pontos percentuais`;
+    else if(deltaP < -3) precisaoTxt = `a precisão média caiu de ${pFirst.toFixed(0)}% para ${pLast.toFixed(0)}%`;
+    else precisaoTxt = `a precisão média se manteve estável, em torno de ${pLast.toFixed(0)}%`;
+
+    if(deltaT > 0.3) tempoTxt = `o tempo médio de resposta reduziu de ${tFirst.toFixed(1)}s para ${tLast.toFixed(1)}s, indicando ganho de agilidade de processamento`;
+    else if(deltaT < -0.3) tempoTxt = `o tempo médio de resposta aumentou de ${tFirst.toFixed(1)}s para ${tLast.toFixed(1)}s`;
+    else tempoTxt = `o tempo médio de resposta permaneceu estável, perto de ${tLast.toFixed(1)}s`;
+
+    let veredito;
+    if(deltaP > 3 && deltaT > 0.3) veredito = 'Os dois indicadores caminham juntos na direção esperada, o que é compatível com um efeito positivo do treino sobre a neuromodulação cognitiva.';
+    else if(deltaP > 3 || deltaT > 0.3) veredito = 'Há sinais de melhora em pelo menos um dos indicadores, sugerindo progresso, ainda que seja recomendável continuar o acompanhamento por mais dias para confirmar a tendência.';
+    else veredito = 'Ainda não há uma tendência clara de melhora nos ' + n + ' simulados registrados. Isso não significa ausência de efeito — recomenda-se completar a sequência de 10 dias para uma análise mais conclusiva.';
+
+    return `Com base em ${n} simulado(s) registrado(s), ${precisaoTxt}, e ${tempoTxt}. ${veredito}`;
+  }
+
+  $('btn-export-backup').addEventListener('click', ()=>{
+    const payload = {paciente:activePatient, exportadoEm:new Date().toISOString(), historico:history};
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'neurocalculo-backup-' + activePatient.nomeCompleto.replace(/\s+/g,'_') + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Backup exportado.');
+  });
+
+  $('btn-export-pdf').addEventListener('click', async ()=>{
+    if(history.length === 0) return;
+    toast('Gerando PDF...');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({unit:'pt', format:'a4'});
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const marginX = 48;
+    let y = 0;
+
+    function drawHeader(){
+      doc.setFillColor(14,110,110);
+      doc.rect(0,0,pageW,70,'F');
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica','bold'); doc.setFontSize(15);
+      doc.text('Fisio Clínica Estiva', marginX, 30);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      doc.text('Relatório de evolução — NeuroCálculo (treino cognitivo de tabuada)', marginX, 47);
+      doc.text('Responsável clínica: Dra. Thaís Pereira Xavier', marginX, 61);
+      doc.setTextColor(0,0,0);
+      return 92;
+    }
+    function drawFooter(pageNum, totalPages){
+      doc.setFontSize(8); doc.setTextColor(110,110,110);
+      doc.text('Desenvolvido por Waldeci Ramos, 2026, com supervisão clínica da Dra. Thaís Pereira Xavier.', marginX, pageH-28);
+      doc.text('Página ' + pageNum + ' de ' + totalPages, pageW-marginX-60, pageH-28);
+      doc.setTextColor(0,0,0);
+    }
+
+    y = drawHeader();
+    doc.setFont('helvetica','bold'); doc.setFontSize(12);
+    doc.text('Paciente: ' + activePatient.nomeCompleto, marginX, y); y += 16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    const age = calcAge(activePatient.dataNascimento);
+    doc.text('Idade: ' + (age !== null ? age+' anos' : '—') + '   Cidade: ' + (activePatient.cidade || '—'), marginX, y); y += 14;
+    doc.text('Data de emissão: ' + new Date().toLocaleDateString('pt-BR'), marginX, y); y += 14;
+    doc.text('Total de simulados registrados: ' + history.length, marginX, y); y += 22;
+
+    const sorted = history.slice().sort((a,b)=>a.id-b.id);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    const cols = [marginX, marginX+80, marginX+170, marginX+260, marginX+350, marginX+430];
+    ['Data','Hora','Mód. A','Tempo A','Mód. B','Tempo B'].forEach((h,i)=>doc.text(h, cols[i], y));
+    y += 6; doc.setLineWidth(0.5); doc.line(marginX, y, pageW-marginX, y); y += 12;
+    doc.setFont('helvetica','normal');
+    sorted.forEach(r=>{
+      if(y > pageH - 80){ doc.addPage(); y = drawHeader(); }
+      const row = [fmtDateBR(r.date), r.time.slice(0,5), r.moduleA.acertos+'/'+r.moduleA.total, (r.moduleA.tempoTotalMs/1000).toFixed(1)+'s', r.moduleB.acertos+'/'+r.moduleB.total, (r.moduleB.tempoTotalMs/1000).toFixed(1)+'s'];
+      row.forEach((val,i)=>doc.text(String(val), cols[i], y));
+      y += 16;
+    });
+    y += 10;
+
+    for(const cid of ['chart-precisao','chart-tempo','chart-erros']){
+      const canvas = document.getElementById(cid);
+      if(!canvas) continue;
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const imgW = pageW - marginX*2;
+      const imgH = imgW * (canvas.height/canvas.width);
+      if(y + imgH > pageH - 90){ doc.addPage(); y = drawHeader(); }
+      doc.addImage(imgData, 'PNG', marginX, y, imgW, imgH);
+      y += imgH + 18;
+    }
+
+    if(y > pageH - 150){ doc.addPage(); y = drawHeader(); }
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Análise da evolução', marginX, y); y += 16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+    const lines = doc.splitTextToSize(buildConclusion(sorted), pageW - marginX*2);
+    doc.text(lines, marginX, y);
+
+    const totalPages = doc.internal.getNumberOfPages();
+    for(let p=1;p<=totalPages;p++){ doc.setPage(p); drawFooter(p, totalPages); }
+    doc.save('relatorio-neurocalculo-' + activePatient.nomeCompleto.replace(/\s+/g,'_') + '.pdf');
+  });
+
+})();
+</script>
+</body>
+</html>
