@@ -320,6 +320,28 @@
     <button class="btn btn-primary" id="btn-save-patient">Salvar ficha</button>
   </section>
 
+  <!-- PATIENT VIEW (read-only) -->
+  <section class="screen" id="screen-patient-view">
+    <div class="top-bar">
+      <button class="icon-btn" data-back="screen-patient-select"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Ficha do paciente</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <div class="card">
+      <h3 id="view-nome" style="font-size:20px;">—</h3>
+      <div class="row" style="margin-top:14px;">
+        <div><div class="muted" style="font-size:12px;">Idade</div><div id="view-idade" style="font-weight:700;">—</div></div>
+        <div><div class="muted" style="font-size:12px;">Nascimento</div><div id="view-nasc" style="font-weight:700;">—</div></div>
+      </div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">Cidade</div><div id="view-cidade" style="font-weight:700;">—</div></div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">Telefone do responsável</div><div id="view-telefone" style="font-weight:700;">—</div></div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">WhatsApp do responsável</div><div id="view-whatsapp" style="font-weight:700;">—</div></div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">Cadastrado em</div><div id="view-criado" style="font-weight:700;">—</div></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" id="btn-view-select">Abrir este paciente</button>
+  </section>
+
   <!-- HOME -->
   <section class="screen" id="screen-home">
     <div class="top-bar">
@@ -752,10 +774,24 @@
       const el = document.createElement('div');
       el.className = 'patient-tile';
       const age = calcAge(p.dataNascimento);
-      el.innerHTML = `<div><div class="pname">${p.nomeCompleto}</div><div class="pmeta">${age !== null ? age+' anos · ' : ''}${p.cidade || ''}</div></div><svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-      el.addEventListener('click', ()=>selectPatient(p));
+      el.innerHTML = `<div class="ptile-select" style="flex:1; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;"><div><div class="pname">${p.nomeCompleto}</div><div class="pmeta">${age !== null ? age+' anos · ' : ''}${p.cidade || ''}</div></div><svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><button class="icon-btn ptile-view" title="Ver ficha" style="width:36px;height:36px;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke-width="1.6"/><circle cx="12" cy="12" r="3" stroke-width="1.6"/></svg></button>`;
+      el.querySelector('.ptile-select').addEventListener('click', ()=>selectPatient(p));
+      el.querySelector('.ptile-view').addEventListener('click', (e)=>{ e.stopPropagation(); viewPatientDetails(p); });
       list.appendChild(el);
     });
+  }
+
+  function viewPatientDetails(p){
+    const age = calcAge(p.dataNascimento);
+    $('view-nome').textContent = p.nomeCompleto;
+    $('view-idade').textContent = age !== null ? age + ' anos' : '—';
+    $('view-nasc').textContent = p.dataNascimento ? fmtDateBR(p.dataNascimento) : '—';
+    $('view-cidade').textContent = p.cidade || '—';
+    $('view-telefone').textContent = p.telefoneResponsavel || '—';
+    $('view-whatsapp').textContent = p.whatsappResponsavel || '—';
+    $('view-criado').textContent = p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—';
+    $('btn-view-select').onclick = ()=>selectPatient(p);
+    showScreen('screen-patient-view');
   }
 
   async function selectPatient(p){
