@@ -52,7 +52,8 @@
     position:relative;
   }
   .screen{display:none; flex-direction:column; flex:1; padding:20px 20px 28px;}
-  .screen.active{display:flex;}
+  .screen.active{display:flex; animation:screenIn .32s cubic-bezier(.22,.68,0,1.01);}
+  @keyframes screenIn{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
   h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; color:var(--primary-dark);}
   h1{font-size:26px; font-weight:700; letter-spacing:-0.01em;}
   h2{font-size:20px; font-weight:600;}
@@ -94,7 +95,9 @@
   .menu-tile{display:flex; align-items:center; gap:14px; padding:18px; border-radius:var(--radius); border:1px solid var(--border); background:var(--surface); cursor:pointer; text-align:left;}
   .menu-tile .tile-icon{width:46px; height:46px; border-radius:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
   .menu-tile .tile-icon svg{width:22px; height:22px;}
-  .menu-tile.primary-tile{background:linear-gradient(135deg, var(--primary), var(--primary-dark)); border:none;}
+  .menu-tile.primary-tile{background:linear-gradient(135deg, var(--primary), var(--primary-dark)); border:none; position:relative; overflow:hidden;}
+  .menu-tile.primary-tile::after{content:''; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(115deg, transparent, rgba(255,255,255,0.22), transparent); animation:shineSweep 3.6s ease-in-out infinite;}
+  @keyframes shineSweep{0%{left:-60%;} 55%{left:130%;} 100%{left:130%;}}
   .menu-tile.primary-tile h3, .menu-tile.primary-tile p{color:#fff;}
   .menu-tile.primary-tile .tile-icon{background:rgba(255,255,255,0.18);}
   .menu-tile.primary-tile .tile-icon svg{stroke:#fff;}
@@ -125,7 +128,11 @@
   .neuro-track .node.done-wrong{background:var(--error);}
   .neuro-track .node.current{background:var(--accent); transform:scale(1.3);}
   .question-zone{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:10px 0 22px;}
-  .q-expr{font-family:'Space Grotesk'; font-weight:700; font-size:52px; color:var(--ink); letter-spacing:-0.01em;}
+  .q-expr-wrap{position:relative; display:flex; align-items:center; justify-content:center; width:200px; height:200px;}
+  .q-expr-wrap::before{content:''; position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--primary-soft), transparent 70%); animation:pulseRing 2.4s ease-in-out infinite;}
+  @keyframes pulseRing{0%,100%{transform:scale(1); opacity:1;} 50%{transform:scale(1.05); opacity:.7;}}
+  .q-expr{position:relative; font-family:'Space Grotesk'; font-weight:700; font-size:48px; color:var(--ink); letter-spacing:-0.01em; animation:popIn .28s cubic-bezier(.22,.68,0,1.01);}
+  @keyframes popIn{from{opacity:0; transform:scale(.85);} to{opacity:1; transform:scale(1);}}
   .q-sub{margin-top:6px; color:var(--muted); font-size:14px;}
   .options-grid{display:flex; flex-direction:row; justify-content:center; gap:18px; width:100%; flex-wrap:wrap;}
   .opt-btn{width:92px; height:92px; border-radius:50%; border:2px solid var(--border); background:var(--surface); font-family:'Space Grotesk'; font-size:24px; font-weight:700; color:var(--ink); cursor:pointer; transition:all .12s ease; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px -8px rgba(14,110,110,0.25);}
@@ -170,6 +177,17 @@
   .sync-pill.status-estavel{background:var(--accent-soft); color:#8A5C0B;}
   .sync-pill.status-piorando{background:var(--error-soft); color:var(--error);}
   .sync-pill.status-insuficiente{background:var(--border); color:var(--muted);}
+  .celebrate-wrap{position:relative; display:inline-block;}
+  .celebrate-mark{animation:markBounce .6s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes markBounce{0%{transform:scale(0);} 60%{transform:scale(1.15);} 100%{transform:scale(1);}}
+  .spark{position:absolute; width:8px; height:8px; border-radius:50%; top:32px; left:32px; opacity:0; animation:sparkFly .9s ease-out forwards; animation-delay:.25s;}
+  .spark.s1{background:var(--accent); --tx:-40px; --ty:-40px;}
+  .spark.s2{background:var(--success); --tx:40px; --ty:-40px;}
+  .spark.s3{background:var(--primary); --tx:-50px; --ty:10px;}
+  .spark.s4{background:var(--accent); --tx:50px; --ty:10px;}
+  .spark.s5{background:var(--success); --tx:-20px; --ty:50px;}
+  .spark.s6{background:var(--primary); --tx:20px; --ty:50px;}
+  @keyframes sparkFly{0%{opacity:0; transform:translate(0,0) scale(.4);} 40%{opacity:1;} 100%{opacity:0; transform:translate(var(--tx,0),var(--ty,0)) scale(1);}}
   .sync-pill .dot2{width:7px; height:7px; border-radius:50%; background:currentColor;}
 </style>
 </head>
@@ -435,7 +453,7 @@
     </div>
     <div class="neuro-track" id="quiz-track"></div>
     <div class="question-zone">
-      <div class="q-expr" id="q-expr">7 × 4</div>
+      <div class="q-expr-wrap"><div class="q-expr" id="q-expr">7 × 4</div></div>
       <div class="q-sub" id="q-sub">Questão 3 de 30</div>
     </div>
     <div id="quiz-options" class="options-grid"></div>
@@ -487,8 +505,12 @@
   <section class="screen" id="screen-saved">
     <div class="spacer"></div>
     <div style="text-align:center;">
-      <div class="brand-mark" style="width:64px;height:64px;border-radius:18px;margin:0 auto 18px;">
-        <svg viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="celebrate-wrap">
+        <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
+        <span class="spark s4"></span><span class="spark s5"></span><span class="spark s6"></span>
+        <div class="brand-mark celebrate-mark" style="width:64px;height:64px;border-radius:18px;margin:0 auto 18px;">
+          <svg viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
       </div>
       <h2>Teste salvo com sucesso</h2>
       <p class="muted" id="saved-detail">Volte amanhã para continuar a sequência de evolução.</p>
@@ -1032,7 +1054,9 @@
     updateTrack(mod);
     const q = mod.questions[mod.idx];
     $('quiz-tag').textContent = 'Tabuada do ' + q.tabuada + (mod.type === 'A' ? ' · múltipla escolha' : ' · resposta livre');
-    $('q-expr').textContent = q.tabuada + ' × ' + q.m;
+    const exprEl = $('q-expr');
+    exprEl.textContent = q.tabuada + ' × ' + q.m;
+    exprEl.style.animation = 'none'; void exprEl.offsetWidth; exprEl.style.animation = '';
     $('q-sub').textContent = 'Questão ' + (mod.idx+1) + ' de ' + mod.questions.length;
     $('feedback-banner').style.display = 'none';
 
