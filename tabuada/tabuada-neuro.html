@@ -223,11 +223,11 @@
       </div>
       <div class="field">
         <label>Repositório</label>
-        <input type="text" id="gh-repo" value="site">
+        <input type="text" id="gh-repo" value="sites">
       </div>
       <div class="field">
         <label>Pasta base</label>
-        <input type="text" id="gh-path" value="neuromodulacao">
+        <input type="text" id="gh-path" value="tabuada">
       </div>
       <div class="field">
         <label>Token de acesso pessoal</label>
@@ -588,6 +588,20 @@
     }catch(e){ console.error(e); return {ok:false, reason:'network'}; }
   }
 
+  async function ghTestConnection(){
+    const cfg = await ghConfig();
+    if(!cfg || !cfg.token) return {ok:false, reason:'sem configuração'};
+    try{
+      const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}`;
+      const res = await fetch(url, {headers:{Authorization:`Bearer ${cfg.token}`, Accept:'application/vnd.github+json'}});
+      if(res.status === 404) return {ok:false, reason:'repositório não encontrado ou sem acesso'};
+      if(res.status === 401 || res.status === 403) return {ok:false, reason:'token inválido ou sem permissão'};
+      if(!res.ok) return {ok:false, reason:'erro '+res.status};
+      const json = await res.json();
+      return {ok:true, defaultBranch: json.default_branch};
+    }catch(e){ console.error(e); return {ok:false, reason:'falha de rede'}; }
+  }
+
   async function refreshSyncPill(){
     const cfg = await ghConfig();
     if(!cfg || !cfg.token){
@@ -595,7 +609,7 @@
       setPatientSyncPill(false);
       return false;
     }
-    const test = await ghGetFile('dados.json');
+    const test = await ghTestConnection();
     if(test.ok){
       setPill($('gh-status-pill'), $('gh-status-text'), 'ok', 'Conectado ao GitHub');
       setPatientSyncPill(true);
