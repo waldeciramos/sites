@@ -189,46 +189,15 @@
   .spark.s6{background:var(--primary); --tx:20px; --ty:50px;}
   @keyframes sparkFly{0%{opacity:0; transform:translate(0,0) scale(.4);} 40%{opacity:1;} 100%{opacity:0; transform:translate(var(--tx,0),var(--ty,0)) scale(1);}}
   .sync-pill .dot2{width:7px; height:7px; border-radius:50%; background:currentColor;}
+  #btn-voice-answer.listening{background:var(--error-soft); border-color:var(--error);}
+  #btn-voice-answer.listening svg{stroke:var(--error);}
+  #btn-voice-answer svg{stroke:var(--primary-dark);}
+  @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(214,69,80,0.35);} 50%{box-shadow:0 0 0 10px rgba(214,69,80,0);}}
+  #btn-voice-answer.listening{animation:micPulse 1.2s ease-out infinite;}
 </style>
 </head>
 <body>
 <div id="app">
-
-  <!-- LOGIN -->
-  <section class="screen active" id="screen-login">
-    <div class="spacer" style="flex:0.3"></div>
-    <div class="brand" style="flex-direction:column; align-items:center; text-align:center; gap:14px;">
-      <div class="brand-mark" style="width:64px; height:64px; border-radius:18px;">
-        <svg viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;"><path d="M12 3a4 4 0 0 0-4 4v1.2A4.5 4.5 0 0 0 5.5 12 4.5 4.5 0 0 0 8 16.2V17a4 4 0 0 0 8 0v-.8A4.5 4.5 0 0 0 18.5 12 4.5 4.5 0 0 0 16 8.2V7a4 4 0 0 0-4-4Z" stroke="#fff" stroke-width="1.5"/><path d="M9 12h6M12 9v6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </div>
-      <div class="brand-text" style="text-align:center;">
-        <div class="top">NeuroCálculo</div>
-        <div class="sub">Treino cognitivo de tabuada</div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:10px;">
-      <h2>Acesso à aplicação</h2>
-      <p class="muted">Uso restrito à equipe da clínica.</p>
-      <div class="field">
-        <label>Usuário</label>
-        <input type="text" id="login-user" placeholder="Usuário" autocomplete="username">
-      </div>
-      <div class="field">
-        <label>Senha</label>
-        <input type="password" id="login-pass" placeholder="Senha" autocomplete="current-password">
-      </div>
-      <div class="error-msg" id="login-error"></div>
-      <div class="stack">
-        <button class="btn btn-primary" id="btn-login-submit">Entrar</button>
-      </div>
-    </div>
-
-    <div class="spacer"></div>
-    <div class="footer-credit">
-      Desenvolvido por Waldeci Ramos em 2026, com supervisão clínica da<br>Dra. Thaís Pereira Xavier.
-    </div>
-  </section>
 
   <!-- GITHUB SYNC SETTINGS -->
   <section class="screen" id="screen-gh-settings">
@@ -268,7 +237,7 @@
   </section>
 
   <!-- PATIENT SELECT -->
-  <section class="screen" id="screen-patient-select">
+  <section class="screen active" id="screen-patient-select">
     <div class="top-bar">
       <div>
         <div class="hello">NeuroCálculo</div>
@@ -277,9 +246,6 @@
       <div class="top-actions">
         <button class="icon-btn" id="btn-open-gh-settings" title="Sincronização">
           <svg viewBox="0 0 24 24" fill="none"><path d="M4 4l16 16M20 4L4 20" stroke-width="0"/><circle cx="12" cy="12" r="3" stroke-width="1.8"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.36a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.64 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.64 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.64a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.36 9c.14.35.5 1 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="icon-btn" id="btn-logout" title="Sair">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
     </div>
@@ -381,9 +347,6 @@
         <button class="icon-btn" id="btn-switch-patient" title="Trocar paciente">
           <svg viewBox="0 0 24 24" fill="none"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <button class="icon-btn" id="btn-logout-home" title="Sair">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
       </div>
     </div>
 
@@ -461,6 +424,9 @@
       <input type="tel" inputmode="numeric" id="answer-input" placeholder="?" autocomplete="off">
     </div>
     <div class="feedback-banner" id="feedback-banner" style="display:none;"></div>
+    <button class="icon-btn" id="btn-voice-answer" title="Responder por voz" style="width:52px; height:52px; border-radius:50%; align-self:center; margin-top:14px; display:none;">
+      <svg viewBox="0 0 24 24" fill="none" style="width:22px;height:22px;"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke-width="1.8"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
   </section>
 
   <!-- MODULE RESULT -->
@@ -547,7 +513,8 @@
       <div style="width:40px;"></div>
     </div>
     <div id="evolution-empty" class="empty-state" style="display:none;">
-      <p>Nenhum simulado fechado ainda para este paciente.<br>Complete o primeiro na tela inicial para começar o acompanhamento.</p>
+      <p>Nenhum simulado fechado ainda para este paciente.<br>Complete o primeiro na tela inicial (Simulado do dia) para começar o acompanhamento.</p>
+      <p class="muted" id="evolution-sync-hint" style="margin-top:14px;"></p>
     </div>
     <div id="evolution-content" style="display:none;">
       <div class="row" style="margin-top:4px;">
@@ -739,29 +706,7 @@
     return age;
   }
 
-  /* ---------------- Login (fixed credentials) ---------------- */
-  const APP_USER = 'fisioclinica';
-  const APP_PASS = '123';
-
-  $('btn-login-submit').addEventListener('click', async ()=>{
-    $('login-error').textContent = '';
-    const u = $('login-user').value.trim();
-    const p = $('login-pass').value;
-    if(u !== APP_USER || p !== APP_PASS){
-      $('login-error').textContent = 'Usuário ou senha incorretos.';
-      return;
-    }
-    await loadPatients();
-    showScreen('screen-patient-select');
-    refreshSyncPill();
-  });
-
-  function goToLogin(){
-    $('login-user').value=''; $('login-pass').value=''; $('login-error').textContent='';
-    showScreen('screen-login');
-  }
-  $('btn-logout').addEventListener('click', goToLogin);
-  $('btn-logout-home').addEventListener('click', goToLogin);
+  /* ---------------- Boot straight into the patient list (no login) ---------------- */
   $('btn-switch-patient').addEventListener('click', async ()=>{ await loadPatients(); showScreen('screen-patient-select'); });
 
   document.querySelectorAll('[data-back]').forEach(btn=>{
@@ -773,8 +718,8 @@
     const cfg = await ghConfig();
     if(cfg){
       $('gh-owner').value = cfg.owner || 'waldeciramos';
-      $('gh-repo').value = cfg.repo || 'site';
-      $('gh-path').value = cfg.basePath || 'neuromodulacao';
+      $('gh-repo').value = cfg.repo || 'sites';
+      $('gh-path').value = cfg.basePath || 'tabuada';
       $('gh-token').value = cfg.token || '';
     }
     showScreen('screen-gh-settings');
@@ -1149,6 +1094,67 @@
   $('answer-input').addEventListener('input', ()=>evaluateTypedInput(false));
   $('answer-input').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') evaluateTypedInput(true); });
 
+  /* ---------------- Voice answer (Web Speech API) ---------------- */
+  const SpeechRecCtor = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  let recognition = null;
+  if(SpeechRecCtor){
+    recognition = new SpeechRecCtor();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 3;
+    $('btn-voice-answer').style.display = 'flex';
+  }
+
+  function parseSpokenNumber(raw){
+    let text = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    const digitMatch = text.match(/\d+/);
+    if(digitMatch) return parseInt(digitMatch[0], 10);
+    const ones = {zero:0,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,catorze:14,quinze:15,dezesseis:16,dezessete:17,dezoito:18,dezenove:19};
+    const tens = {vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90};
+    const words = text.split(/\s+/).filter(w=>w && w!=='e');
+    if(words.length === 1){
+      if(words[0] === 'cem') return 100;
+      if(ones[words[0]] !== undefined) return ones[words[0]];
+      if(tens[words[0]] !== undefined) return tens[words[0]];
+    }
+    if(words.length === 2 && tens[words[0]] !== undefined && ones[words[1]] !== undefined){
+      return tens[words[0]] + ones[words[1]];
+    }
+    return null;
+  }
+
+  function applyVoiceAnswer(num){
+    const mod = session.modules[session.modIdx];
+    const q = mod.questions[mod.idx];
+    if(q.userAnswer !== null) return;
+    if(mod.type === 'A'){
+      const buttons = Array.from($('quiz-options').querySelectorAll('.opt-btn'));
+      const match = buttons.find(b => Number(b.textContent) === num);
+      if(match) match.click();
+      else toast('Não reconheci esse valor entre as opções. Tente de novo ou toque na tela.');
+    }else{
+      $('answer-input').value = String(num);
+      evaluateTypedInput(true);
+    }
+  }
+
+  if(recognition){
+    $('btn-voice-answer').addEventListener('click', ()=>{
+      try{ recognition.start(); }catch(e){ /* já estava ouvindo */ }
+    });
+    recognition.addEventListener('start', ()=>{ $('btn-voice-answer').classList.add('listening'); });
+    recognition.addEventListener('end', ()=>{ $('btn-voice-answer').classList.remove('listening'); });
+    recognition.addEventListener('error', ()=>{ $('btn-voice-answer').classList.remove('listening'); toast('Não consegui ouvir. Tente de novo.'); });
+    recognition.addEventListener('result', (e)=>{
+      const transcripts = Array.from(e.results[0]).map(r=>r.transcript);
+      let num = null;
+      for(const t of transcripts){ num = parseSpokenNumber(t); if(num !== null) break; }
+      if(num !== null && session) applyVoiceAnswer(num);
+      else toast('Não entendi o número. Tente falar só o valor, ex: "trinta e seis".');
+    });
+  }
+
   function advance(mod){
     mod.idx++;
     if(mod.idx >= mod.questions.length) finishModule(mod);
@@ -1242,7 +1248,17 @@
   /* ---------------- Evolution / Charts / PDF ---------------- */
   let charts = {};
   $('tile-evolution').addEventListener('click', openEvolution);
-  function openEvolution(){ renderEvolution(); showScreen('screen-evolution'); }
+  async function openEvolution(){
+    await loadHistoryForActivePatient();
+    renderEvolution();
+    if(history.length === 0){
+      const test = await ghTestConnection();
+      $('evolution-sync-hint').textContent = test.ok
+        ? 'Conectado ao GitHub — se o paciente já tem simulados no histórico, verifique se o arquivo historico_' + activePatient.id + '.json existe na pasta correta.'
+        : 'Sem conexão com o GitHub agora (' + test.reason + '). Os dados ficam salvos apenas neste dispositivo até a sincronização funcionar — confira em Sincronização.';
+    }
+    showScreen('screen-evolution');
+  }
 
   function renderEvolution(){
     if(history.length === 0){
@@ -1432,6 +1448,11 @@
     for(let p=1;p<=totalPages;p++){ doc.setPage(p); drawFooter(p, totalPages); }
     doc.save('relatorio-neurocalculo-' + activePatient.nomeCompleto.replace(/\s+/g,'_') + '.pdf');
   });
+
+  (async function init(){
+    await loadPatients();
+    await refreshSyncPill();
+  })();
 
 })();
 </script>
