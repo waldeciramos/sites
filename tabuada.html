@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>NeuroCálculo — Treino de Tabuada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    --bg:#e6e9f5;
+    --ink:#4b5170;
+    --muted:#8b93b8;
+    --accent:#5b5fe0;
+    --accent-dark:#4347c9;
+    --accent-soft:#e2e3fb;
+    --success:#22b573;
+    --success-soft:#dcf5e9;
+    --error:#e14f4f;
+    --error-soft:#fbe2e2;
+    --white:#ffffff;
+    --sh-light:rgba(255,255,255,0.9);
+    --sh-dark:rgba(163,177,198,0.55);
+    --raised:8px 8px 16px var(--sh-dark), -8px -8px 16px var(--sh-light);
+    --raised-sm:5px 5px 10px var(--sh-dark), -5px -5px 10px var(--sh-light);
+    --inset:inset 5px 5px 10px var(--sh-dark), inset -5px -5px 10px var(--sh-light);
+    --inset-sm:inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light);
+    --raised-accent:6px 6px 14px rgba(91,95,224,0.35), -4px -4px 10px rgba(255,255,255,0.6);
+    --purple:#8b5cf6;
+    --purple-soft:#ece7fc;
+    --radius-lg:32px;
+    --radius-md:20px;
+    --radius-pill:999px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #app{width:100%; max-width:560px; min-height:100vh; display:flex; flex-direction:column; position:relative;}
+  @media (min-width:700px){ #app{max-width:640px;} .pad{padding-left:32px; padding-right:32px;} }
+  .screen{display:none; flex-direction:column; flex:1;}
+  .screen.active{display:flex; animation:screenIn .28s ease-out;}
+  @keyframes screenIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .pad{padding:20px 20px 28px;}
+  h1,h2,h3{font-family:'Plus Jakarta Sans', sans-serif; margin:0; color:var(--ink); font-weight:700;}
+  h1{font-size:24px; letter-spacing:-0.01em;}
+  h2{font-size:19px; letter-spacing:-0.01em;}
+  h3{font-size:15.5px;}
+  p{line-height:1.55; margin:8px 0 0; color:var(--ink);}
+  .muted{color:var(--muted); font-size:14px;}
+
+  .app-topbar{flex-shrink:0; display:flex; align-items:center; justify-content:space-between; margin:16px 16px 6px; padding:10px 16px; background:var(--bg); border-radius:var(--radius-pill); box-shadow:var(--raised-sm); position:sticky; top:16px; z-index:20;}
+  .app-brand{display:flex; align-items:center; gap:9px; font-weight:700; font-size:13.5px; color:var(--ink);}
+  .app-brand-mark{width:26px; height:26px; border-radius:50%; background:var(--accent); box-shadow:var(--raised-accent); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .app-topbar-patient{font-size:12px; font-weight:700; color:var(--accent); background:var(--bg); padding:5px 12px; border-radius:var(--radius-pill); box-shadow:var(--inset-sm);}
+  .app-body{flex:1; display:flex; flex-direction:column;}
+  .app-footer{flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; padding:18px 16px 22px;}
+  .app-footer .app-footer-brand{display:flex; align-items:center; gap:8px; font-weight:700; font-size:12.5px; color:var(--ink); background:var(--bg); padding:8px 16px; border-radius:var(--radius-pill); box-shadow:var(--raised-sm);}
+  .app-footer .app-footer-brand .app-brand-mark{width:20px; height:20px;}
+  .app-footer .app-footer-credit{font-size:11px; color:var(--muted);}
+
+  .hero-header{background:var(--bg); padding:28px 22px 44px; border-radius:0 0 var(--radius-lg) var(--radius-lg); position:relative; box-shadow:var(--raised);}
+  .hero-header .hello{color:var(--muted); font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;}
+  .hero-top{display:flex; align-items:flex-start; justify-content:space-between;}
+  .avatar-circle{width:48px; height:48px; border-radius:50%; background:var(--bg); box-shadow:var(--raised-sm); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent); font-size:17px; flex-shrink:0;}
+  .content-lift{margin-top:-26px; position:relative; z-index:2;}
+  .brand-mark{width:44px; height:44px; border-radius:50%; background:var(--accent); box-shadow:var(--raised-accent); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .brand-mark svg{width:22px; height:22px;}
+
+  .field{margin-top:16px;}
+  .field label{display:block; font-size:13px; font-weight:700; color:var(--ink); margin-bottom:6px;}
+  .field input, .field select{width:100%; padding:14px 18px; border-radius:var(--radius-md); border:none; font-size:16px; font-family:'Plus Jakarta Sans'; background:var(--bg); color:var(--ink); box-shadow:var(--inset);}
+  .field input:focus, .field select:focus{outline:none; box-shadow:var(--inset), 0 0 0 2px var(--accent-soft);}
+  .field .hint{font-size:12px; color:var(--muted); margin-top:5px;}
+  .checkline{display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; color:var(--muted);}
+
+  .btn{appearance:none; border:none; cursor:pointer; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; letter-spacing:0.01em; border-radius:var(--radius-pill); padding:16px 22px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform .1s ease, box-shadow .1s ease;}
+  .btn:active{transform:scale(0.97); box-shadow:var(--inset) !important;}
+  .btn-primary{background:var(--accent); color:#fff; box-shadow:var(--raised-accent);}
+  .btn-accent{background:var(--accent); color:#fff; box-shadow:var(--raised-accent);}
+  .btn-ghost{background:var(--bg); color:var(--ink); box-shadow:var(--raised-sm);}
+  .btn-danger-ghost{background:var(--bg); color:var(--error); box-shadow:var(--raised-sm);}
+  .btn[disabled]{opacity:.4; cursor:not-allowed;}
+  .stack{display:flex; flex-direction:column; gap:14px; margin-top:16px;}
+  .row{display:flex; gap:12px;}
+  .row > *{flex:1;}
+
+  .card{background:var(--bg); border-radius:var(--radius-lg); padding:20px; box-shadow:var(--raised);}
+  .spacer{flex:1;}
+  .link-text{background:none; border:none; color:var(--muted); font-size:13px; text-decoration:underline; cursor:pointer; padding:6px; font-family:'Plus Jakarta Sans';}
+  .error-msg{color:var(--error); font-size:13px; margin-top:10px; min-height:16px;}
+  .top-bar{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:8px;}
+  .icon-btn{background:var(--bg); border:none; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; box-shadow:var(--raised-sm);}
+  .icon-btn svg{width:18px; height:18px; stroke:var(--accent);}
+  .icon-btn.light{background:var(--bg); box-shadow:var(--raised-sm);}
+  .icon-btn.light svg{stroke:var(--accent);}
+  .icon-btn:active{box-shadow:var(--inset-sm);}
+  .top-actions{display:flex; gap:8px;}
+
+  .menu-tile{display:flex; align-items:center; gap:14px; padding:18px; border-radius:var(--radius-lg); border:none; background:var(--bg); cursor:pointer; text-align:left; box-shadow:var(--raised);}
+  .menu-tile .tile-icon{width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:var(--bg); box-shadow:var(--raised-sm);}
+  .menu-tile .tile-icon svg{width:22px; height:22px; stroke:var(--accent);}
+  .menu-tile.primary-tile{background:var(--accent); box-shadow:var(--raised-accent);}
+  .menu-tile.primary-tile h3, .menu-tile.primary-tile p{color:#fff;}
+  .menu-tile.primary-tile .tile-icon{background:rgba(255,255,255,0.18); box-shadow:none;}
+  .menu-tile.primary-tile .tile-icon svg{stroke:#fff;}
+  .menu-tile p{font-size:13px; margin-top:2px; color:var(--muted);}
+
+  .patient-tile{display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:var(--radius-lg); background:var(--bg); box-shadow:var(--raised);}
+  .patient-avatar{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:var(--raised-accent);}
+  .patient-tile .ptile-select{flex:1; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;}
+  .patient-tile .pname{font-weight:700; font-size:16px; color:var(--ink);}
+  .patient-tile .pmeta{font-size:12px; color:var(--muted); margin-top:2px;}
+  .patient-tile .chev{stroke:var(--muted); width:18px; height:18px; flex-shrink:0;}
+
+  .grid-9{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px;}
+  .num-tile{aspect-ratio:1; border-radius:50%; background:var(--bg); box-shadow:var(--raised-sm); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:20px; color:var(--ink); cursor:pointer;}
+  .num-tile.selected{background:var(--accent); color:#fff; box-shadow:var(--inset), var(--raised-accent);}
+  .mode-choice{display:flex; flex-direction:row; gap:4px; margin-top:14px; background:var(--bg); border-radius:var(--radius-pill); padding:5px; box-shadow:var(--inset);}
+  .mode-opt{flex:1; border:none; border-radius:var(--radius-pill); padding:12px 10px; cursor:pointer; background:transparent; display:flex; align-items:center; justify-content:center; gap:8px; text-align:center; transition:all .15s ease;}
+  .mode-opt h3{font-size:13.5px; color:var(--muted); margin:0;}
+  .mode-opt p{display:none;}
+  .mode-opt .dot{display:none;}
+  .mode-opt.selected{background:var(--bg); box-shadow:var(--raised-sm);}
+  .mode-opt.selected h3{color:var(--accent);}
+
+  .quiz-head{display:flex; align-items:center; justify-content:space-between;}
+  .quiz-tag{font-size:12px; font-weight:700; color:var(--accent); background:var(--bg); padding:7px 14px; border-radius:var(--radius-pill); box-shadow:var(--raised-sm);}
+  .timer-tag{font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; color:var(--ink); background:var(--bg); padding:7px 14px; border-radius:var(--radius-pill); box-shadow:var(--inset-sm);}
+  .neuro-track{display:flex; gap:6px; margin:18px 0 6px; flex-wrap:wrap;}
+  .neuro-track .node{width:10px; height:10px; border-radius:50%; background:var(--bg); box-shadow:var(--inset-sm); transition:all .2s;}
+  .neuro-track .node.done-correct{background:var(--success); box-shadow:none;}
+  .neuro-track .node.done-wrong{background:var(--error); box-shadow:none;}
+  .neuro-track .node.current{background:var(--accent); box-shadow:none; transform:scale(1.3);}
+  .question-zone{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:14px 0 26px;}
+  .q-expr-wrap{position:relative; display:flex; align-items:center; justify-content:center; width:200px; height:200px; border-radius:50%; background:var(--bg); box-shadow:var(--raised);}
+  .q-expr{position:relative; font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:42px; color:var(--ink); letter-spacing:-0.01em; animation:popIn .25s ease-out;}
+  @keyframes popIn{from{opacity:0; transform:scale(.9);} to{opacity:1; transform:scale(1);}}
+  .q-sub{margin-top:10px; color:var(--muted); font-size:14px;}
+  .options-grid{display:flex; flex-direction:row; justify-content:center; gap:16px; width:100%; flex-wrap:wrap;}
+  .opt-btn{width:88px; height:88px; border-radius:50%; border:none; background:var(--bg); box-shadow:var(--raised-sm); font-family:'Plus Jakarta Sans'; font-size:22px; font-weight:700; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .opt-btn:active{box-shadow:var(--inset-sm);}
+  .opt-btn.correct{background:var(--success); color:#fff; box-shadow:none;}
+  .opt-btn.wrong{background:var(--error); color:#fff; box-shadow:none;}
+  .opt-btn[disabled]{opacity:.95;}
+  .answer-input-wrap{display:flex; gap:10px; width:100%;}
+  .answer-input-wrap input{flex:1; text-align:center; font-family:'Plus Jakarta Sans'; font-size:26px; font-weight:700; padding:14px; border-radius:var(--radius-md); border:none; background:var(--bg); box-shadow:var(--inset); color:var(--ink);}
+  .answer-input-wrap input:focus{outline:none;}
+  .answer-input-wrap input.input-correct{background:var(--success); color:#fff; box-shadow:none;}
+  .answer-input-wrap input.input-wrong{background:var(--error); color:#fff; box-shadow:none;}
+  .feedback-banner{margin-top:16px; padding:11px 14px; border-radius:var(--radius-pill); font-weight:700; font-size:14px; width:100%; text-align:center;}
+  .feedback-banner.ok{background:var(--success); color:#fff;}
+  .feedback-banner.no{background:var(--error); color:#fff;}
+  #btn-voice-answer{width:56px; height:56px; border-radius:50%; align-self:center; margin-top:16px; background:var(--bg); border:none; box-shadow:var(--raised-sm);}
+  #btn-voice-answer svg{stroke:var(--accent);}
+  #btn-voice-answer.listening{box-shadow:var(--inset-sm);}
+  #btn-voice-answer.listening svg{stroke:var(--error);}
+  @keyframes micPulse{0%,100%{box-shadow:var(--inset-sm), 0 0 0 0 rgba(225,79,79,0.4);} 50%{box-shadow:var(--inset-sm), 0 0 0 10px rgba(225,79,79,0);}}
+  #btn-voice-answer.listening{animation:micPulse 1.2s ease-out infinite;}
+  .voice-hint{text-align:center; font-size:12px; color:var(--muted); margin-top:8px;}
+
+  .stat-row{display:flex; gap:12px; margin-top:18px;}
+  .stat-box{flex:1; background:var(--bg); border-radius:var(--radius-md); padding:14px; text-align:center; box-shadow:var(--raised-sm);}
+  .stat-box .val{font-family:'Plus Jakarta Sans'; font-weight:700; font-size:22px; color:var(--accent);}
+  .stat-box .lbl{font-size:11px; font-weight:700; color:var(--muted); margin-top:2px; text-transform:uppercase; letter-spacing:0.04em;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;}
+  th,td{padding:10px 6px; text-align:center;}
+  th{color:var(--muted); font-weight:700; font-size:10.5px; text-transform:uppercase; letter-spacing:0.04em;}
+  td{font-family:'Plus Jakarta Sans'; font-weight:600; color:var(--ink);}
+  tbody tr{box-shadow:none;}
+  tbody tr:nth-child(odd){background:rgba(163,177,198,0.08);}
+  .chart-wrap{background:var(--bg); border-radius:var(--radius-lg); padding:18px; margin-top:18px; box-shadow:var(--raised);}
+  .chart-wrap canvas{max-width:100%;}
+  .conclusion-box{background:var(--bg); border-radius:var(--radius-lg); padding:22px; margin-top:18px; box-shadow:var(--inset);}
+  .conclusion-box p{color:var(--ink); font-size:14.5px;}
+  .milestone-banner{background:var(--accent); color:#fff; border-radius:var(--radius-lg); padding:16px; margin-top:18px; font-weight:700; font-size:14px; text-align:center; box-shadow:var(--raised-accent);}
+
+  .footer-credit{margin-top:22px; text-align:center; font-size:11.5px; color:var(--muted); line-height:1.5;}
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--accent); color:#fff; padding:12px 20px; border-radius:var(--radius-pill); font-size:13px; z-index:50; opacity:0; transition:opacity .25s; pointer-events:none; max-width:90%; text-align:center; box-shadow:var(--raised-accent);}
+  .toast.show{opacity:1;}
+  .empty-state{text-align:center; padding:34px 12px; color:var(--muted);}
+  .badge-module{display:inline-block; font-size:11px; font-weight:700; padding:5px 12px; border-radius:var(--radius-pill);}
+  .badge-a{background:var(--bg); color:var(--accent); box-shadow:var(--raised-sm);}
+  .badge-b{background:var(--bg); color:var(--success); box-shadow:var(--raised-sm);}
+  .sync-pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:6px 14px; border-radius:var(--radius-pill); background:var(--bg); color:var(--muted); box-shadow:var(--inset-sm);}
+  .sync-pill.status-melhorando{background:var(--success); color:#fff; box-shadow:none;}
+  .sync-pill.status-estavel{background:var(--bg); color:var(--muted); box-shadow:var(--inset-sm);}
+  .sync-pill.status-piorando{background:var(--error); color:#fff; box-shadow:none;}
+  .sync-pill.status-insuficiente{background:var(--bg); color:var(--muted); box-shadow:var(--inset-sm);}
+  .celebrate-wrap{position:relative; display:inline-block;}
+  .celebrate-mark{animation:markBounce .5s ease-out;}
+  @keyframes markBounce{0%{transform:scale(0);} 60%{transform:scale(1.12);} 100%{transform:scale(1);}}
+  .spark{position:absolute; width:8px; height:8px; border-radius:50%; top:32px; left:32px; opacity:0; animation:sparkFly .9s ease-out forwards; animation-delay:.2s;}
+  .spark.s1{background:var(--accent); --tx:-40px; --ty:-40px;}
+  .spark.s2{background:var(--success); --tx:40px; --ty:-40px;}
+  .spark.s3{background:var(--error); --tx:-50px; --ty:10px;}
+  .spark.s4{background:var(--accent); --tx:50px; --ty:10px;}
+  .spark.s5{background:var(--success); --tx:-20px; --ty:50px;}
+  .spark.s6{background:var(--error); --tx:20px; --ty:50px;}
+  @keyframes sparkFly{0%{opacity:0; transform:translate(0,0) scale(.4);} 40%{opacity:1;} 100%{opacity:0; transform:translate(var(--tx,0),var(--ty,0)) scale(1);}}
+
+  /* ---------- Simulado Misto: badge de bloqueio / tile especial ---------- */
+  .tile-lock-badge{font-size:10px; font-weight:800; padding:3px 9px; border-radius:var(--radius-pill); background:var(--bg); color:var(--muted); box-shadow:var(--inset-sm); white-space:nowrap;}
+  .menu-tile.locked{opacity:.65;}
+  .menu-tile.unlocked-special{background:var(--purple); box-shadow:6px 6px 14px rgba(139,92,246,0.35), -4px -4px 10px rgba(255,255,255,0.6);}
+  .menu-tile.unlocked-special h3, .menu-tile.unlocked-special p{color:#fff;}
+  .menu-tile.unlocked-special .tile-icon{background:rgba(255,255,255,0.2); box-shadow:none;}
+  .menu-tile.unlocked-special .tile-icon svg{stroke:#fff;}
+  .menu-tile.unlocked-special .tile-lock-badge{background:rgba(255,255,255,0.25); color:#fff; box-shadow:none;}
+  .quiz-tag.quiz-tag-mista{color:var(--purple); background:var(--bg); box-shadow:var(--raised-sm);}
+
+  /* ---------- Mensagem de incentivo (resumo do dia) ---------- */
+  .encourage-box{background:var(--bg); border-radius:var(--radius-lg); padding:22px 16px; margin-top:16px; text-align:center; box-shadow:var(--raised);}
+  .encourage-box .enc-emoji{font-size:38px; line-height:1;}
+  .encourage-box h3{margin-top:8px;}
+  .encourage-box p{margin-top:6px; font-size:13.5px;}
+
+  /* ---------- Indicadores (KPIs) ---------- */
+  .kpi-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-top:14px;}
+  @media (min-width:520px){ .kpi-grid{grid-template-columns:repeat(3, 1fr);} }
+  .kpi-card{background:var(--bg); border-radius:20px; padding:14px; box-shadow:var(--raised-sm); min-width:0;}
+  .kpi-top{display:flex; align-items:center; justify-content:space-between; gap:6px;}
+  .kpi-icon{width:26px; height:26px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:var(--bg); box-shadow:var(--inset-sm);}
+  .kpi-icon svg{width:14px; height:14px; stroke:var(--accent);}
+  .kpi-trend{font-size:10.5px; font-weight:800; padding:3px 7px; border-radius:var(--radius-pill); white-space:nowrap;}
+  .kpi-trend.up{background:var(--success-soft); color:var(--success);}
+  .kpi-trend.down{background:var(--error-soft); color:var(--error);}
+  .kpi-trend.flat{background:var(--bg); color:var(--muted); box-shadow:var(--inset-sm);}
+  .kpi-val{font-family:'JetBrains Mono'; font-weight:700; font-size:20px; color:var(--ink); margin-top:9px; line-height:1.1;}
+  .kpi-lbl{font-size:10.5px; font-weight:700; color:var(--muted); margin-top:3px; text-transform:uppercase; letter-spacing:0.03em;}
+
+  /* ---------- Gráfico 3D (pseudo-isométrico, CSS puro) ---------- */
+  .chart3d-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; padding:6px 2px 10px;}
+  .chart3d-stage{display:flex; align-items:flex-end; gap:22px; min-height:190px; padding:20px 14px 0; perspective:900px;}
+  .bar3d-col{display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:38px; cursor:pointer;}
+  .bar3d-3d{position:relative; width:34px; transform-style:preserve-3d; transform:rotateX(6deg) rotateY(-22deg); transition:transform .25s ease;}
+  .bar3d-face{position:absolute; left:0; width:34px; border-radius:4px 4px 0 0;}
+  .bar3d-front{bottom:0; box-shadow:inset 0 8px 14px rgba(255,255,255,0.35), inset 0 -6px 10px rgba(0,0,0,0.14);}
+  .bar3d-top{width:34px; height:12px; top:-11px; transform:rotateX(90deg) translateZ(6px); border-radius:5px; filter:brightness(1.28);}
+  .bar3d-side{left:32px; width:11px; top:0; transform:rotateY(90deg) translateZ(17px); filter:brightness(0.72); border-radius:0 4px 0 0;}
+  .bar3d-col:active .bar3d-3d, .bar3d-col.tapped .bar3d-3d{transform:rotateX(6deg) rotateY(-22deg) translateY(-4px) scale(1.04);}
+  .bar3d-tip{font-family:'JetBrains Mono'; font-size:10.5px; font-weight:700; color:var(--ink); background:var(--bg); border-radius:var(--radius-pill); padding:2px 7px; margin-bottom:6px; box-shadow:var(--raised-sm); opacity:0; transform:translateY(4px); transition:opacity .15s, transform .15s; white-space:nowrap;}
+  .bar3d-col.tapped .bar3d-tip, .bar3d-col:hover .bar3d-tip{opacity:1; transform:translateY(0);}
+  .bar3d-label{font-size:10.5px; color:var(--muted); font-weight:700; margin-top:9px; font-family:'JetBrains Mono';}
+  .chart3d-legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; font-size:11px; color:var(--muted);}
+  .chart3d-legend span{display:inline-flex; align-items:center; gap:5px;}
+  .chart3d-legend i{width:9px; height:9px; border-radius:3px; display:inline-block;}
+
+  /* ---------- Reiniciar / cancelar teste em andamento ---------- */
+  .quiz-actions{display:flex; gap:8px;}
+
+  /* ---------- Google Drive ---------- */
+  .drive-pill{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:var(--radius-pill); background:var(--bg); color:var(--muted); box-shadow:var(--inset-sm); margin-top:10px;}
+  .drive-pill.connected{background:var(--success); color:#fff; box-shadow:none;}
+  .drive-pill svg{width:14px; height:14px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="app-topbar">
+    <div class="app-brand">
+      <div class="app-brand-mark"><svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><path d="M12 3a4 4 0 0 0-4 4v1.2A4.5 4.5 0 0 0 5.5 12 4.5 4.5 0 0 0 8 16.2V17a4 4 0 0 0 8 0v-.8A4.5 4.5 0 0 0 18.5 12 4.5 4.5 0 0 0 16 8.2V7a4 4 0 0 0-4-4Z" stroke="#fff" stroke-width="1.6"/></svg></div>
+      <span>NeuroCálculo</span>
+    </div>
+    <span class="app-topbar-patient" id="app-topbar-patient"></span>
+  </div>
+  <div class="app-body">
+
+  <!-- PATIENT SELECT -->
+  <section class="screen active" id="screen-patient-select">
+    <div class="hero-header">
+      <div class="hero-top">
+        <div>
+          <div class="hello">NeuroCálculo</div>
+          <h1>Pacientes</h1>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="btn-drive-connect" title="Conectar ao Google Drive"><svg viewBox="0 0 24 24" fill="none"><path d="M8 3h8l6 10.5-4 6.5H6l-4-6.5Z" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 3l8 13.5M16 3l-8 13.5h8" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+          <button class="icon-btn" id="btn-export-dados" title="Exportar cadastros"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <div id="drive-status" class="drive-pill"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="1.8"/></svg> Google Drive: desconectado</div>
+    </div>
+    <div class="content-lift pad">
+      <div id="patient-list" class="stack" style="margin-top:0;"></div>
+      <div id="patient-empty" class="empty-state" style="display:none;">
+        <p>Nenhum paciente cadastrado ainda.<br>Cadastre a primeira ficha de avaliação para começar.</p>
+      </div>
+      <div class="stack">
+        <button class="btn btn-accent" id="btn-new-patient">Cadastrar novo paciente</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATIENT FORM (ficha de avaliação) -->
+  <section class="screen" id="screen-patient-form">
+    <div class="pad">
+    <div class="top-bar">
+      <button class="icon-btn light" data-back="screen-patient-select"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2 id="pf-title">Ficha de avaliação</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-top:0;">
+        <label>Nome completo</label>
+        <input type="text" id="pf-nome" placeholder="Nome completo do paciente">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Data de nascimento</label>
+          <input type="date" id="pf-nasc">
+        </div>
+        <div class="field">
+          <label>Idade</label>
+          <input type="text" id="pf-idade" placeholder="—" disabled>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cidade</label>
+        <input type="text" id="pf-cidade" placeholder="Cidade - UF">
+      </div>
+      <div class="field">
+        <label>Telefone do responsável</label>
+        <input type="text" id="pf-telefone" placeholder="(35)99999-9999" inputmode="numeric">
+      </div>
+      <div class="checkline">
+        <input type="checkbox" id="pf-mesmo-whats" checked>
+        <label for="pf-mesmo-whats" style="margin:0;">WhatsApp é o mesmo número acima</label>
+      </div>
+      <div class="field" id="pf-whats-field" style="display:none;">
+        <label>WhatsApp do responsável</label>
+        <input type="text" id="pf-whatsapp" placeholder="(35)99999-9999" inputmode="numeric">
+      </div>
+      <div class="error-msg" id="pf-error"></div>
+    </div>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-save-patient">Salvar ficha</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- PATIENT VIEW (read-only) -->
+  <section class="screen" id="screen-patient-view">
+    <div class="pad">
+    <div class="top-bar">
+      <button class="icon-btn light" data-back="screen-patient-select"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Ficha do paciente</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <div class="card">
+      <h3 id="view-nome" style="font-size:20px;">—</h3>
+      <div class="row" style="margin-top:14px;">
+        <div><div class="muted" style="font-size:12px;">Idade</div><div id="view-idade" style="font-weight:700;">—</div></div>
+        <div><div class="muted" style="font-size:12px;">Nascimento</div><div id="view-nasc" style="font-weight:700;">—</div></div>
+      </div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">Cidade</div><div id="view-cidade" style="font-weight:700;">—</div></div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">Telefone do responsável</div><div id="view-telefone" style="font-weight:700;">—</div></div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">WhatsApp do responsável</div><div id="view-whatsapp" style="font-weight:700;">—</div></div>
+      <div style="margin-top:14px;"><div class="muted" style="font-size:12px;">Cadastrado em</div><div id="view-criado" style="font-weight:700;">—</div></div>
+    </div>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-view-select">Abrir este paciente</button>
+      <button class="btn btn-ghost" id="btn-view-edit">Editar ficha</button>
+      <button class="btn btn-danger-ghost" id="btn-view-delete">Excluir paciente</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="hero-header">
+      <div class="hero-top">
+        <div>
+          <div class="hello">Paciente</div>
+          <h1 id="home-patient-name" style="font-size:22px;">—</h1>
+          <div class="muted" id="home-patient-meta" style="font-size:12px; margin-top:2px; color:rgba(255,255,255,0.75);"></div>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="btn-switch-patient" title="Trocar paciente"><svg viewBox="0 0 24 24" fill="none"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="content-lift pad">
+      <div class="stack" style="margin-top:0; gap:14px;">
+        <button class="menu-tile primary-tile" id="tile-official">
+          <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div><h3>Simulado do dia</h3><p>Teste oficial cronometrado — conta para a evolução</p></div>
+        </button>
+        <button class="menu-tile" id="tile-practice">
+          <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v6h6" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+          <div><h3>Treino livre</h3><p>Escolha uma tabuada e pratique sem contar no histórico</p></div>
+        </button>
+        <button class="menu-tile locked" id="tile-mixed">
+          <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.2 6.8H21l-5.6 4.1 2.2 6.8L12 15.6l-5.6 4.1 2.2-6.8L3 8.8h6.8Z" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+          <div><h3 style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">Simulado Misto <span class="tile-lock-badge" id="mixed-lock-badge">🔒 Bloqueado</span></h3><p id="mixed-desc">Continue treinando! Libera com boa performance nos últimos simulados.</p></div>
+        </button>
+        <button class="menu-tile" id="tile-evolution">
+          <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke-width="1.8" stroke-linecap="round"/><path d="M7 15l4-5 3 3 5-7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><h3>Evolução / Comparativo</h3><p>Gráficos, histórico e relatório em PDF</p></div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE SETUP -->
+  <section class="screen" id="screen-practice-setup">
+    <div class="pad">
+    <div class="top-bar">
+      <button class="icon-btn light" data-back="screen-home"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Treino livre</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <p class="muted">Escolha a tabuada que deseja treinar.</p>
+    <div class="grid-9" id="practice-tabuada-grid"></div>
+    <div style="margin-top:22px;">
+      <p class="muted" style="margin-top:0;">Como você quer responder?</p>
+      <div class="mode-choice" id="practice-mode-choice">
+        <div class="mode-opt" data-mode="A">
+          <div class="dot"></div>
+          <div><h3 style="font-size:15px;">Múltipla escolha</h3><p style="margin-top:2px;">3 opções para escolher</p></div>
+        </div>
+        <div class="mode-opt" data-mode="B">
+          <div class="dot"></div>
+          <div><h3 style="font-size:15px;">Resposta livre</h3><p style="margin-top:2px;">Digite o resultado</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-start-practice" disabled>Começar treino</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- OFFICIAL TEST SETUP -->
+  <section class="screen" id="screen-official-setup">
+    <div class="pad">
+    <div class="top-bar">
+      <button class="icon-btn light" data-back="screen-home"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Simulado do dia</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <p class="muted">Escolha a tabuada de hoje. O simulado passa primeiro pela múltipla escolha e, ao concluir, segue direto para a resposta livre da mesma tabuada.</p>
+    <div class="grid-9" id="official-tabuada-grid"></div>
+    <div class="stack">
+      <button class="btn btn-accent" id="btn-start-official" disabled>Iniciar simulado</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="pad">
+    <div class="quiz-head">
+      <span class="quiz-tag" id="quiz-tag">Tabuada do 7</span>
+      <div class="quiz-actions">
+        <button class="icon-btn" id="btn-restart-test" title="Limpar e recomeçar este teste"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="timer-tag" id="quiz-timer">00:00</span>
+      </div>
+    </div>
+    <div class="neuro-track" id="quiz-track"></div>
+    <div class="question-zone">
+      <div class="q-expr-wrap"><div class="q-expr" id="q-expr">7 × 4</div></div>
+      <div class="q-sub" id="q-sub">Questão 3 de 30</div>
+    </div>
+    <div id="quiz-options" class="options-grid"></div>
+    <div id="quiz-input-zone" class="answer-input-wrap" style="display:none;">
+      <input type="tel" inputmode="numeric" id="answer-input" placeholder="?" autocomplete="off">
+    </div>
+    <div class="feedback-banner" id="feedback-banner" style="display:none;"></div>
+    <button class="icon-btn light" id="btn-voice-answer" title="Microfone" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke-width="1.8"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <div class="voice-hint" id="voice-hint" style="display:none;">Microfone sempre ligado — fale o número. Diga "próximo" para avançar depois de acertar.</div>
+    </div>
+  </section>
+
+  <!-- MODULE RESULT -->
+  <section class="screen" id="screen-module-result">
+    <div class="pad">
+    <div class="spacer" style="flex:0.15"></div>
+    <h2 id="mod-result-title">Módulo concluído</h2>
+    <p class="muted" id="mod-result-sub">Veja como você se saiu nesta etapa.</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="val" id="mr-acertos">0/0</div><div class="lbl">Acertos</div></div>
+      <div class="stat-box"><div class="val" id="mr-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      <div class="stat-box"><div class="val" id="mr-media">0s</div><div class="lbl">Média/questão</div></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" id="btn-mod-continue">Continuar</button>
+    </div>
+  </section>
+
+  <!-- DAILY SUMMARY -->
+  <section class="screen" id="screen-daily-summary">
+    <div class="pad">
+    <div class="spacer" style="flex:0.1"></div>
+    <h2>Simulado do dia concluído</h2>
+    <p class="muted">Confira o resumo antes de fechar o teste de hoje.</p>
+    <div class="card" style="margin-top:16px;">
+      <span class="badge-module badge-a">Módulo A · múltipla escolha</span>
+      <div class="stat-row">
+        <div class="stat-box"><div class="val" id="ds-a-acertos">0/0</div><div class="lbl">Acertos</div></div>
+        <div class="stat-box"><div class="val" id="ds-a-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <span class="badge-module badge-b">Módulo B · resposta livre</span>
+      <div class="stat-row">
+        <div class="stat-box"><div class="val" id="ds-b-acertos">0/0</div><div class="lbl">Acertos</div></div>
+        <div class="stat-box"><div class="val" id="ds-b-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      </div>
+    </div>
+    <div class="encourage-box" id="encourage-box">
+      <div class="enc-emoji" id="enc-emoji">🎉</div>
+      <h3 id="enc-title">Muito bem!</h3>
+      <p id="enc-text" class="muted"></p>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-accent" id="btn-close-test">Fechar e salvar o teste do dia</button>
+    <p class="muted" style="text-align:center; margin-top:10px;">Salva no histórico deste paciente, baixa um arquivo desta sessão e envia para o Google Drive (se conectado).</p>
+    </div>
+  </section>
+
+  <!-- SAVED -->
+  <section class="screen" id="screen-saved">
+    <div class="pad">
+    <div class="spacer"></div>
+    <div style="text-align:center;">
+      <div class="celebrate-wrap">
+        <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
+        <span class="spark s4"></span><span class="spark s5"></span><span class="spark s6"></span>
+        <div class="brand-mark celebrate-mark" style="width:64px;height:64px;border-radius:18px;margin:0 auto 18px;">
+          <svg viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <h2>Teste salvo com sucesso</h2>
+      <p class="muted" id="saved-detail">Volte amanhã para continuar a sequência de evolução.</p>
+    </div>
+    <div class="spacer"></div>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-saved-evolution">Ver evolução</button>
+      <button class="btn btn-ghost" id="btn-saved-home">Voltar ao início</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE RESULT -->
+  <section class="screen" id="screen-practice-result">
+    <div class="pad">
+    <div class="spacer" style="flex:0.15"></div>
+    <h2>Treino finalizado</h2>
+    <p class="muted" id="pr-sub">Tabuada do 7 · Múltipla escolha</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="val" id="pr-acertos">0/0</div><div class="lbl">Acertos</div></div>
+      <div class="stat-box"><div class="val" id="pr-tempo">0s</div><div class="lbl">Tempo total</div></div>
+      <div class="stat-box"><div class="val" id="pr-media">0s</div><div class="lbl">Média/questão</div></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="stack">
+      <button class="btn btn-primary" id="btn-practice-again">Treinar outra tabuada</button>
+      <button class="btn btn-ghost" id="btn-practice-home">Voltar ao início</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- EVOLUTION -->
+  <section class="screen" id="screen-evolution">
+    <div class="pad">
+    <div class="top-bar">
+      <button class="icon-btn light" data-back="screen-home"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2>Evolução / Comparativo</h2>
+      <div style="width:40px;"></div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <h3>Buscar arquivos de sessões salvos</h3>
+      <p class="muted" style="margin-top:4px;">Selecione os arquivos sessao_....json baixados após cada teste (pode escolher vários de uma vez). Sessões repetidas são ignoradas automaticamente.</p>
+      <label class="btn btn-accent" for="import-sessions-input" style="cursor:pointer; margin-top:12px;">
+        <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;stroke:#3A2703;"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Buscar arquivos
+      </label>
+      <input type="file" id="import-sessions-input" accept="application/json" multiple style="display:none;">
+    </div>
+    <div id="evolution-empty" class="empty-state" style="display:none;">
+      <p>Nenhuma sessão carregada ainda para este paciente.<br>Use "Buscar arquivos" acima para trazer as sessões salvas, ou complete a primeira em "Simulado do dia".</p>
+    </div>
+    <div id="evolution-content" style="display:none;">
+      <div id="milestone-banner" class="milestone-banner" style="display:none;">🎉 10 sessões completas! Este é o comparativo completo da avaliação.</div>
+
+      <h3 style="margin-top:6px;">Indicadores</h3>
+      <div class="kpi-grid" id="kpi-grid"></div>
+
+      <div class="chart-wrap">
+        <h3 style="margin-bottom:2px;">Análise visual 3D — precisão por sessão</h3>
+        <p class="muted" style="margin-top:0; font-size:12px;">Cada barra combina os módulos A e B. Toque numa barra para ver o valor.</p>
+        <div class="chart3d-scroll"><div class="chart3d-stage" id="chart3d-stage"></div></div>
+        <div class="chart3d-legend">
+          <span><i style="background:#22b573;"></i> ≥ 80%</span>
+          <span><i style="background:#e0a83a;"></i> 50–79%</span>
+          <span><i style="background:#e14f4f;"></i> &lt; 50%</span>
+        </div>
+      </div>
+
+      <div class="chart-wrap"><h3 style="margin-bottom:6px;">Precisão por sessão (%)</h3><canvas id="chart-precisao" height="180"></canvas></div>
+      <div class="chart-wrap"><h3 style="margin-bottom:6px;">Tempo médio por questão (s)</h3><canvas id="chart-tempo" height="180"></canvas></div>
+      <div class="chart-wrap"><h3 style="margin-bottom:6px;">Erros por simulado</h3><canvas id="chart-erros" height="180"></canvas></div>
+      <div class="conclusion-box"><h3 style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">Análise da evolução <span class="sync-pill" id="conclusion-label">—</span></h3><p id="conclusion-text">—</p></div>
+
+      <div class="card" style="margin-top:16px;">
+        <h3>Observações da fisioterapeuta responsável</h3>
+        <p class="muted" style="margin-top:4px;">Este texto entra no relatório em PDF, abaixo da análise automática.</p>
+        <textarea id="therapist-notes" rows="4" placeholder="Ex: paciente demonstrou maior foco a partir da 4ª sessão..." style="width:100%; margin-top:10px; padding:14px 16px; border-radius:16px; border:none; background:var(--bg); box-shadow:var(--inset); font-family:'Plus Jakarta Sans'; font-size:14px; resize:vertical; color:var(--ink);"></textarea>
+        <div id="extra-notes-list" class="stack" style="margin-top:14px;"></div>
+        <button class="btn btn-ghost" id="btn-add-note-field" style="margin-top:12px;">+ Adicionar campo de observação</button>
+        <button class="btn btn-primary" id="btn-save-notes" style="margin-top:10px;">Salvar observações</button>
+      </div>
+
+      <h3 style="margin-top:20px;">Histórico</h3>
+      <div style="overflow-x:auto;">
+        <table id="history-table"><thead><tr><th>Sessão</th><th>Data</th><th>Mód. A</th><th>Tempo A</th><th>Mód. B</th><th>Tempo B</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="stack" style="margin-top:20px;">
+        <button class="btn btn-primary" id="btn-export-pdf">Abrir relatório para impressão</button>
+        <button class="btn btn-ghost" id="btn-download-pdf">Baixar PDF em vez de imprimir</button>
+        <button class="btn btn-ghost" id="btn-export-backup">Salvar backup (.json)</button>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  </div>
+  <div class="app-footer">
+    <div class="app-footer-brand"><div class="app-brand-mark"><svg viewBox="0 0 24 24" fill="none" style="width:11px;height:11px;"><path d="M12 3a4 4 0 0 0-4 4v1.2A4.5 4.5 0 0 0 5.5 12 4.5 4.5 0 0 0 8 16.2V17a4 4 0 0 0 8 0v-.8A4.5 4.5 0 0 0 18.5 12 4.5 4.5 0 0 0 16 8.2V7a4 4 0 0 0-4-4Z" stroke="#fff" stroke-width="1.8"/></svg></div>NeuroCálculo</div>
+    <div class="app-footer-credit">Elaboração: Waldeci Ramos, 2026 · Supervisão clínica: Dra. Thaís Pereira Xavier</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* Deterrente simples de botão direito / atalhos de inspeção — não é
+     segurança real, só reduz curiosidade casual. */
+  document.addEventListener('contextmenu', e=>e.preventDefault());
+  document.addEventListener('keydown', function(e){
+    const k = e.key ? e.key.toLowerCase() : '';
+    const blocked = e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) || (e.ctrlKey && k === 'u');
+    if(blocked) e.preventDefault();
+  });
+
+  const HAS_CLAUDE_STORAGE = (typeof window.storage !== 'undefined');
+  window.addEventListener('error', function(e){
+    console.error('Erro não tratado:', e.error || e.message);
+    try{ toast('Algo deu errado (' + (e.message||'erro') + '). Veja o console (F12) para detalhes.'); }catch(_){}
+  });
+  async function localGet(key){
+    try{
+      if(HAS_CLAUDE_STORAGE){ const r = await window.storage.get(key, false); return r ? JSON.parse(r.value) : null; }
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+  async function localSet(key, value){
+    try{
+      if(HAS_CLAUDE_STORAGE){ await window.storage.set(key, JSON.stringify(value), false); }
+      else{ localStorage.setItem(key, JSON.stringify(value)); }
+      return true;
+    }catch(e){ console.error('storage set failed', e); return false; }
+  }
+
+  /* ---------------- Cadastro inicial (edite aqui direto se quiser) ----------------
+     Para adicionar/alterar pacientes direto no código, edite este array.
+     A lista também pode ser editada pela própria tela do app (Cadastrar/Editar/Excluir). */
+  const SEED_PATIENTS = [
+    { id:'p_eduardo-pereira-ramos', nomeCompleto:'Eduardo Pereira Ramos', dataNascimento:'2013-02-04',
+      cidade:'Estiva - MG', telefoneResponsavel:'(35)98401-6706', whatsappResponsavel:'(35)98401-6706',
+      criadoEm:'2026-01-01T00:00:00.000Z' }
+  ];
+
+  let patients = [];
+  let activePatient = null;
+  let history = [];
+  let session = null;
+  let quizTimerHandle = null;
+
+  const $ = (id)=>document.getElementById(id);
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    $(id).classList.add('active');
+  }
+  function toast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2400);
+  }
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+  function fmtSeconds(ms){ return (ms/1000).toFixed(1) + "s"; }
+  function fmtClock(ms){
+    const totalSec = Math.floor(ms/1000);
+    const m = Math.floor(totalSec/60).toString().padStart(2,'0');
+    const s = (totalSec%60).toString().padStart(2,'0');
+    return m+":"+s;
+  }
+  function fmtDateBR(dateStr){ const [y,m,d] = dateStr.split('-'); return d+"/"+m+"/"+y; }
+  function formatPhone(raw){
+    const d = (raw||'').replace(/\D/g,'').slice(0,11);
+    if(d.length <= 2) return d ? '('+d : '';
+    if(d.length <= 6) return '('+d.slice(0,2)+')'+d.slice(2);
+    if(d.length <= 10) return '('+d.slice(0,2)+')'+d.slice(2,6)+'-'+d.slice(6);
+    return '('+d.slice(0,2)+')'+d.slice(2,7)+'-'+d.slice(7);
+  }
+  function wirePhoneMask(input){
+    input.addEventListener('input', ()=>{
+      const pos = input.selectionStart;
+      const before = input.value.length;
+      input.value = formatPhone(input.value);
+      const after = input.value.length;
+      input.selectionStart = input.selectionEnd = Math.max(0, pos + (after-before));
+    });
+  }
+  wirePhoneMask($('pf-telefone'));
+  wirePhoneMask($('pf-whatsapp'));
+
+  function calcAge(dobStr){
+    if(!dobStr) return null;
+    const dob = new Date(dobStr+'T00:00:00');
+    const now = new Date();
+    let age = now.getFullYear() - dob.getFullYear();
+    const mDiff = now.getMonth() - dob.getMonth();
+    if(mDiff < 0 || (mDiff === 0 && now.getDate() < dob.getDate())) age--;
+    return age;
+  }
+  function initials(name){
+    return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  }
+
+  document.querySelectorAll('[data-back]').forEach(btn=>{
+    btn.addEventListener('click', ()=>showScreen(btn.dataset.back));
+  });
+
+  /* ---------------- Patients (100% local, sem token, sem sincronizar) ---------------- */
+  async function loadPatients(){
+    let local = await localGet('patients');
+    if(!local){ local = SEED_PATIENTS.slice(); await localSet('patients', local); }
+    patients = local;
+    renderPatientList();
+  }
+
+  function renderPatientList(){
+    const list = $('patient-list');
+    list.innerHTML = '';
+    if(patients.length === 0){ $('patient-empty').style.display = 'block'; return; }
+    $('patient-empty').style.display = 'none';
+    patients.forEach(p=>{
+      const el = document.createElement('div');
+      el.className = 'patient-tile';
+      const age = calcAge(p.dataNascimento);
+      el.innerHTML = `<div class="patient-avatar">${initials(p.nomeCompleto)}</div><div class="ptile-select"><div><div class="pname">${p.nomeCompleto}</div><div class="pmeta">${age !== null ? age+' anos · ' : ''}${p.cidade || ''}</div></div><svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+      el.querySelector('.ptile-select').addEventListener('click', ()=>viewPatientDetails(p));
+      list.appendChild(el);
+    });
+  }
+
+  function viewPatientDetails(p){
+    const age = calcAge(p.dataNascimento);
+    $('view-nome').textContent = p.nomeCompleto;
+    $('view-idade').textContent = age !== null ? age + ' anos' : '—';
+    $('view-nasc').textContent = p.dataNascimento ? fmtDateBR(p.dataNascimento) : '—';
+    $('view-cidade').textContent = p.cidade || '—';
+    $('view-telefone').textContent = p.telefoneResponsavel || '—';
+    $('view-whatsapp').textContent = p.whatsappResponsavel || '—';
+    $('view-criado').textContent = p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—';
+    $('btn-view-select').onclick = ()=>selectPatient(p);
+    $('btn-view-edit').onclick = ()=>openPatientForm(p);
+    $('btn-view-delete').onclick = ()=>deletePatient(p);
+    showScreen('screen-patient-view');
+  }
+
+  async function deletePatient(p){
+    const sure = confirm('Excluir "' + p.nomeCompleto + '"? O histórico de exercícios dele continua salvo neste navegador, mas ele sai da lista.');
+    if(!sure) return;
+    patients = patients.filter(x=>x.id !== p.id);
+    await localSet('patients', patients);
+    toast('Paciente excluído.');
+    renderPatientList();
+    showScreen('screen-patient-select');
+  }
+
+  async function selectPatient(p){
+    activePatient = p;
+    const age = calcAge(p.dataNascimento);
+    $('home-patient-name').textContent = p.nomeCompleto;
+    $('home-patient-meta').textContent = (age !== null ? age+' anos · ' : '') + (p.cidade || '');
+    $('app-topbar-patient').textContent = p.nomeCompleto.split(' ')[0];
+    history = (await localGet('history-' + p.id)) || [];
+    updateMixedTileState();
+    showScreen('screen-home');
+  }
+
+  let editingPatientId = null;
+  function openPatientForm(p){
+    editingPatientId = p ? p.id : null;
+    $('pf-title').textContent = p ? 'Editar ficha' : 'Ficha de avaliação';
+    $('pf-nome').value = p ? p.nomeCompleto : '';
+    $('pf-nasc').value = p ? p.dataNascimento : '';
+    $('pf-idade').value = p ? (calcAge(p.dataNascimento) ?? '') : '';
+    $('pf-cidade').value = p ? (p.cidade || '') : '';
+    $('pf-telefone').value = p ? (p.telefoneResponsavel || '') : '';
+    const mesmo = p ? (p.whatsappResponsavel === p.telefoneResponsavel) : true;
+    $('pf-mesmo-whats').checked = mesmo;
+    $('pf-whats-field').style.display = mesmo ? 'none' : 'block';
+    $('pf-whatsapp').value = p ? (p.whatsappResponsavel || '') : '';
+    $('pf-error').textContent = '';
+    showScreen('screen-patient-form');
+  }
+  $('btn-new-patient').addEventListener('click', ()=>openPatientForm(null));
+
+  $('pf-nasc').addEventListener('input', ()=>{
+    const age = calcAge($('pf-nasc').value);
+    $('pf-idade').value = age !== null ? age : '';
+  });
+  $('pf-mesmo-whats').addEventListener('change', ()=>{
+    $('pf-whats-field').style.display = $('pf-mesmo-whats').checked ? 'none' : 'block';
+  });
+
+  $('btn-save-patient').addEventListener('click', async ()=>{
+    $('pf-error').textContent = '';
+    const nome = $('pf-nome').value.trim();
+    const nasc = $('pf-nasc').value;
+    const cidade = $('pf-cidade').value.trim();
+    const telefone = $('pf-telefone').value.trim();
+    const mesmo = $('pf-mesmo-whats').checked;
+    const whatsapp = mesmo ? telefone : $('pf-whatsapp').value.trim();
+    if(nome.length < 2){ $('pf-error').textContent = 'Informe o nome completo do paciente.'; return; }
+    if(!nasc){ $('pf-error').textContent = 'Informe a data de nascimento.'; return; }
+    if(!telefone){ $('pf-error').textContent = 'Informe o telefone do responsável.'; return; }
+
+    let record;
+    if(editingPatientId){
+      const idx = patients.findIndex(x=>x.id === editingPatientId);
+      record = patients[idx];
+      record.nomeCompleto = nome; record.dataNascimento = nasc; record.cidade = cidade;
+      record.telefoneResponsavel = telefone; record.whatsappResponsavel = whatsapp;
+    }else{
+      record = { id:'p_'+Date.now(), nomeCompleto:nome, dataNascimento:nasc, cidade:cidade,
+        telefoneResponsavel:telefone, whatsappResponsavel:whatsapp, criadoEm:new Date().toISOString() };
+      patients.push(record);
+    }
+    await localSet('patients', patients);
+    toast('Ficha salva.');
+    renderPatientList();
+    selectPatient(record);
+  });
+
+  $('btn-export-dados').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(patients, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'dados.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('dados.json exportado.');
+  });
+
+  $('btn-switch-patient').addEventListener('click', async ()=>{ $('app-topbar-patient').textContent = ''; await loadPatients(); showScreen('screen-patient-select'); });
+
+  /* ---------------- Practice setup ---------------- */
+  let practiceTabuada = null;
+  let practiceMode = null;
+  const grid = $('practice-tabuada-grid');
+  for(let n=1;n<=9;n++){
+    const tile = document.createElement('div');
+    tile.className = 'num-tile'; tile.textContent = n;
+    tile.addEventListener('click', ()=>{
+      document.querySelectorAll('#practice-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+      tile.classList.add('selected'); practiceTabuada = n; checkPracticeReady();
+    });
+    grid.appendChild(tile);
+  }
+  document.querySelectorAll('#practice-mode-choice .mode-opt').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('#practice-mode-choice .mode-opt').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected'); practiceMode = opt.dataset.mode; checkPracticeReady();
+    });
+  });
+  function checkPracticeReady(){ $('btn-start-practice').disabled = !(practiceTabuada && practiceMode); }
+
+  $('tile-practice').addEventListener('click', ()=>{
+    practiceTabuada = null; practiceMode = null;
+    document.querySelectorAll('#practice-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+    document.querySelectorAll('#practice-mode-choice .mode-opt').forEach(o=>o.classList.remove('selected'));
+    $('btn-start-practice').disabled = true;
+    showScreen('screen-practice-setup');
+  });
+  $('btn-start-practice').addEventListener('click', ()=>{
+    const questions = buildQuestions([practiceTabuada]);
+    session = { kind:'practice', modules:[{type:practiceMode, tabuadas:[practiceTabuada], questions, idx:0, startTs:null, endTs:null}], modIdx:0 };
+    startModule(session.modules[0]);
+  });
+
+  /* ---------------- Official daily test ---------------- */
+  let officialTabuada = null;
+  const officialGrid = $('official-tabuada-grid');
+  for(let n=1;n<=9;n++){
+    const tile = document.createElement('div');
+    tile.className = 'num-tile'; tile.textContent = n;
+    tile.addEventListener('click', ()=>{
+      document.querySelectorAll('#official-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+      tile.classList.add('selected'); officialTabuada = n; $('btn-start-official').disabled = false;
+    });
+    officialGrid.appendChild(tile);
+  }
+  $('tile-official').addEventListener('click', ()=>{
+    officialTabuada = null;
+    document.querySelectorAll('#official-tabuada-grid .num-tile').forEach(t=>t.classList.remove('selected'));
+    $('btn-start-official').disabled = true;
+    showScreen('screen-official-setup');
+  });
+  $('btn-start-official').addEventListener('click', ()=>{
+    session = { kind:'official', modules:[
+      {type:'A', tabuadas:[officialTabuada], questions:buildQuestions([officialTabuada]), idx:0, startTs:null, endTs:null},
+      {type:'B', tabuadas:[officialTabuada], questions:buildQuestions([officialTabuada]), idx:0, startTs:null, endTs:null}
+    ], modIdx:0 };
+    startModule(session.modules[0]);
+  });
+
+  function buildQuestions(tabuadas){
+    const qs = [];
+    tabuadas.forEach(t=>{ for(let m=1;m<=10;m++){ qs.push({tabuada:t, m:m, answer:t*m, userAnswer:null, correct:null, timeMs:0}); } });
+    return qs;
+  }
+
+  /* ---------------- Simulado Misto (tabuadas variadas, sorteadas de 1 a 9) ---------------- */
+  const MIXED_MIN_SESSOES = 3;
+  const MIXED_META_PRECISAO = 0.8;
+  const MIXED_QTD_QUESTOES = 15;
+
+  function isMixedUnlocked(){
+    if(!history || history.length < MIXED_MIN_SESSOES) return false;
+    const last = history.slice(-MIXED_MIN_SESSOES);
+    const avg = last.reduce((s,r)=> s + (r.moduleA.acertos+r.moduleB.acertos)/(r.moduleA.total+r.moduleB.total), 0) / last.length;
+    return avg >= MIXED_META_PRECISAO;
+  }
+
+  function updateMixedTileState(){
+    const tile = $('tile-mixed');
+    if(!tile) return;
+    const unlocked = isMixedUnlocked();
+    tile.classList.toggle('locked', !unlocked);
+    tile.classList.toggle('unlocked-special', unlocked);
+    $('mixed-lock-badge').textContent = unlocked ? '✨ Desbloqueado' : '🔒 Bloqueado';
+    if(unlocked){
+      $('mixed-desc').textContent = 'Tabuadas variadas sorteadas de 1 a 9 — desafie sua memória em um único simulado!';
+    }else{
+      const n = history ? history.length : 0;
+      const faltam = Math.max(0, MIXED_MIN_SESSOES - n);
+      $('mixed-desc').textContent = faltam > 0
+        ? `Continue treinando! Faltam ${faltam} simulado(s) para liberar (meta: ${Math.round(MIXED_META_PRECISAO*100)}% de acerto médio).`
+        : `Quase lá! Libera com ${Math.round(MIXED_META_PRECISAO*100)}% de acerto médio nos últimos ${MIXED_MIN_SESSOES} simulados.`;
+    }
+  }
+
+  function buildMixedQuestions(count){
+    const qs = [];
+    let lastT = null;
+    for(let i=0;i<count;i++){
+      let t;
+      do{ t = Math.floor(Math.random()*9)+1; } while(t === lastT);
+      lastT = t;
+      const m = Math.floor(Math.random()*10)+1;
+      qs.push({tabuada:t, m:m, answer:t*m, userAnswer:null, correct:null, timeMs:0});
+    }
+    return qs;
+  }
+
+  $('tile-mixed').addEventListener('click', ()=>{
+    if(!isMixedUnlocked()){
+      toast('Simulado Misto ainda bloqueado — continue treinando! 💪 Ele libera com boa performance nos últimos simulados.');
+      return;
+    }
+    session = { kind:'mista', modules:[
+      {type:'A', tabuadas:['misto'], questions:buildMixedQuestions(MIXED_QTD_QUESTOES), idx:0, startTs:null, endTs:null},
+      {type:'B', tabuadas:['misto'], questions:buildMixedQuestions(MIXED_QTD_QUESTOES), idx:0, startTs:null, endTs:null}
+    ], modIdx:0 };
+    startModule(session.modules[0]);
+  });
+
+  /* ---------------- Quiz engine ---------------- */
+  function startModule(mod){
+    mod.startTs = performance.now(); mod.idx = 0;
+    renderTrack(mod); startTimerDisplay(mod); renderQuestion(mod);
+    showScreen('screen-quiz');
+    if(voiceAlwaysOn && recognition) startRecognitionSafe();
+  }
+  function renderTrack(mod){
+    const track = $('quiz-track'); track.innerHTML = '';
+    mod.questions.forEach((q,i)=>{ const n = document.createElement('div'); n.className = 'node'; n.dataset.i = i; track.appendChild(n); });
+  }
+  function updateTrack(mod){
+    const nodes = $('quiz-track').children;
+    for(let i=0;i<nodes.length;i++){
+      nodes[i].classList.remove('current','done-correct','done-wrong');
+      const q = mod.questions[i];
+      if(q.correct === true) nodes[i].classList.add('done-correct');
+      else if(q.correct === false) nodes[i].classList.add('done-wrong');
+      else if(i === mod.idx) nodes[i].classList.add('current');
+    }
+  }
+  function startTimerDisplay(mod){
+    clearInterval(quizTimerHandle);
+    quizTimerHandle = setInterval(()=>{ $('quiz-timer').textContent = fmtClock(performance.now() - mod.startTs); }, 200);
+  }
+
+  let questionStartTs = 0;
+  let pendingAdvance = null;
+  function renderQuestion(mod){
+    updateTrack(mod);
+    const q = mod.questions[mod.idx];
+    $('quiz-tag').textContent = (session.kind === 'mista' ? 'Simulado Misto · ' : '') + 'Tabuada do ' + q.tabuada + (mod.type === 'A' ? ' · múltipla escolha' : ' · resposta livre');
+    $('quiz-tag').classList.toggle('quiz-tag-mista', session.kind === 'mista');
+    const exprEl = $('q-expr');
+    exprEl.textContent = q.tabuada + ' × ' + q.m;
+    exprEl.style.animation = 'none'; void exprEl.offsetWidth; exprEl.style.animation = '';
+    $('q-sub').textContent = 'Questão ' + (mod.idx+1) + ' de ' + mod.questions.length;
+    $('feedback-banner').style.display = 'none';
+
+    if(mod.type === 'A'){
+      $('quiz-options').style.display = 'flex';
+      $('quiz-input-zone').style.display = 'none';
+      const distractors = new Set([q.answer]);
+      while(distractors.size < 3){
+        const delta = (Math.floor(Math.random()*5)+1) * (Math.random()<0.5?-1:1) * (q.tabuada || 1);
+        let candidate = q.answer + delta;
+        if(candidate <= 0) candidate = q.answer + Math.floor(Math.random()*9)+1;
+        distractors.add(candidate);
+      }
+      const options = shuffle(Array.from(distractors));
+      const zone = $('quiz-options'); zone.innerHTML = '';
+      options.forEach(opt=>{
+        const b = document.createElement('button');
+        b.className = 'opt-btn'; b.textContent = opt;
+        b.addEventListener('click', ()=>answerQuestion(mod, opt, b));
+        zone.appendChild(b);
+      });
+    }else{
+      $('quiz-options').style.display = 'none';
+      $('quiz-input-zone').style.display = 'flex';
+      const input = $('answer-input');
+      input.value = ''; input.disabled = false;
+      input.classList.remove('input-correct','input-wrong');
+      setTimeout(()=>input.focus(), 50);
+    }
+    questionStartTs = performance.now();
+  }
+
+  function answerQuestion(mod, value, btnEl){
+    const q = mod.questions[mod.idx];
+    if(q.userAnswer !== null) return;
+    const elapsed = performance.now() - questionStartTs;
+    q.userAnswer = value; q.correct = (Number(value) === q.answer); q.timeMs = elapsed;
+    const buttons = $('quiz-options').querySelectorAll('.opt-btn');
+    buttons.forEach(b=>{
+      b.disabled = true;
+      if(Number(b.textContent) === q.answer) b.classList.add('correct');
+      else if(b === btnEl) b.classList.add('wrong');
+    });
+    updateTrack(mod);
+    pendingAdvance = setTimeout(()=>{ pendingAdvance = null; advance(mod); }, 700);
+  }
+
+  /* Módulo B: confere sozinho ao digitar. Errado trava até acertar;
+     certo marca verde e avança em 5s (ou na hora, se disser "próximo"). */
+  function evaluateTypedInput(force){
+    const mod = session.modules[session.modIdx];
+    const q = mod.questions[mod.idx];
+    if(q.userAnswer !== null) return;
+    const input = $('answer-input');
+    const val = input.value.trim();
+    if(val === '' || isNaN(Number(val))){ input.classList.remove('input-correct','input-wrong'); $('feedback-banner').style.display = 'none'; return; }
+    const digitsNeeded = String(q.answer).length;
+    if(!force && val.length < digitsNeeded) return;
+    const num = Number(val);
+    if(num === q.answer){
+      const elapsed = performance.now() - questionStartTs;
+      q.userAnswer = num; q.correct = true; q.timeMs = elapsed;
+      input.disabled = true; input.classList.remove('input-wrong'); input.classList.add('input-correct');
+      const banner = $('feedback-banner');
+      banner.style.display = 'block'; banner.className = 'feedback-banner ok';
+      banner.textContent = 'Certo! ' + q.tabuada + ' × ' + q.m + ' = ' + q.answer + ' — diga "próximo" ou aguarde.';
+      updateTrack(mod);
+      pendingAdvance = setTimeout(()=>{ pendingAdvance = null; advance(mod); }, 5000);
+    }else{
+      input.classList.add('input-wrong');
+      const banner = $('feedback-banner');
+      banner.style.display = 'block'; banner.className = 'feedback-banner no';
+      banner.textContent = 'Ainda não. Corrija o número para continuar.';
+    }
+  }
+  $('answer-input').addEventListener('input', ()=>evaluateTypedInput(false));
+  $('answer-input').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') evaluateTypedInput(true); });
+
+  /* ---------------- Voz: sempre ligado, com comando "próximo" ---------------- */
+  const SpeechRecCtor = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  let recognition = null;
+  let voiceAlwaysOn = false;
+  let voiceShouldRun = false;
+
+  if(SpeechRecCtor){
+    recognition = new SpeechRecCtor();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 3;
+    $('btn-voice-answer').style.display = 'flex';
+  }else{
+    $('voice-hint').style.display = 'block';
+    $('voice-hint').textContent = 'Microfone por voz indisponível neste navegador (comum no Safari/iPhone). Funciona no Chrome para Android e no Chrome/Edge do computador.';
+  }
+
+  function startRecognitionSafe(){
+    if(!recognition) return;
+    voiceShouldRun = true;
+    try{ recognition.start(); }catch(e){ /* já estava rodando */ }
+  }
+  function stopRecognitionSafe(){
+    voiceShouldRun = false;
+    if(recognition){ try{ recognition.stop(); }catch(e){} }
+  }
+
+  $('btn-voice-answer').addEventListener('click', ()=>{
+    voiceAlwaysOn = !voiceAlwaysOn;
+    if(voiceAlwaysOn){
+      $('btn-voice-answer').classList.add('listening');
+      $('voice-hint').style.display = 'block';
+      startRecognitionSafe();
+      toast('Microfone sempre ligado.');
+    }else{
+      $('btn-voice-answer').classList.remove('listening');
+      $('voice-hint').style.display = 'none';
+      stopRecognitionSafe();
+      toast('Microfone desligado.');
+    }
+  });
+
+  function parseSpokenNumber(raw){
+    let text = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    const digitMatch = text.match(/\d+/);
+    if(digitMatch) return parseInt(digitMatch[0], 10);
+    const ones = {zero:0,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,catorze:14,quinze:15,dezesseis:16,dezessete:17,dezoito:18,dezenove:19};
+    const tens = {vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90};
+    const words = text.split(/\s+/).filter(w=>w && w!=='e');
+    if(words.length === 1){
+      if(words[0] === 'cem') return 100;
+      if(ones[words[0]] !== undefined) return ones[words[0]];
+      if(tens[words[0]] !== undefined) return tens[words[0]];
+    }
+    if(words.length === 2 && tens[words[0]] !== undefined && ones[words[1]] !== undefined) return tens[words[0]] + ones[words[1]];
+    return null;
+  }
+  function isNextCommand(raw){
+    const t = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    return ['proximo','proxima','avancar','pular','next','continua','continuar'].some(w=>t.includes(w));
+  }
+
+  function applyVoiceAnswer(rawTranscript){
+    if(!session) return;
+    const mod = session.modules[session.modIdx];
+    const q = mod.questions[mod.idx];
+    if(isNextCommand(rawTranscript)){
+      if(q.userAnswer !== null && pendingAdvance){
+        clearTimeout(pendingAdvance); pendingAdvance = null;
+        advance(mod);
+      }
+      return;
+    }
+    if(q.userAnswer !== null) return;
+    const num = parseSpokenNumber(rawTranscript);
+    if(num === null){ toast('Não entendi. Fale só o número, ex: "trinta e seis".'); return; }
+    if(mod.type === 'A'){
+      const buttons = Array.from($('quiz-options').querySelectorAll('.opt-btn'));
+      const match = buttons.find(b => Number(b.textContent) === num);
+      if(match) match.click();
+      else toast('Esse valor não está entre as opções. Tente de novo.');
+    }else{
+      $('answer-input').value = String(num);
+      evaluateTypedInput(true);
+    }
+  }
+
+  if(recognition){
+    recognition.addEventListener('result', (e)=>{
+      const res = e.results[e.results.length-1];
+      const transcripts = Array.from(res).map(r=>r.transcript);
+      for(const t of transcripts){
+        applyVoiceAnswer(t);
+      }
+    });
+    recognition.addEventListener('end', ()=>{
+      if(voiceShouldRun){ setTimeout(()=>{ try{ recognition.start(); }catch(e){} }, 250); }
+    });
+    recognition.addEventListener('error', ()=>{ /* ignora erros pontuais, o auto-restart cuida do resto */ });
+  }
+
+  $('btn-restart-test').addEventListener('click', ()=>{
+    if(!session) return;
+    const sure = confirm('Limpar este teste e começar de novo do zero? As respostas dadas até agora serão descartadas.');
+    if(!sure) return;
+    clearTimeout(pendingAdvance); pendingAdvance = null;
+    session.modIdx = 0;
+    session.modules.forEach(mod=>{
+      mod.questions.forEach(q=>{ q.userAnswer = null; q.correct = null; q.timeMs = 0; });
+      mod.idx = 0; mod.startTs = null; mod.endTs = null;
+    });
+    toast('Teste reiniciado.');
+    startModule(session.modules[0]);
+  });
+
+  function advance(mod){
+    mod.idx++;
+    if(mod.idx >= mod.questions.length) finishModule(mod);
+    else renderQuestion(mod);
+  }
+
+  function moduleStats(mod){
+    const total = mod.questions.length;
+    const acertos = mod.questions.filter(q=>q.correct).length;
+    const tempoTotal = mod.endTs - mod.startTs;
+    const tempoMedio = mod.questions.reduce((s,q)=>s+q.timeMs,0) / total;
+    return {total, acertos, erros: total-acertos, tempoTotal, tempoMedio};
+  }
+
+  function finishModule(mod){
+    clearInterval(quizTimerHandle);
+    mod.endTs = performance.now();
+    const stats = moduleStats(mod);
+
+    if(session.kind === 'practice'){
+      stopRecognitionSafe(); $('btn-voice-answer').classList.remove('listening');
+      $('pr-sub').textContent = 'Tabuada do ' + mod.tabuadas.join(', ') + ' · ' + (mod.type==='A'?'Múltipla escolha':'Resposta livre');
+      $('pr-acertos').textContent = stats.acertos + '/' + stats.total;
+      $('pr-tempo').textContent = fmtSeconds(stats.tempoTotal);
+      $('pr-media').textContent = fmtSeconds(stats.tempoMedio);
+      showScreen('screen-practice-result');
+      return;
+    }
+    if(session.modIdx === 0){
+      $('mod-result-title').textContent = 'Módulo A concluído';
+      $('mod-result-sub').textContent = 'Múltipla escolha — tabuada do ' + mod.tabuadas[0];
+      $('mr-acertos').textContent = stats.acertos + '/' + stats.total;
+      $('mr-tempo').textContent = fmtSeconds(stats.tempoTotal);
+      $('mr-media').textContent = fmtSeconds(stats.tempoMedio);
+      showScreen('screen-module-result');
+    }else{
+      stopRecognitionSafe(); $('btn-voice-answer').classList.remove('listening');
+      showDailySummary();
+    }
+  }
+
+  $('btn-mod-continue').addEventListener('click', ()=>{
+    session.modIdx = 1;
+    startModule(session.modules[1]);
+  });
+
+  function buildEncouragement(accPct){
+    if(accPct >= 90) return {emoji:'🌟', title:'Show de bola!', text:'Você mandou muito bem nesse simulado! Sua dedicação está dando resultado — continue treinando assim para ficar cada vez mais rápido e afiado na tabuada.'};
+    if(accPct >= 70) return {emoji:'🎉', title:'Muito bem!', text:'Ótimo resultado! Você está indo muito bem. Mais alguns treinos e você chega no topo — continue praticando um pouquinho todo dia!'};
+    if(accPct >= 50) return {emoji:'💪', title:'Bom trabalho!', text:'Você está no caminho certo! Errar faz parte de aprender. Que tal treinar mais um pouco essa tabuada? A cada tentativa você fica mais rápido e seguro.'};
+    return {emoji:'🚀', title:'Continue tentando!', text:'Você completou o desafio, e isso já é um passo importante! Vamos estudar mais um pouco essa tabuada — com treino, a evolução vem rápido. Você consegue!'};
+  }
+
+  function showDailySummary(){
+    const sa = moduleStats(session.modules[0]);
+    const sb = moduleStats(session.modules[1]);
+    $('ds-a-acertos').textContent = sa.acertos + '/' + sa.total;
+    $('ds-a-tempo').textContent = fmtSeconds(sa.tempoTotal);
+    $('ds-b-acertos').textContent = sb.acertos + '/' + sb.total;
+    $('ds-b-tempo').textContent = fmtSeconds(sb.tempoTotal);
+    const accPct = Math.round(((sa.acertos+sb.acertos)/(sa.total+sb.total))*100);
+    const enc = buildEncouragement(accPct);
+    $('enc-emoji').textContent = enc.emoji;
+    $('enc-title').textContent = enc.title;
+    $('enc-text').textContent = enc.text;
+    showScreen('screen-daily-summary');
+  }
+
+  $('btn-close-test').addEventListener('click', async ()=>{
+    const sa = moduleStats(session.modules[0]);
+    const sb = moduleStats(session.modules[1]);
+    const now = new Date();
+    const record = {
+      id: now.getTime(), sessionNumber: history.length + 1,
+      date: now.toISOString().slice(0,10), time: now.toTimeString().slice(0,8),
+      kind: session.kind,
+      moduleA: {tabuadas:session.modules[0].tabuadas, total:sa.total, acertos:sa.acertos, erros:sa.erros, tempoTotalMs:sa.tempoTotal, tempoMedioMs:sa.tempoMedio},
+      moduleB: {tabuadas:session.modules[1].tabuadas, total:sb.total, acertos:sb.acertos, erros:sb.erros, tempoTotalMs:sb.tempoTotal, tempoMedioMs:sb.tempoMedio}
+    };
+    history.push(record);
+    await localSet('history-' + activePatient.id, history);
+    updateMixedTileState();
+
+    const fileData = { paciente:activePatient.nomeCompleto, ...record };
+    const fileName = 'sessao_' + record.sessionNumber + '_' + activePatient.nomeCompleto.replace(/\s+/g,'_') + '_' + record.date + '.json';
+    const jsonText = JSON.stringify(fileData, null, 2);
+    const blob = new Blob([jsonText], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    let driveMsg = '';
+    if(driveConnected){
+      const ok = await uploadFileToDrive(fileName, 'application/json', jsonText);
+      driveMsg = ok ? ' Também foi enviado ao Google Drive.' : ' (Falha ao enviar ao Google Drive — o arquivo local foi baixado normalmente.)';
+    }
+
+    $('saved-detail').textContent = 'Sessão nº ' + record.sessionNumber + ' registrada em ' + fmtDateBR(record.date) + ' às ' + record.time.slice(0,5) + '. Um arquivo desta sessão foi baixado.' + driveMsg;
+    showScreen('screen-saved');
+  });
+
+  $('btn-saved-home').addEventListener('click', ()=>showScreen('screen-home'));
+  $('btn-saved-evolution').addEventListener('click', ()=>openEvolution());
+  $('btn-practice-home').addEventListener('click', ()=>showScreen('screen-home'));
+  $('btn-practice-again').addEventListener('click', ()=>showScreen('screen-practice-setup'));
+
+  /* ---------------- Evolução / Comparativo / Gráficos / PDF ---------------- */
+  let charts = {};
+  let extraNotes = [];
+  $('tile-evolution').addEventListener('click', openEvolution);
+  async function openEvolution(){
+    showScreen('screen-evolution');
+    try{
+      history = (await localGet('history-' + activePatient.id)) || [];
+      $('therapist-notes').value = (await localGet('notes-' + activePatient.id)) || '';
+      extraNotes = (await localGet('extra-notes-' + activePatient.id)) || [];
+      renderExtraNotes();
+      renderEvolution();
+    }catch(err){
+      console.error('Falha ao abrir Evolução:', err);
+      toast('Algo falhou ao carregar a evolução — veja o console (F12) para detalhes.');
+    }
+  }
+
+  function renderExtraNotes(){
+    const list = $('extra-notes-list');
+    list.innerHTML = '';
+    extraNotes.forEach((n, idx)=>{
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'background:var(--bg); border-radius:16px; padding:12px; box-shadow:var(--raised-sm);';
+      wrap.innerHTML = `
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+          <input type="text" data-idx="${idx}" class="extra-note-title" value="${n.title.replace(/"/g,'&quot;')}" placeholder="Título do campo (ex: Comportamento)" style="flex:1; padding:8px 12px; border-radius:10px; border:none; background:var(--bg); box-shadow:var(--inset-sm); font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; color:var(--ink);">
+          <button class="icon-btn light extra-note-remove" data-idx="${idx}" style="width:32px;height:32px;"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px;"><path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </div>
+        <textarea data-idx="${idx}" class="extra-note-text" rows="3" placeholder="Observação..." style="width:100%; padding:10px 12px; border-radius:10px; border:none; background:var(--bg); box-shadow:var(--inset-sm); font-family:'Plus Jakarta Sans'; font-size:13.5px; resize:vertical; color:var(--ink);">${n.text}</textarea>`;
+      list.appendChild(wrap);
+    });
+    list.querySelectorAll('.extra-note-remove').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ extraNotes.splice(Number(btn.dataset.idx),1); renderExtraNotes(); });
+    });
+  }
+
+  $('btn-add-note-field').addEventListener('click', ()=>{
+    extraNotes.push({title:'', text:''});
+    renderExtraNotes();
+  });
+
+  $('btn-save-notes').addEventListener('click', async ()=>{
+    document.querySelectorAll('.extra-note-title').forEach(inp=>{ extraNotes[Number(inp.dataset.idx)].title = inp.value; });
+    document.querySelectorAll('.extra-note-text').forEach(ta=>{ extraNotes[Number(ta.dataset.idx)].text = ta.value; });
+    await localSet('notes-' + activePatient.id, $('therapist-notes').value);
+    await localSet('extra-notes-' + activePatient.id, extraNotes);
+    toast('Observações salvas.');
+  });
+
+  $('import-sessions-input').addEventListener('change', async (e)=>{
+    const files = Array.from(e.target.files || []);
+    if(files.length === 0) return;
+    let imported = 0, skipped = 0;
+    for(const file of files){
+      try{
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if(!data || !data.moduleA || !data.moduleB || !data.id){ skipped++; continue; }
+        if(history.some(r=>r.id === data.id)){ skipped++; continue; }
+        const record = { id:data.id, sessionNumber:data.sessionNumber, date:data.date, time:data.time, moduleA:data.moduleA, moduleB:data.moduleB };
+        history.push(record); imported++;
+      }catch(err){ skipped++; }
+    }
+    history.sort((a,b)=>a.id-b.id);
+    history.forEach((r,i)=>{ if(!r.sessionNumber) r.sessionNumber = i+1; });
+    await localSet('history-' + activePatient.id, history);
+    updateMixedTileState();
+    e.target.value = '';
+    toast(imported + ' sessão(ões) importada(s)' + (skipped ? ', ' + skipped + ' ignorada(s)' : '') + '.');
+    renderEvolution();
+  });
+
+  function renderEvolution(){
+    if(history.length === 0){
+      $('evolution-empty').style.display = 'block';
+      $('evolution-content').style.display = 'none';
+      return;
+    }
+    $('evolution-empty').style.display = 'none';
+    $('evolution-content').style.display = 'block';
+
+    const sorted = history.slice().sort((a,b)=>a.id-b.id);
+    $('milestone-banner').style.display = sorted.length >= 10 ? 'block' : 'none';
+    const labels = sorted.map((r,i)=>'S'+(r.sessionNumber || i+1));
+    const precA = sorted.map(r=>Math.round((r.moduleA.acertos/r.moduleA.total)*100));
+    const precB = sorted.map(r=>Math.round((r.moduleB.acertos/r.moduleB.total)*100));
+    const tempoA = sorted.map(r=>+(r.moduleA.tempoMedioMs/1000).toFixed(1));
+    const tempoB = sorted.map(r=>+(r.moduleB.tempoMedioMs/1000).toFixed(1));
+    const errosA = sorted.map(r=>r.moduleA.erros);
+    const errosB = sorted.map(r=>r.moduleB.erros);
+
+    const precCombinada = sorted.map(r=>Math.round(((r.moduleA.acertos+r.moduleB.acertos)/(r.moduleA.total+r.moduleB.total))*100));
+    renderKPIs(sorted, precCombinada);
+    renderChart3D(sorted, precCombinada);
+
+    const tbody = document.querySelector('#history-table tbody');
+    tbody.innerHTML = '';
+    sorted.forEach((r,i)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${r.sessionNumber || i+1}</td><td>${fmtDateBR(r.date)}</td><td>${r.moduleA.acertos}/${r.moduleA.total}</td><td>${fmtSeconds(r.moduleA.tempoTotalMs)}</td><td>${r.moduleB.acertos}/${r.moduleB.total}</td><td>${fmtSeconds(r.moduleB.tempoTotalMs)}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const blue = '#5b5fe0', teal='#22b573';
+    if(typeof Chart === 'undefined'){
+      console.error('Chart.js não carregou — gráficos ficarão ocultos, mas o restante da análise segue normalmente.');
+      document.querySelectorAll('.chart-wrap canvas').forEach(cv=>{ cv.parentElement.innerHTML = '<p class="muted">Gráfico indisponível (biblioteca não carregou nesta conexão).</p>'; });
+    }else{
+      try{
+        if(charts.precisao) charts.precisao.destroy();
+        charts.precisao = new Chart($('chart-precisao'), { type:'line', data:{labels, datasets:[
+          {label:'Módulo A', data:precA, borderColor:blue, backgroundColor:blue, tension:.3},
+          {label:'Módulo B', data:precB, borderColor:teal, backgroundColor:teal, tension:.3}
+        ]}, options:{responsive:true, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}}, plugins:{legend:{position:'bottom'}}} });
+
+        if(charts.tempo) charts.tempo.destroy();
+        charts.tempo = new Chart($('chart-tempo'), { type:'line', data:{labels, datasets:[
+          {label:'Módulo A', data:tempoA, borderColor:blue, backgroundColor:blue, tension:.3},
+          {label:'Módulo B', data:tempoB, borderColor:teal, backgroundColor:teal, tension:.3}
+        ]}, options:{responsive:true, plugins:{legend:{position:'bottom'}}} });
+
+        if(charts.erros) charts.erros.destroy();
+        charts.erros = new Chart($('chart-erros'), { type:'bar', data:{labels, datasets:[
+          {label:'Módulo A', data:errosA, backgroundColor:blue},
+          {label:'Módulo B', data:errosB, backgroundColor:teal}
+        ]}, options:{responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}} });
+      }catch(chartErr){
+        console.error('Erro ao desenhar gráficos:', chartErr);
+      }
+    }
+
+    const analysis = buildConclusion(sorted);
+    $('conclusion-label').textContent = analysis.label;
+    $('conclusion-label').className = 'sync-pill status-' + analysis.cls;
+    $('conclusion-text').textContent = analysis.text;
+  }
+
+  function buildConclusion(sorted){
+    if(sorted.length < 2) return {cls:'insuficiente', label:'Aguardando mais sessões', text:'Complete mais simulados em dias diferentes para que a análise de evolução seja gerada.'};
+    const n = sorted.length;
+    const half = Math.max(1, Math.floor(Math.min(3, Math.floor(n/2))));
+    const first = sorted.slice(0, half);
+    const last = sorted.slice(n-half, n);
+    function avgPrec(g){ return g.reduce((s,r)=>s+(r.moduleA.acertos+r.moduleB.acertos)/(r.moduleA.total+r.moduleB.total),0)/g.length; }
+    function avgTempo(g){ return g.reduce((s,r)=>s+((r.moduleA.tempoMedioMs+r.moduleB.tempoMedioMs)/2),0)/g.length; }
+    const pFirst = avgPrec(first)*100, pLast = avgPrec(last)*100;
+    const tFirst = avgTempo(first)/1000, tLast = avgTempo(last)/1000;
+    const deltaP = pLast - pFirst;
+    const deltaT = tFirst - tLast;
+
+    let precisaoTxt, tempoTxt;
+    if(deltaP > 3) precisaoTxt = `a precisão média subiu de ${pFirst.toFixed(0)}% para ${pLast.toFixed(0)}%, uma melhora de ${deltaP.toFixed(0)} pontos percentuais`;
+    else if(deltaP < -3) precisaoTxt = `a precisão média caiu de ${pFirst.toFixed(0)}% para ${pLast.toFixed(0)}%`;
+    else precisaoTxt = `a precisão média se manteve estável, em torno de ${pLast.toFixed(0)}%`;
+
+    if(deltaT > 0.3) tempoTxt = `o tempo médio de resposta reduziu de ${tFirst.toFixed(1)}s para ${tLast.toFixed(1)}s, indicando ganho de agilidade de processamento`;
+    else if(deltaT < -0.3) tempoTxt = `o tempo médio de resposta aumentou de ${tFirst.toFixed(1)}s para ${tLast.toFixed(1)}s`;
+    else tempoTxt = `o tempo médio de resposta permaneceu estável, perto de ${tLast.toFixed(1)}s`;
+
+    let cls, label, veredito;
+    if(deltaP > 3 && deltaT > 0.3){ cls='melhorando'; label='Melhorando'; veredito='Os dois indicadores caminham juntos na direção esperada, compatível com um efeito positivo do treino sobre a neuromodulação cognitiva.'; }
+    else if(deltaP > 3 || deltaT > 0.3){ cls='melhorando'; label='Melhorando'; veredito='Há sinais de melhora em pelo menos um dos indicadores, sugerindo progresso — vale continuar o acompanhamento pelas próximas sessões.'; }
+    else if(deltaP < -3 && deltaT < -0.3){ cls='piorando'; label='Piorando'; veredito='Os dois indicadores pioraram na comparação entre as sessões. Pode ser oscilação pontual ou uma tendência real — observe as próximas sessões.'; }
+    else if(deltaP < -3 || deltaT < -0.3){ cls='piorando'; label='Leve piora'; veredito='Um dos indicadores piorou levemente. Ainda não é conclusivo isoladamente, mas merece acompanhamento.'; }
+    else{ cls='estavel'; label='Sem alteração relevante'; veredito='Ainda não há uma tendência clara de melhora ou piora nos ' + n + ' simulados registrados. Recomenda-se completar a sequência de sessões (até 20) para uma análise mais conclusiva.'; }
+
+    return {cls, label, text:`Com base em ${n} sessão(ões) registrada(s), ${precisaoTxt}, e ${tempoTxt}. ${veredito}`};
+  }
+
+  function kpiIcon(path){ return `<svg viewBox="0 0 24 24" fill="none">${path}</svg>`; }
+  function renderKPIs(sorted, precCombinada){
+    const n = sorted.length;
+    const precisaoGeral = precCombinada.reduce((s,v)=>s+v,0) / n;
+    const tempoGeral = sorted.reduce((s,r)=>s + (r.moduleA.tempoMedioMs + r.moduleB.tempoMedioMs)/2, 0) / n / 1000;
+    let bestIdx = 0;
+    precCombinada.forEach((v,i)=>{ if(v > precCombinada[bestIdx]) bestIdx = i; });
+    const bestLabel = 'S' + (sorted[bestIdx].sessionNumber || (bestIdx+1));
+    const half = Math.max(1, Math.floor(Math.min(3, Math.floor(n/2))));
+    const trendDelta = n >= 2 ? (precCombinada.slice(n-half).reduce((s,v)=>s+v,0)/half) - (precCombinada.slice(0,half).reduce((s,v)=>s+v,0)/half) : 0;
+    const trendCls = trendDelta > 3 ? 'up' : (trendDelta < -3 ? 'down' : 'flat');
+    const trendTxt = n < 2 ? '—' : (trendDelta > 3 ? '▲ Melhorando' : (trendDelta < -3 ? '▼ Piora' : '● Estável'));
+
+    const cards = [
+      { icon:kpiIcon('<path d="M9 11l3 3L22 4M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'), val:n, lbl:'Simulados feitos', trend:null },
+      { icon:kpiIcon('<circle cx="12" cy="12" r="9" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke-width="1.8" stroke-linecap="round"/>'), val:Math.round(precisaoGeral)+'%', lbl:'Precisão média', trend:{cls:trendCls, txt:trendTxt} },
+      { icon:kpiIcon('<path d="M12 8v4l3 2" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="13" r="8" stroke-width="1.8"/><path d="M9 2h6M12 2v3" stroke-width="1.8" stroke-linecap="round"/>'), val:tempoGeral.toFixed(1)+'s', lbl:'Tempo médio/questão', trend:null },
+      { icon:kpiIcon('<path d="M8 21h8M12 17v4M17 3H7v6a5 5 0 0 0 10 0V3Z" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 5H4a2 2 0 0 0 0 4h3M17 5h3a2 2 0 0 1 0 4h-3" stroke-width="1.8" stroke-linecap="round"/>'), val:bestLabel, lbl:'Melhor sessão', trend:null },
+      { icon:kpiIcon('<path d="M3 3v18h18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 15l4-5 3 3 5-7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'), val:trendTxt.replace(/[▲▼●]\s*/,''), lbl:'Tendência geral', trend:{cls:trendCls, txt:(trendDelta>=0?'+':'')+trendDelta.toFixed(0)+'%'} },
+      { icon:kpiIcon('<path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'), val:sorted[n-1].moduleA.acertos+sorted[n-1].moduleB.acertos+'/'+(sorted[n-1].moduleA.total+sorted[n-1].moduleB.total), lbl:'Última sessão (acertos)', trend:null },
+    ];
+
+    $('kpi-grid').innerHTML = cards.map(c=>`
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon">${c.icon}</div>
+          ${c.trend ? `<span class="kpi-trend ${c.trend.cls}">${c.trend.txt}</span>` : ''}
+        </div>
+        <div class="kpi-val">${c.val}</div>
+        <div class="kpi-lbl">${c.lbl}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderChart3D(sorted, precCombinada){
+    const stage = $('chart3d-stage');
+    stage.innerHTML = '';
+    const maxBars = 20;
+    const view = sorted.slice(-maxBars);
+    const viewPrec = precCombinada.slice(-maxBars);
+    viewPrec.forEach((val, i)=>{
+      const r = view[i];
+      const h = Math.max(6, Math.round(val * 1.5));
+      const color = val >= 80 ? '#22b573' : (val >= 50 ? '#e0a83a' : '#e14f4f');
+      const label = 'S' + (r.sessionNumber || (i+1));
+      const col = document.createElement('div');
+      col.className = 'bar3d-col';
+      col.innerHTML = `
+        <div class="bar3d-tip">${val}%</div>
+        <div class="bar3d-3d" style="height:${h}px;">
+          <div class="bar3d-face bar3d-front" style="height:${h}px; background:${color};"></div>
+          <div class="bar3d-face bar3d-top" style="background:${color};"></div>
+          <div class="bar3d-face bar3d-side" style="height:${h}px; background:${color};"></div>
+        </div>
+        <div class="bar3d-label">${label}</div>
+      `;
+      col.addEventListener('click', ()=>{
+        document.querySelectorAll('.bar3d-col.tapped').forEach(c=>{ if(c!==col) c.classList.remove('tapped'); });
+        col.classList.toggle('tapped');
+      });
+      stage.appendChild(col);
+    });
+  }
+
+  $('btn-export-backup').addEventListener('click', async ()=>{
+    const payload = {paciente:activePatient, exportadoEm:new Date().toISOString(), historico:history};
+    const jsonText = JSON.stringify(payload, null, 2);
+    const fileName = 'neurocalculo-backup-' + activePatient.nomeCompleto.replace(/\s+/g,'_') + '.json';
+    const blob = new Blob([jsonText], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if(driveConnected){
+      const ok = await uploadFileToDrive(fileName, 'application/json', jsonText);
+      toast(ok ? 'Backup exportado e enviado ao Google Drive.' : 'Backup exportado (falha ao enviar ao Google Drive).');
+    }else{
+      toast('Backup exportado.');
+    }
+  });
+
+  function buildReportDoc(){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({unit:'pt', format:'a4'});
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const marginX = 48;
+    let y = 0;
+
+    function drawHeader(){
+      doc.setFillColor(91,95,224);
+      doc.rect(0,0,pageW,70,'F');
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica','bold'); doc.setFontSize(15);
+      doc.text('Fisio Clínica Estiva', marginX, 30);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      doc.text('Relatório de evolução — NeuroCálculo (treino cognitivo de tabuada)', marginX, 47);
+      doc.text('Responsável clínica: Dra. Thaís Pereira Xavier', marginX, 61);
+      doc.setTextColor(0,0,0);
+      return 92;
+    }
+    function drawFooter(pageNum, totalPages){
+      doc.setFontSize(8); doc.setTextColor(110,110,110);
+      doc.text('Desenvolvido por Waldeci Ramos, 2026, com supervisão clínica da Dra. Thaís Pereira Xavier.', marginX, pageH-28);
+      doc.text('Página ' + pageNum + ' de ' + totalPages, pageW-marginX-60, pageH-28);
+      doc.setTextColor(0,0,0);
+    }
+
+    y = drawHeader();
+    doc.setFont('helvetica','bold'); doc.setFontSize(12);
+    doc.text('Paciente: ' + activePatient.nomeCompleto, marginX, y); y += 16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    const age = calcAge(activePatient.dataNascimento);
+    doc.text('Idade: ' + (age !== null ? age+' anos' : '—') + '   Cidade: ' + (activePatient.cidade || '—'), marginX, y); y += 14;
+    doc.text('Telefone do responsável: ' + formatPhone(activePatient.telefoneResponsavel || ''), marginX, y); y += 14;
+    doc.text('Data de emissão: ' + new Date().toLocaleDateString('pt-BR'), marginX, y); y += 14;
+    doc.text('Total de sessões registradas: ' + history.length, marginX, y); y += 22;
+
+    const sorted = history.slice().sort((a,b)=>a.id-b.id);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    const cols = [marginX, marginX+60, marginX+150, marginX+240, marginX+330, marginX+410];
+    ['Sessão','Data','Mód. A','Tempo A','Mód. B','Tempo B'].forEach((h,i)=>doc.text(h, cols[i], y));
+    y += 6; doc.setLineWidth(0.5); doc.line(marginX, y, pageW-marginX, y); y += 12;
+    doc.setFont('helvetica','normal');
+    sorted.forEach((r,i)=>{
+      if(y > pageH - 80){ doc.addPage(); y = drawHeader(); }
+      const row = [String(r.sessionNumber||i+1), fmtDateBR(r.date), r.moduleA.acertos+'/'+r.moduleA.total, (r.moduleA.tempoTotalMs/1000).toFixed(1)+'s', r.moduleB.acertos+'/'+r.moduleB.total, (r.moduleB.tempoTotalMs/1000).toFixed(1)+'s'];
+      row.forEach((val,i2)=>doc.text(val, cols[i2], y));
+      y += 16;
+    });
+    y += 10;
+
+    for(const cid of ['chart-precisao','chart-tempo','chart-erros']){
+      const canvas = document.getElementById(cid);
+      if(!canvas) continue;
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const imgW = pageW - marginX*2;
+      const imgH = imgW * (canvas.height/canvas.width);
+      if(y + imgH > pageH - 90){ doc.addPage(); y = drawHeader(); }
+      doc.addImage(imgData, 'PNG', marginX, y, imgW, imgH);
+      y += imgH + 18;
+    }
+
+    if(y > pageH - 150){ doc.addPage(); y = drawHeader(); }
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Análise da evolução', marginX, y); y += 16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+    const lines = doc.splitTextToSize(buildConclusion(sorted).text, pageW - marginX*2);
+    doc.text(lines, marginX, y);
+    y += lines.length * 12 + 20;
+
+    const notes = $('therapist-notes').value.trim();
+    if(notes){
+      if(y > pageH - 120){ doc.addPage(); y = drawHeader(); }
+      doc.setFont('helvetica','bold'); doc.setFontSize(11);
+      doc.text('Observações da fisioterapeuta responsável', marginX, y); y += 16;
+      doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+      const noteLines = doc.splitTextToSize(notes, pageW - marginX*2);
+      doc.text(noteLines, marginX, y);
+      y += noteLines.length * 12 + 18;
+    }
+
+    extraNotes.forEach(n=>{
+      const title = (n.title||'').trim();
+      const text = (n.text||'').trim();
+      if(!title && !text) return;
+      if(y > pageH - 120){ doc.addPage(); y = drawHeader(); }
+      doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+      doc.text(title || 'Observação adicional', marginX, y); y += 15;
+      doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+      const extraLines = doc.splitTextToSize(text, pageW - marginX*2);
+      doc.text(extraLines, marginX, y);
+      y += extraLines.length * 12 + 16;
+    });
+
+    const totalPages = doc.internal.getNumberOfPages();
+    for(let p=1;p<=totalPages;p++){ doc.setPage(p); drawFooter(p, totalPages); }
+    return doc;
+  }
+
+  $('btn-export-pdf').addEventListener('click', ()=>{
+    if(history.length === 0) return;
+    toast('Preparando impressão...');
+    const doc = buildReportDoc();
+    doc.autoPrint();
+    const url = doc.output('bloburl');
+    window.open(url, '_blank');
+  });
+
+  $('btn-download-pdf').addEventListener('click', async ()=>{
+    if(history.length === 0) return;
+    toast('Gerando PDF...');
+    const doc = buildReportDoc();
+    const fileName = 'relatorio-neurocalculo-' + activePatient.nomeCompleto.replace(/\s+/g,'_') + '.pdf';
+    doc.save(fileName);
+    if(driveConnected){
+      const base64 = doc.output('datauristring').split(',')[1];
+      const ok = await uploadFileToDrive(fileName, 'application/pdf', base64, true);
+      toast(ok ? 'PDF baixado e enviado ao Google Drive.' : 'PDF baixado (falha ao enviar ao Google Drive).');
+    }
+  });
+
+  /* ---------------- Google Drive (upload direto, via login OAuth) ----------------
+     1) Crie um projeto no Google Cloud Console com a conta fisioclinicasistema@gmail.com.
+     2) Ative a "Google Drive API".
+     3) Configure a Tela de consentimento OAuth (Externo, com esse e-mail como usuário de teste).
+     4) Crie uma credencial "ID do cliente OAuth" tipo Aplicativo da Web, com a origem
+        onde este HTML for hospedado (ex: https://seuusuario.github.io) em
+        "Origens JavaScript autorizadas".
+     5) Cole o Client ID gerado na constante abaixo. */
+  const GOOGLE_CLIENT_ID = 'COLE_AQUI_SEU_CLIENT_ID.apps.googleusercontent.com';
+  const GOOGLE_DRIVE_FOLDER_ID = '1IUBCcNnDeak8O74WGwLhEW-aQYL1iLwy';
+  const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+
+  let driveConnected = false;
+  let driveAccessToken = null;
+  let driveTokenClient = null;
+
+  function setDriveStatus(connected, label){
+    driveConnected = connected;
+    const pill = $('drive-status');
+    pill.classList.toggle('connected', connected);
+    pill.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="1.8"/></svg> ' + label;
+  }
+
+  function initDriveClient(){
+    if(GOOGLE_CLIENT_ID.startsWith('COLE_AQUI')){
+      setDriveStatus(false, 'Google Drive: configure o Client ID no código');
+      return;
+    }
+    if(!window.google || !google.accounts || !google.accounts.oauth2){
+      setDriveStatus(false, 'Google Drive: biblioteca não carregou');
+      return;
+    }
+    driveTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: GOOGLE_DRIVE_SCOPE,
+      callback: (resp)=>{
+        if(resp && resp.access_token){
+          driveAccessToken = resp.access_token;
+          setDriveStatus(true, 'Google Drive: conectado');
+          toast('Conectado ao Google Drive.');
+        }else{
+          setDriveStatus(false, 'Google Drive: desconectado');
+          toast('Não foi possível conectar ao Google Drive.');
+        }
+      }
+    });
+  }
+
+  $('btn-drive-connect').addEventListener('click', ()=>{
+    if(GOOGLE_CLIENT_ID.startsWith('COLE_AQUI')){
+      toast('Ainda falta configurar o Client ID do Google Cloud no código deste app.');
+      return;
+    }
+    if(!driveTokenClient) initDriveClient();
+    if(driveTokenClient) driveTokenClient.requestAccessToken({prompt: driveAccessToken ? '' : 'consent'});
+  });
+
+  async function uploadFileToDrive(filename, mimeType, content, isBase64){
+    if(!driveConnected || !driveAccessToken) return false;
+    try{
+      const metadata = {name: filename, parents: [GOOGLE_DRIVE_FOLDER_ID]};
+      const boundary = '-------neurocalculo' + Date.now();
+      const contentPart = isBase64
+        ? `--${boundary}\r\nContent-Type: ${mimeType}\r\nContent-Transfer-Encoding: base64\r\n\r\n${content}\r\n`
+        : `--${boundary}\r\nContent-Type: ${mimeType}\r\n\r\n${content}\r\n`;
+      const body =
+        `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n` +
+        contentPart +
+        `--${boundary}--`;
+      const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + driveAccessToken,
+          'Content-Type': 'multipart/related; boundary=' + boundary
+        },
+        body
+      });
+      if(!res.ok){
+        if(res.status === 401){ driveAccessToken = null; setDriveStatus(false, 'Google Drive: sessão expirada, reconecte'); }
+        return false;
+      }
+      return true;
+    }catch(err){
+      console.error('Falha ao enviar para o Google Drive:', err);
+      return false;
+    }
+  }
+
+  window.addEventListener('load', initDriveClient);
+
+  (async function init(){ await loadPatients(); })();
+
+})();
+</script>
+</body>
+</html>
