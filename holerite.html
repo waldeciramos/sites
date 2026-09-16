@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recibo de Pagamento — APAE Estiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef2f0;
+    --panel:#ffffff;
+    --ink:#16241f;
+    --muted:#5c6b65;
+    --line:#d8e1dc;
+    --accent:#2b6e58;
+    --accent-ink:#ffffff;
+    --accent-soft:#e3efe9;
+    --danger:#a8433f;
+    --danger-soft:#f5e4e3;
+    --paper:#fdfdfb;
+    --paper-ink:#111;
+    --paper-line:#111;
+    --radius:10px;
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --bg:#121815;
+      --panel:#1a221e;
+      --ink:#e9efec;
+      --muted:#9db0a7;
+      --line:#2b3630;
+      --accent:#57b498;
+      --accent-ink:#0b1712;
+      --accent-soft:#1f2e28;
+      --danger:#e58c88;
+      --danger-soft:#2e1e1d;
+      --paper:#f3f1ea;
+      --paper-ink:#111;
+      --paper-line:#111;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121815;
+    --panel:#1a221e;
+    --ink:#e9efec;
+    --muted:#9db0a7;
+    --line:#2b3630;
+    --accent:#57b498;
+    --accent-ink:#0b1712;
+    --accent-soft:#1f2e28;
+    --danger:#e58c88;
+    --danger-soft:#2e1e1d;
+    --paper:#f3f1ea;
+    --paper-ink:#111;
+    --paper-line:#111;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+  }
+  .topbar{
+    padding:18px 24px 6px;
+    max-width:1320px;
+    margin:0 auto;
+  }
+  .topbar h1{
+    font-size:19px;
+    font-weight:700;
+    margin:0 0 2px;
+    letter-spacing:-0.01em;
+  }
+  .topbar p{
+    margin:0;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 380px 1fr;
+    gap:18px;
+    padding:14px 24px 32px;
+    max-width:1320px;
+    margin:0 auto;
+    align-items:start;
+  }
+  @media (max-width: 920px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+  }
+  .panel + .panel{margin-top:14px;}
+
+  h2.section-title{
+    font-size:11.5px;
+    font-weight:600;
+    text-transform:none;
+    letter-spacing:0.01em;
+    color:var(--accent);
+    margin:0 0 12px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+
+  label{
+    display:block;
+    font-size:11.5px;
+    color:var(--muted);
+    margin:9px 0 3px;
+  }
+  label:first-of-type{margin-top:0;}
+  input[type=text],input[type=number],input[type=month],select{
+    width:100%;
+    padding:7px 9px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    font-size:13px;
+    font-family:inherit;
+    background:var(--panel);
+    color:var(--ink);
+  }
+  input:focus,select:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  select#funcionarioSelect{
+    font-weight:600;
+    border-color:var(--accent);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+
+  .readout{
+    background:var(--accent-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    margin-top:10px;
+  }
+  .readout-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    padding:3px 0;
+  }
+  .readout-row span:first-child{color:var(--muted);}
+  .readout-row span:last-child{font-weight:600;font-variant-numeric:tabular-nums;}
+  .readout-row.total{
+    border-top:1px solid var(--line);
+    margin-top:4px;
+    padding-top:6px;
+    font-size:14px;
+  }
+  .readout-row.total span:last-child{color:var(--accent);}
+
+  .hint{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:6px;
+    line-height:1.5;
+  }
+
+  table.itens{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:6px;
+    font-size:11.5px;
+  }
+  table.itens th,table.itens td{
+    border:1px solid var(--line);
+    padding:4px;
+  }
+  table.itens th{
+    background:var(--accent-soft);
+    font-weight:600;
+    font-size:10.5px;
+    color:var(--muted);
+  }
+  table.itens input{
+    border:none;
+    width:100%;
+    padding:3px 4px;
+    font-size:11.5px;
+    background:transparent;
+  }
+  tr.linha-auto td{background:var(--accent-soft);}
+  tr.linha-auto input{color:var(--ink);font-weight:500;}
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--accent);
+    color:var(--accent-ink);
+    border:none;
+    border-radius:7px;
+    padding:9px 15px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btn:hover{filter:brightness(1.06);}
+  .btn.secondary{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid var(--accent);
+  }
+  .btn.small{
+    padding:3px 9px;
+    font-size:11px;
+    font-weight:500;
+    border-radius:5px;
+  }
+  .btn.danger{
+    background:var(--danger-soft);
+    color:var(--danger);
+    border:1px solid transparent;
+  }
+  .actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+  }
+
+  /* ---------- PREVIEW / RECIBO ---------- */
+  .preview-wrap{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+  }
+  .preview-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .preview-toolbar .titulo{
+    font-size:13px;
+    font-weight:600;
+    color:var(--muted);
+  }
+  .paper{
+    background:var(--paper);
+    color:var(--paper-ink);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .recibo{
+    font-family:'IBM Plex Mono','Courier New',monospace;
+    font-size:11.5px;
+    color:var(--paper-ink);
+    border:1px solid var(--paper-line);
+    padding:6px;
+    margin-bottom:20px;
+    width:100%;
+  }
+  .recibo:last-child{margin-bottom:0;}
+  .recibo-grid{
+    display:grid;
+    grid-template-columns: 1fr 26px;
+  }
+  .recibo-main{border-right:1px solid var(--paper-line);padding-right:6px;}
+  .recibo-side{
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align:center;
+    font-size:9px;
+    padding:4px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .rec-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  .rec-header .empresa{line-height:1.4;}
+  .rec-header .direita{text-align:right;line-height:1.4;}
+  .rec-sub{text-align:center;margin:2px 0 6px;}
+  .rec-funcionario{
+    border-top:1px solid var(--paper-line);
+    border-bottom:1px solid var(--paper-line);
+    display:grid;
+    grid-template-columns: 40px 1fr 140px;
+    gap:4px;
+    padding:3px 0;
+    margin-top:4px;
+  }
+  .rec-funcionario .lbl{font-size:8.5px;color:#444;}
+  table.rec-itens{width:100%;border-collapse:collapse;margin-top:2px;}
+  table.rec-itens th,table.rec-itens td{
+    border-left:1px solid var(--paper-line);
+    border-right:1px solid var(--paper-line);
+    padding:1px 4px;
+    font-size:11px;
+  }
+  table.rec-itens thead th{
+    border-top:1px solid var(--paper-line);
+    border-bottom:1px solid var(--paper-line);
+    text-align:left;
+  }
+  table.rec-itens td.num{text-align:right;}
+  .rec-itens-wrap{
+    border-bottom:1px solid var(--paper-line);
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+  }
+  .rec-itens-fill{flex:1;border-left:1px solid var(--paper-line);border-right:1px solid var(--paper-line);}
+  .rec-totais{display:grid;grid-template-columns: 1fr 1fr;}
+  .rec-totais > div{
+    border-left:1px solid var(--paper-line);
+    border-right:1px solid var(--paper-line);
+    border-bottom:1px solid var(--paper-line);
+    padding:1px 4px;
+  }
+  .rec-totais .lbl{font-size:9px;color:#444;}
+  .rec-totais .val{font-size:12px;text-align:right;padding-top:2px;}
+  .rec-liquido{grid-column: 1 / -1;display:grid;grid-template-columns:1fr 1fr;}
+  .rec-liquido .lbl{font-size:9px;color:#444;}
+  .rec-liquido .val{font-size:13px;text-align:right;font-weight:bold;}
+  .rec-rodape{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    border-left:1px solid var(--paper-line);
+    border-right:1px solid var(--paper-line);
+    border-bottom:1px solid var(--paper-line);
+  }
+  .rec-rodape > div{border-right:1px solid var(--paper-line);padding:1px 4px;text-align:center;}
+  .rec-rodape > div:last-child{border-right:none;}
+  .rec-rodape .lbl{font-size:8.5px;color:#444;}
+  .rec-rodape .val{font-size:11px;}
+
+  @media print{
+    body{background:#fff;}
+    .no-print{display:none !important;}
+    .layout{display:block;padding:0;}
+    .preview-wrap{border:none;padding:0;}
+    .recibo{page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar no-print">
+  <h1>Recibo de Pagamento — APAE Estiva</h1>
+  <p>Selecione o funcionário, ajuste as horas do mês e o recibo recalcula sozinho a partir do valor/hora.</p>
+</div>
+
+<div class="layout">
+
+  <!-- ===================== FORMULÁRIO ===================== -->
+  <div class="col no-print">
+
+    <div class="panel">
+      <h2 class="section-title">Funcionário</h2>
+      <label>Selecionar cadastrado</label>
+      <select id="funcionarioSelect" onchange="selecionarFuncionario()"></select>
+      <p class="hint" id="admissaoHint"></p>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Folha do mês</h2>
+      <div class="row2">
+        <div>
+          <label>Mês de referência</label>
+          <input type="month" id="mesAno" oninput="recalcular()">
+        </div>
+        <div>
+          <label>Feriados no mês (além dos domingos)</label>
+          <input type="number" id="feriados" value="0" min="0" oninput="recalcular()">
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Horas trabalhadas no mês</label>
+          <input type="number" step="0.01" id="horasTrabalhadas" oninput="recalcular()">
+        </div>
+        <div>
+          <label>Valor da hora (salário base)</label>
+          <input type="number" step="0.01" id="valorHoraInput" oninput="recalcular()">
+        </div>
+      </div>
+      <p class="hint" id="valorHoraHint"></p>
+
+      <div class="row2">
+        <div>
+          <label>Gratificação do mês (valor fixo)</label>
+          <input type="number" step="0.01" id="gratificacaoInput" oninput="recalcular()">
+        </div>
+        <div>
+          <label>INSS (%)</label>
+          <input type="number" step="0.01" id="inssPercentInput" oninput="recalcular()">
+        </div>
+      </div>
+
+      <div class="readout" id="readout"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Itens do recibo</h2>
+      <table class="itens" id="tabelaItens">
+        <thead>
+          <tr>
+            <th style="width:34px;">Cód.</th>
+            <th>Descrição</th>
+            <th style="width:56px;">Ref.</th>
+            <th style="width:64px;">Vencim.</th>
+            <th style="width:64px;">Descto.</th>
+            <th style="width:18px;"></th>
+          </tr>
+        </thead>
+        <tbody id="corpoItens"></tbody>
+      </table>
+      <div class="actions">
+        <button type="button" class="btn small secondary" onclick="adicionarItem()">+ item manual</button>
+      </div>
+      <p class="hint">As 4 linhas em destaque (horas, DSR, gratificação, INSS) são recalculadas automaticamente. Itens manuais adicionados aqui ficam do jeito que você digitar.</p>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Base de cálculo (rodapé)</h2>
+      <div class="row3">
+        <div>
+          <label>Sal. Contr. INSS</label>
+          <input type="number" step="0.01" id="salContrInss" oninput="marcarManual('salContrInss')">
+        </div>
+        <div>
+          <label>Base Cálc. FGTS</label>
+          <input type="number" step="0.01" id="baseFgts" oninput="marcarManual('baseFgts')">
+        </div>
+        <div>
+          <label>F.G.T.S do mês</label>
+          <input type="number" step="0.01" id="fgtsMes" oninput="marcarManual('fgtsMes')">
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Base Cálc. IRRF</label>
+          <input type="number" step="0.01" id="baseIrrf" oninput="marcarManual('baseIrrf')">
+        </div>
+        <div>
+          <label>Faixa IRRF</label>
+          <input type="number" step="0.01" id="faixaIrrf" value="0" oninput="marcarManual('faixaIrrf')">
+        </div>
+      </div>
+      <p class="hint">Preenchidos automaticamente (INSS 7,5% e FGTS 8% sobre o total de vencimentos). Edite à vontade — passa a valer só para este recibo.</p>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn" onclick="window.print()">🖨️ Imprimir / salvar em PDF</button>
+    </div>
+  </div>
+
+  <!-- ===================== PRÉ-VISUALIZAÇÃO ===================== -->
+  <div class="col">
+    <div class="preview-wrap">
+      <div class="preview-toolbar no-print">
+        <span class="titulo">Pré-visualização (2 vias)</span>
+      </div>
+      <div class="paper">
+        <div id="reciboContainer1"></div>
+        <div id="reciboContainer2"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =====================================================================
+   EMPRESA — dado fixo, mesmo para todos os funcionários desta folha.
+   ===================================================================== */
+const EMPRESA = {
+  razaoSocial: 'ASSOCIACAO DE PAIS E AMIGOS EXCEPCIONAIS DE ESTIVA',
+  cnpj: '05.639.080/0001-43',
+  cc: 'GERAL',
+  tipoFolha: 'Horista'
+};
+
+/* =====================================================================
+   FUNCIONÁRIOS — cadastrados direto aqui no código (sem JSON/localStorage).
+   Para adicionar alguém novo, copie o bloco da Thaís e ajuste os valores.
+   Campos:
+     id              -> identificador único (string, sem espaço)
+     codigo          -> código do funcionário na folha
+     nome, cargo, cbo, departamento, filial, admissao
+     valorHora       -> valor da hora trabalhada (recalcula "Horas Trabalhadas" e o DSR)
+     horasPadrao     -> horas do mês sugeridas ao selecionar (você pode mudar na tela)
+     gratificacao    -> valor fixo mensal de gratificação (não depende da hora)
+     inssPercent     -> % de INSS aplicado sobre o total de vencimentos
+     fgtsPercent     -> % de FGTS aplicado sobre o total de vencimentos
+   ===================================================================== */
+const EMPLOYEES = [
+  {
+    id: 'thais-pereira-xavier',
+    codigo: '9',
+    nome: 'THAIS PEREIRA XAVIER',
+    cargo: 'FISIOTERAPEUTA',
+    cbo: '223605',
+    departamento: '1',
+    filial: '1',
+    admissao: '03/03/2008',
+    valorHora: 16.30,
+    horasPadrao: 32,
+    gratificacao: 877.75,
+    inssPercent: 7.5,
+    fgtsPercent: 8
+  }
+  // { id: 'proximo-funcionario', codigo: '10', nome: '...', ... },
+];
+
+/* =====================================================================
+   Itens do recibo. As 4 primeiras linhas (auto:true) são recalculadas
+   a cada mudança de horas/mês/funcionário. Linhas extras (auto:false)
+   ficam como o usuário digitar.
+   ===================================================================== */
+let itens = [];
+
+function linhaAuto(codigo, descricao){
+  return {codigo, descricao, referencia:'', vencimento:'', desconto:'', auto:true};
+}
+
+function resetLinhasAuto(){
+  itens = [
+    linhaAuto('204', 'HORAS TRABALHADAS (HORISTA'),
+    linhaAuto('9360', 'DSR HORISTA VARIAVEL'),
+    linhaAuto('426', 'GRATIFICACOES HORISTA'),
+    linhaAuto('998', 'I.N.S.S')
+  ];
+}
+
+const corpoItens = document.getElementById('corpoItens');
+
+function renderTabelaItens(){
+  corpoItens.innerHTML = '';
+  itens.forEach((item,idx)=>{
+    const tr = document.createElement('tr');
+    if(item.auto) tr.className = 'linha-auto';
+    tr.innerHTML = `
+      <td><input type="text" value="${item.codigo}" ${item.auto?'readonly':''} onchange="itens[${idx}].codigo=this.value;atualizarPreview()"></td>
+      <td><input type="text" value="${item.descricao}" ${item.auto?'readonly':''} onchange="itens[${idx}].descricao=this.value;atualizarPreview()"></td>
+      <td><input type="text" value="${item.referencia}" onchange="itens[${idx}].referencia=this.value;atualizarPreview()"></td>
+      <td><input type="text" value="${item.vencimento}" onchange="itens[${idx}].vencimento=this.value;atualizarPreview()"></td>
+      <td><input type="text" value="${item.desconto}" onchange="itens[${idx}].desconto=this.value;atualizarPreview()"></td>
+      <td>${item.auto?'':`<button type="button" class="btn small danger" onclick="removerItem(${idx})">×</button>`}</td>
+    `;
+    corpoItens.appendChild(tr);
+  });
+}
+
+function adicionarItem(){
+  itens.push({codigo:'',descricao:'',referencia:'',vencimento:'',desconto:'',auto:false});
+  renderTabelaItens();
+}
+function removerItem(idx){
+  itens.splice(idx,1);
+  renderTabelaItens();
+  atualizarPreview();
+}
+
+function parseNum(v){
+  if(v===''||v===null||v===undefined) return 0;
+  if(typeof v === 'number') return v;
+  const n = parseFloat(String(v).replace(/\./g,'').replace(',', '.'));
+  return isNaN(n)?0:n;
+}
+// Para <input type="number"> — o navegador sempre entrega ponto decimal,
+// nunca vírgula nem separador de milhar. Usar parseNum aqui multiplicaria
+// o valor por 10x/100x (ex.: "16.3" seria lido como 163).
+function parseNumInput(v){
+  const n = parseFloat(v);
+  return isNaN(n)?0:n;
+}
+function fmt(n){
+  return (n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function mesAnoExtenso(valor){
+  if(!valor) return '';
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const [ano,mes] = valor.split('-');
+  return `${meses[parseInt(mes,10)-1]} de ${ano}`;
+}
+
+/* Domingos e dias úteis do mês — usados no cálculo do DSR variável */
+function domingosNoMes(ano, mes){ // mes: 1-12
+  const ultimoDia = new Date(ano, mes, 0).getDate();
+  let count = 0;
+  for(let d=1; d<=ultimoDia; d++){
+    if(new Date(ano, mes-1, d).getDay() === 0) count++;
+  }
+  return count;
+}
+function diasNoMes(ano, mes){
+  return new Date(ano, mes, 0).getDate();
+}
+
+/* =====================================================================
+   Preencher formulário ao trocar de funcionário
+   ===================================================================== */
+function popularSelectFuncionarios(){
+  const sel = document.getElementById('funcionarioSelect');
+  sel.innerHTML = EMPLOYEES.map(f=>`<option value="${f.id}">${f.codigo} — ${f.nome}</option>`).join('');
+}
+
+function funcionarioAtual(){
+  const id = document.getElementById('funcionarioSelect').value;
+  return EMPLOYEES.find(f=>f.id===id) || EMPLOYEES[0];
+}
+
+function selecionarFuncionario(){
+  const f = funcionarioAtual();
+  document.getElementById('admissaoHint').textContent = `${f.cargo} · CBO ${f.cbo} · admitido em ${f.admissao}`;
+  document.getElementById('horasTrabalhadas').value = f.horasPadrao;
+  document.getElementById('valorHoraInput').value = f.valorHora;
+  document.getElementById('gratificacaoInput').value = f.gratificacao;
+  document.getElementById('inssPercentInput').value = f.inssPercent;
+  // limpa overrides manuais do rodapé ao trocar de funcionário
+  ['salContrInss','baseFgts','fgtsMes','baseIrrf'].forEach(id=>delete manualOverride[id]);
+  document.getElementById('faixaIrrf').value = 0;
+  resetLinhasAuto();
+  renderTabelaItens();
+  recalcular();
+}
+
+/* Overrides manuais do rodapé: se o usuário editar, paramos de sobrescrever aquele campo */
+let manualOverride = {};
+function marcarManual(id){ manualOverride[id] = true; atualizarPreview(); }
+
+/* =====================================================================
+   Recalcular valores a partir de: funcionário + mês + horas + feriados
+   ===================================================================== */
+function recalcular(){
+  const f = funcionarioAtual();
+  // Campos <input type="number"> sempre entregam valor com ponto decimal
+  // (ex.: "16.3"), nunca no formato BR "16,30" — por isso usam parseNumInput,
+  // e não o parseNum() (que é só pra texto digitado em formato BR na tabela de itens).
+  const horas = parseNumInput(document.getElementById('horasTrabalhadas').value);
+  const mesAnoVal = document.getElementById('mesAno').value;
+  const feriados = parseNumInput(document.getElementById('feriados').value);
+  const gratificacao = parseNumInput(document.getElementById('gratificacaoInput').value);
+  const valorHora = parseNumInput(document.getElementById('valorHoraInput').value);
+  const inssPercent = parseNumInput(document.getElementById('inssPercentInput').value);
+
+  const valorHoras = horas * valorHora;
+
+  let dsr = 0, domingos = 0, diasUteis = 0;
+  if(mesAnoVal){
+    const [ano, mes] = mesAnoVal.split('-').map(Number);
+    domingos = domingosNoMes(ano, mes);
+    diasUteis = diasNoMes(ano, mes) - domingos - feriados;
+    if(diasUteis > 0) dsr = (valorHoras / diasUteis) * domingos;
+  }
+
+  // atualiza as 4 linhas automáticas da tabela de itens
+  if(itens.length < 4) resetLinhasAuto();
+  itens[0].referencia = fmtHoras(horas);
+  itens[0].vencimento = fmt(valorHoras);
+  itens[1].referencia = domingos ? fmt(domingos) : '';
+  itens[1].vencimento = dsr ? fmt(dsr) : '';
+  itens[2].referencia = gratificacao ? fmt(gratificacao) : '';
+  itens[2].vencimento = gratificacao ? fmt(gratificacao) : '';
+
+  const totalVencimentosBase = valorHoras + dsr + gratificacao;
+  const totalVencExtras = itens.slice(4).reduce((s,it)=>s+parseNum(it.vencimento),0);
+  const totalVenc = totalVencimentosBase + totalVencExtras;
+
+  const inss = totalVenc * (inssPercent/100);
+  itens[3].referencia = inssPercent.toFixed(2).replace('.',',');
+  itens[3].desconto = fmt(inss);
+
+  const totalDescExtras = itens.slice(4).reduce((s,it)=>s+parseNum(it.desconto),0);
+  const totalDesc = inss + totalDescExtras;
+  const liquido = totalVenc - totalDesc;
+  const fgts = totalVenc * (f.fgtsPercent/100);
+
+  // readout de conferência
+  document.getElementById('valorHoraHint').textContent = `${horas} h × R$ ${fmt(valorHora)} = R$ ${fmt(valorHoras)}`;
+  document.getElementById('readout').innerHTML = `
+    <div class="readout-row"><span>Horas trabalhadas</span><span>R$ ${fmt(valorHoras)}</span></div>
+    <div class="readout-row"><span>DSR (${domingos} domingo${domingos===1?'':'s'} / ${diasUteis||0} dias úteis)</span><span>R$ ${fmt(dsr)}</span></div>
+    <div class="readout-row"><span>Gratificação</span><span>R$ ${fmt(gratificacao)}</span></div>
+    <div class="readout-row"><span>INSS (${inssPercent}% × total de vencimentos)</span><span>− R$ ${fmt(inss)}</span></div>
+    <div class="readout-row total"><span>Valor líquido</span><span>R$ ${fmt(liquido)}</span></div>
+  `;
+
+  // rodapé — só sobrescreve o que o usuário não editou manualmente
+  if(!manualOverride.salContrInss) document.getElementById('salContrInss').value = totalVenc.toFixed(2);
+  if(!manualOverride.baseFgts) document.getElementById('baseFgts').value = totalVenc.toFixed(2);
+  if(!manualOverride.fgtsMes) document.getElementById('fgtsMes').value = fgts.toFixed(2);
+  if(!manualOverride.baseIrrf) document.getElementById('baseIrrf').value = (totalVenc - inss).toFixed(2);
+
+  renderTabelaItens();
+  atualizarPreview();
+}
+
+function fmtHoras(horas){
+  const h = Math.floor(horas);
+  const m = Math.round((horas - h) * 60);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+/* =====================================================================
+   Montagem do HTML do recibo (via impressa)
+   ===================================================================== */
+function montarRecibo(){
+  const f = funcionarioAtual();
+  const folhaRef = mesAnoExtenso(document.getElementById('mesAno').value);
+
+  let totalVenc = 0, totalDesc = 0;
+  const linhas = itens.map(it=>{
+    totalVenc += parseNum(it.vencimento);
+    totalDesc += parseNum(it.desconto);
+    return `<tr>
+      <td>${it.codigo}</td>
+      <td>${it.descricao}</td>
+      <td class="num">${it.referencia}</td>
+      <td class="num">${it.vencimento}</td>
+      <td class="num">${it.desconto}</td>
+    </tr>`;
+  }).join('');
+
+  const liquido = totalVenc - totalDesc;
+
+  const salContrInss = document.getElementById('salContrInss').value;
+  const baseFgts = document.getElementById('baseFgts').value;
+  const fgtsMes = document.getElementById('fgtsMes').value;
+  const baseIrrf = document.getElementById('baseIrrf').value;
+  const faixaIrrf = document.getElementById('faixaIrrf').value;
+
+  return `
+  <div class="recibo">
+    <div class="recibo-grid">
+      <div class="recibo-main">
+        <div class="rec-header">
+          <div class="empresa">
+            <div>${EMPRESA.razaoSocial}</div>
+            <div>CNPJ: ${EMPRESA.cnpj}</div>
+          </div>
+          <div class="direita">
+            <div>Folha Mensal</div>
+            <div>${folhaRef}</div>
+          </div>
+        </div>
+        <div class="rec-sub">CC: ${EMPRESA.cc} &nbsp;&nbsp; ${EMPRESA.tipoFolha}</div>
+
+        <div class="rec-funcionario">
+          <div>
+            <div class="lbl">Código</div>
+            <div>${f.codigo}</div>
+          </div>
+          <div>
+            <div class="lbl">Nome do Funcionário</div>
+            <div>${f.nome}</div>
+            <div>${f.cargo}</div>
+          </div>
+          <div>
+            <div class="lbl">CBO</div>
+            <div>${f.cbo}</div>
+            <div class="lbl">Departamento&nbsp;&nbsp;Filial</div>
+            <div>${f.departamento}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${f.filial}</div>
+            <div class="lbl">Admissão</div>
+            <div>${f.admissao}</div>
+          </div>
+        </div>
+
+        <div class="rec-itens-wrap">
+          <table class="rec-itens">
+            <thead>
+              <tr>
+                <th style="width:40px;">Código</th>
+                <th>Descrição</th>
+                <th style="width:70px;">Referência</th>
+                <th style="width:85px;">Vencimentos</th>
+                <th style="width:85px;">Descontos</th>
+              </tr>
+            </thead>
+            <tbody>${linhas}</tbody>
+          </table>
+          <div class="rec-itens-fill"></div>
+        </div>
+
+        <div class="rec-totais">
+          <div><div class="lbl">Total de Vencimentos</div><div class="val">${fmt(totalVenc)}</div></div>
+          <div><div class="lbl">Total de Descontos</div><div class="val">${fmt(totalDesc)}</div></div>
+          <div class="rec-liquido">
+            <div><div class="lbl">Valor Líquido</div></div>
+            <div><div class="val">${fmt(liquido)}</div></div>
+          </div>
+        </div>
+
+        <div class="rec-rodape">
+          <div><div class="lbl">Salário Base</div><div class="val">${fmt(parseNumInput(document.getElementById('valorHoraInput').value))}</div></div>
+          <div><div class="lbl">Sal. Contr. INSS</div><div class="val">${salContrInss?fmt(parseFloat(salContrInss)):''}</div></div>
+          <div><div class="lbl">Base Cálc. FGTS</div><div class="val">${baseFgts?fmt(parseFloat(baseFgts)):''}</div></div>
+          <div><div class="lbl">F.G.T.S do Mês</div><div class="val">${fgtsMes?fmt(parseFloat(fgtsMes)):''}</div></div>
+          <div><div class="lbl">Base Cálc. IRRF</div><div class="val">${baseIrrf?fmt(parseFloat(baseIrrf)):''}</div></div>
+          <div><div class="lbl">Faixa IRRF</div><div class="val">${faixaIrrf?fmt(parseFloat(faixaIrrf)):''}</div></div>
+        </div>
+      </div>
+      <div class="recibo-side">
+        <span>Assinatura do Funcionário</span>
+        <span>Declaro ter recebido a importância líquida discriminada neste recibo. Data ____/____/____</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function atualizarPreview(){
+  const html = montarRecibo();
+  document.getElementById('reciboContainer1').innerHTML = html;
+  document.getElementById('reciboContainer2').innerHTML = html;
+}
+
+/* =====================================================================
+   Inicialização
+   ===================================================================== */
+popularSelectFuncionarios();
+selecionarFuncionario();
+
+// Mês de referência inicial = mês atual
+(function(){
+  const hoje = new Date();
+  const mesAno = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('mesAno').value = mesAno;
+  recalcular();
+})();
+</script>
+
+</body>
+</html>
