@@ -148,9 +148,10 @@ header.topo{
   padding:0.6rem 0;
 }
 .marca{ display:flex; align-items:center; gap:0.6rem; }
-.marca img{ height:52px; width:auto; }
+.marca img{ height:64px; width:auto; }
+@media (min-width:900px){ .marca img{ height:80px; } }
 nav.menu{ display:none; }
-nav.menu ul{ list-style:none; display:flex; gap:var(--espaco-6); margin:0; padding:0; }
+nav.menu ul{ list-style:none; display:flex; flex-wrap:wrap; gap:var(--espaco-5); margin:0; padding:0; }
 nav.menu a{
   text-decoration:none;
   color:var(--mata);
@@ -529,6 +530,48 @@ footer.rodape{
 .estado-legenda{ font-size:0.78rem; color:var(--tinta-suave); margin-top:0.4rem; text-align:center; }
 .estado-bloco{ display:flex; flex-direction:column; align-items:center; }
 
+/* ================================
+   MODAL DE DOCUMENTAÇÃO (tokens)
+   ================================ */
+dialog.tokens-modal{
+  border:none;
+  border-radius:var(--raio-lg);
+  padding:0;
+  width:min(920px, 92vw);
+  max-height:86vh;
+  box-shadow:var(--sombra-md);
+  background:var(--branco);
+}
+dialog.tokens-modal::backdrop{
+  background:rgba(30,52,35,0.55);
+  backdrop-filter:blur(2px);
+}
+.tokens-modal-inner{
+  padding:var(--espaco-6) var(--espaco-5) var(--espaco-7);
+  overflow-y:auto;
+  max-height:86vh;
+  position:relative;
+}
+@media (min-width:700px){
+  .tokens-modal-inner{ padding:var(--espaco-7) var(--espaco-7) var(--espaco-8); }
+}
+.tokens-fechar{
+  position:sticky;
+  top:0;
+  float:right;
+  margin-left:var(--espaco-3);
+  width:36px; height:36px;
+  border-radius:50%;
+  border:1px solid rgba(43,36,30,0.15);
+  background:var(--creme);
+  color:var(--mata);
+  font-size:1.3rem;
+  line-height:1;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.tokens-fechar:hover{ background:var(--dourado-suave); }
+
 </style>
 </head>
 <body>
@@ -544,6 +587,8 @@ footer.rodape{
         <li><a href="#variedades">Variedades</a></li>
         <li><a href="#historia">Nossa história</a></li>
         <li><a href="#contato">Contato</a></li>
+        <li><a href="guia-marca-morango.html" target="_blank" rel="noopener">Rótulo do produto</a></li>
+        <li><a href="#" id="abrir-docs">Documentação</a></li>
       </ul>
     </nav>
     <a href="#contato" class="btn btn-primario topo-cta">Falar com a gente</a>
@@ -768,8 +813,9 @@ footer.rodape{
   </div>
 </footer>
 
-<section class="tokens">
-  <div class="container">
+<dialog class="tokens-modal" id="docs-modal">
+  <div class="tokens-modal-inner">
+    <button type="button" class="tokens-fechar" id="fechar-docs" aria-label="Fechar documentação">×</button>
     <div class="secao-cabecalho">
       <h2>Sistema de design</h2>
       <p>Os tokens que sustentam a marca J.A Morangos — para manter a mesma identidade em qualquer página nova.</p>
@@ -841,7 +887,21 @@ footer.rodape{
     </div>
 
   </div>
-</section>
+</dialog>
+
+<script>
+  var docsModal = document.getElementById('docs-modal');
+  document.getElementById('abrir-docs').addEventListener('click', function(e){
+    e.preventDefault();
+    docsModal.showModal();
+  });
+  document.getElementById('fechar-docs').addEventListener('click', function(){
+    docsModal.close();
+  });
+  docsModal.addEventListener('click', function(e){
+    if(e.target === docsModal){ docsModal.close(); }
+  });
+</script>
 
 </body>
 </html>
