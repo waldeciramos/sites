@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia: registro de marca e regularização do morango congelado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF7F0;
+    --paper-2:#F1ECDF;
+    --ink:#2B2A25;
+    --ink-soft:#5A5748;
+    --green:#33503E;
+    --green-dark:#213629;
+    --green-tint:#E7EEE4;
+    --berry:#B23A34;
+    --berry-tint:#F6E3E1;
+    --gold:#A9782F;
+    --rule:#D8D0BC;
+    --white:#FFFFFF;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--paper-2);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;
+  }
+  .sheet{
+    max-width:760px;
+    margin:0 auto;
+    background:var(--paper);
+    box-shadow:0 0 0 1px var(--rule);
+  }
+  header.masthead{
+    background:var(--green-dark);
+    color:var(--white);
+    padding:2.6rem 2.2rem 2.2rem;
+    position:relative;
+  }
+  header.masthead .kicker{
+    font-family:'Source Serif 4',serif;
+    font-size:0.95rem;
+    color:#C9D6CC;
+    margin:0 0 0.4rem;
+  }
+  header.masthead h1{
+    font-family:'Source Serif 4',serif;
+    font-weight:600;
+    font-size:2rem;
+    line-height:1.2;
+    margin:0 0 0.9rem;
+  }
+  header.masthead p.lede{
+    max-width:44ch;
+    color:#D9E1D5;
+    font-size:1rem;
+    margin:0;
+  }
+  .badge-row{
+    display:flex;
+    gap:0.5rem;
+    flex-wrap:wrap;
+    margin-top:1.2rem;
+  }
+  .badge{
+    font-size:0.8rem;
+    border:1px solid #4E6D5A;
+    color:#CFE0D2;
+    padding:0.3rem 0.7rem;
+    border-radius:2px;
+  }
+  nav.toc{
+    background:var(--green-tint);
+    border-bottom:1px solid var(--rule);
+    padding:1.3rem 2.2rem;
+  }
+  nav.toc p{
+    margin:0 0 0.6rem;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+  nav.toc ol{
+    margin:0;
+    padding-left:1.2rem;
+    columns:2;
+    column-gap:1.5rem;
+    font-size:0.92rem;
+  }
+  nav.toc li{ margin-bottom:0.35rem; }
+  nav.toc a{ color:var(--green-dark); text-decoration:none; border-bottom:1px solid #9FB6A6; }
+  nav.toc a:hover{ border-bottom-color:var(--green-dark); }
+
+  main{ padding:0.5rem 2.2rem 2.5rem; }
+
+  section.part{
+    margin-top:2.6rem;
+    padding-top:0.4rem;
+  }
+  section.part > .part-head{
+    display:flex;
+    align-items:baseline;
+    gap:0.8rem;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:0.5rem;
+    margin-bottom:1.3rem;
+  }
+  section.part > .part-head .num{
+    font-family:'Source Serif 4',serif;
+    font-size:1.8rem;
+    color:var(--berry);
+    font-weight:600;
+  }
+  section.part > .part-head h2{
+    font-family:'Source Serif 4',serif;
+    font-size:1.5rem;
+    font-weight:600;
+    margin:0;
+    color:var(--ink);
+  }
+  section.part > .part-head .scope{
+    margin-left:auto;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+
+  h3{
+    font-family:'Source Serif 4',serif;
+    font-size:1.12rem;
+    font-weight:600;
+    margin:1.6rem 0 0.5rem;
+    color:var(--green-dark);
+  }
+  p{ margin:0 0 0.85rem; }
+  .note{
+    background:var(--green-tint);
+    border-left:3px solid var(--green);
+    padding:0.7rem 1rem;
+    font-size:0.93rem;
+    margin:0.9rem 0 1.2rem;
+    border-radius:0 3px 3px 0;
+  }
+  .note.warn{
+    background:var(--berry-tint);
+    border-left-color:var(--berry);
+  }
+  .note strong{ color:var(--ink); }
+
+  ol.steps{
+    counter-reset:step;
+    list-style:none;
+    padding:0;
+    margin:0 0 1.1rem;
+  }
+  ol.steps > li{
+    counter-increment:step;
+    position:relative;
+    padding:0 0 1.1rem 2.5rem;
+    border-left:1px solid var(--rule);
+    margin-left:0.55rem;
+  }
+  ol.steps > li:last-child{ border-left-color:transparent; padding-bottom:0; }
+  ol.steps > li::before{
+    content:counter(step);
+    position:absolute;
+    left:-0.55rem;
+    top:0;
+    width:1.1rem;
+    height:1.1rem;
+    background:var(--paper);
+    border:1px solid var(--green);
+    color:var(--green-dark);
+    font-size:0.72rem;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+  }
+  ol.steps > li .step-title{
+    font-weight:600;
+    display:block;
+    margin-bottom:0.2rem;
+  }
+  ol.steps ul{ margin:0.4rem 0 0; padding-left:1.1rem; }
+  ol.steps li li{ font-size:0.94rem; }
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    margin:0.6rem 0 1.2rem;
+    font-size:0.9rem;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:0.5rem 0.6rem;
+    border-bottom:1px solid var(--rule);
+  }
+  table.data th{
+    color:var(--ink-soft);
+    font-weight:600;
+    font-size:0.8rem;
+  }
+  table.data tr:last-child td{ border-bottom:none; }
+
+  .scope-pill{
+    display:inline-block;
+    font-size:0.76rem;
+    background:var(--paper-2);
+    border:1px solid var(--rule);
+    padding:0.15rem 0.5rem;
+    border-radius:2px;
+    color:var(--ink-soft);
+    margin-bottom:0.8rem;
+  }
+
+  /* checklist */
+  .checklist-wrap{
+    background:var(--white);
+    border:1px solid var(--rule);
+    padding:1.5rem 1.6rem;
+    margin-top:1.4rem;
+  }
+  .checklist-wrap h3{ margin-top:0; }
+  .checklist-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  .print-btn{
+    flex:0 0 auto;
+    background:var(--green-dark);
+    color:#fff;
+    border:none;
+    font-family:'Inter',sans-serif;
+    font-size:0.85rem;
+    font-weight:600;
+    padding:0.6rem 1rem;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .print-btn:hover{ background:var(--green); }
+  .check-group{ margin-bottom:1.4rem; }
+  .check-group:last-child{ margin-bottom:0; }
+  .check-group h4{
+    font-size:0.85rem;
+    text-transform:none;
+    color:var(--berry);
+    border-bottom:1px solid var(--berry-tint);
+    padding-bottom:0.3rem;
+    margin:0 0 0.6rem;
+  }
+  ul.checks{ list-style:none; margin:0; padding:0; }
+  ul.checks li{
+    display:flex;
+    align-items:flex-start;
+    gap:0.6rem;
+    padding:0.4rem 0;
+    border-bottom:1px dashed var(--rule);
+    font-size:0.93rem;
+  }
+  ul.checks li:last-child{ border-bottom:none; }
+  ul.checks .box{
+    flex:0 0 auto;
+    width:0.95rem;
+    height:0.95rem;
+    border:1px solid var(--ink);
+    margin-top:0.18rem;
+  }
+
+  footer{
+    background:var(--green-dark);
+    color:#D9E1D5;
+    padding:1.8rem 2.2rem;
+    font-size:0.85rem;
+  }
+  footer h3{
+    color:#fff;
+    font-size:1rem;
+    margin:0 0 0.8rem;
+  }
+  footer ul{ list-style:none; padding:0; margin:0 0 1rem; columns:1; }
+  footer li{ margin-bottom:0.45rem; }
+  footer a{ color:#BFE0C8; }
+  footer .fine{ color:#8FA894; font-size:0.78rem; margin-top:1rem; }
+
+  @media print{
+    body{ background:#fff; }
+    .sheet{ box-shadow:none; max-width:100%; }
+    header.masthead{ background:#fff !important; color:#000 !important; padding:1rem 0.2rem; }
+    header.masthead .kicker, header.masthead p.lede, .badge{ color:#333 !important; border-color:#999 !important; }
+    nav.toc{ display:none; }
+    .print-btn{ display:none; }
+    section.part{ break-inside:avoid-page; }
+    .checklist-wrap{ break-before:page; }
+    footer{ background:#fff !important; color:#000 !important; }
+    footer a{ color:#000 !important; }
+    a{ text-decoration:none; color:inherit; }
+  }
+  @media (max-width:600px){
+    header.masthead{ padding:2rem 1.2rem; }
+    main{ padding:0 1.2rem 2rem; }
+    nav.toc{ padding:1.1rem 1.2rem; }
+    nav.toc ol{ columns:1; }
+    section.part > .part-head .scope{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <p class="kicker">Guia prático — agricultura familiar</p>
+    <h1>Registro de marca e regularização do produto para venda de fruta congelada</h1>
+    <p class="lede">Passo a passo para registrar a marca no INPI, regularizar a produção junto ao IMA e preparar o rótulo com código de barras e informação nutricional.</p>
+    <div class="badge-row">
+      <span class="badge">Minas Gerais</span>
+      <span class="badge">Sul de Minas</span>
+      <span class="badge">Produtor rural pessoa física</span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <p>Neste guia</p>
+    <ol>
+      <li><a href="#parte1">Registro da marca no INPI</a></li>
+      <li><a href="#parte2">Regularização do produto no IMA</a></li>
+      <li><a href="#parte3">Código de barras e rótulo nutricional</a></li>
+      <li><a href="#checklist">Checklist para impressão</a></li>
+      <li><a href="#fontes">Fontes e links oficiais</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section class="part" id="parte1">
+      <div class="part-head">
+        <span class="num">1</span>
+        <h2>Registro da marca no INPI</h2>
+        <span class="scope">CPF, sem necessidade de CNPJ</span>
+      </div>
+
+      <p>O registro de marca é federal e não depende de onde a propriedade fica em Minas Gerais. Pode ser feito com CPF, desde que você comprove a atividade rural relacionada ao nome que quer proteger.</p>
+
+      <ol class="steps">
+        <li>
+          <span class="step-title">Pesquisa de viabilidade</span>
+          Antes de pagar qualquer taxa, pesquise o nome pretendido na base do INPI (texto e sonoridade parecida) para verificar se já existe marca igual ou semelhante nas classes de alimentos.
+        </li>
+        <li>
+          <span class="step-title">Escolher a classe de Nice</span>
+          <ul>
+            <li>Classe 29 — frutas processadas, conservadas ou congeladas (classe principal para o morango congelado)</li>
+            <li>Classe 31 — se também vender a fruta fresca, in natura</li>
+            <li>Classe 35 — apenas se quiser proteger a marca também para a atividade de comércio/venda, geralmente dispensável para pequeno produtor</li>
+          </ul>
+          Cada classe gera uma taxa separada.
+        </li>
+        <li>
+          <span class="step-title">Criar conta no e-INPI</span>
+          Login pelo gov.br (nível prata ou ouro) e cadastro como pessoa física no sistema do INPI.
+        </li>
+        <li>
+          <span class="step-title">Reunir os documentos</span>
+          <ul>
+            <li>CPF e RG</li>
+            <li>Cartão de produtor rural — comprova a atividade</li>
+            <li>Inscrição Estadual de Produtor Rural (IEPR), se já tiver</li>
+            <li>Reforço opcional: registro no IMA, DAP/CAF, nota fiscal de produtor</li>
+          </ul>
+        </li>
+        <li>
+          <span class="step-title">Protocolar o pedido</span>
+          Escolher entre marca nominativa (só texto) ou mista (texto e logotipo), selecionar a especificação pré-aprovada da classe escolhida, anexar os comprovantes de atividade e gerar a GRU para pagamento.
+        </li>
+        <li>
+          <span class="step-title">Acompanhar o processo</span>
+          O prazo médio até a concessão costuma ficar entre 9 e 18 meses. Acompanhe as publicações semanais na Revista da Propriedade Industrial e responda a qualquer exigência ou oposição dentro do prazo.
+        </li>
+        <li>
+          <span class="step-title">Após a concessão</span>
+          Certificado válido por 10 anos, renovável por períodos iguais. Só use o símbolo ® depois da concessão — antes disso, o pedido em análise não dá esse direito.
+        </li>
+      </ol>
+
+      <h3>Taxas de referência</h3>
+      <table class="data">
+        <tr><th>Situação</th><th>Especificação pré-aprovada</th><th>Especificação livre</th></tr>
+        <tr><td>Pessoa física, com desconto de 50%</td><td>R$ 440 por classe</td><td>R$ 860 por classe</td></tr>
+        <tr><td>Sem desconto</td><td>R$ 880 por classe</td><td>R$ 1.720 por classe</td></tr>
+      </table>
+      <p class="note">Pagamento único, feito no protocolo: cobre o pedido, a concessão e os primeiros 10 anos de proteção. Isenção total (100%) existe para inscritos no CadÚnico e pessoas com deficiência. Valores sujeitos a reajuste — confirme a tabela vigente no site do INPI antes de pagar.</p>
+    </section>
+
+    <section class="part" id="parte2">
+      <div class="part-head">
+        <span class="num">2</span>
+        <h2>Regularização do produto no IMA</h2>
+        <span class="scope">Válido em qualquer região de MG</span>
+      </div>
+
+      <p>Diferente da marca, isso trata do direito de vender o alimento. Em Minas Gerais, o órgão responsável por produtos de origem vegetal é o <strong>IMA (Instituto Mineiro de Agropecuária)</strong>, com escritórios regionais em todo o estado, incluindo o Sul de Minas.</p>
+
+      <h3>Definir o alcance de venda</h3>
+      <table class="data">
+        <tr><th>Onde pretende vender</th><th>Inspeção necessária</th></tr>
+        <tr><td>Só no seu município</td><td>SIM — Serviço de Inspeção Municipal (prefeitura)</td></tr>
+        <tr><td>Em qualquer lugar de Minas Gerais</td><td>IMA — Serviço de Inspeção Estadual</td></tr>
+        <tr><td>Fora de MG / todo o Brasil</td><td>SIF — federal, MAPA (mais complexo)</td></tr>
+      </table>
+      <p>Para vender em mercados e feiras da própria região ou de outras cidades mineiras, o registro estadual no IMA costuma ser o caminho mais indicado.</p>
+
+      <ol class="steps">
+        <li>
+          <span class="step-title">Cadastro no Portal do Produtor Rural</span>
+          No site do IMA, solicitar acesso ao Portal de Serviços do Produtor Rural com nome completo, CPF, e-mail e telefone.
+        </li>
+        <li>
+          <span class="step-title">Obter o RGAA</span>
+          Registro Geral da Atividade Agropecuária — se ainda não tiver, é solicitado junto ao próprio IMA.
+        </li>
+        <li>
+          <span class="step-title">Registrar o estabelecimento</span>
+          O local onde a fruta é congelada e embalada — mesmo sendo dentro da propriedade rural — precisa ser registrado junto à área de Produtos de Origem Vegetal do IMA. Aceita CPF e IEPR, sem exigência de CNPJ. O IMA avalia estrutura, higiene, controle de temperatura e armazenamento.
+        </li>
+        <li>
+          <span class="step-title">Registrar o produto e o rótulo</span>
+          Depois do estabelecimento aprovado, o morango congelado é registrado vinculado a ele. O rótulo deve trazer denominação de venda, peso líquido, lote, validade, dados do estabelecimento e informação nutricional.
+        </li>
+        <li>
+          <span class="step-title">Verificar licença sanitária municipal</span>
+          Procurar a Vigilância Sanitária do seu município para confirmar se há exigência complementar de alvará.
+        </li>
+      </ol>
+
+      <h3>Onde buscar orientação direta</h3>
+      <p>Procure o escritório regional do IMA que atende sua região do Sul de Minas para confirmar exigências específicas e agendar a vistoria do estabelecimento.</p>
+    </section>
+
+    <section class="part" id="parte3">
+      <div class="part-head">
+        <span class="num">3</span>
+        <h2>Código de barras e rótulo nutricional</h2>
+      </div>
+
+      <div class="note warn">
+        <strong>Um esclarecimento importante:</strong> o código de barras não contém a informação nutricional dentro dele. Ele é apenas um número de identificação único do produto (GTIN). A tabela nutricional é impressa separadamente no rótulo, seguindo as regras da ANVISA. São dois elementos diferentes que aparecem juntos na embalagem.
+      </div>
+
+      <h3>Como obter o código de barras (GTIN/EAN)</h3>
+      <ol class="steps">
+        <li>
+          <span class="step-title">Associar-se à GS1 Brasil</span>
+          A GS1 Brasil é a única entidade autorizada a emitir códigos de barras oficiais no país. Geradores gratuitos de imagem de código de barras não geram um GTIN válido — o número não estará registrado e pode ser rejeitado por mercados, sistemas fiscais e leitores de caixa.
+        </li>
+        <li>
+          <span class="step-title">Escolher o plano</span>
+          Existem faixas de valor conforme o porte e o faturamento, com condições reduzidas para MEI, pequenos produtores e artesãos. Simule o custo direto no site da GS1 Brasil antes de contratar.
+        </li>
+        <li>
+          <span class="step-title">Enviar a documentação</span>
+          Para produtor rural, a comprovação de atividade costuma ser feita com o cartão de produtor rural ou documento equivalente — confirme a lista exata no cadastro da GS1.
+        </li>
+        <li>
+          <span class="step-title">Atribuir o GTIN ao produto</span>
+          Depois de associado, você cadastra o morango congelado no Cadastro Nacional de Produtos e recebe um número GTIN exclusivo para ele.
+        </li>
+        <li>
+          <span class="step-title">Gerar a imagem do código de barras</span>
+          A partir do GTIN, gera-se a imagem no padrão EAN-13 (o mais usado no varejo), respeitando tamanho, contraste e margens mínimas para leitura correta nos caixas.
+        </li>
+        <li>
+          <span class="step-title">Testar a leitura antes de imprimir</span>
+          Testar o código com um leitor antes de mandar imprimir a embalagem em lote, e manter a licença da GS1 ativa com a renovação anual.
+        </li>
+      </ol>
+
+      <h3>Como montar a tabela de informação nutricional</h3>
+      <p>Regida pela RDC nº 429/2020 e pela Instrução Normativa nº 75/2020 da ANVISA.</p>
+      <ul>
+        <li>A tabela deve ter fundo branco, letras e linhas pretas, seguindo o modelo padronizado da ANVISA.</li>
+        <li>Os valores costumam ser calculados a partir de análise laboratorial do produto ou de tabelas de composição de alimentos reconhecidas, por porção e por 100 g.</li>
+        <li>Itens obrigatórios quando aplicável: valor energético, carboidratos, açúcares totais e adicionados, proteínas, gorduras totais, saturadas e trans, fibra alimentar e sódio.</li>
+      </ul>
+      <div class="note">
+        <strong>Possível exceção para o seu caso:</strong> frutas sem ingrediente adicionado que agregue valor nutricional — como morango congelado puro, sem calda ou açúcar — podem se enquadrar entre os alimentos com declaração nutricional voluntária, e não obrigatória, segundo o Anexo I da IN nº 75/2020. Ainda assim, muitos mercados e redes exigem a tabela por política própria, então vale confirmar com o comprador e, na dúvida, incluir a tabela mesmo quando não for obrigatória.
+      </div>
+    </section>
+
+    <section class="checklist-wrap" id="checklist">
+      <div class="checklist-head">
+        <div>
+          <h3>Checklist para impressão</h3>
+          <p style="font-size:0.85rem;color:var(--ink-soft);margin-top:-0.4rem;">Marque conforme for reunindo cada item.</p>
+        </div>
+        <button class="print-btn" onclick="window.print()">Imprimir checklist</button>
+      </div>
+
+      <div class="check-group">
+        <h4>Marca — INPI</h4>
+        <ul class="checks">
+          <li><span class="box"></span> Nome da marca definido e pesquisado na base do INPI</li>
+          <li><span class="box"></span> Classe de Nice escolhida (29 e/ou 31)</li>
+          <li><span class="box"></span> Conta gov.br nível prata ou ouro</li>
+          <li><span class="box"></span> Cadastro feito no e-INPI</li>
+          <li><span class="box"></span> CPF e RG</li>
+          <li><span class="box"></span> Cartão de produtor rural</li>
+          <li><span class="box"></span> IEPR, se já tiver</li>
+          <li><span class="box"></span> GRU paga</li>
+        </ul>
+      </div>
+
+      <div class="check-group">
+        <h4>Produto — IMA</h4>
+        <ul class="checks">
+          <li><span class="box"></span> Cadastro no Portal do Produtor Rural do IMA</li>
+          <li><span class="box"></span> RGAA obtido</li>
+          <li><span class="box"></span> Comprovante de propriedade ou posse do imóvel rural</li>
+          <li><span class="box"></span> Descrição ou planta do local de congelamento/embalagem</li>
+          <li><span class="box"></span> Vistoria do IMA agendada</li>
+          <li><span class="box"></span> Registro do estabelecimento concluído</li>
+          <li><span class="box"></span> Registro do produto vinculado ao estabelecimento</li>
+          <li><span class="box"></span> Consulta feita à Vigilância Sanitária municipal</li>
+        </ul>
+      </div>
+
+      <div class="check-group">
+        <h4>Rótulo — código de barras e nutricional</h4>
+        <ul class="checks">
+          <li><span class="box"></span> Associação à GS1 Brasil feita</li>
+          <li><span class="box"></span> GTIN atribuído ao produto</li>
+          <li><span class="box"></span> Imagem do código de barras gerada e testada em leitor</li>
+          <li><span class="box"></span> Análise nutricional do produto obtida (laboratório ou tabela de referência)</li>
+          <li><span class="box"></span> Tabela nutricional montada no modelo ANVISA</li>
+          <li><span class="box"></span> Rótulo com peso líquido, lote, validade e dados do estabelecimento</li>
+          <li><span class="box"></span> Arte final do rótulo revisada antes da impressão em lote</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="fontes">
+    <h3>Fontes e links oficiais</h3>
+    <ul>
+      <li><a href="https://www.gov.br/inpi/pt-br">INPI — Instituto Nacional da Propriedade Industrial</a></li>
+      <li><a href="https://busca.inpi.gov.br/pePI/">Busca de marcas do INPI</a></li>
+      <li><a href="https://www.ima.mg.gov.br">IMA — Instituto Mineiro de Agropecuária</a></li>
+      <li><a href="https://www.gs1br.org">GS1 Brasil — código de barras e GTIN</a></li>
+      <li><a href="https://www.gov.br/anvisa/pt-br">ANVISA — Agência Nacional de Vigilância Sanitária</a></li>
+    </ul>
+    <p class="fine">Guia de orientação geral. Taxas, prazos e exigências podem mudar — confirme sempre os valores e documentos atualizados diretamente nos sites oficiais acima antes de protocolar qualquer pedido.</p>
+  </footer>
+
+</div>
+</body>
+</html>
