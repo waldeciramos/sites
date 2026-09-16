@@ -41,13 +41,18 @@
     color:var(--white);
     padding:2.6rem 2.2rem 2.2rem;
     position:relative;
+    border-top:5px solid var(--berry);
   }
   header.masthead .kicker{
     font-family:'Source Serif 4',serif;
     font-size:0.95rem;
     color:#C9D6CC;
     margin:0 0 0.4rem;
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
   }
+  header.masthead .kicker svg{ flex:0 0 auto; }
   header.masthead h1{
     font-family:'Source Serif 4',serif;
     font-weight:600;
@@ -109,11 +114,19 @@
     padding-bottom:0.5rem;
     margin-bottom:1.3rem;
   }
-  section.part > .part-head .num{
+  .part-head .num{
     font-family:'Source Serif 4',serif;
-    font-size:1.8rem;
+    font-weight:700;
+    font-size:1.15rem;
     color:var(--berry);
-    font-weight:600;
+    background:var(--berry-tint);
+    width:2.1rem;
+    height:2.1rem;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
   }
   section.part > .part-head h2{
     font-family:'Source Serif 4',serif;
@@ -291,6 +304,77 @@
   footer a{ color:#BFE0C8; }
   footer .fine{ color:#8FA894; font-size:0.78rem; margin-top:1rem; }
 
+  /* modelo de rótulo */
+  .label-mock{
+    background:var(--white);
+    border:1px solid var(--ink);
+    padding:0;
+    margin:1rem 0 1.2rem;
+    box-shadow:3px 3px 0 var(--rule);
+  }
+  .label-top{
+    background:var(--green-dark);
+    color:#fff;
+    padding:1rem 1.2rem;
+    text-align:center;
+  }
+  .label-brand{
+    font-family:'Source Serif 4',serif;
+    font-size:1.3rem;
+    font-weight:700;
+    letter-spacing:0.02em;
+    color:var(--berry);
+    background:#fff;
+    display:inline-block;
+    padding:0.15rem 0.7rem;
+    margin-bottom:0.3rem;
+  }
+  .label-product{ font-size:1.05rem; font-weight:600; }
+  .label-weight{ font-size:0.85rem; color:#D9E1D5; margin-top:0.2rem; }
+  .label-body{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:0;
+  }
+  .label-col{ padding:1rem 1.2rem; }
+  .label-col.nutri{ border-left:1px solid var(--rule); background:#FCFBF7; }
+  .label-field{ font-size:0.85rem; margin:0 0 0.6rem; }
+  .label-field span{ font-weight:600; color:var(--ink); }
+  .barcode-block{ margin-top:1rem; text-align:center; }
+  .barcode-bars{
+    height:2.4rem;
+    background-image:repeating-linear-gradient(90deg,
+      var(--ink) 0, var(--ink) 2px, transparent 2px, transparent 4px,
+      var(--ink) 4px, var(--ink) 5px, transparent 5px, transparent 8px,
+      var(--ink) 8px, var(--ink) 11px, transparent 11px, transparent 13px);
+    margin-bottom:0.3rem;
+  }
+  .barcode-number{ font-size:0.8rem; letter-spacing:0.15em; color:var(--ink-soft); }
+
+  table.nutri-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.78rem;
+    background:#fff;
+  }
+  table.nutri-table caption{
+    text-align:left;
+    font-weight:700;
+    font-size:0.85rem;
+    padding-bottom:0.4rem;
+    border-bottom:6px solid var(--ink);
+  }
+  table.nutri-table td, table.nutri-table th{
+    border-top:1px solid var(--ink);
+    padding:0.28rem 0.15rem;
+    text-align:left;
+  }
+  table.nutri-table th{ font-weight:600; text-align:right; }
+  table.nutri-table td:nth-child(2), table.nutri-table td:nth-child(3){ text-align:right; }
+  table.nutri-table .por{ font-weight:600; border-top:none; padding-top:0.3rem; }
+  .nutri-foot{ font-size:0.68rem; color:var(--ink-soft); margin:0.5rem 0 0; }
+
+
   @media print{
     body{ background:#fff; }
     .sheet{ box-shadow:none; max-width:100%; }
@@ -299,6 +383,7 @@
     nav.toc{ display:none; }
     .print-btn{ display:none; }
     section.part{ break-inside:avoid-page; }
+    #rotulo{ break-before:page; }
     .checklist-wrap{ break-before:page; }
     footer{ background:#fff !important; color:#000 !important; }
     footer a{ color:#000 !important; }
@@ -310,6 +395,8 @@
     nav.toc{ padding:1.1rem 1.2rem; }
     nav.toc ol{ columns:1; }
     section.part > .part-head .scope{ display:none; }
+    .label-body{ grid-template-columns:1fr; }
+    .label-col.nutri{ border-left:none; border-top:1px solid var(--rule); }
   }
 </style>
 </head>
@@ -317,7 +404,10 @@
 <div class="sheet">
 
   <header class="masthead">
-    <p class="kicker">Guia prático — agricultura familiar</p>
+    <p class="kicker">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8C9 8 6.5 10.2 6.5 14C6.5 17.5 9.2 21 12 21C14.8 21 17.5 17.5 17.5 14C17.5 10.2 15 8 12 8Z" fill="#C1352D" opacity="0.9"/><path d="M9 8L10.5 5M12 8L12 4.5M15 8L13.5 5" stroke="#8FA894" stroke-width="1.2" stroke-linecap="round"/><circle cx="9.5" cy="12.5" r="0.6" fill="#213629"/><circle cx="13" cy="11.5" r="0.6" fill="#213629"/><circle cx="11" cy="15" r="0.6" fill="#213629"/><circle cx="14.5" cy="15.5" r="0.6" fill="#213629"/></svg>
+      Guia prático — agricultura familiar
+    </p>
     <h1>Registro de marca e regularização do produto para venda de fruta congelada</h1>
     <p class="lede">Passo a passo para registrar a marca no INPI, regularizar a produção junto ao IMA e preparar o rótulo com código de barras e informação nutricional.</p>
     <div class="badge-row">
@@ -333,6 +423,7 @@
       <li><a href="#parte1">Registro da marca no INPI</a></li>
       <li><a href="#parte2">Regularização do produto no IMA</a></li>
       <li><a href="#parte3">Código de barras e rótulo nutricional</a></li>
+      <li><a href="#rotulo">Modelo de rótulo</a></li>
       <li><a href="#checklist">Checklist para impressão</a></li>
       <li><a href="#fontes">Fontes e links oficiais</a></li>
     </ol>
@@ -417,6 +508,11 @@
       </table>
       <p>Para vender em mercados e feiras da própria região ou de outras cidades mineiras, o registro estadual no IMA costuma ser o caminho mais indicado.</p>
 
+      <div class="note" style="background:var(--green-tint);border-left-color:var(--gold);">
+        <strong>Opção mais simples para começar:</strong> se a ideia inicial é vender só dentro do seu próprio município — direto ao consumidor, em mercados locais ou feiras da cidade — o registro pelo <strong>SIM</strong>, na prefeitura, costuma ser mais rápido e menos burocrático que o IMA. Muitos municípios já aceitam produtor com CPF e cartão de produtor rural, sem exigir CNPJ. Dá pra começar vendendo localmente com o SIM e, se o negócio crescer, migrar depois para o registro estadual no IMA para alcançar outras cidades.
+      </div>
+
+
       <ol class="steps">
         <li>
           <span class="step-title">Cadastro no Portal do Produtor Rural</span>
@@ -491,6 +587,62 @@
       </ul>
       <div class="note">
         <strong>Possível exceção para o seu caso:</strong> frutas sem ingrediente adicionado que agregue valor nutricional — como morango congelado puro, sem calda ou açúcar — podem se enquadrar entre os alimentos com declaração nutricional voluntária, e não obrigatória, segundo o Anexo I da IN nº 75/2020. Ainda assim, muitos mercados e redes exigem a tabela por política própria, então vale confirmar com o comprador e, na dúvida, incluir a tabela mesmo quando não for obrigatória.
+      </div>
+    </section>
+
+    <section class="part" id="rotulo">
+      <div class="part-head">
+        <span class="num">4</span>
+        <h2>Modelo de rótulo</h2>
+        <span class="scope">Exemplo para adaptar à sua marca</span>
+      </div>
+
+      <p>Um exemplo de como os elementos obrigatórios costumam ficar organizados juntos na embalagem. Troque os textos em vermelho pelos dados reais do seu produto antes de mandar para a gráfica.</p>
+
+      <div class="label-mock">
+        <div class="label-top">
+          <div class="label-brand">[NOME DA MARCA]</div>
+          <div class="label-product">Morango Congelado</div>
+          <div class="label-weight">Peso líquido: 500 g</div>
+        </div>
+
+        <div class="label-body">
+          <div class="label-col">
+            <p class="label-field"><span>Ingredientes:</span> Morango.</p>
+            <p class="label-field"><span>Lote:</span> [nº do lote] &nbsp; <span>Validade:</span> [dd/mm/aaaa]</p>
+            <p class="label-field"><span>Conservação:</span> Manter congelado a -18°C.</p>
+            <p class="label-field"><span>Fabricante:</span> [Nome do produtor] — [endereço da propriedade, cidade/MG]</p>
+            <p class="label-field"><span>Registro:</span> [nº de registro IMA/SIM]</p>
+
+            <div class="barcode-block">
+              <div class="barcode-bars" aria-hidden="true"></div>
+              <span class="barcode-number">7 89XXXX XXXXXX</span>
+            </div>
+          </div>
+
+          <div class="label-col nutri">
+            <table class="nutri-table">
+              <caption>INFORMAÇÃO NUTRICIONAL</caption>
+              <tr><td colspan="3" class="por">Porção 100 g</td></tr>
+              <tr><th>&nbsp;</th><th>Quantidade</th><th>%VD*</th></tr>
+              <tr><td>Valor energético</td><td>32 kcal</td><td>2%</td></tr>
+              <tr><td>Carboidratos</td><td>7,7 g</td><td>3%</td></tr>
+              <tr><td>Açúcares totais</td><td>4,9 g</td><td>—</td></tr>
+              <tr><td>Açúcares adicionados</td><td>0 g</td><td>0%</td></tr>
+              <tr><td>Proteínas</td><td>0,7 g</td><td>1%</td></tr>
+              <tr><td>Gorduras totais</td><td>0,3 g</td><td>1%</td></tr>
+              <tr><td>Gorduras saturadas</td><td>0 g</td><td>0%</td></tr>
+              <tr><td>Gorduras trans</td><td>0 g</td><td>**</td></tr>
+              <tr><td>Fibra alimentar</td><td>2 g</td><td>8%</td></tr>
+              <tr><td>Sódio</td><td>1 mg</td><td>0%</td></tr>
+            </table>
+            <p class="nutri-foot">*% Valores Diários com base em uma dieta de 2.000 kcal ou 8.400 kJ. Seus valores diários podem ser maiores ou menores dependendo de suas necessidades energéticas.<br>**VD não estabelecido.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="note warn">
+        Os números da tabela acima são só um exemplo de formatação. Os valores reais do seu morango congelado precisam vir de uma análise laboratorial do próprio produto ou de uma tabela de composição de alimentos reconhecida — não copie os números deste modelo.
       </div>
     </section>
 
