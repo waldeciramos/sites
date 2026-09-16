@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Recibo de Pagamento</title>
+<style>
+  :root{
+    --bg:#f4f5f7;
+    --panel:#ffffff;
+    --border:#d7dbe0;
+    --text:#1f2430;
+    --muted:#6b7280;
+    --accent:#2f5d50;
+    --accent-light:#e7efec;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:20px;
+    padding:20px;
+    align-items:start;
+  }
+  @media (max-width: 900px){
+    .layout{grid-template-columns:1fr;}
+  }
+  h1{
+    font-size:18px;
+    margin:0 0 14px;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px;
+  }
+  fieldset{
+    border:1px solid var(--border);
+    border-radius:6px;
+    margin:0 0 14px;
+    padding:10px 12px 14px;
+  }
+  legend{
+    font-size:12px;
+    font-weight:600;
+    color:var(--accent);
+    padding:0 6px;
+  }
+  label{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin:8px 0 2px;
+  }
+  input[type=text],input[type=number],input[type=month],select{
+    width:100%;
+    padding:6px 8px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    font-size:13px;
+    font-family:inherit;
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  table.itens{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:8px;
+    font-size:12px;
+  }
+  table.itens th,table.itens td{
+    border:1px solid var(--border);
+    padding:4px;
+  }
+  table.itens th{
+    background:var(--accent-light);
+    font-weight:600;
+  }
+  table.itens input{
+    border:none;
+    width:100%;
+    padding:3px 4px;
+    font-size:12px;
+  }
+  .btn{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    padding:8px 14px;
+    font-size:13px;
+    cursor:pointer;
+    margin-top:8px;
+  }
+  .btn.secondary{
+    background:#fff;
+    color:var(--accent);
+    border:1px solid var(--accent);
+  }
+  .btn.small{
+    padding:3px 8px;
+    font-size:11px;
+    margin:0;
+  }
+  .btn.danger{
+    background:#b0413e;
+  }
+  .actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .hint{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+
+  /* ---------- PREVIEW / RECIBO ---------- */
+  .preview-wrap{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:20px;
+  }
+  .recibo{
+    font-family:'Courier New',monospace;
+    font-size:11.5px;
+    color:#000;
+    border:1px solid #000;
+    padding:6px;
+    margin-bottom:24px;
+    width:100%;
+  }
+  .recibo-grid{
+    display:grid;
+    grid-template-columns: 1fr 26px;
+  }
+  .recibo-main{border-right:1px solid #000;padding-right:6px;}
+  .recibo-side{
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align:center;
+    font-size:9px;
+    padding:4px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .rec-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  .rec-header .empresa{line-height:1.4;}
+  .rec-header .direita{text-align:right;line-height:1.4;}
+  .rec-sub{
+    text-align:center;
+    margin:2px 0 6px;
+  }
+  .rec-funcionario{
+    border-top:1px solid #000;
+    border-bottom:1px solid #000;
+    display:grid;
+    grid-template-columns: 40px 1fr 140px;
+    gap:4px;
+    padding:3px 0;
+    margin-top:4px;
+  }
+  .rec-funcionario .lbl{font-size:8.5px;color:#333;}
+  table.rec-itens{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:2px;
+  }
+  table.rec-itens th,table.rec-itens td{
+    border-left:1px solid #000;
+    border-right:1px solid #000;
+    padding:1px 4px;
+    font-size:11px;
+  }
+  table.rec-itens thead th{
+    border-top:1px solid #000;
+    border-bottom:1px solid #000;
+    text-align:left;
+  }
+  table.rec-itens td.num{text-align:right;}
+  table.rec-itens tbody{height:1px;}
+  .rec-itens-wrap{
+    border-bottom:1px solid #000;
+    min-height:230px;
+    display:flex;
+    flex-direction:column;
+  }
+  .rec-itens-fill{flex:1;border-left:1px solid #000;border-right:1px solid #000;}
+  .rec-totais{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .rec-totais > div{
+    border-left:1px solid #000;
+    border-right:1px solid #000;
+    border-bottom:1px solid #000;
+    padding:1px 4px;
+  }
+  .rec-totais .lbl{font-size:9px;color:#333;}
+  .rec-totais .val{font-size:12px;text-align:right;padding-top:2px;}
+  .rec-liquido{
+    grid-column: 1 / -1;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .rec-liquido .lbl{font-size:9px;color:#333;}
+  .rec-liquido .val{font-size:13px;text-align:right;font-weight:bold;}
+  .rec-rodape{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    border-left:1px solid #000;
+    border-right:1px solid #000;
+    border-bottom:1px solid #000;
+  }
+  .rec-rodape > div{
+    border-right:1px solid #000;
+    padding:1px 4px;
+    text-align:center;
+  }
+  .rec-rodape > div:last-child{border-right:none;}
+  .rec-rodape .lbl{font-size:8.5px;color:#333;}
+  .rec-rodape .val{font-size:11px;}
+  .declaro{
+    font-size:8px;
+    text-align:center;
+  }
+
+  @media print{
+    body{background:#fff;}
+    .no-print{display:none !important;}
+    .layout{display:block;padding:0;}
+    .preview-wrap{border:none;padding:0;}
+    .recibo{page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ===================== FORMULÁRIO ===================== -->
+  <div class="panel no-print">
+    <h1>Cadastro do recibo de pagamento</h1>
+
+    <fieldset>
+      <legend>Empresa / Folha</legend>
+      <label>Razão social</label>
+      <input type="text" id="empresa" value="ASSOCIACAO DE PAIS E AMIGOS EXCEPCIONAIS DE ESTIVA">
+      <div class="row2">
+        <div>
+          <label>CNPJ</label>
+          <input type="text" id="cnpj" value="05.639.080/0001-43">
+        </div>
+        <div>
+          <label>CC</label>
+          <input type="text" id="cc" value="GERAL">
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Tipo de folha</label>
+          <input type="text" id="tipoFolha" value="Horista">
+        </div>
+        <div>
+          <label>Mês/Ano de referência</label>
+          <input type="month" id="mesAno">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Funcionário</legend>
+      <div class="row2">
+        <div>
+          <label>Código</label>
+          <input type="text" id="codFunc" value="9">
+        </div>
+        <div>
+          <label>CBO</label>
+          <input type="text" id="cbo" value="223605">
+        </div>
+      </div>
+      <label>Nome do funcionário</label>
+      <input type="text" id="nomeFunc" placeholder="Nome completo">
+      <label>Cargo / função</label>
+      <input type="text" id="cargo" placeholder="Ex.: FISIOTERAPEUTA">
+      <div class="row3">
+        <div>
+          <label>Departamento</label>
+          <input type="text" id="depto" value="1">
+        </div>
+        <div>
+          <label>Filial</label>
+          <input type="text" id="filial" value="1">
+        </div>
+        <div>
+          <label>Admissão</label>
+          <input type="text" id="admissao" placeholder="dd/mm/aaaa">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Itens da folha (vencimentos / descontos)</legend>
+      <table class="itens" id="tabelaItens">
+        <thead>
+          <tr>
+            <th style="width:40px;">Cód.</th>
+            <th>Descrição</th>
+            <th style="width:60px;">Ref.</th>
+            <th style="width:70px;">Vencim.</th>
+            <th style="width:70px;">Descto.</th>
+            <th style="width:20px;"></th>
+          </tr>
+        </thead>
+        <tbody id="corpoItens"></tbody>
+      </table>
+      <div class="actions">
+        <button type="button" class="btn small secondary" onclick="adicionarItem()">+ item</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Base de cálculo (rodapé)</legend>
+      <div class="row3">
+        <div>
+          <label>Salário base</label>
+          <input type="number" step="0.01" id="salarioBase">
+        </div>
+        <div>
+          <label>Sal. Contr. INSS</label>
+          <input type="number" step="0.01" id="salContrInss">
+        </div>
+        <div>
+          <label>Base Cálc. FGTS</label>
+          <input type="number" step="0.01" id="baseFgts">
+        </div>
+      </div>
+      <div class="row3">
+        <div>
+          <label>F.G.T.S do mês</label>
+          <input type="number" step="0.01" id="fgtsMes">
+        </div>
+        <div>
+          <label>Base Cálc. IRRF</label>
+          <input type="number" step="0.01" id="baseIrrf">
+        </div>
+        <div>
+          <label>Faixa IRRF</label>
+          <input type="number" step="0.01" id="faixaIrrf" value="0">
+        </div>
+      </div>
+      <p class="hint">Esses campos não são calculados automaticamente — preencha com os valores corretos da folha.</p>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="btn" onclick="cadastrarFuncionario()">Cadastrar funcionário</button>
+      <button type="button" class="btn secondary" onclick="limparFormFuncionario()">Limpar formulário</button>
+    </div>
+
+    <fieldset>
+      <legend>Funcionários cadastrados</legend>
+      <div id="listaFuncionarios" class="hint">Nenhum funcionário cadastrado ainda.</div>
+      <div class="actions">
+        <button type="button" class="btn small secondary" onclick="exportarJson()">Exportar JSON</button>
+        <button type="button" class="btn small secondary" onclick="document.getElementById('inputImportar').click()">Importar JSON</button>
+        <input type="file" id="inputImportar" accept="application/json" style="display:none" onchange="importarJson(event)">
+      </div>
+      <p class="hint">Os cadastros ficam salvos no navegador (localStorage), em formato JSON. Exporte o arquivo de vez em quando para ter uma cópia de segurança ou levar para outro computador.</p>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="btn secondary" onclick="window.print()">Imprimir / salvar em PDF (todos)</button>
+    </div>
+  </div>
+
+  <!-- ===================== PRÉ-VISUALIZAÇÃO / RECIBOS CADASTRADOS ===================== -->
+  <div class="preview-wrap">
+    <div id="reciboContainer"></div>
+  </div>
+
+</div>
+
+<script>
+function novoItem(codigo,descricao,referencia,vencimento,desconto){
+  return {codigo:codigo||'',descricao:descricao||'',referencia:referencia||'',vencimento:vencimento||'',desconto:desconto||''};
+}
+
+let itens = [
+  novoItem('204','HORAS TRABALHADAS (HORISTA','60:00','978,28',''),
+  novoItem('9360','DSR HORISTA VARIAVEL','5,00','100,34',''),
+  novoItem('426','GRATIFICACOES HORISTA','','877,75',''),
+  novoItem('998','I.N.S.S','7,50','','112,48')
+];
+
+const corpoItens = document.getElementById('corpoItens');
+
+function renderTabelaItens(){
+  corpoItens.innerHTML = '';
+  itens.forEach((item,idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${item.codigo}" onchange="itens[${idx}].codigo=this.value"></td>
+      <td><input type="text" value="${item.descricao}" onchange="itens[${idx}].descricao=this.value"></td>
+      <td><input type="text" value="${item.referencia}" onchange="itens[${idx}].referencia=this.value"></td>
+      <td><input type="text" value="${item.vencimento}" onchange="itens[${idx}].vencimento=this.value"></td>
+      <td><input type="text" value="${item.desconto}" onchange="itens[${idx}].desconto=this.value"></td>
+      <td><button type="button" class="btn small danger" onclick="removerItem(${idx})">×</button></td>
+    `;
+    corpoItens.appendChild(tr);
+  });
+}
+
+function adicionarItem(){
+  itens.push(novoItem());
+  renderTabelaItens();
+}
+function removerItem(idx){
+  itens.splice(idx,1);
+  renderTabelaItens();
+}
+
+function parseNum(v){
+  if(!v) return 0;
+  const n = parseFloat(String(v).replace(/\./g,'').replace(',', '.'));
+  return isNaN(n)?0:n;
+}
+function fmt(n){
+  return n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function mesAnoExtenso(valor){
+  if(!valor) return '';
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const [ano,mes] = valor.split('-');
+  return `${meses[parseInt(mes,10)-1]} de ${ano}`;
+}
+
+function montarRecibo(){
+  const empresa = document.getElementById('empresa').value;
+  const cnpj = document.getElementById('cnpj').value;
+  const cc = document.getElementById('cc').value;
+  const tipoFolha = document.getElementById('tipoFolha').value;
+  const folhaRef = mesAnoExtenso(document.getElementById('mesAno').value);
+
+  const codFunc = document.getElementById('codFunc').value;
+  const nomeFunc = document.getElementById('nomeFunc').value;
+  const cargo = document.getElementById('cargo').value;
+  const cbo = document.getElementById('cbo').value;
+  const depto = document.getElementById('depto').value;
+  const filial = document.getElementById('filial').value;
+  const admissao = document.getElementById('admissao').value;
+
+  let totalVenc = 0, totalDesc = 0;
+  const linhas = itens.map(it=>{
+    totalVenc += parseNum(it.vencimento);
+    totalDesc += parseNum(it.desconto);
+    return `<tr>
+      <td>${it.codigo}</td>
+      <td>${it.descricao}</td>
+      <td class="num">${it.referencia}</td>
+      <td class="num">${it.vencimento}</td>
+      <td class="num">${it.desconto}</td>
+    </tr>`;
+  }).join('');
+
+  const liquido = totalVenc - totalDesc;
+
+  const salarioBase = document.getElementById('salarioBase').value;
+  const salContrInss = document.getElementById('salContrInss').value;
+  const baseFgts = document.getElementById('baseFgts').value;
+  const fgtsMes = document.getElementById('fgtsMes').value;
+  const baseIrrf = document.getElementById('baseIrrf').value;
+  const faixaIrrf = document.getElementById('faixaIrrf').value;
+
+  return `
+  <div class="recibo">
+    <div class="recibo-grid">
+      <div class="recibo-main">
+        <div class="rec-header">
+          <div class="empresa">
+            <div>${empresa}</div>
+            <div>CNPJ: ${cnpj}</div>
+          </div>
+          <div class="direita">
+            <div>Folha Mensal</div>
+            <div>${folhaRef}</div>
+          </div>
+        </div>
+        <div class="rec-sub">CC: ${cc} &nbsp;&nbsp; ${tipoFolha}</div>
+
+        <div class="rec-funcionario">
+          <div>
+            <div class="lbl">Código</div>
+            <div>${codFunc}</div>
+          </div>
+          <div>
+            <div class="lbl">Nome do Funcionário</div>
+            <div>${nomeFunc}</div>
+            <div>${cargo}</div>
+          </div>
+          <div>
+            <div class="lbl">CBO</div>
+            <div>${cbo}</div>
+            <div class="lbl">Departamento&nbsp;&nbsp;Filial</div>
+            <div>${depto}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${filial}</div>
+            <div class="lbl">Admissão</div>
+            <div>${admissao}</div>
+          </div>
+        </div>
+
+        <div class="rec-itens-wrap">
+          <table class="rec-itens">
+            <thead>
+              <tr>
+                <th style="width:40px;">Código</th>
+                <th>Descrição</th>
+                <th style="width:70px;">Referência</th>
+                <th style="width:85px;">Vencimentos</th>
+                <th style="width:85px;">Descontos</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${linhas}
+            </tbody>
+          </table>
+          <div class="rec-itens-fill"></div>
+        </div>
+
+        <div class="rec-totais">
+          <div>
+            <div class="lbl">Total de Vencimentos</div>
+            <div class="val">${fmt(totalVenc)}</div>
+          </div>
+          <div>
+            <div class="lbl">Total de Descontos</div>
+            <div class="val">${fmt(totalDesc)}</div>
+          </div>
+          <div class="rec-liquido">
+            <div>
+              <div class="lbl">Valor Líquido</div>
+            </div>
+            <div>
+              <div class="val">${fmt(liquido)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-rodape">
+          <div>
+            <div class="lbl">Salário Base</div>
+            <div class="val">${salarioBase?fmt(parseFloat(salarioBase)):''}</div>
+          </div>
+          <div>
+            <div class="lbl">Sal. Contr. INSS</div>
+            <div class="val">${salContrInss?fmt(parseFloat(salContrInss)):''}</div>
+          </div>
+          <div>
+            <div class="lbl">Base Cálc. FGTS</div>
+            <div class="val">${baseFgts?fmt(parseFloat(baseFgts)):''}</div>
+          </div>
+          <div>
+            <div class="lbl">F.G.T.S do Mês</div>
+            <div class="val">${fgtsMes?fmt(parseFloat(fgtsMes)):''}</div>
+          </div>
+          <div>
+            <div class="lbl">Base Cálc. IRRF</div>
+            <div class="val">${baseIrrf?fmt(parseFloat(baseIrrf)):''}</div>
+          </div>
+          <div>
+            <div class="lbl">Faixa IRRF</div>
+            <div class="val">${faixaIrrf?fmt(parseFloat(faixaIrrf)):''}</div>
+          </div>
+        </div>
+      </div>
+      <div class="recibo-side">
+        <span>Assinatura do Funcionário</span>
+        <span>Declaro ter recebido a importância líquida discriminada neste recibo. Data ____/____/____</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function atualizarPreview(){
+  const html = montarRecibo();
+  document.getElementById('reciboContainer1').innerHTML = html;
+  document.getElementById('reciboContainer2').innerHTML = html;
+}
+
+renderTabelaItens();
+atualizarPreview();
+</script>
+
+</body>
+</html>
