@@ -430,6 +430,12 @@
     #rotulo{ break-before:page; }
     .label-actions{ display:none; }
     .stamp-slot{ border-color:#999 !important; color:#666 !important; }
+
+    body.print-label-only .sheet > *:not(main){ display:none !important; }
+    body.print-label-only main > *:not(#rotulo){ display:none !important; }
+    body.print-label-only #rotulo > *:not(.label-mock){ display:none !important; }
+    body.print-label-only #rotulo{ break-before:auto !important; margin:0; padding:0; }
+    body.print-label-only .label-mock{ box-shadow:none; margin:0; }
     .checklist-wrap{ break-before:page; }
     footer{ background:#fff !important; color:#000 !important; }
     footer a{ color:#000 !important; }
@@ -601,6 +607,22 @@
       </div>
 
       <h3>Como obter o código de barras (GTIN/EAN)</h3>
+
+      <div class="note" style="background:var(--green-tint);border-left-color:var(--gold);">
+        <strong>O que você vai precisar reunir antes de começar:</strong>
+        <ul style="margin:0.5rem 0 0;padding-left:1.1rem;">
+          <li>CPF e RG</li>
+          <li>Cartão de produtor rural (ou documento equivalente que comprove a atividade) — costuma substituir a exigência de CNPJ para pequeno produtor</li>
+          <li>E-mail e telefone para abrir o cadastro na GS1 Brasil</li>
+          <li>Apresentações definidas do produto (ex: morango congelado 500 g, 1 kg) — cada peso ou embalagem diferente recebe um GTIN próprio</li>
+          <li>Escolha do plano de associação — faixas por porte/faturamento, com condições reduzidas para MEI, pequeno produtor e artesão (simular direto no site da GS1 Brasil)</li>
+          <li>Pagamento da anuidade do plano escolhido</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <strong>O que o código guarda:</strong> o GTIN de 13 dígitos (padrão EAN-13) é formado pelo prefixo do país (789 ou 790, indicando GS1 Brasil), o prefixo da sua empresa/produtor, o código do item que você mesmo define e um dígito verificador calculado automaticamente. Ele não contém nome do produto, peso nem tabela nutricional — só esse número. No rótulo, o número aparece escrito por extenso embaixo das barrinhas.
+      </div>
       <ol class="steps">
         <li>
           <span class="step-title">Associar-se à GS1 Brasil</span>
@@ -650,7 +672,7 @@
       <p>Um exemplo de como os elementos obrigatórios costumam ficar organizados juntos na embalagem, já com a logo enviada. Troque os textos entre colchetes pelos dados reais do seu produto antes de mandar para a gráfica.</p>
 
       <div class="label-actions">
-        <button class="print-btn" onclick="window.print()">Imprimir rótulo</button>
+        <button class="print-btn" onclick="printLabelOnly()">Imprimir rótulo</button>
       </div>
 
       <div class="label-mock">
@@ -776,5 +798,15 @@
   </footer>
 
 </div>
+
+<script>
+  function printLabelOnly(){
+    document.body.classList.add('print-label-only');
+    window.print();
+  }
+  window.addEventListener('afterprint', function(){
+    document.body.classList.remove('print-label-only');
+  });
+</script>
 </body>
 </html>
