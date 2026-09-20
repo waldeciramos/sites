@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Treino de Tabuada</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✖️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#e6ebf2;
+    --text:#33415c;
+    --subtle:#7b8794;
+    --light:#ffffff;
+    --dark:#b7c0cf;
+    --accent:#5b6eea;
+    --accent-dark:#4453c4;
+    --success:#2bb894;
+    --error:#ef6f6f;
+    --radius:22px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    font-family:'Nunito',system-ui,sans-serif;
+    color:var(--text);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:28px 16px 60px;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  input, textarea{ user-select:text; -webkit-user-select:text; }
+  .app{
+    width:100%;
+    max-width:560px;
+  }
+  .card{
+    background:var(--bg);
+    border-radius:var(--radius);
+    box-shadow:10px 10px 22px var(--dark), -10px -10px 22px var(--light);
+    padding:28px 26px;
+    margin-bottom:20px;
+  }
+  .flat{
+    box-shadow:none;
+  }
+  h1{
+    font-size:1.5rem;
+    font-weight:800;
+    margin:0 0 4px;
+    letter-spacing:.2px;
+  }
+  .subtitle{
+    color:var(--subtle);
+    font-weight:600;
+    font-size:.92rem;
+    margin:0 0 20px;
+  }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .neu-input{
+    width:100%;
+    border:none;
+    outline:none;
+    background:var(--bg);
+    border-radius:14px;
+    padding:14px 16px;
+    font-family:inherit;
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--text);
+    box-shadow:inset 5px 5px 10px var(--dark), inset -5px -5px 10px var(--light);
+    text-align:center;
+  }
+  .neu-input::placeholder{ color:var(--subtle); font-weight:600; }
+
+  .btn{
+    border:none;
+    outline:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:800;
+    font-size:1rem;
+    color:var(--text);
+    background:var(--bg);
+    border-radius:14px;
+    padding:14px 18px;
+    box-shadow:6px 6px 12px var(--dark), -6px -6px 12px var(--light);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{
+    box-shadow:inset 4px 4px 8px var(--dark), inset -4px -4px 8px var(--light);
+    transform:translateY(1px);
+  }
+  .btn.primary{
+    background:var(--accent);
+    color:#fff;
+    box-shadow:6px 6px 14px rgba(91,110,234,.45), -6px -6px 14px var(--light);
+  }
+  .btn.primary:active{
+    box-shadow:inset 4px 4px 8px var(--accent-dark), inset -4px -4px 8px rgba(255,255,255,.4);
+  }
+  .btn.block{ width:100%; }
+  .btn.small{ padding:10px 14px; font-size:.85rem; border-radius:12px; }
+  .btn.icon{
+    width:52px; height:52px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; padding:0;
+  }
+  .btn.icon.on{
+    background:var(--success); color:#fff;
+    box-shadow:6px 6px 14px rgba(43,184,148,.45), -6px -6px 14px var(--light);
+  }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+
+  .row{ display:flex; gap:10px; }
+  .row.wrap{ flex-wrap:wrap; }
+  .stack{ display:flex; flex-direction:column; gap:12px; }
+  .between{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+
+  .chip{
+    border:none;
+    background:var(--bg);
+    color:var(--text);
+    font-family:inherit;
+    font-weight:800;
+    font-size:.95rem;
+    border-radius:12px;
+    padding:10px 0;
+    width:52px;
+    cursor:pointer;
+    box-shadow:4px 4px 8px var(--dark), -4px -4px 8px var(--light);
+  }
+  .chip.selected{
+    background:var(--accent);
+    color:#fff;
+    box-shadow:inset 3px 3px 6px var(--accent-dark), inset -3px -3px 6px rgba(255,255,255,.35);
+  }
+
+  .toggle-group{ display:flex; gap:10px; }
+  .toggle-group .btn{ flex:1; }
+  .toggle-group .btn.active{
+    background:var(--accent); color:#fff;
+    box-shadow:inset 4px 4px 8px var(--accent-dark), inset -4px -4px 8px rgba(255,255,255,.35);
+  }
+
+  .mode-card{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+  }
+  .mode-card .emoji{
+    font-size:1.8rem;
+    width:56px; height:56px;
+    border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--bg);
+    box-shadow:inset 4px 4px 8px var(--dark), inset -4px -4px 8px var(--light);
+    flex-shrink:0;
+  }
+  .mode-card .txt strong{ display:block; font-size:1.02rem; }
+  .mode-card .txt span{ color:var(--subtle); font-weight:600; font-size:.85rem; }
+
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--bg);
+    box-shadow:inset 3px 3px 6px var(--dark), inset -3px -3px 6px var(--light);
+    border-radius:20px;
+    padding:6px 14px;
+    font-weight:700;
+    font-size:.82rem;
+    color:var(--subtle);
+  }
+
+  /* game screen */
+  .progress-track{
+    height:10px;
+    border-radius:8px;
+    background:var(--bg);
+    box-shadow:inset 3px 3px 6px var(--dark), inset -3px -3px 6px var(--light);
+    overflow:hidden;
+    margin-bottom:22px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--accent),var(--success));
+    width:0%;
+    transition:width .3s ease;
+  }
+  .question-box{
+    text-align:center;
+    padding:22px 10px 30px;
+  }
+  .question-box .op{
+    font-size:2.6rem;
+    font-weight:900;
+    letter-spacing:1px;
+  }
+  .question-box .op .x{ color:var(--accent); margin:0 10px; }
+  .feedback{
+    min-height:26px;
+    font-weight:800;
+    font-size:1rem;
+    margin-top:8px;
+  }
+  .feedback.ok{ color:var(--success); }
+  .feedback.no{ color:var(--error); }
+  .answer-row{
+    display:flex; gap:10px; align-items:center;
+    margin-top:6px;
+  }
+  .answer-row .neu-input{ flex:1; font-size:1.4rem; text-align:center; }
+  .listening{
+    animation:pulse 1s infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ box-shadow:6px 6px 14px rgba(239,111,111,.45), -6px -6px 14px var(--light); }
+    50%{ box-shadow:6px 6px 22px rgba(239,111,111,.7), -6px -6px 14px var(--light); }
+  }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:18px 0;
+  }
+  .stat-box{
+    text-align:center;
+    padding:14px 6px;
+    border-radius:16px;
+    background:var(--bg);
+    box-shadow:inset 4px 4px 8px var(--dark), inset -4px -4px 8px var(--light);
+  }
+  .stat-box .val{ font-size:1.3rem; font-weight:900; }
+  .stat-box .lbl{ font-size:.72rem; color:var(--subtle); font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+  table.rank{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.86rem;
+  }
+  table.rank th{
+    text-align:left;
+    color:var(--subtle);
+    font-weight:700;
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    padding-bottom:8px;
+  }
+  table.rank td{
+    padding:9px 4px;
+    font-weight:700;
+    border-top:1px solid rgba(183,192,207,.4);
+  }
+  table.rank td.pos{ color:var(--accent); font-weight:900; }
+
+  canvas.chart{ width:100%; height:170px; display:block; }
+
+  footer{
+    text-align:center;
+    color:var(--subtle);
+    font-size:.78rem;
+    font-weight:700;
+    line-height:1.6;
+    padding-top:6px;
+  }
+  footer strong{ color:var(--text); }
+
+  .back-link{
+    background:none; border:none; cursor:pointer;
+    color:var(--subtle); font-weight:800; font-family:inherit;
+    font-size:.85rem; padding:6px 0; margin-bottom:6px;
+  }
+
+  @media (max-width:420px){
+    .card{ padding:22px 18px; }
+    .question-box .op{ font-size:2.1rem; }
+    .chip{ width:44px; padding:8px 0; font-size:.85rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TELA 1: NOME DO JOGADOR -->
+  <section id="screen-welcome" class="screen active">
+    <div class="card">
+      <h1>Treino de Tabuada</h1>
+      <p class="subtitle">Escolha um nome de jogador para salvar suas estatísticas e ranking.</p>
+      <div class="stack">
+        <input id="input-nome" class="neu-input" placeholder="Seu nome" maxlength="18" autocomplete="off">
+        <button class="btn primary block" id="btn-comecar">Começar ▸</button>
+      </div>
+    </div>
+    <footer>Criado por <strong>Waldeci Ramos</strong> — ideia e desenvolvimento originais.</footer>
+  </section>
+
+  <!-- TELA 2: MENU DE MODOS -->
+  <section id="screen-menu" class="screen">
+    <div class="card">
+      <div class="between">
+        <div>
+          <h1 style="margin-bottom:2px;">Olá, <span id="menu-nome">Jogador</span> 👋</h1>
+          <p class="subtitle" style="margin-bottom:0;">Escolha como quer treinar hoje.</p>
+        </div>
+        <span class="badge" id="menu-melhor">—</span>
+      </div>
+    </div>
+
+    <div class="card stack">
+      <button class="btn mode-card" id="btn-modo-escolher">
+        <span class="emoji">🎯</span>
+        <span class="txt">
+          <strong>Escolher tabuadas</strong>
+          <span>Selecione as tabelas e o formato: sequencial ou aleatório</span>
+        </span>
+      </button>
+      <button class="btn mode-card" id="btn-modo-geral">
+        <span class="emoji">🎲</span>
+        <span class="txt">
+          <strong>Aleatório geral (3 a 9)</strong>
+          <span>Perguntas embaralhadas de todas as tabuadas de 3 a 9</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="card stack">
+      <div class="between">
+        <span style="font-weight:800;">🔊 Perguntar em voz alta</span>
+        <button class="btn icon" id="toggle-tts">🔇</button>
+      </div>
+      <div class="between">
+        <span style="font-weight:800;">🎙️ Responder por voz</span>
+        <button class="btn icon" id="toggle-stt">🔇</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="between" style="margin-bottom:14px;">
+        <h1 style="font-size:1.1rem; margin:0;">📊 Últimas partidas</h1>
+        <button class="btn small" id="btn-limpar">Limpar dados</button>
+      </div>
+      <div id="rank-wrap">
+        <p class="subtitle" id="rank-empty">Ainda não há partidas registradas.</p>
+        <table class="rank" id="rank-table" style="display:none;">
+          <thead><tr><th>#</th><th>Data</th><th>Modo</th><th>Acertos</th><th>Precisão</th><th>Tempo</th></tr></thead>
+          <tbody id="rank-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <footer>Criado por <strong>Waldeci Ramos</strong> — ideia e desenvolvimento originais.</footer>
+  </section>
+
+  <!-- TELA 3: SELEÇÃO DE TABUADAS -->
+  <section id="screen-select" class="screen">
+    <div class="card">
+      <button class="back-link" id="back-from-select">‹ Voltar</button>
+      <h1>Escolher tabuadas</h1>
+      <p class="subtitle">Toque para selecionar uma ou mais tabelas (1 a 10).</p>
+      <div class="row wrap" id="chips-tabuadas"></div>
+
+      <p class="subtitle" style="margin-top:20px; margin-bottom:8px;">Formato das perguntas</p>
+      <div class="toggle-group">
+        <button class="btn active" id="fmt-sequencial">Sequencial</button>
+        <button class="btn" id="fmt-aleatorio">Aleatório</button>
+      </div>
+
+      <button class="btn primary block" id="btn-iniciar-selecao" style="margin-top:22px;">Iniciar treino ▸</button>
+    </div>
+  </section>
+
+  <!-- TELA 4: JOGO -->
+  <section id="screen-game" class="screen">
+    <div class="card">
+      <div class="between" style="margin-bottom:10px;">
+        <span class="badge" id="game-contador">Pergunta 1/10</span>
+        <span class="badge" id="game-placar">✅ 0 &nbsp;|&nbsp; ❌ 0</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+      <div class="question-box">
+        <div class="op"><span id="q-a">3</span><span class="x">×</span><span id="q-b">4</span><span> = ?</span></div>
+        <div class="feedback" id="q-feedback"></div>
+      </div>
+
+      <div class="answer-row">
+        <input id="q-input" class="neu-input" type="tel" inputmode="numeric" placeholder="Sua resposta" autocomplete="off">
+        <button class="btn icon" id="btn-mic" title="Responder por voz">🎙️</button>
+        <button class="btn primary icon" id="btn-enviar" title="Enviar">➤</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TELA 5: RESULTADO -->
+  <section id="screen-result" class="screen">
+    <div class="card">
+      <h1 id="result-title">Resultado</h1>
+      <p class="subtitle" id="result-subtitle">Veja como você se saiu.</p>
+
+      <div class="stat-grid">
+        <div class="stat-box"><div class="val" id="r-acertos">0</div><div class="lbl">Acertos</div></div>
+        <div class="stat-box"><div class="val" id="r-precisao">0%</div><div class="lbl">Precisão</div></div>
+        <div class="stat-box"><div class="val" id="r-tempo">0s</div><div class="lbl">Tempo</div></div>
+      </div>
+
+      <canvas id="chart-tabuadas" class="chart"></canvas>
+
+      <div class="row" style="margin-top:20px;">
+        <button class="btn block" id="btn-refazer">Jogar de novo</button>
+        <button class="btn primary block" id="btn-menu">Menu</button>
+      </div>
+    </div>
+    <footer>Criado por <strong>Waldeci Ramos</strong> — ideia e desenvolvimento originais.</footer>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ======================= PROTEÇÃO BÁSICA (F12 / clique direito) =======================
+   Aviso: nenhuma proteção client-side impede 100% o acesso ao código-fonte de uma
+   página web. Isto apenas dificulta o uso casual do menu de contexto e atalhos comuns. */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  const k = e.key ? e.key.toUpperCase() : '';
+  if (k === 'F12') { e.preventDefault(); return; }
+  if (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(k)) { e.preventDefault(); return; }
+  if (e.ctrlKey && k === 'U') { e.preventDefault(); return; }
+});
+
+/* ============================= STORAGE ============================= */
+const STORAGE_KEY = 'tabuada_jogador_v1';
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { nome:'', jogos:[] };
+    const parsed = JSON.parse(raw);
+    if(!Array.isArray(parsed.jogos)) parsed.jogos = [];
+    return parsed;
+  }catch(e){ return { nome:'', jogos:[] }; }
+}
+function saveData(data){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let jogador = loadData();
+
+/* ============================= NAVEGAÇÃO ============================= */
+const screens = {
+  welcome: document.getElementById('screen-welcome'),
+  menu: document.getElementById('screen-menu'),
+  select: document.getElementById('screen-select'),
+  game: document.getElementById('screen-game'),
+  result: document.getElementById('screen-result'),
+};
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+/* ============================= ESTADO GLOBAL ============================= */
+let ttsOn = false;   // perguntar em voz alta
+let sttOn = false;   // responder por voz
+let recognition = null;
+let recognizing = false;
+
+let sessao = null; // { modo, tabuadas, formato, perguntas:[], indice, acertos, erros, tempos:[], porTabuada:{} }
+
+/* ============================= INICIALIZAÇÃO TELA 1 ============================= */
+const inputNome = document.getElementById('input-nome');
+inputNome.value = jogador.nome || '';
+
+document.getElementById('btn-comecar').addEventListener('click', () => {
+  const nome = inputNome.value.trim() || 'Jogador';
+  jogador.nome = nome;
+  saveData(jogador);
+  irParaMenu();
+});
+inputNome.addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('btn-comecar').click(); });
+
+/* Se já existe jogador salvo, pula direto pro menu */
+if(jogador.nome){
+  irParaMenu();
+}
+
+function irParaMenu(){
+  document.getElementById('menu-nome').textContent = jogador.nome || 'Jogador';
+  atualizarMelhorBadge();
+  atualizarRanking();
+  showScreen('menu');
+}
+
+function atualizarMelhorBadge(){
+  const el = document.getElementById('menu-melhor');
+  if(!jogador.jogos.length){ el.textContent = 'Primeira partida'; return; }
+  const melhor = jogador.jogos.reduce((m,j)=> j.precisao > m.precisao ? j : m, jogador.jogos[0]);
+  el.textContent = '🏆 melhor: ' + melhor.precisao + '%';
+}
+
+/* ============================= TOGGLES DE VOZ ============================= */
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+document.getElementById('toggle-tts').addEventListener('click', (e) => {
+  ttsOn = !ttsOn;
+  e.currentTarget.textContent = ttsOn ? '🔊' : '🔇';
+  e.currentTarget.classList.toggle('on', ttsOn);
+});
+document.getElementById('toggle-stt').addEventListener('click', (e) => {
+  if(!SpeechRecognitionAPI){
+    alert('Reconhecimento de voz não é suportado neste navegador. Tente usar o Chrome.');
+    return;
+  }
+  sttOn = !sttOn;
+  e.currentTarget.textContent = sttOn ? '🎙️' : '🔇';
+  e.currentTarget.classList.toggle('on', sttOn);
+  document.getElementById('btn-mic').style.display = sttOn ? 'flex' : 'none';
+});
+document.getElementById('btn-mic').style.display = 'none';
+
+/* ============================= SELEÇÃO DE TABUADAS ============================= */
+document.getElementById('btn-modo-escolher').addEventListener('click', () => {
+  montarChips();
+  showScreen('select');
+});
+document.getElementById('back-from-select').addEventListener('click', () => showScreen('menu'));
+
+let tabuadasSelecionadas = new Set();
+let formatoSelecao = 'sequencial';
+
+function montarChips(){
+  const wrap = document.getElementById('chips-tabuadas');
+  wrap.innerHTML = '';
+  for(let n=1; n<=10; n++){
+    const b = document.createElement('button');
+    b.className = 'chip' + (tabuadasSelecionadas.has(n) ? ' selected' : '');
+    b.textContent = n;
+    b.addEventListener('click', () => {
+      if(tabuadasSelecionadas.has(n)) tabuadasSelecionadas.delete(n);
+      else tabuadasSelecionadas.add(n);
+      b.classList.toggle('selected');
+    });
+    wrap.appendChild(b);
+  }
+}
+
+document.getElementById('fmt-sequencial').addEventListener('click', (e) => {
+  formatoSelecao = 'sequencial';
+  e.currentTarget.classList.add('active');
+  document.getElementById('fmt-aleatorio').classList.remove('active');
+});
+document.getElementById('fmt-aleatorio').addEventListener('click', (e) => {
+  formatoSelecao = 'aleatorio';
+  e.currentTarget.classList.add('active');
+  document.getElementById('fmt-sequencial').classList.remove('active');
+});
+
+document.getElementById('btn-iniciar-selecao').addEventListener('click', () => {
+  if(tabuadasSelecionadas.size === 0){
+    alert('Selecione pelo menos uma tabuada.');
+    return;
+  }
+  const tabuadas = Array.from(tabuadasSelecionadas).sort((a,b)=>a-b);
+  let perguntas = [];
+  tabuadas.forEach(t => {
+    for(let m=1; m<=10; m++) perguntas.push({a:t, b:m});
+  });
+  if(formatoSelecao === 'aleatorio') perguntas = embaralhar(perguntas);
+  iniciarSessao('Tabuadas escolhidas', tabuadas, perguntas);
+});
+
+/* ============================= MODO ALEATÓRIO GERAL ============================= */
+document.getElementById('btn-modo-geral').addEventListener('click', () => {
+  const tabuadas = [3,4,5,6,7,8,9];
+  let todas = [];
+  tabuadas.forEach(t => { for(let m=1; m<=10; m++) todas.push({a:t, b:m}); });
+  todas = embaralhar(todas);
+  const perguntas = todas.slice(0, 20); // 20 perguntas por partida
+  iniciarSessao('Aleatório geral (3–9)', tabuadas, perguntas);
+});
+
+function embaralhar(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ============================= SESSÃO DE JOGO ============================= */
+function iniciarSessao(modo, tabuadas, perguntas){
+  sessao = {
+    modo, tabuadas, perguntas,
+    indice: 0,
+    acertos: 0,
+    erros: 0,
+    tempos: [],
+    porTabuada: {},
+    inicioTotal: Date.now(),
+  };
+  tabuadas.forEach(t => sessao.porTabuada[t] = {acertos:0, total:0});
+  showScreen('game');
+  mostrarPergunta();
+}
+
+let inicioPergunta = 0;
+let travado = false;
+
+function mostrarPergunta(){
+  travado = false;
+  const p = sessao.perguntas[sessao.indice];
+  document.getElementById('q-a').textContent = p.a;
+  document.getElementById('q-b').textContent = p.b;
+  document.getElementById('q-feedback').textContent = '';
+  document.getElementById('q-feedback').className = 'feedback';
+  document.getElementById('game-contador').textContent = `Pergunta ${sessao.indice+1}/${sessao.perguntas.length}`;
+  document.getElementById('game-placar').textContent = `✅ ${sessao.acertos}  |  ❌ ${sessao.erros}`;
+  document.getElementById('progress-fill').style.width = Math.round((sessao.indice / sessao.perguntas.length) * 100) + '%';
+  const input = document.getElementById('q-input');
+  input.value = '';
+  input.disabled = false;
+  input.focus();
+  inicioPergunta = Date.now();
+
+  if(ttsOn && 'speechSynthesis' in window){
+    try{
+      const utter = new SpeechSynthesisUtterance(`Quanto é ${p.a} vezes ${p.b}?`);
+      utter.lang = 'pt-BR';
+      utter.rate = 1;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }catch(e){}
+  }
+}
+
+document.getElementById('btn-enviar').addEventListener('click', enviarResposta);
+document.getElementById('q-input').addEventListener('keydown', e => { if(e.key === 'Enter') enviarResposta(); });
+
+function enviarResposta(){
+  if(travado) return;
+  const input = document.getElementById('q-input');
+  const valor = parseInt(input.value.replace(/[^\d-]/g,''), 10);
+  if(isNaN(valor)) { input.focus(); return; }
+  julgarResposta(valor);
+}
+
+function julgarResposta(valor){
+  travado = true;
+  const p = sessao.perguntas[sessao.indice];
+  const correta = p.a * p.b;
+  const tempoMs = Date.now() - inicioPergunta;
+  sessao.tempos.push(tempoMs);
+  const acertou = valor === correta;
+  const stats = sessao.porTabuada[p.a] || (sessao.porTabuada[p.a] = {acertos:0,total:0});
+  stats.total++;
+  if(acertou){
+    sessao.acertos++;
+    stats.acertos++;
+  }else{
+    sessao.erros++;
+  }
+  const fb = document.getElementById('q-feedback');
+  if(acertou){
+    fb.textContent = '✔ Certo!';
+    fb.className = 'feedback ok';
+  }else{
+    fb.textContent = `✘ Errado — resposta certa: ${correta}`;
+    fb.className = 'feedback no';
+  }
+  document.getElementById('q-input').disabled = true;
+  document.getElementById('game-placar').textContent = `✅ ${sessao.acertos}  |  ❌ ${sessao.erros}`;
+
+  setTimeout(() => {
+    sessao.indice++;
+    if(sessao.indice >= sessao.perguntas.length){
+      finalizarSessao();
+    }else{
+      mostrarPergunta();
+    }
+  }, 1000);
+}
+
+function finalizarSessao(){
+  const total = sessao.perguntas.length;
+  const precisao = Math.round((sessao.acertos / total) * 100);
+  const tempoTotalMs = Date.now() - sessao.inicioTotal;
+
+  const registro = {
+    data: new Date().toISOString(),
+    modo: sessao.modo,
+    tabuadas: sessao.tabuadas,
+    acertos: sessao.acertos,
+    total,
+    precisao,
+    tempoTotalMs,
+    porTabuada: sessao.porTabuada,
+  };
+  jogador.jogos.unshift(registro);
+  jogador.jogos = jogador.jogos.slice(0, 20); // guarda histórico, ranking mostra os 5 últimos
+  saveData(jogador);
+
+  mostrarResultado(registro);
+}
+
+/* ============================= TELA DE RESULTADO ============================= */
+function mostrarResultado(registro){
+  document.getElementById('result-title').textContent =
+    registro.precisao >= 80 ? '🎉 Mandou bem!' : (registro.precisao >= 50 ? '👍 Bom treino!' : '💪 Continue treinando!');
+  document.getElementById('result-subtitle').textContent = registro.modo;
+  document.getElementById('r-acertos').textContent = `${registro.acertos}/${registro.total}`;
+  document.getElementById('r-precisao').textContent = registro.precisao + '%';
+  document.getElementById('r-tempo').textContent = formatarTempo(registro.tempoTotalMs);
+
+  desenharGrafico(registro.porTabuada);
+  showScreen('result');
+  atualizarMelhorBadge();
+  atualizarRanking();
+}
+
+function formatarTempo(ms){
+  const s = Math.round(ms/1000);
+  if(s < 60) return s + 's';
+  const m = Math.floor(s/60), r = s%60;
+  return `${m}m${r.toString().padStart(2,'0')}s`;
+}
+
+document.getElementById('btn-refazer').addEventListener('click', () => {
+  if(!sessao) { showScreen('menu'); return; }
+  const perguntas = sessao.modo === 'Aleatório geral (3–9)'
+    ? (() => { let t=[]; sessao.tabuadas.forEach(x=>{for(let m=1;m<=10;m++)t.push({a:x,b:m});}); return embaralhar(t).slice(0,20); })()
+    : embaralhar(sessao.perguntas.slice());
+  iniciarSessao(sessao.modo, sessao.tabuadas, perguntas);
+});
+document.getElementById('btn-menu').addEventListener('click', irParaMenu);
+
+/* ============================= GRÁFICO (canvas nativo) ============================= */
+function desenharGrafico(porTabuada){
+  const canvas = document.getElementById('chart-tabuadas');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width || 500, h = 170;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,w,h);
+
+  const entradas = Object.keys(porTabuada).map(Number).sort((a,b)=>a-b);
+  if(entradas.length === 0) return;
+
+  const padding = 26;
+  const chartW = w - padding*2;
+  const chartH = h - 40;
+  const barGap = 10;
+  const barW = Math.max(14, (chartW - barGap*(entradas.length-1)) / entradas.length);
+
+  ctx.font = '700 11px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+
+  entradas.forEach((t, i) => {
+    const stat = porTabuada[t];
+    const pct = stat.total ? stat.acertos / stat.total : 0;
+    const barH = Math.max(4, pct * chartH);
+    const x = padding + i * (barW + barGap);
+    const y = padding + (chartH - barH);
+
+    const grad = ctx.createLinearGradient(0, y, 0, y+barH);
+    if(pct >= 0.8){ grad.addColorStop(0,'#2bb894'); grad.addColorStop(1,'#38d9a9'); }
+    else if(pct >= 0.5){ grad.addColorStop(0,'#5b6eea'); grad.addColorStop(1,'#7d8bf0'); }
+    else{ grad.addColorStop(0,'#ef6f6f'); grad.addColorStop(1,'#f39a9a'); }
+
+    ctx.fillStyle = grad;
+    roundRect(ctx, x, y, barW, barH, 6);
+    ctx.fill();
+
+    ctx.fillStyle = '#33415c';
+    ctx.fillText('×' + t, x + barW/2, padding + chartH + 16);
+    ctx.fillStyle = '#7b8794';
+    ctx.fillText(Math.round(pct*100) + '%', x + barW/2, y - 6 < 10 ? 10 : y - 6);
+  });
+}
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+/* ============================= RANKING (últimas 5 partidas) ============================= */
+function atualizarRanking(){
+  const empty = document.getElementById('rank-empty');
+  const tableEl = document.getElementById('rank-table');
+  const body = document.getElementById('rank-body');
+  const ultimos5 = jogador.jogos.slice(0, 5);
+
+  if(ultimos5.length === 0){
+    empty.style.display = 'block';
+    tableEl.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  tableEl.style.display = 'table';
+
+  const ordenado = ultimos5.slice().sort((a,b) => b.precisao - a.precisao);
+
+  body.innerHTML = '';
+  ordenado.forEach((j, i) => {
+    const tr = document.createElement('tr');
+    const dataFmt = new Date(j.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+    tr.innerHTML = `
+      <td class="pos">${i+1}º</td>
+      <td>${dataFmt}</td>
+      <td>${j.modo.includes('geral') ? 'Geral' : 'Escolhida'}</td>
+      <td>${j.acertos}/${j.total}</td>
+      <td>${j.precisao}%</td>
+      <td>${formatarTempo(j.tempoTotalMs)}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+document.getElementById('btn-limpar').addEventListener('click', () => {
+  if(confirm('Apagar nome, histórico e ranking salvos neste dispositivo?')){
+    localStorage.removeItem(STORAGE_KEY);
+    jogador = { nome:'', jogos:[] };
+    inputNome.value = '';
+    showScreen('welcome');
+  }
+});
+
+/* ============================= RECONHECIMENTO DE VOZ (responder falando) ============================= */
+const NUM_PALAVRAS = {
+  'zero':0,'um':1,'uma':1,'dois':2,'duas':2,'três':3,'tres':3,'quatro':4,'cinco':5,'seis':6,
+  'sete':7,'oito':8,'nove':9,'dez':10,'onze':11,'doze':12,'treze':13,'catorze':14,'quatorze':14,
+  'quinze':15,'dezesseis':16,'dezessete':17,'dezoito':18,'dezenove':19,'vinte':20,'trinta':30,
+  'quarenta':40,'cinquenta':50,'sessenta':60,'setenta':70,'oitenta':80,'noventa':90,'cem':100
+};
+function palavrasParaNumero(texto){
+  const limpo = texto.toLowerCase().trim();
+  const direto = limpo.match(/\d+/);
+  if(direto) return parseInt(direto[0], 10);
+
+  const partes = limpo.replace(/-/g,' ').split(/\s+e\s+|\s+/).filter(Boolean);
+  let total = null;
+  for(const parte of partes){
+    if(parte in NUM_PALAVRAS){
+      const v = NUM_PALAVRAS[parte];
+      if(total === null) total = v;
+      else if(total % 10 === 0 && total < 100) total += v;
+      else total = v;
+    }
+  }
+  return total;
+}
+
+if(SpeechRecognitionAPI){
+  recognition = new SpeechRecognitionAPI();
+  recognition.lang = 'pt-BR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const numero = palavrasParaNumero(transcript);
+    document.getElementById('q-input').value = numero !== null ? numero : transcript;
+    if(numero !== null) enviarResposta();
+  };
+  recognition.onend = () => {
+    recognizing = false;
+    document.getElementById('btn-mic').classList.remove('listening');
+  };
+  recognition.onerror = () => {
+    recognizing = false;
+    document.getElementById('btn-mic').classList.remove('listening');
+  };
+}
+
+document.getElementById('btn-mic').addEventListener('click', () => {
+  if(!recognition) return;
+  if(recognizing){
+    recognition.stop();
+    return;
+  }
+  try{
+    recognizing = true;
+    document.getElementById('btn-mic').classList.add('listening');
+    recognition.start();
+  }catch(e){ recognizing = false; }
+});
+
+})();
+</script>
+</body>
+</html>
