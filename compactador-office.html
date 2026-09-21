@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compactador de Documentos — Waldeci Ramos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --paper: #EEF1F0;
+    --card: #FFFFFF;
+    --ink: #16211D;
+    --ink-soft: #52645C;
+    --line: #D6DED9;
+    --moss: #1F6F4E;
+    --moss-deep: #164F38;
+    --moss-tint: #E4F0E9;
+    --clay: #C4622C;
+    --clay-tint: #FBEAE0;
+    --danger: #B3402B;
+    --shadow: rgba(22, 33, 29, 0.08);
+  }
+
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #12161A;
+      --card: #1B2126;
+      --ink: #E9EEEA;
+      --ink-soft: #9AABA2;
+      --line: #2B3339;
+      --moss: #4CB585;
+      --moss-deep: #6FCE9F;
+      --moss-tint: #1B3128;
+      --clay: #E0895A;
+      --clay-tint: #2E2018;
+      --danger: #E27B63;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #12161A;
+    --card: #1B2126;
+    --ink: #E9EEEA;
+    --ink-soft: #9AABA2;
+    --line: #2B3339;
+    --moss: #4CB585;
+    --moss-deep: #6FCE9F;
+    --moss-tint: #1B3128;
+    --clay: #E0895A;
+    --clay-tint: #2E2018;
+    --danger: #E27B63;
+    --shadow: rgba(0, 0, 0, 0.4);
+  }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono { font-family: 'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 20px 64px;
+  }
+
+  header.top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .brandmark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brandmark .glyph {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--moss);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .brandmark .glyph svg { width: 24px; height: 24px; }
+
+  h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 0 0 2px;
+    letter-spacing: -0.01em;
+  }
+
+  .tagline {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  .credit {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    text-align: right;
+    line-height: 1.5;
+    padding-top: 6px;
+  }
+  .credit strong { color: var(--ink); font-weight: 700; }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px var(--shadow);
+  }
+
+  .quality-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .quality-row label {
+    font-weight: 700;
+    font-size: 0.88rem;
+    flex-shrink: 0;
+    width: 130px;
+  }
+
+  input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--moss);
+    cursor: pointer;
+    border: 3px solid var(--card);
+    box-shadow: 0 0 0 1px var(--moss);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--moss);
+    cursor: pointer;
+    border: 3px solid var(--card);
+    box-shadow: 0 0 0 1px var(--moss);
+  }
+
+  .quality-val {
+    width: 48px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .quality-hint {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    margin: 10px 0 0 146px;
+  }
+  @media (max-width: 480px) {
+    .quality-row { flex-wrap: wrap; }
+    .quality-hint { margin-left: 0; }
+  }
+
+  .dropzone {
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    padding: 38px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .dropzone.drag {
+    border-color: var(--moss);
+    background: var(--moss-tint);
+  }
+  .dropzone svg { width: 34px; height: 34px; color: var(--ink-soft); margin-bottom: 10px; }
+  .dropzone .ttl { font-weight: 700; margin-bottom: 4px; }
+  .dropzone .sub { color: var(--ink-soft); font-size: 0.84rem; }
+  .dropzone .exts {
+    margin-top: 14px;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+  }
+  .exts span {
+    display: inline-block;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin: 2px;
+  }
+
+  input[type="file"] { display: none; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--moss);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .btn:hover { background: var(--moss-deep); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn.ghost {
+    background: transparent;
+    color: var(--moss-deep);
+    border: 1px solid var(--moss);
+  }
+  .btn.ghost:hover { background: var(--moss-tint); }
+  .btn.small { padding: 7px 12px; font-size: 0.78rem; }
+
+  .results-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .results-head h2 {
+    font-size: 0.95rem;
+    margin: 0;
+    font-weight: 800;
+  }
+
+  .file-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+  }
+  .file-row:first-of-type { border-top: none; padding-top: 4px; }
+
+  .file-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: var(--ink-soft);
+  }
+
+  .file-info { flex: 1; min-width: 0; }
+  .file-name {
+    font-weight: 700;
+    font-size: 0.86rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .file-meta {
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .file-meta .reduce { color: var(--moss-deep); font-weight: 700; }
+  .file-meta .same { color: var(--ink-soft); }
+
+  .progress-track {
+    height: 4px;
+    background: var(--line);
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--clay);
+    transition: width .2s ease;
+  }
+  .file-row.done .progress-fill { background: var(--moss); }
+
+  .file-action { flex-shrink: 0; }
+
+  .empty-note {
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    text-align: center;
+    padding: 6px 0 2px;
+  }
+
+  .totals {
+    display: flex;
+    gap: 22px;
+    margin-top: 6px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .totals .stat .num {
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+  .totals .stat.reduce .num { color: var(--moss-deep); }
+  .totals .stat .lbl {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  footer.note {
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-top: 26px;
+    line-height: 1.6;
+  }
+
+  ::selection { background: var(--moss-tint); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brandmark">
+      <div class="glyph">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+          <polyline points="13 2 13 9 20 9"/>
+          <path d="M9 15l3 3 3-3"/>
+          <path d="M12 12v6"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Compactador de Documentos</h1>
+        <p class="tagline">Reduz o tamanho de documentos do Word, Excel e LibreOffice comprimindo as imagens internas, e também comprime fotos e imagens soltas (JPG, PNG, WEBP) — sem perder qualidade visível. Ideal para envio por e-mail.</p>
+      </div>
+    </div>
+    <div class="credit">ferramenta criada por<br><strong>Waldeci Ramos</strong></div>
+  </header>
+
+  <section class="panel">
+    <div class="quality-row">
+      <label for="quality">Compressão</label>
+      <input type="range" id="quality" min="40" max="95" value="78" step="1">
+      <div class="quality-val mono"><span id="qualityVal">78</span>%</div>
+    </div>
+    <p class="quality-hint">Valores mais altos preservam mais qualidade e reduzem menos o tamanho. 75–85% costuma ser o melhor equilíbrio.</p>
+  </section>
+
+  <section class="panel">
+    <div class="dropzone" id="dropzone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <div class="ttl">Arraste os arquivos aqui</div>
+      <div class="sub">ou clique para selecionar do computador</div>
+      <div class="exts">
+        <span>.docx</span><span>.xlsx</span><span>.pptx</span><span>.odt</span><span>.ods</span><span>.odp</span><span>.jpg</span><span>.png</span><span>.webp</span><span>.bmp</span>
+      </div>
+    </div>
+    <input type="file" id="fileInput" multiple accept=".docx,.xlsx,.pptx,.odt,.ods,.odp,.dotx,.xltx,.potx,.jpg,.jpeg,.png,.webp,.bmp">
+  </section>
+
+  <section class="panel" id="resultsPanel" style="display:none;">
+    <div class="results-head">
+      <h2>Arquivos</h2>
+      <button class="btn ghost small" id="clearBtn">Limpar lista</button>
+    </div>
+    <div id="fileList"></div>
+    <div class="totals" id="totals" style="display:none;">
+      <div class="stat"><div class="num mono" id="totOriginal">—</div><div class="lbl">Tamanho original</div></div>
+      <div class="stat"><div class="num mono" id="totNew">—</div><div class="lbl">Tamanho final</div></div>
+      <div class="stat reduce"><div class="num mono" id="totReduce">—</div><div class="lbl">Redução total</div></div>
+    </div>
+  </section>
+
+  <footer class="note">
+    Todo o processamento acontece no seu navegador — nenhum arquivo é enviado a servidores.<br>
+    Compatível com documentos do Microsoft Office e do LibreOffice.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Bloqueio de F12 / inspeção / menu de contexto ----------
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  document.addEventListener('keydown', function (e) {
+    var k = (e.key || '').toUpperCase();
+    if (k === 'F12') { e.preventDefault(); return; }
+    if (e.ctrlKey && e.shiftKey && (k === 'I' || k === 'J' || k === 'C')) { e.preventDefault(); return; }
+    if (e.ctrlKey && k === 'U') { e.preventDefault(); return; }
+  });
+
+  // ---------- Elementos ----------
+  var dropzone = document.getElementById('dropzone');
+  var fileInput = document.getElementById('fileInput');
+  var qualitySlider = document.getElementById('quality');
+  var qualityVal = document.getElementById('qualityVal');
+  var resultsPanel = document.getElementById('resultsPanel');
+  var fileList = document.getElementById('fileList');
+  var clearBtn = document.getElementById('clearBtn');
+  var totalsEl = document.getElementById('totals');
+  var totOriginal = document.getElementById('totOriginal');
+  var totNew = document.getElementById('totNew');
+  var totReduce = document.getElementById('totReduce');
+
+  var MAX_DIM = 1920; // maior lado, em pixels, após redimensionamento
+  var IMAGE_RE = /(word\/media|xl\/media|ppt\/media|Pictures)\/[^/]+\.(jpe?g|png)$/i;
+  var OFFICE_EXTS = ['docx', 'xlsx', 'pptx', 'odt', 'ods', 'odp', 'dotx', 'xltx', 'potx'];
+  var IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'bmp'];
+
+  function isOfficeFile(file) { return OFFICE_EXTS.indexOf(extOf(file.name)) !== -1; }
+  function isImageFile(file) { return IMAGE_EXTS.indexOf(extOf(file.name)) !== -1; }
+
+  function pickOutputMime(ext) {
+    if (ext === 'png') return 'image/png';
+    if (ext === 'webp') return 'image/webp';
+    return 'image/jpeg'; // jpg, jpeg, bmp
+  }
+  function extForMime(mime) {
+    if (mime === 'image/png') return 'png';
+    if (mime === 'image/webp') return 'webp';
+    return 'jpg';
+  }
+
+  qualitySlider.addEventListener('input', function () {
+    qualityVal.textContent = qualitySlider.value;
+  });
+
+  dropzone.addEventListener('click', function () { fileInput.click(); });
+  ['dragenter', 'dragover'].forEach(function (evt) {
+    dropzone.addEventListener(evt, function (e) {
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.add('drag');
+    });
+  });
+  ['dragleave', 'drop'].forEach(function (evt) {
+    dropzone.addEventListener(evt, function (e) {
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.remove('drag');
+    });
+  });
+  dropzone.addEventListener('drop', function (e) {
+    var files = e.dataTransfer.files;
+    if (files && files.length) handleFiles(files);
+  });
+  fileInput.addEventListener('change', function () {
+    if (fileInput.files && fileInput.files.length) handleFiles(fileInput.files);
+    fileInput.value = '';
+  });
+
+  clearBtn.addEventListener('click', function () {
+    fileList.innerHTML = '';
+    resultsPanel.style.display = 'none';
+    totalsEl.style.display = 'none';
+    runningTotals.original = 0;
+    runningTotals.compressed = 0;
+  });
+
+  var runningTotals = { original: 0, compressed: 0 };
+
+  function fmtBytes(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1024 * 1024) return (n / 1024).toFixed(0) + ' KB';
+    return (n / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+
+  function extOf(name) {
+    var m = /\.([a-z0-9]+)$/i.exec(name);
+    return m ? m[1].toLowerCase() : '';
+  }
+
+  function handleFiles(fileArr) {
+    resultsPanel.style.display = 'block';
+    var arr = Array.prototype.slice.call(fileArr);
+    arr.forEach(function (file) { processFile(file); });
+  }
+
+  function updateTotals() {
+    if (runningTotals.original <= 0) { totalsEl.style.display = 'none'; return; }
+    totalsEl.style.display = 'flex';
+    totOriginal.textContent = fmtBytes(runningTotals.original);
+    totNew.textContent = fmtBytes(runningTotals.compressed);
+    var pct = runningTotals.original > 0
+      ? Math.max(0, (1 - runningTotals.compressed / runningTotals.original) * 100)
+      : 0;
+    totReduce.textContent = '-' + pct.toFixed(0) + '%';
+  }
+
+  function processFile(file) {
+    var row = document.createElement('div');
+    row.className = 'file-row';
+    row.innerHTML =
+      '<div class="file-icon">' + extOf(file.name).toUpperCase() + '</div>' +
+      '<div class="file-info">' +
+        '<div class="file-name">' + escapeHtml(file.name) + '</div>' +
+        '<div class="file-meta">Comprimindo… ' + fmtBytes(file.size) + '</div>' +
+        '<div class="progress-track"><div class="progress-fill"></div></div>' +
+      '</div>' +
+      '<div class="file-action"></div>';
+    fileList.appendChild(row);
+
+    var fill = row.querySelector('.progress-fill');
+    var meta = row.querySelector('.file-meta');
+    var actionCell = row.querySelector('.file-action');
+    var quality = parseInt(qualitySlider.value, 10) / 100;
+
+    var task;
+    if (isOfficeFile(file)) {
+      task = compressOfficeFile(file, quality, function (pct) {
+        fill.style.width = Math.min(95, pct) + '%';
+      });
+    } else if (isImageFile(file)) {
+      fill.style.width = '40%';
+      task = compressStandaloneImage(file, quality);
+    } else {
+      task = Promise.reject(new Error('tipo de arquivo não suportado'));
+    }
+
+    task.then(function (result) {
+      row.classList.add('done');
+      fill.style.width = '100%';
+      var saved = file.size - result.blob.size;
+      var pct = file.size > 0 ? (saved / file.size) * 100 : 0;
+      var outName = result.fileName || file.name;
+
+      if (saved > 1024 && pct > 1) {
+        meta.innerHTML = fmtBytes(file.size) + ' &rarr; ' + fmtBytes(result.blob.size) +
+          ' &nbsp; <span class="reduce">-' + pct.toFixed(0) + '%</span>' +
+          (result.imagesFound === 0 ? ' <span class="same">(sem imagens compactáveis)</span>' : '');
+        runningTotals.original += file.size;
+        runningTotals.compressed += result.blob.size;
+      } else {
+        meta.innerHTML = fmtBytes(file.size) + ' &nbsp; <span class="same">já está no tamanho ideal</span>';
+        runningTotals.original += file.size;
+        runningTotals.compressed += file.size;
+        outName = file.name;
+      }
+      updateTotals();
+
+      var url = URL.createObjectURL(saved > 1024 && pct > 1 ? result.blob : file);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = (saved > 1024 && pct > 1 ? 'compactado-' : '') + outName;
+      a.className = 'btn small';
+      a.textContent = 'Baixar';
+      actionCell.appendChild(a);
+    }).catch(function (err) {
+      row.classList.add('done');
+      meta.innerHTML = '<span style="color:var(--danger)">Não foi possível processar este arquivo (' +
+        (err && err.message ? escapeHtml(err.message) : 'formato inválido') + ')</span>';
+      fill.style.background = 'var(--danger)';
+      fill.style.width = '100%';
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // ---------- Núcleo: abre o pacote ZIP do arquivo Office e recomprime as imagens ----------
+  function compressOfficeFile(file, quality, onProgress) {
+    return file.arrayBuffer().then(function (buf) {
+      return JSZip.loadAsync(buf);
+    }).then(function (zip) {
+      var targets = [];
+      zip.forEach(function (relPath, entry) {
+        if (!entry.dir && IMAGE_RE.test(relPath)) targets.push(relPath);
+      });
+
+      if (targets.length === 0) {
+        return file.arrayBuffer().then(function (buf2) {
+          return { blob: new Blob([buf2], { type: file.type }), imagesFound: 0 };
+        });
+      }
+
+      var done = 0;
+      var chain = Promise.resolve();
+      targets.forEach(function (path) {
+        chain = chain.then(function () {
+          return zip.file(path).async('blob').then(function (imgBlob) {
+            return recompressImage(imgBlob, path, quality);
+          }).then(function (newBlob) {
+            done++;
+            if (onProgress) onProgress((done / targets.length) * 90);
+            if (newBlob && newBlob.size < imgBlob.size) {
+              return zip.file(path).async('arraybuffer').then(function () {
+                zip.file(path, newBlob);
+              });
+            }
+          }).catch(function () {
+            done++;
+            if (onProgress) onProgress((done / targets.length) * 90);
+          });
+        });
+      });
+
+      return chain.then(function () {
+        return zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+      }).then(function (blob) {
+        return { blob: blob, imagesFound: targets.length };
+      });
+    });
+  }
+
+  function recompressImage(blob, path, quality) {
+    var isPng = /\.png$/i.test(path);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) { URL.revokeObjectURL(url); resolve(null); return; }
+
+        var scale = Math.min(1, MAX_DIM / Math.max(w, h));
+        var tw = Math.max(1, Math.round(w * scale));
+        var th = Math.max(1, Math.round(h * scale));
+
+        var canvas = document.createElement('canvas');
+        canvas.width = tw;
+        canvas.height = th;
+        var ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        if (isPng) {
+          // mantém transparência: fundo branco não é aplicado
+          ctx.clearRect(0, 0, tw, th);
+        }
+        ctx.drawImage(img, 0, 0, tw, th);
+        URL.revokeObjectURL(url);
+
+        var mime = isPng ? 'image/png' : 'image/jpeg';
+        canvas.toBlob(function (outBlob) {
+          resolve(outBlob);
+        }, mime, isPng ? undefined : quality);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('imagem inválida')); };
+      img.src = url;
+    });
+  }
+
+  // ---------- Compressão de uma foto/imagem solta (JPG, PNG, WEBP, BMP) ----------
+  function compressStandaloneImage(file, quality) {
+    var ext = extOf(file.name);
+    var outMime = pickOutputMime(ext);
+    var hasAlpha = ext === 'png' || ext === 'webp';
+
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) { URL.revokeObjectURL(url); reject(new Error('imagem inválida')); return; }
+
+        var scale = Math.min(1, MAX_DIM / Math.max(w, h));
+        var tw = Math.max(1, Math.round(w * scale));
+        var th = Math.max(1, Math.round(h * scale));
+
+        var canvas = document.createElement('canvas');
+        canvas.width = tw;
+        canvas.height = th;
+        var ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        if (!hasAlpha) {
+          // jpg/bmp não têm canal alfa: preenche fundo branco antes de desenhar
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, tw, th);
+        } else {
+          ctx.clearRect(0, 0, tw, th);
+        }
+        ctx.drawImage(img, 0, 0, tw, th);
+        URL.revokeObjectURL(url);
+
+        canvas.toBlob(function (outBlob) {
+          if (!outBlob) { reject(new Error('falha ao gerar imagem')); return; }
+          var base = file.name.replace(/\.[^/.]+$/, '');
+          resolve({
+            blob: outBlob,
+            imagesFound: 1,
+            fileName: base + '.' + extForMime(outMime)
+          });
+        }, outMime, outMime === 'image/png' ? undefined : quality);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('imagem inválida')); };
+      img.src = url;
+    });
+  }
+})();
+</script>
+</body>
+</html>
