@@ -289,6 +289,38 @@
     .question-box .op{ font-size:2.1rem; }
     .chip{ width:44px; padding:8px 0; font-size:.85rem; }
   }
+
+  /* ===== Relatório de impressão / PDF ===== */
+  #print-report{ display:none; }
+  @media print{
+    body *{ visibility:hidden; }
+    #print-report, #print-report *{ visibility:visible; }
+    #print-report{
+      display:block;
+      position:absolute; left:0; top:0; width:100%;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#22304a;
+      background:#fff;
+    }
+    @page{ margin:16mm 14mm; }
+    #print-report header{
+      display:flex; justify-content:space-between; align-items:flex-end;
+      border-bottom:3px solid #5b6eea; padding-bottom:12px; margin-bottom:18px;
+    }
+    #print-report header h1{ margin:0; font-size:1.3rem; }
+    #print-report header .meta{ text-align:right; font-size:.8rem; color:#556; line-height:1.5; }
+    #print-report .stats{ display:flex; gap:14px; margin-bottom:18px; }
+    #print-report .stat{ flex:1; border:1px solid #d8deea; border-radius:10px; padding:10px; text-align:center; }
+    #print-report .stat b{ display:block; font-size:1.25rem; }
+    #print-report .stat span{ font-size:.65rem; color:#667; text-transform:uppercase; letter-spacing:.3px; }
+    #print-report h2{ font-size:.95rem; margin:18px 0 8px; border-left:4px solid #5b6eea; padding-left:8px; }
+    #print-report table{ width:100%; border-collapse:collapse; font-size:.78rem; margin-bottom:8px; }
+    #print-report th, #print-report td{ border:1px solid #dde3ee; padding:5px 7px; text-align:left; }
+    #print-report th{ background:#f1f3fa; }
+    #print-report tr{ page-break-inside:avoid; }
+    #print-report img.chart-img{ max-width:100%; margin:6px 0; border:1px solid #dde3ee; border-radius:8px; }
+    #print-report footer{ margin-top:20px; border-top:1px solid #dde3ee; padding-top:8px; font-size:.7rem; color:#667; text-align:center; }
+  }
 </style>
 </head>
 <body>
@@ -417,7 +449,9 @@
 
       <canvas id="chart-tabuadas" class="chart"></canvas>
 
-      <div class="row" style="margin-top:20px;">
+      <button class="btn block" id="btn-imprimir" style="margin-top:16px;">🖨️ Salvar / imprimir relatório (PDF)</button>
+
+      <div class="row" style="margin-top:12px;">
         <button class="btn block" id="btn-refazer">Jogar de novo</button>
         <button class="btn primary block" id="btn-menu">Menu</button>
       </div>
@@ -426,6 +460,8 @@
   </section>
 
 </div>
+
+<div id="print-report"></div>
 
 <script>
 (function(){
@@ -478,7 +514,6 @@ function showScreen(name){
 let ttsOn = false;   // perguntar em voz alta
 let sttOn = false;   // responder por voz
 let recognition = null;
-let recognizing = false;
 
 let sessao = null; // { modo, tabuadas, formato, perguntas:[], indice, acertos, erros, tempos:[], porTabuada:{} }
 
@@ -611,6 +646,7 @@ function iniciarSessao(modo, tabuadas, perguntas){
     acertos: 0,
     erros: 0,
     tempos: [],
+    detalhes: [],
     porTabuada: {},
     inicioTotal: Date.now(),
   };
@@ -675,6 +711,7 @@ function julgarResposta(valor){
   }else{
     sessao.erros++;
   }
+  sessao.detalhes.push({a:p.a, b:p.b, correta, resposta:valor, acertou, tempoMs});
   const fb = document.getElementById('q-feedback');
   if(acertou){
     fb.textContent = '✔ Certo!';
@@ -697,6 +734,7 @@ function julgarResposta(valor){
 }
 
 function finalizarSessao(){
+  desligarMic();
   const total = sessao.perguntas.length;
   const precisao = Math.round((sessao.acertos / total) * 100);
   const tempoTotalMs = Date.now() - sessao.inicioTotal;
@@ -710,6 +748,7 @@ function finalizarSessao(){
     precisao,
     tempoTotalMs,
     porTabuada: sessao.porTabuada,
+    detalhes: sessao.detalhes,
   };
   jogador.jogos.unshift(registro);
   jogador.jogos = jogador.jogos.slice(0, 20); // guarda histórico, ranking mostra os 5 últimos
@@ -719,7 +758,10 @@ function finalizarSessao(){
 }
 
 /* ============================= TELA DE RESULTADO ============================= */
+let ultimoRegistro = null;
+
 function mostrarResultado(registro){
+  ultimoRegistro = registro;
   document.getElementById('result-title').textContent =
     registro.precisao >= 80 ? '🎉 Mandou bem!' : (registro.precisao >= 50 ? '👍 Bom treino!' : '💪 Continue treinando!');
   document.getElementById('result-subtitle').textContent = registro.modo;
@@ -731,6 +773,65 @@ function mostrarResultado(registro){
   showScreen('result');
   atualizarMelhorBadge();
   atualizarRanking();
+}
+
+/* ============================= RELATÓRIO PARA IMPRIMIR / SALVAR EM PDF ============================= */
+function abrirRelatorio(registro){
+  if(!registro){
+    alert('Ainda não há um resultado para gerar o relatório.');
+    return;
+  }
+  let imgChart = '';
+  try{ imgChart = document.getElementById('chart-tabuadas').toDataURL('image/png'); }catch(e){}
+
+  const dataFmt = new Date(registro.data).toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'});
+  const tabuadasStr = registro.tabuadas.join(', ');
+
+  let linhasTabuada = '';
+  Object.keys(registro.porTabuada).map(Number).sort((a,b)=>a-b).forEach(t => {
+    const s = registro.porTabuada[t];
+    const pct = s.total ? Math.round(s.acertos/s.total*100) : 0;
+    linhasTabuada += `<tr><td>Tabuada do ${t}</td><td>${s.acertos}/${s.total}</td><td>${pct}%</td></tr>`;
+  });
+
+  let linhasDetalhe = '';
+  (registro.detalhes || []).forEach((d, i) => {
+    linhasDetalhe += `<tr>
+      <td>${i+1}</td>
+      <td>${d.a} × ${d.b}</td>
+      <td>${d.correta}</td>
+      <td>${d.resposta}</td>
+      <td>${d.acertou ? 'Certo ✔' : 'Errado ✘'}</td>
+      <td>${(d.tempoMs/1000).toFixed(1)}s</td>
+    </tr>`;
+  });
+
+  // Monta o relatório dentro da própria página (sem abrir pop-up, que costuma ser
+  // bloqueado no navegador do celular) e dispara a impressão nativa do dispositivo.
+  const relatorio = document.getElementById('print-report');
+  relatorio.innerHTML = `
+    <header>
+      <h1>Relatório de Treino — Tabuada</h1>
+      <div class="meta">
+        Jogador: <strong>${jogador.nome}</strong><br>
+        Data: ${dataFmt}<br>
+        Modo: ${registro.modo} (tabuadas ${tabuadasStr})
+      </div>
+    </header>
+    <div class="stats">
+      <div class="stat"><b>${registro.acertos}/${registro.total}</b><span>Acertos</span></div>
+      <div class="stat"><b>${registro.precisao}%</b><span>Precisão</span></div>
+      <div class="stat"><b>${formatarTempo(registro.tempoTotalMs)}</b><span>Tempo total</span></div>
+    </div>
+    ${imgChart ? `<h2>Desempenho por tabuada</h2><img class="chart-img" src="${imgChart}">` : ''}
+    <h2>Resumo por tabuada</h2>
+    <table><thead><tr><th>Tabuada</th><th>Acertos</th><th>Precisão</th></tr></thead><tbody>${linhasTabuada}</tbody></table>
+    <h2>Todas as perguntas do teste</h2>
+    <table><thead><tr><th>#</th><th>Pergunta</th><th>Resposta certa</th><th>Sua resposta</th><th>Resultado</th><th>Tempo</th></tr></thead><tbody>${linhasDetalhe}</tbody></table>
+    <footer>Treino de Tabuada — criado por <strong>Waldeci Ramos</strong>, ideia e desenvolvimento originais.</footer>
+  `;
+
+  setTimeout(() => window.print(), 60);
 }
 
 function formatarTempo(ms){
@@ -748,6 +849,7 @@ document.getElementById('btn-refazer').addEventListener('click', () => {
   iniciarSessao(sessao.modo, sessao.tabuadas, perguntas);
 });
 document.getElementById('btn-menu').addEventListener('click', irParaMenu);
+document.getElementById('btn-imprimir').addEventListener('click', () => abrirRelatorio(ultimoRegistro));
 
 /* ============================= GRÁFICO (canvas nativo) ============================= */
 function desenharGrafico(porTabuada){
@@ -871,39 +973,77 @@ function palavrasParaNumero(texto){
   return total;
 }
 
+let vozArmada = false;             // fica true assim que o jogador toca o microfone; some só quando ele toca de novo ou a partida acaba
+let sessaoReconhecimentoAtiva = false;
+
 if(SpeechRecognitionAPI){
   recognition = new SpeechRecognitionAPI();
   recognition.lang = 'pt-BR';
+  recognition.continuous = true;      // uma única ativação escuta várias respostas seguidas, sem precisar tocar de novo
   recognition.interimResults = false;
   recognition.maxAlternatives = 3;
 
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    const numero = palavrasParaNumero(transcript);
-    document.getElementById('q-input').value = numero !== null ? numero : transcript;
-    if(numero !== null) enviarResposta();
+    if(travado) return; // pergunta já foi respondida / tela de feedback: ignora fala fora de hora
+    for(let i = event.resultIndex; i < event.results.length; i++){
+      const resultado = event.results[i];
+      if(!resultado.isFinal) continue;
+      const transcript = resultado[0].transcript;
+      const numero = palavrasParaNumero(transcript);
+      if(numero !== null){
+        document.getElementById('q-input').value = numero;
+        enviarResposta();
+      }
+      break;
+    }
   };
+  recognition.onspeechstart = () => { document.getElementById('btn-mic').classList.add('listening'); };
+  recognition.onspeechend = () => { document.getElementById('btn-mic').classList.remove('listening'); };
   recognition.onend = () => {
-    recognizing = false;
+    sessaoReconhecimentoAtiva = false;
     document.getElementById('btn-mic').classList.remove('listening');
+    // Se o microfone ainda está "armado" e o jogo continua rolando, retoma sozinho —
+    // assim o jogador não precisa tocar de novo a cada pergunta.
+    if(vozArmada && screens.game.classList.contains('active')){
+      try{ recognition.start(); sessaoReconhecimentoAtiva = true; }catch(e){}
+    }else{
+      document.getElementById('btn-mic').classList.remove('on');
+    }
   };
-  recognition.onerror = () => {
-    recognizing = false;
-    document.getElementById('btn-mic').classList.remove('listening');
+  recognition.onerror = (event) => {
+    if(event.error === 'not-allowed' || event.error === 'audio-capture' || event.error === 'service-not-allowed'){
+      vozArmada = false;
+      sessaoReconhecimentoAtiva = false;
+      document.getElementById('btn-mic').classList.remove('on','listening');
+      alert('Não foi possível usar o microfone. Verifique a permissão de microfone do navegador para este site.');
+    }
+    // outros erros (ex.: "no-speech") são normais em silêncio prolongado; o onend cuida de retomar.
   };
 }
 
-document.getElementById('btn-mic').addEventListener('click', () => {
-  if(!recognition) return;
-  if(recognizing){
-    recognition.stop();
+function ligarMic(){
+  if(!recognition){
+    alert('Reconhecimento de voz não é suportado neste navegador. Tente usar o Chrome.');
     return;
   }
+  vozArmada = true;
+  document.getElementById('btn-mic').classList.add('on');
   try{
-    recognizing = true;
-    document.getElementById('btn-mic').classList.add('listening');
     recognition.start();
-  }catch(e){ recognizing = false; }
+    sessaoReconhecimentoAtiva = true;
+  }catch(e){ /* já pode estar em execução — ignora erro de start duplicado */ }
+}
+function desligarMic(){
+  vozArmada = false;
+  document.getElementById('btn-mic').classList.remove('on','listening');
+  if(recognition && sessaoReconhecimentoAtiva){
+    try{ recognition.stop(); }catch(e){}
+  }
+}
+
+document.getElementById('btn-mic').addEventListener('click', () => {
+  if(vozArmada) desligarMic();
+  else ligarMic();
 });
 
 })();
