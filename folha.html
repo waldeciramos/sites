@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infinity Ponto • Sistema de Apuração</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --azul:#2b8fd6;
+  --azul-escuro:#1a6fb0;
+  --azul-claro:#e8f4fd;
+  --verde:#27ae60;
+  --amarelo:#f39c12;
+  --vermelho:#e74c3c;
+  --cinza:#95a5a6;
+  --cinza-claro:#f5f7fa;
+  --texto:#2c3e50;
+  --borda:#e1e8ed;
+  --sombra:0 4px 16px rgba(0,0,0,.08);
+}
+
+body {
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:var(--cinza-claro);
+  color:var(--texto);
+  min-height:100vh;
+}
+.hidden{display:none !important;}
+
+/* MODAIS */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;backdrop-filter:blur(4px);padding:20px;
+}
+.modal-card{
+  background:#fff;border-radius:18px;padding:28px;
+  width:100%;max-width:520px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  animation:subir .3s ease;
+}
+@keyframes subir{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.logo-area{text-align:center;margin-bottom:20px;}
+.logo-circle{
+  width:72px;height:72px;margin:0 auto 12px;
+  background:linear-gradient(135deg,var(--azul),var(--azul-escuro));
+  color:#fff;font-size:40px;font-weight:bold;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(43,143,214,.4);
+}
+.logo-area h1{color:var(--azul);font-size:28px;letter-spacing:2px;}
+.subtitle{color:var(--cinza);font-size:13px;letter-spacing:3px;text-transform:uppercase;}
+
+.funcionario-info{
+  background:var(--azul-claro);border-radius:12px;padding:14px;
+  font-size:12px;line-height:1.7;margin-bottom:16px;
+}
+.funcionario-info p{color:#555;}
+.funcionario-info strong{color:var(--texto);}
+
+.entrada-box{text-align:center;}
+.entrada-box label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin-bottom:8px;}
+.entrada-box input{
+  font-size:32px;text-align:center;padding:12px;width:100%;
+  border:2px solid var(--borda);border-radius:12px;
+  margin-bottom:16px;font-weight:600;color:var(--azul);font-family:inherit;
+}
+.entrada-box input:focus{outline:none;border-color:var(--azul);}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--azul),var(--azul-escuro));
+  color:#fff;border:none;border-radius:12px;
+  padding:14px 28px;font-size:15px;font-weight:600;
+  cursor:pointer;width:100%;font-family:inherit;
+  transition:transform .15s,box-shadow .15s;
+  box-shadow:0 6px 18px rgba(43,143,214,.35);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(43,143,214,.45);}
+
+.hint{text-align:center;font-size:12px;color:var(--cinza);margin-top:12px;}
+
+/* APP */
+.app{max-width:1200px;margin:0 auto;padding:16px;}
+
+.header{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  background:#fff;border-radius:16px;padding:14px 20px;
+  box-shadow:var(--sombra);margin-bottom:14px;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.logo-small{
+  width:44px;height:44px;
+  background:linear-gradient(135deg,var(--azul),var(--azul-escuro));
+  color:#fff;font-size:26px;font-weight:bold;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.header h2{font-size:16px;color:var(--azul);}
+.periodo{font-size:11px;color:var(--cinza);}
+.periodo-small{font-size:11px;color:var(--cinza);font-weight:normal;}
+
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.relogio{
+  font-size:20px;font-weight:700;color:var(--azul);
+  font-variant-numeric:tabular-nums;
+  background:var(--azul-claro);padding:6px 14px;border-radius:10px;
+}
+.btn-ghost{
+  background:var(--cinza-claro);border:1px solid var(--borda);
+  border-radius:10px;padding:8px 12px;cursor:pointer;
+  font-size:14px;font-family:inherit;transition:background .2s;
+  color:var(--texto);
+}
+.btn-ghost:hover{background:#e8ecf1;}
+
+/* META 25 SEMANAS */
+.meta-bar{
+  background:#fff;border-radius:14px;padding:14px 18px;
+  box-shadow:var(--sombra);margin-bottom:14px;
+}
+.meta-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;}
+.meta-bar-top strong{font-size:14px;color:var(--texto);}
+.meta-bar-top span{font-size:12px;color:var(--cinza);}
+.meta-progress{
+  height:14px;background:var(--cinza-claro);border-radius:20px;overflow:hidden;
+  border:1px solid var(--borda);
+}
+.meta-progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--azul),var(--verde));
+  border-radius:20px;transition:width .5s ease;
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:8px;color:#fff;font-size:10px;font-weight:700;
+}
+.meta-info{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--cinza);flex-wrap:wrap;gap:8px;}
+
+/* STATUS BAR */
+.status-bar{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:10px;margin-bottom:14px;
+}
+.status-item{
+  background:#fff;border-radius:12px;padding:12px 16px;
+  box-shadow:var(--sombra);display:flex;flex-direction:column;gap:4px;
+  border-left:4px solid var(--azul);
+}
+.status-item.destaque{border-left-color:var(--verde);background:linear-gradient(135deg,#fff,#f0fbf5);}
+.status-item .label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);}
+.status-item .value{font-size:18px;font-weight:700;color:var(--texto);font-variant-numeric:tabular-nums;}
+
+/* AÇÕES */
+.acoes{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:10px;margin-bottom:16px;
+}
+.btn-acao{
+  border:none;border-radius:12px;padding:14px;
+  font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+  color:#fff;transition:transform .15s,opacity .2s;
+  box-shadow:var(--sombra);
+}
+.btn-acao:hover:not(:disabled){transform:translateY(-2px);}
+.btn-acao:disabled{opacity:.45;cursor:not-allowed;}
+.btn-acao.azul{background:linear-gradient(135deg,#3498db,#2980b9);}
+.btn-acao.verde{background:linear-gradient(135deg,#2ecc71,#27ae60);}
+.btn-acao.vermelho{background:linear-gradient(135deg,#e74c3c,#c0392b);}
+.btn-acao.cinza{background:linear-gradient(135deg,#95a5a6,#7f8c8d);}
+.btn-acao.roxo{background:linear-gradient(135deg,#9b59b6,#8e44ad);}
+
+/* MAIN */
+.main{display:grid;grid-template-columns:1fr;gap:16px;}
+@media(min-width:900px){
+  .main{grid-template-columns:380px 1fr;}
+  .calendario-section{grid-row:span 2;}
+}
+
+section{background:#fff;border-radius:16px;padding:18px;box-shadow:var(--sombra);}
+section h3{font-size:15px;color:var(--texto);margin-bottom:14px;}
+
+/* CALENDÁRIO */
+.calendario-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.calendario-header h3{margin:0;text-transform:capitalize;font-size:16px;}
+.btn-nav{
+  background:var(--azul-claro);border:none;border-radius:8px;
+  width:32px;height:32px;font-size:18px;color:var(--azul);
+  cursor:pointer;transition:background .2s;font-family:inherit;
+}
+.btn-nav:hover{background:#d3e9f9;}
+.calendario-semana{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  text-align:center;font-size:11px;font-weight:700;
+  color:var(--cinza);text-transform:uppercase;margin-bottom:8px;
+}
+.calendario-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.dia-cal{
+  aspect-ratio:1;border-radius:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;cursor:pointer;
+  background:var(--cinza-claro);color:var(--texto);
+  transition:transform .15s,box-shadow .15s;
+  position:relative;
+}
+.dia-cal:hover{transform:scale(1.06);box-shadow:var(--sombra);z-index:2;}
+.dia-cal.vazio{background:transparent;cursor:default;}
+.dia-cal.vazio:hover{transform:none;box-shadow:none;}
+.dia-cal.fim-semana{background:#f0f2f5;color:#b0b8c1;}
+.dia-cal.trabalhado{background:#e8f8ef;color:var(--verde);border:2px solid var(--verde);}
+.dia-cal.parcial{background:#fef5e7;color:var(--amarelo);border:2px solid var(--amarelo);}
+.dia-cal.falta{background:#fdecea;color:var(--vermelho);border:2px solid var(--vermelho);}
+.dia-cal.hoje{box-shadow:0 0 0 3px var(--azul);}
+.dia-cal .saldo-mini{font-size:9px;font-weight:700;margin-top:2px;}
+
+.legenda{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:11px;color:var(--cinza);}
+.legenda span{display:flex;align-items:center;gap:5px;}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.dot.verde{background:var(--verde);}
+.dot.amarelo{background:var(--amarelo);}
+.dot.vermelho{background:var(--vermelho);}
+.dot.cinza{background:#b0b8c1;}
+.dot.azul{background:var(--azul);}
+
+/* RESUMO */
+.resumo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
+.resumo-card{
+  background:var(--cinza-claro);border-radius:12px;padding:14px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.resumo-card span{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);}
+.resumo-card strong{font-size:20px;color:var(--texto);font-variant-numeric:tabular-nums;}
+.resumo-card.destaque{background:linear-gradient(135deg,var(--azul-claro),#d3e9f9);}
+.resumo-card.destaque strong{color:var(--azul-escuro);}
+
+/* TABELA */
+.tabela-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.tabela-wrapper{overflow-x:auto;border-radius:10px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead{background:var(--azul-claro);}
+th{
+  text-align:left;padding:10px 12px;font-size:11px;
+  text-transform:uppercase;letter-spacing:.5px;color:var(--azul-escuro);
+  white-space:nowrap;
+}
+td{padding:10px 12px;border-bottom:1px solid var(--borda);font-variant-numeric:tabular-nums;}
+tbody tr:hover{background:#fafcfe;}
+td.saldo-pos{color:var(--verde);font-weight:700;}
+td.saldo-neg{color:var(--vermelho);font-weight:700;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;}
+.badge.ok{background:#e8f8ef;color:var(--verde);}
+.badge.parcial{background:#fef5e7;color:var(--amarelo);}
+.badge.falta{background:#fdecea;color:var(--vermelho);}
+.badge.folga{background:#f0f2f5;color:var(--cinza);}
+.btn-mini{
+  background:var(--azul-claro);border:none;border-radius:6px;
+  padding:4px 8px;cursor:pointer;font-size:12px;color:var(--azul);
+  margin-right:4px;font-family:inherit;
+}
+.btn-mini:hover{background:#d3e9f9;}
+.btn-mini.del{background:#fdecea;color:var(--vermelho);}
+.btn-mini.del:hover{background:#fbd5d0;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--cinza);}
+.form-grid input{
+  padding:10px;border:1px solid var(--borda);border-radius:8px;
+  font-size:14px;font-family:inherit;color:var(--texto);
+}
+.form-grid input:focus{outline:none;border-color:var(--azul);}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;}
+.modal-actions .btn-primary{width:auto;}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr;}}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px;font-size:12px;color:var(--cinza);}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--texto);color:#fff;
+  padding:16px 22px;border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+  font-size:14px;font-weight:600;
+  z-index:2000;max-width:340px;
+  animation:slideIn .3s ease;
+}
+.toast.sucesso{background:linear-gradient(135deg,#2ecc71,#27ae60);}
+.toast.aviso{background:linear-gradient(135deg,#f39c12,#e67e22);}
+.toast.erro{background:linear-gradient(135deg,#e74c3c,#c0392b);}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* FATURA */
+.fatura-box{
+  background:#fff;border:2px dashed var(--azul);border-radius:12px;
+  padding:20px;margin-top:14px;
+}
+.fatura-linha{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--borda);font-size:14px;}
+.fatura-linha.total{border-bottom:none;border-top:2px solid var(--azul);margin-top:8px;padding-top:12px;font-size:18px;font-weight:700;color:var(--azul);}
+
+/* BOTÕES BACKUP */
+.backup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+@media(max-width:520px){.backup-grid{grid-template-columns:1fr;}}
+
+/* IMPRESSÃO */
+@media print{
+  body{background:#fff;}
+  .header,.status-bar,.acoes,.calendario-section,.resumo-section,.meta-bar,
+  .tabela-header .btn-ghost,.footer,.modal-overlay,.toast,.no-print{display:none !important;}
+  .app{max-width:100%;padding:0;}
+  .tabela-section{box-shadow:none;padding:0;}
+  table{font-size:11px;}
+  th,td{padding:6px 8px;border:1px solid #ccc;}
+  .tabela-section::before{
+    content:"RELATÓRIO DE PONTO — FOLHA MODELO";
+    display:block;text-align:center;font-weight:700;font-size:14px;
+    margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== MODAL ENTRADA ===================== -->
+<div id="modalEntrada" class="modal-overlay">
+  <div class="modal-card">
+    <div class="logo-area">
+      <div class="logo-circle">∞</div>
+      <h1>Infinity</h1>
+      <p class="subtitle">Sistema de Apuração de Pontos</p>
+    </div>
+    <div class="funcionario-info">
+      <p><strong>Funcionário:</strong> WALDECI DE ANDRADE RAMOS</p>
+      <p><strong>Empresa:</strong> REDE DP DE POSTOS LTDA</p>
+      <p><strong>Departamento:</strong> Administrativo</p>
+    </div>
+    <div class="entrada-box">
+      <label>Registrar Entrada</label>
+      <input type="time" id="inputEntrada" step="60">
+      <button id="btnRegistrarEntrada" class="btn-primary">▶ Bater Entrada</button>
+    </div>
+    <p class="hint">Ajuste o horário se precisar antes de confirmar.</p>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="app hidden">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-small">∞</div>
+      <div>
+        <h2>Infinity Ponto</h2>
+        <span id="periodoLabel" class="periodo">Período: --</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="relogio" id="relogio">--:--:--</div>
+      <button id="btnBackup" class="btn-ghost" title="Fazer backup (JSON)">💾</button>
+      <button id="btnRestaurar" class="btn-ghost" title="Restaurar backup">📂</button>
+      <button id="btnImprimir" class="btn-ghost" title="Imprimir folha modelo">🖨️</button>
+      <button id="btnConfig" class="btn-ghost" title="Configurações">⚙️</button>
+    </div>
+  </header>
+
+  <!-- META 25 SEMANAS -->
+  <section class="meta-bar">
+    <div class="meta-bar-top">
+      <strong>🎯 Meta: 25 semanas de trabalho</strong>
+      <span id="metaTexto">--</span>
+    </div>
+    <div class="meta-progress">
+      <div class="meta-progress-fill" id="metaProgress" style="width:0%">0%</div>
+    </div>
+    <div class="meta-info">
+      <span id="metaFalta">--</span>
+      <span id="metaHoras">--</span>
+    </div>
+  </section>
+
+  <!-- STATUS DO DIA -->
+  <section class="status-bar">
+    <div class="status-item">
+      <span class="label">Status</span>
+      <span class="value" id="statusDia">Aguardando</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Entrada</span>
+      <span class="value" id="statusEntrada">--:--</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Saída Intervalo</span>
+      <span class="value" id="statusSaidaInt">--:--</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Volta Intervalo</span>
+      <span class="value" id="statusVoltaInt">--:--</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Saída Prevista</span>
+      <span class="value" id="statusSaidaPrev">--:--</span>
+    </div>
+    <div class="status-item destaque">
+      <span class="label">Saldo do Dia</span>
+      <span class="value" id="statusSaldoDia">00:00</span>
+    </div>
+  </section>
+
+  <!-- AÇÕES -->
+  <section class="acoes">
+    <button id="btnSaidaIntervalo" class="btn-acao azul" disabled>🍽️ Sair p/ Intervalo</button>
+    <button id="btnVoltaIntervalo" class="btn-acao verde" disabled>↩️ Voltar do Intervalo</button>
+    <button id="btnSaidaFinal" class="btn-acao vermelho" disabled>🏁 Bater Saída</button>
+    <button id="btnDiaExtra" class="btn-acao cinza">➕ Registrar Dia Extra</button>
+    <button id="btnFecharMes" class="btn-acao roxo">📊 Fechar Mês (Fatura)</button>
+  </section>
+
+  <main class="main">
+
+    <!-- CALENDÁRIO -->
+    <section class="calendario-section">
+      <div class="calendario-header">
+        <button id="mesAnterior" class="btn-nav">‹</button>
+        <h3 id="mesAtual">--</h3>
+        <button id="proximoMes" class="btn-nav">›</button>
+      </div>
+      <div class="calendario-semana">
+        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+      </div>
+      <div class="calendario-grid" id="calendarioGrid"></div>
+      <div class="legenda">
+        <span><i class="dot verde"></i> Trabalhado</span>
+        <span><i class="dot amarelo"></i> Parcial</span>
+        <span><i class="dot vermelho"></i> Falta</span>
+        <span><i class="dot cinza"></i> Fim de semana</span>
+        <span><i class="dot azul"></i> Hoje</span>
+      </div>
+    </section>
+
+    <!-- RESUMO -->
+    <section class="resumo-section">
+      <h3>Resumo do Período <span id="periodoResumo" class="periodo-small"></span></h3>
+      <div class="resumo-grid">
+        <div class="resumo-card"><span>Horas Trabalhadas</span><strong id="totalTrabalhadas">00:00</strong></div>
+        <div class="resumo-card"><span>Horas Extras</span><strong id="totalExtras">00:00</strong></div>
+        <div class="resumo-card"><span>Faltas</span><strong id="totalFaltas">00:00</strong></div>
+        <div class="resumo-card"><span>Atrasos</span><strong id="totalAtrasos">00:00</strong></div>
+        <div class="resumo-card destaque"><span>Saldo Final</span><strong id="saldoFinal">00:00</strong></div>
+        <div class="resumo-card"><span>Dias Úteis</span><strong id="diasUteis">0</strong></div>
+      </div>
+    </section>
+
+    <!-- TABELA -->
+    <section class="tabela-section">
+      <div class="tabela-header">
+        <h3>Registros Diários</h3>
+        <div>
+          <button id="btnExportarCSV" class="btn-ghost">⬇️ CSV</button>
+          <button id="btnExportarJSON" class="btn-ghost">💾 Backup</button>
+        </div>
+      </div>
+      <div class="tabela-wrapper">
+        <table id="tabelaRegistros">
+          <thead>
+            <tr>
+              <th>Data</th><th>Dia</th><th>Entrada</th><th>Saída Int.</th>
+              <th>Volta Int.</th><th>Saída</th><th>Intervalo</th>
+              <th>Trabalhado</th><th>Saldo</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="corpoTabela"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Infinity • Sistema de Apuração de Pontos • Período fecha dia 26</p>
+  </footer>
+</div>
+
+<!-- ===================== MODAL DIA EXTRA ===================== -->
+<div id="modalDiaExtra" class="modal-overlay hidden">
+  <div class="modal-card">
+    <h3 id="tituloModalExtra" style="margin-bottom:16px;">Registrar Dia</h3>
+    <div class="form-grid">
+      <label>Data <input type="date" id="extraData"></label>
+      <label>Entrada <input type="time" id="extraEntrada" step="60"></label>
+      <label>Saída Intervalo <input type="time" id="extraSaidaInt" step="60"></label>
+      <label>Volta Intervalo <input type="time" id="extraVoltaInt" step="60"></label>
+      <label>Saída Final <input type="time" id="extraSaida" step="60"></label>
+      <label>Observação <input type="text" id="extraObs" placeholder="Ex: feriado trabalhado"></label>
+    </div>
+    <div class="modal-actions">
+      <button id="btnCancelarExtra" class="btn-ghost">Cancelar</button>
+      <button id="btnSalvarExtra" class="btn-primary">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL DETALHE DIA ===================== -->
+<div id="modalDia" class="modal-overlay hidden">
+  <div class="modal-card">
+    <h3 id="tituloModalDia" style="margin-bottom:16px;">Detalhes do Dia</h3>
+    <div id="conteudoModalDia"></div>
+    <div class="modal-actions">
+      <button id="btnFecharDia" class="btn-ghost">Fechar</button>
+      <button id="btnEditarDia" class="btn-primary">Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL CONFIG ===================== -->
+<div id="modalConfig" class="modal-overlay hidden">
+  <div class="modal-card">
+    <h3 style="margin-bottom:16px;">⚙️ Configurações</h3>
+    <div class="form-grid">
+      <label>Jornada diária (horas) <input type="number" id="cfgJornada" step="0.5" min="1" max="12"></label>
+      <label>Intervalo mínimo (min) <input type="number" id="cfgIntervalo" step="5" min="0" max="120"></label>
+      <label>Aviso antes do intervalo (min) <input type="number" id="cfgAviso" step="5" min="5" max="60"></label>
+      <label>Fechamento (dia do mês) <input type="number" id="cfgFechamento" min="1" max="31"></label>
+      <label>Tolerância (min) <input type="number" id="cfgTolerancia" min="0" max="30"></label>
+      <label>Valor da hora (R$) <input type="number" id="cfgValorHora" step="0.01" min="0"></label>
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--borda);">
+      <strong style="font-size:13px;">💾 Backup e Restauração</strong>
+      <div class="backup-grid">
+        <button id="btnBackup2" class="btn-ghost" style="padding:12px;">💾 Baixar Backup (JSON)</button>
+        <button id="btnRestaurar2" class="btn-ghost" style="padding:12px;">📂 Restaurar Backup</button>
+      </div>
+      <p style="font-size:11px;color:var(--cinza);margin-top:8px;">O backup inclui todos os registros e configurações.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="btnCancelarConfig" class="btn-ghost">Cancelar</button>
+      <button id="btnSalvarConfig" class="btn-primary">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL FECHAMENTO ===================== -->
+<div id="modalFechamento" class="modal-overlay hidden">
+  <div class="modal-card" style="max-width:600px;">
+    <h3 style="margin-bottom:8px;">📊 Fechamento do Mês</h3>
+    <p style="font-size:12px;color:var(--cinza);margin-bottom:16px;" id="fechamentoPeriodo">--</p>
+    <div id="fechamentoConteudo"></div>
+    <div class="modal-actions no-print">
+      <button id="btnFecharFechamento" class="btn-ghost">Fechar</button>
+      <button id="btnImprimirFatura" class="btn-primary">🖨️ Imprimir Fatura</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- INPUT FILE OCULTO PARA RESTAURAR -->
+<input type="file" id="fileRestore" accept=".json" style="display:none;">
+
+<script>
+/* =========================================================
+   INFINITY PONTO — Sistema completo
+   ========================================================= */
+
+const STORAGE_KEY = 'infinity_ponto_v1';
+const CONFIG_KEY  = 'infinity_ponto_config_v1';
+
+const CONFIG_PADRAO = {
+  jornadaDiaria: 5,
+  intervaloMinimo: 20,
+  avisoAntesIntervalo: 20,
+  diaFechamento: 26,
+  tolerancia: 5,
+  valorHora: 0,
+  metaSemanas: 25
+};
+
+let config = carregarConfig();
+let estado = carregarEstado();
+let mesCalendario = new Date();
+
+/* ---------- PERSISTÊNCIA ---------- */
+function carregarConfig(){
+  try{ return { ...CONFIG_PADRAO, ...JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}') }; }
+  catch{ return { ...CONFIG_PADRAO }; }
+}
+function salvarConfig(){ localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); }
+
+function carregarEstado(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); }
+  catch{ return {}; }
+}
+function salvarEstado(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(estado)); }
+
+/* ---------- HELPERS ---------- */
+function pad(n){ return String(n).padStart(2,'0'); }
+function dateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function hoje(){ return new Date(); }
+function isFimSemana(d){ const w=d.getDay(); return w===0||w===6; }
+
+function minutosParaHM(min){
+  const neg = min < 0;
+  min = Math.abs(Math.round(min));
+  const h = Math.floor(min/60), m = min%60;
+  return `${neg?'-':''}${pad(h)}:${pad(m)}`;
+}
+function timeParaMin(t){
+  if(!t) return null;
+  const [h,m] = t.split(':').map(Number);
+  return h*60+m;
+}
+function agoraHM(){
+  const d = new Date();
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function formatarDataBR(d){
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+}
+function nomeDiaSemana(d){
+  return ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'][d.getDay()];
+}
+
+/* ---------- PERÍODO (fecha dia 26) ---------- */
+function periodoAtual(ref = new Date()){
+  const dia = ref.getDate(), mes = ref.getMonth(), ano = ref.getFullYear();
+  let inicio, fim;
+  if(dia >= config.diaFechamento){
+    inicio = new Date(ano, mes, config.diaFechamento);
+    fim = new Date(ano, mes+1, config.diaFechamento-1);
+  } else {
+    inicio = new Date(ano, mes-1, config.diaFechamento);
+    fim = new Date(ano, mes, config.diaFechamento-1);
+  }
+  return { inicio, fim };
+}
+
+/* ---------- CÁLCULOS ---------- */
+function calcularDia(reg){
+  const jornadaMin = config.jornadaDiaria * 60;
+  if(!reg || !reg.entrada) return { trabalhado:0, saldo:-jornadaMin, intervalo:0, status:'falta' };
+
+  const entrada = timeParaMin(reg.entrada);
+  const saidaInt = reg.saidaIntervalo ? timeParaMin(reg.saidaIntervalo) : null;
+  const voltaInt = reg.voltaIntervalo ? timeParaMin(reg.voltaIntervalo) : null;
+  const saida = reg.saida ? timeParaMin(reg.saida) : null;
+
+  let intervalo = 0;
+  if(saidaInt !== null && voltaInt !== null) intervalo = voltaInt - saidaInt;
+
+  const agora = timeParaMin(agoraHM());
+  const saidaFinal = saida !== null ? saida : Math.max(agora, entrada);
+
+  let trabalhado = 0;
+  if(saidaFinal !== null){
+    if(intervalo > 0 && intervalo < config.intervaloMinimo){
+      trabalhado = saidaFinal - entrada - config.intervaloMinimo;
+    } else {
+      trabalhado = saidaFinal - entrada - intervalo;
+    }
+  }
+
+  const saidaPrevista = entrada + jornadaMin + config.intervaloMinimo;
+  const saldo = trabalhado - jornadaMin;
+
+  let status = 'ok';
+  if(trabalhado <= 0) status = 'falta';
+  else if(saldo < -config.tolerancia) status = 'parcial';
+
+  return { trabalhado, saldo, intervalo, status, entrada, saidaInt, voltaInt, saida:saidaFinal, saidaPrevista };
+}
+
+/* ---------- ESTADO ---------- */
+function getRegistro(d){ return estado[dateKey(d)] || null; }
+function setRegistro(d, reg){ estado[dateKey(d)] = reg; salvarEstado(); }
+function removerRegistro(d){ delete estado[dateKey(d)]; salvarEstado(); }
+function registroHoje(){ return getRegistro(hoje()); }
+
+/* ---------- RELÓGIO ---------- */
+function tickRelogio(){
+  const d = new Date();
+  document.getElementById('relogio').textContent =
+    `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+/* ---------- STATUS ---------- */
+function atualizarStatus(){
+  const reg = registroHoje();
+  const calc = reg ? calcularDia(reg) : null;
+
+  const sd = document.getElementById('statusDia');
+  const se = document.getElementById('statusEntrada');
+  const ssi = document.getElementById('statusSaidaInt');
+  const svi = document.getElementById('statusVoltaInt');
+  const ssp = document.getElementById('statusSaidaPrev');
+  const ssd = document.getElementById('statusSaldoDia');
+
+  if(!reg || !reg.entrada){
+    sd.textContent = isFimSemana(hoje()) ? 'Fim de semana' : 'Aguardando entrada';
+    se.textContent = ssi.textContent = svi.textContent = ssp.textContent = '--:--';
+    ssd.textContent = '00:00';
+  } else {
+    se.textContent = reg.entrada;
+    ssi.textContent = reg.saidaIntervalo || '--:--';
+    svi.textContent = reg.voltaIntervalo || '--:--';
+    ssp.textContent = calc.saidaPrevista !== null ? minutosParaHM(calc.saidaPrevista) : '--:--';
+    if(reg.saida) sd.textContent = '✅ Jornada concluída';
+    else if(reg.voltaIntervalo) sd.textContent = '🔄 Em jornada';
+    else if(reg.saidaIntervalo) sd.textContent = '🍽️ Em intervalo';
+    else sd.textContent = '▶ Em jornada';
+    ssd.textContent = minutosParaHM(calc.saldo);
+    ssd.style.color = calc.saldo >= 0 ? 'var(--verde)' : 'var(--vermelho)';
+  }
+
+  document.getElementById('btnSaidaIntervalo').disabled = !reg || !reg.entrada || !!reg.saidaIntervalo || !!reg.saida;
+  document.getElementById('btnVoltaIntervalo').disabled = !reg || !reg.saidaIntervalo || !!reg.voltaIntervalo || !!reg.saida;
+  document.getElementById('btnSaidaFinal').disabled = !reg || !reg.entrada || !!reg.saida;
+}
+
+/* ---------- META 25 SEMANAS ---------- */
+function atualizarMeta(){
+  const p = periodoAtual();
+  // Conta dias trabalhados no período
+  let diasTrab = 0;
+  let horasTotais = 0;
+  let cursor = new Date(p.inicio);
+  while(cursor <= p.fim){
+    const reg = getRegistro(cursor);
+    if(reg && reg.entrada){
+      const c = calcularDia(reg);
+      if(c.trabalhado > 0){
+        diasTrab++;
+        horasTotais += c.trabalhado;
+      }
+    }
+    cursor.setDate(cursor.getDate()+1);
+  }
+  const metaDias = config.metaSemanas * 5; // 5 dias úteis por semana
+  const pct = Math.min(100, (diasTrab / metaDias) * 100);
+  const faltam = Math.max(0, metaDias - diasTrab);
+  const semanasEquiv = (diasTrab / 5).toFixed(1);
+
+  document.getElementById('metaTexto').textContent =
+    `${diasTrab} / ${metaDias} dias (${semanasEquiv} semanas)`;
+  const fill = document.getElementById('metaProgress');
+  fill.style.width = pct + '%';
+  fill.textContent = pct.toFixed(0) + '%';
+  document.getElementById('metaFalta').textContent = `Faltam ${faltam} dias (${(faltam/5).toFixed(1)} semanas)`;
+  document.getElementById('metaHoras').textContent = `Total: ${minutosParaHM(horasTotais)} • Média/dia: ${diasTrab?minutosParaHM(horasTotais/diasTrab):'00:00'}`;
+}
+
+/* ---------- TABELA ---------- */
+function atualizarTabela(){
+  const p = periodoAtual();
+  const corpo = document.getElementById('corpoTabela');
+  corpo.innerHTML = '';
+
+  const registros = [];
+  let cursor = new Date(p.inicio);
+  while(cursor <= p.fim){
+    registros.push(new Date(cursor));
+    cursor.setDate(cursor.getDate()+1);
+  }
+
+  let totalTrab=0, totalExtras=0, totalFaltas=0, totalAtrasos=0, diasUteis=0;
+
+  registros.forEach(d => {
+    const reg = getRegistro(d);
+    const calc = calcularDia(reg);
+    const fds = isFimSemana(d);
+    if(!fds) diasUteis++;
+
+    const tr = document.createElement('tr');
+    const saldoClass = calc.saldo > 0 ? 'saldo-pos' : (calc.saldo < 0 ? 'saldo-neg' : '');
+    const badge = calc.status === 'ok' ? '<span class="badge ok">OK</span>'
+                 : calc.status === 'parcial' ? '<span class="badge parcial">Parcial</span>'
+                 : (fds && !reg) ? '<span class="badge folga">Folga</span>'
+                 : '<span class="badge falta">Falta</span>';
+
+    tr.innerHTML = `
+      <td>${pad(d.getDate())}/${pad(d.getMonth()+1)}</td>
+      <td>${nomeDiaSemana(d).slice(0,3)}</td>
+      <td>${reg?.entrada || '--:--'}</td>
+      <td>${reg?.saidaIntervalo || '--:--'}</td>
+      <td>${reg?.voltaIntervalo || '--:--'}</td>
+      <td>${reg?.saida || (reg?.entrada && !reg?.saida ? 'em aberto' : '--:--')}</td>
+      <td>${calc.intervalo ? minutosParaHM(calc.intervalo) : '--:--'}</td>
+      <td>${calc.trabalhado ? minutosParaHM(calc.trabalhado) : '--:--'}</td>
+      <td class="${saldoClass}">${reg || !fds ? minutosParaHM(calc.saldo) : '--:--'}</td>
+      <td>
+        <button class="btn-mini" data-acao="ver" data-data="${dateKey(d)}">👁️</button>
+        <button class="btn-mini" data-acao="editar" data-data="${dateKey(d)}">✏️</button>
+        ${reg ? `<button class="btn-mini del" data-acao="excluir" data-data="${dateKey(d)}">🗑️</button>` : ''}
+      </td>
+    `;
+    corpo.appendChild(tr);
+
+    if(!fds || reg){
+      totalTrab += Math.max(0, calc.trabalhado);
+      if(calc.saldo > 0) totalExtras += calc.saldo;
+      if(calc.saldo < 0) totalAtrasos += Math.abs(calc.saldo);
+      if(calc.status === 'falta' && !fds) totalFaltas += config.jornadaDiaria * 60;
+    }
+  });
+
+  document.getElementById('totalTrabalhadas').textContent = minutosParaHM(totalTrab);
+  document.getElementById('totalExtras').textContent = minutosParaHM(totalExtras);
+  document.getElementById('totalFaltas').textContent = minutosParaHM(totalFaltas);
+  document.getElementById('totalAtrasos').textContent = minutosParaHM(totalAtrasos);
+  document.getElementById('saldoFinal').textContent = minutosParaHM(totalTrab - (diasUteis * config.jornadaDiaria * 60));
+  document.getElementById('diasUteis').textContent = diasUteis;
+
+  corpo.querySelectorAll('.btn-mini').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const acao = btn.dataset.acao;
+      const key = btn.dataset.data;
+      const [ano,mes,dia] = key.split('-').map(Number);
+      const d = new Date(ano, mes-1, dia);
+      if(acao === 'ver') abrirModalDia(d);
+      if(acao === 'editar') abrirModalExtra(d);
+      if(acao === 'excluir'){
+        if(confirm(`Excluir registro de ${formatarDataBR(d)}?`)){
+          removerRegistro(d); atualizarTudo();
+        }
+      }
+    });
+  });
+}
+
+/* ---------- CALENDÁRIO ---------- */
+function atualizarCalendario(){
+  const grid = document.getElementById('calendarioGrid');
+  const titulo = document.getElementById('mesAtual');
+  grid.innerHTML = '';
+
+  const ano = mesCalendario.getFullYear();
+  const mes = mesCalendario.getMonth();
+  const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  titulo.textContent = `${nomes[mes]} ${ano}`;
+
+  const primeiro = new Date(ano, mes, 1);
+  const ultimoDia = new Date(ano, mes+1, 0).getDate();
+  const diaSemanaInicio = primeiro.getDay();
+
+  for(let i=0; i<diaSemanaInicio; i++){
+    const v = document.createElement('div');
+    v.className = 'dia-cal vazio';
+    grid.appendChild(v);
+  }
+
+  const h = hoje();
+  for(let dia=1; dia<=ultimoDia; dia++){
+    const d = new Date(ano, mes, dia);
+    const reg = getRegistro(d);
+    const calc = calcularDia(reg);
+    const fds = isFimSemana(d);
+
+    const el = document.createElement('div');
+    el.className = 'dia-cal';
+    if(fds) el.classList.add('fim-semana');
+    if(dateKey(d) === dateKey(h)) el.classList.add('hoje');
+
+    if(reg && reg.entrada){
+      if(calc.status === 'ok') el.classList.add('trabalhado');
+      else if(calc.status === 'parcial') el.classList.add('parcial');
+      else el.classList.add('falta');
+    } else if(!fds && d < h){
+      el.classList.add('falta');
+    }
+
+    el.innerHTML = `<span>${dia}</span>`;
+    if(reg && reg.entrada){
+      const s = calc.saldo;
+      el.innerHTML += `<span class="saldo-mini" style="color:${s>=0?'var(--verde)':'var(--vermelho)'}">${minutosParaHM(s)}</span>`;
+    }
+
+    el.addEventListener('click', () => {
+      const r = getRegistro(d);
+      if(r) abrirModalDia(d);
+      else abrirModalExtra(d);
+    });
+
+    grid.appendChild(el);
+  }
+}
+
+/* ---------- PERÍODO ---------- */
+function atualizarPeriodo(){
+  const p = periodoAtual();
+  const txt = `${formatarDataBR(p.inicio)} a ${formatarDataBR(p.fim)}`;
+  document.getElementById('periodoLabel').textContent = `Período: ${txt}`;
+  document.getElementById('periodoResumo').textContent = `(${txt})`;
+}
+
+/* ---------- MODAIS ---------- */
+function abrirModalDia(d){
+  const reg = getRegistro(d);
+  if(!reg){ abrirModalExtra(d); return; }
+  const calc = calcularDia(reg);
+  document.getElementById('tituloModalDia').textContent = `Detalhes • ${formatarDataBR(d)} (${nomeDiaSemana(d)})`;
+  document.getElementById('conteudoModalDia').innerHTML = `
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+      <p><strong>Entrada:</strong> ${reg.entrada || '--:--'}</p>
+      <p><strong>Saída Intervalo:</strong> ${reg.saidaIntervalo || '--:--'}</p>
+      <p><strong>Volta Intervalo:</strong> ${reg.voltaIntervalo || '--:--'}</p>
+      <p><strong>Saída Final:</strong> ${reg.saida || '--:--'}</p>
+      <p><strong>Intervalo:</strong> ${calc.intervalo ? minutosParaHM(calc.intervalo) : '--:--'}</p>
+      <p><strong>Trabalhado:</strong> ${minutosParaHM(calc.trabalhado)}</p>
+      <p><strong>Saldo:</strong> <span style="color:${calc.saldo>=0?'var(--verde)':'var(--vermelho)'};font-weight:700">${minutosParaHM(calc.saldo)}</span></p>
+      <p><strong>Status:</strong> ${calc.status}</p>
+    </div>
+    ${reg.obs ? `<p style="margin-top:12px"><strong>Obs:</strong> ${reg.obs}</p>` : ''}
+  `;
+  document.getElementById('modalDia').classList.remove('hidden');
+  document.getElementById('btnEditarDia').onclick = () => {
+    document.getElementById('modalDia').classList.add('hidden');
+    abrirModalExtra(d);
+  };
+}
+
+function abrirModalExtra(d){
+  const reg = d ? getRegistro(d) : null;
+  document.getElementById('tituloModalExtra').textContent = d ? `Editar • ${formatarDataBR(d)}` : 'Registrar Dia Extra';
+  document.getElementById('extraData').value = d ? dateKey(d) : dateKey(hoje());
+  document.getElementById('extraEntrada').value = reg?.entrada || '';
+  document.getElementById('extraSaidaInt').value = reg?.saidaIntervalo || '';
+  document.getElementById('extraVoltaInt').value = reg?.voltaIntervalo || '';
+  document.getElementById('extraSaida').value = reg?.saida || '';
+  document.getElementById('extraObs').value = reg?.obs || '';
+  document.getElementById('modalDiaExtra').classList.remove('hidden');
+}
+
+/* ---------- ENTRADA ---------- */
+function registrarEntrada(){
+  const valor = document.getElementById('inputEntrada').value;
+  if(!valor){ toast('Informe o horário de entrada','erro'); return; }
+  const d = hoje();
+  const existente = getRegistro(d);
+  if(existente && existente.entrada){
+    if(!confirm('Já existe entrada hoje. Substituir?')) return;
+  }
+  setRegistro(d, { entrada:valor, saidaIntervalo:null, voltaIntervalo:null, saida:null, obs:'' });
+  document.getElementById('modalEntrada').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  atualizarTudo();
+  toast('▶ Entrada registrada: '+valor,'sucesso');
+  agendarAlertas();
+}
+
+/* ---------- ALERTAS ---------- */
+let alertasAgendados = [];
+function agendarAlertas(){
+  alertasAgendados.forEach(t => clearTimeout(t));
+  alertasAgendados = [];
+  const reg = registroHoje();
+  if(!reg || !reg.entrada || reg.saida) return;
+
+  const entradaMin = timeParaMin(reg.entrada);
+  const agoraMin = timeParaMin(agoraHM());
+  const jornadaMin = config.jornadaDiaria * 60;
+  const avisoMin = config.avisoAntesIntervalo;
+
+  const alvoAviso = entradaMin + jornadaMin - avisoMin;
+  const alvoIntervalo = entradaMin + jornadaMin;
+  const agora = new Date();
+
+  if(agoraMin < alvoAviso){
+    const ms = (alvoAviso - agoraMin)*60000 - agora.getSeconds()*1000;
+    alertasAgendados.push(setTimeout(() => {
+      notificar('⏰ Faltam 20 min para bater o intervalo!','Prepare-se para registrar a saída.');
+    }, ms));
+  } else if(agoraMin < alvoIntervalo && !reg.saidaIntervalo){
+    notificar('⏰ Atenção: intervalo se aproximando!','Você já está perto das '+config.jornadaDiaria+'h.');
+  }
+
+  if(agoraMin < alvoIntervalo && !reg.saidaIntervalo){
+    const ms = (alvoIntervalo - agoraMin)*60000 - agora.getSeconds()*1000;
+    alertasAgendados.push(setTimeout(() => {
+      if(!registroHoje()?.saidaIntervalo){
+        notificar('🍽️ Hora do intervalo!','Registre a saída para o intervalo agora.');
+      }
+    }, ms));
+  }
+}
+
+function notificar(titulo, corpo){
+  if('Notification' in window && Notification.permission === 'granted'){
+    try{ new Notification(titulo,{ body:corpo }); }catch{}
+  }
+  toast(`${titulo} — ${corpo}`,'aviso',8000);
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 880; o.type='sine'; g.gain.value=0.1;
+    o.start();
+    setTimeout(()=>o.stop(), 400);
+  }catch{}
+}
+
+function pedirPermissaoNotificacao(){
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+}
+
+/* ---------- TOAST ---------- */
+let toastTimeout;
+function toast(msg, tipo='sucesso', dur=4000){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${tipo}`;
+  el.classList.remove('hidden');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(()=>el.classList.add('hidden'), dur);
+}
+
+/* ---------- ATUALIZAR TUDO ---------- */
+function atualizarTudo(){
+  atualizarStatus();
+  atualizarTabela();
+  atualizarCalendario();
+  atualizarPeriodo();
+  atualizarMeta();
+}
+
+/* ---------- BACKUP / RESTAURAÇÃO ---------- */
+function fazerBackup(){
+  const dados = {
+    versao: 1,
+    dataBackup: new Date().toISOString(),
+    config: config,
+    registros: estado
+  };
+  const blob = new Blob([JSON.stringify(dados, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const d = new Date();
+  a.download = `infinity_backup_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('💾 Backup baixado com sucesso!','sucesso');
+}
+
+function restaurarBackup(file){
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const dados = JSON.parse(e.target.result);
+      if(!dados.registros) throw new Error('Arquivo inválido');
+      if(!confirm(`Restaurar backup de ${new Date(dados.dataBackup).toLocaleString('pt-BR')}?\nIsso substituirá todos os registros atuais.`)) return;
+      estado = dados.registros;
+      if(dados.config) config = { ...CONFIG_PADRAO, ...dados.config };
+      salvarEstado();
+      salvarConfig();
+      atualizarTudo();
+      toast('📂 Backup restaurado com sucesso!','sucesso');
+    }catch(err){
+      toast('❌ Erro ao restaurar: '+err.message,'erro');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- EXPORTAR CSV ---------- */
+function exportarCSV(){
+  const p = periodoAtual();
+  let csv = 'Data;Dia;Entrada;Saida Intervalo;Volta Intervalo;Saida;Intervalo;Trabalhado;Saldo;Status\n';
+  let cursor = new Date(p.inicio);
+  while(cursor <= p.fim){
+    const reg = getRegistro(cursor);
+    const calc = calcularDia(reg);
+    csv += [
+      formatarDataBR(cursor),
+      nomeDiaSemana(cursor),
+      reg?.entrada || '',
+      reg?.saidaIntervalo || '',
+      reg?.voltaIntervalo || '',
+      reg?.saida || '',
+      calc.intervalo ? minutosParaHM(calc.intervalo) : '',
+      calc.trabalhado ? minutosParaHM(calc.trabalhado) : '',
+      reg ? minutosParaHM(calc.saldo) : '',
+      reg ? calc.status : (isFimSemana(cursor) ? 'folga' : 'falta')
+    ].join(';') + '\n';
+    cursor.setDate(cursor.getDate()+1);
+  }
+  const blob = new Blob(['\ufeff'+csv], { type:'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ponto_${dateKey(p.inicio)}_a_${dateKey(p.fim)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('⬇️ CSV exportado','sucesso');
+}
+
+/* ---------- FECHAMENTO MENSAL (FATURA) ---------- */
+function abrirFechamento(){
+  const p = periodoAtual();
+  document.getElementById('fechamentoPeriodo').textContent =
+    `Período: ${formatarDataBR(p.inicio)} a ${formatarDataBR(p.fim)}`;
+
+  let totalTrab=0, totalExtras=0, totalFaltas=0, diasTrab=0, diasUteis=0;
+  let cursor = new Date(p.inicio);
+  while(cursor <= p.fim){
+    const reg = getRegistro(cursor);
+    const calc = calcularDia(reg);
+    const fds = isFimSemana(cursor);
+    if(!fds) diasUteis++;
+    if(reg && reg.entrada && calc.trabalhado > 0){
+      diasTrab++;
+      totalTrab += calc.trabalhado;
+      if(calc.saldo > 0) totalExtras += calc.saldo;
+    }
+    if(calc.status === 'falta' && !fds) totalFaltas += config.jornadaDiaria*60;
+    cursor.setDate(cursor.getDate()+1);
+  }
+
+  const horasTrab = totalTrab / 60;
+  const valorHora = config.valorHora || 0;
+  const valorBruto = horasTrab * valorHora;
+  const metaDias = config.metaSemanas * 5;
+  const semanas = (diasTrab / 5).toFixed(2);
+  const pctMeta = Math.min(100, (diasTrab/metaDias)*100).toFixed(1);
+
+  let html = `
+    <div class="fatura-box">
+      <div class="fatura-linha"><span>Dias úteis no período</span><strong>${diasUteis}</strong></div>
+      <div class="fatura-linha"><span>Dias trabalhados</span><strong>${diasTrab}</strong></div>
+      <div class="fatura-linha"><span>Semanas equivalentes</span><strong>${semanas}</strong></div>
+      <div class="fatura-linha"><span>Meta (${config.metaSemanas} semanas = ${metaDias} dias)</span><strong>${pctMeta}%</strong></div>
+      <div class="fatura-linha"><span>Horas trabalhadas</span><strong>${minutosParaHM(totalTrab)} (${horasTrab.toFixed(2)}h)</strong></div>
+      <div class="fatura-linha"><span>Horas extras</span><strong>${minutosParaHM(totalExtras)}</strong></div>
+      <div class="fatura-linha"><span>Faltas</span><strong>${minutosParaHM(totalFaltas)}</strong></div>
+      ${valorHora > 0 ? `
+        <div class="fatura-linha"><span>Valor/hora</span><strong>R$ ${valorHora.toFixed(2).replace('.',',')}</strong></div>
+        <div class="fatura-linha total"><span>TOTAL A RECEBER</span><strong>R$ ${valorBruto.toFixed(2).replace('.',',')}</strong></div>
+      ` : `
+        <div class="fatura-linha total"><span>TOTAL DE HORAS</span><strong>${horasTrab.toFixed(2)} h</strong></div>
+      `}
+    </div>
+    <p style="font-size:11px;color:var(--cinza);margin-top:12px;text-align:center;">
+      Fechamento gerado em ${new Date().toLocaleString('pt-BR')}
+    </p>
+  `;
+
+  document.getElementById('fechamentoConteudo').innerHTML = html;
+  document.getElementById('modalFechamento').classList.remove('hidden');
+}
+
+/* ---------- EVENTOS ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inputEntrada').value = agoraHM();
+
+  document.getElementById('btnRegistrarEntrada').addEventListener('click', registrarEntrada);
+  document.getElementById('inputEntrada').addEventListener('keydown', e => {
+    if(e.key === 'Enter') registrarEntrada();
+  });
+
+  // Se já tem entrada hoje, pula modal
+  const reg = registroHoje();
+  if(reg && reg.entrada){
+    document.getElementById('modalEntrada').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    atualizarTudo();
+    agendarAlertas();
+  } else {
+    document.getElementById('app').classList.add('hidden');
+  }
+
+  tickRelogio();
+  setInterval(tickRelogio, 1000);
+  setInterval(()=>{ atualizarStatus(); agendarAlertas(); }, 30000);
+
+  // Ações
+  document.getElementById('btnSaidaIntervalo').addEventListener('click', () => {
+    const r = registroHoje(); if(!r) return;
+    r.saidaIntervalo = agoraHM();
+    setRegistro(hoje(), r);
+    atualizarTudo();
+    toast('🍽️ Saída para intervalo: '+r.saidaIntervalo,'sucesso');
+  });
+
+  document.getElementById('btnVoltaIntervalo').addEventListener('click', () => {
+    const r = registroHoje(); if(!r || !r.saidaIntervalo) return;
+    r.voltaIntervalo = agoraHM();
+    const dur = timeParaMin(r.voltaIntervalo) - timeParaMin(r.saidaIntervalo);
+    setRegistro(hoje(), r);
+    atualizarTudo();
+    if(dur > config.intervaloMinimo){
+      toast(`↩️ Voltou: ${r.voltaIntervalo} (${dur} min — excedeu ${dur-config.intervaloMinimo} min, saída será empurrada)`,'aviso',7000);
+    } else if(dur < config.intervaloMinimo){
+      toast(`↩️ Voltou: ${r.voltaIntervalo} (${dur} min — abaixo do mínimo de ${config.intervaloMinimo} min)`,'aviso',7000);
+    } else {
+      toast('↩️ Voltou: '+r.voltaIntervalo,'sucesso');
+    }
+    agendarAlertas();
+  });
+
+  document.getElementById('btnSaidaFinal').addEventListener('click', () => {
+    const r = registroHoje(); if(!r) return;
+    r.saida = agoraHM();
+    setRegistro(hoje(), r);
+    atualizarTudo();
+    const calc = calcularDia(r);
+    toast(`🏁 Saída: ${r.saida} • Saldo: ${calc.saldo>=0?'+':''}${minutosParaHM(calc.saldo)}`,
+      calc.saldo >= 0 ? 'sucesso' : 'aviso', 8000);
+  });
+
+  // Dia extra
+  document.getElementById('btnDiaExtra').addEventListener('click', () => abrirModalExtra(null));
+  document.getElementById('btnCancelarExtra').addEventListener('click', () => {
+    document.getElementById('modalDiaExtra').classList.add('hidden');
+  });
+  document.getElementById('btnSalvarExtra').addEventListener('click', () => {
+    const dataStr = document.getElementById('extraData').value;
+    if(!dataStr){ toast('Informe a data','erro'); return; }
+    const [ano,mes,dia] = dataStr.split('-').map(Number);
+    const d = new Date(ano, mes-1, dia);
+    const reg = {
+      entrada: document.getElementById('extraEntrada').value || null,
+      saidaIntervalo: document.getElementById('extraSaidaInt').value || null,
+      voltaIntervalo: document.getElementById('extraVoltaInt').value || null,
+      saida: document.getElementById('extraSaida').value || null,
+      obs: document.getElementById('extraObs').value || ''
+    };
+    if(!reg.entrada){ toast('Informe ao menos a entrada','erro'); return; }
+    setRegistro(d, reg);
+    document.getElementById('modalDiaExtra').classList.add('hidden');
+    atualizarTudo();
+    toast(`✅ Registro salvo para ${formatarDataBR(d)}`,'sucesso');
+  });
+
+  document.getElementById('btnFecharDia').addEventListener('click', () => {
+    document.getElementById('modalDia').classList.add('hidden');
+  });
+
+  // Calendário nav
+  document.getElementById('mesAnterior').addEventListener('click', () => {
+    mesCalendario.setMonth(mesCalendario.getMonth()-1);
+    atualizarCalendario();
+  });
+  document.getElementById('proximoMes').addEventListener('click', () => {
+    mesCalendario.setMonth(mesCalendario.getMonth()+1);
+    atualizarCalendario();
+  });
+
+  // Config
+  document.getElementById('btnConfig').addEventListener('click', () => {
+    document.getElementById('cfgJornada').value = config.jornadaDiaria;
+    document.getElementById('cfgIntervalo').value = config.intervaloMinimo;
+    document.getElementById('cfgAviso').value = config.avisoAntesIntervalo;
+    document.getElementById('cfgFechamento').value = config.diaFechamento;
+    document.getElementById('cfgTolerancia').value = config.tolerancia;
+    document.getElementById('cfgValorHora').value = config.valorHora;
+    document.getElementById('modalConfig').classList.remove('hidden');
+  });
+  document.getElementById('btnCancelarConfig').addEventListener('click', () => {
+    document.getElementById('modalConfig').classList.add('hidden');
+  });
+  document.getElementById('btnSalvarConfig').addEventListener('click', () => {
+    config.jornadaDiaria = parseFloat(document.getElementById('cfgJornada').value) || 5;
+    config.intervaloMinimo = parseInt(document.getElementById('cfgIntervalo').value) || 20;
+    config.avisoAntesIntervalo = parseInt(document.getElementById('cfgAviso').value) || 20;
+    config.diaFechamento = parseInt(document.getElementById('cfgFechamento').value) || 26;
+    config.tolerancia = parseInt(document.getElementById('cfgTolerancia').value) || 5;
+    config.valorHora = parseFloat(document.getElementById('cfgValorHora').value) || 0;
+    salvarConfig();
+    document.getElementById('modalConfig').classList.add('hidden');
+    atualizarTudo();
+    toast('⚙️ Configurações salvas','sucesso');
+  });
+
+  // Backup
+  document.getElementById('btnBackup').addEventListener('click', fazerBackup);
+  document.getElementById('btnBackup2').addEventListener('click', fazerBackup);
+  document.getElementById('btnExportarJSON').addEventListener('click', fazerBackup);
+
+  document.getElementById('btnRestaurar').addEventListener('click', () => {
+    document.getElementById('fileRestore').click();
+  });
+  document.getElementById('btnRestaurar2').addEventListener('click', () => {
+    document.getElementById('fileRestore').click();
+  });
+  document.getElementById('fileRestore').addEventListener('change', e => {
+    if(e.target.files[0]) restaurarBackup(e.target.files[0]);
+    e.target.value = '';
+  });
+
+  // Imprimir
+  document.getElementById('btnImprimir').addEventListener('click', () => window.print());
+  document.getElementById('btnExportarCSV').addEventListener('click', exportarCSV);
+
+  // Fechamento
+  document.getElementById('btnFecharMes').addEventListener('click', abrirFechamento);
+  document.getElementById('btnFecharFechamento').addEventListener('click', () => {
+    document.getElementById('modalFechamento').classList.add('hidden');
+  });
+  document.getElementById('btnImprimirFatura').addEventListener('click', () => window.print());
+
+  // Permissão notificação
+  document.body.addEventListener('click', pedirPermissaoNotificacao, { once:true });
+});
+</script>
+</body>
+</html>
