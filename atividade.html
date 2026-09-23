@@ -2,38 +2,79 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Future with WILL: respostas, traduções e explicações</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>English Activity – The Future with WILL</title>
 <style>
+@page{size:A4;margin:0}
+body{margin:0;font:16px/1.6 system-ui,sans-serif}
+.bar{position:sticky;top:0;z-index:9;background:#1f2d3d;padding:calc(8px + env(safe-area-inset-top,0px)) 8px 8px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.bar button{font:600 14px system-ui,sans-serif;padding:9px 12px;border:0;border-radius:8px;background:#3a4b5e;color:#fff;cursor:pointer}
+.bar button.on{background:#fff;color:#1f2d3d}
+.bar button.p{background:#ffd54a;color:#1f2d3d}
+body[data-view="exp"] .bar .p{display:none}
+body:not([data-view="exp"]) #exp,body[data-view="exp"] #ws,body[data-view="ans"] #d2,body[data-view="blank"] #d1{display:none}
+#exp{background:var(--bg);color:var(--ink);font:16px/1.6 Georgia,"Times New Roman",serif;min-height:100vh}
 :root{--bg:#f6f8fb;--card:#fff;--ink:#1c2733;--mute:#5b6b7b;--line:#d9e1ea;--acc:#1f5fbf;--ans:#e8f1ff;--ok:#1b7a4b;--no:#b3332b;--hl:#ffe76a;--hlt:#1c2733;--src:#8fd3ff}
 @media (prefers-color-scheme:dark){:root{--bg:#12181f;--card:#1a232d;--ink:#e7edf3;--mute:#9fb0c0;--line:#2c3947;--acc:#7db1ff;--ans:#1d3552;--ok:#5fd39a;--no:#ff8f86;--hl:#a88a00;--hlt:#fff;--src:#1b5f86}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Georgia,"Times New Roman",serif}
-main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
-h1{font-size:1.6rem;line-height:1.25;margin:.4em 0 .2em}
-h2{font-size:1.25rem;margin:1.8em 0 .6em;padding-bottom:.3em;border-bottom:2px solid var(--acc)}
-p{margin:.5em 0}
-.sub,.pt{color:var(--mute);font-family:system-ui,sans-serif;font-size:.9rem}
-.pt{display:block;font-style:italic;margin-top:2px}
-.box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0}
-.q{font-family:system-ui,sans-serif;font-weight:600;margin:0 0 6px}
-.ans{background:var(--ans);border-left:4px solid var(--acc);padding:8px 12px;border-radius:4px;margin:6px 0;font-weight:600}
-.ans .pt{font-weight:400}
-.why{color:var(--mute);font-size:.93rem;margin:6px 0 0}
-.t{color:var(--ok);font-weight:700}.f{color:var(--no);font-weight:700}
-table{width:100%;border-collapse:collapse;font-size:.95rem}
-td,th{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
-.scroll{overflow-x:auto}
-code{font-family:ui-monospace,monospace;background:var(--ans);padding:1px 5px;border-radius:3px}
-mark{background:var(--hl);color:var(--hlt);padding:0 2px;border-radius:3px;font-weight:700}
-.src{background:var(--src);border-radius:3px;padding:0 2px}
-.src sup{font-family:system-ui,sans-serif;font-weight:700;color:var(--acc);margin-left:2px}
-.leg{font-family:system-ui,sans-serif;font-size:.85rem}
-:root{padding-top:env(safe-area-inset-top,0)}
+#exp main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+#exp h1{font-size:1.6rem;line-height:1.25;margin:.4em 0 .2em}
+#exp h2{font-size:1.25rem;margin:1.8em 0 .6em;padding-bottom:.3em;border-bottom:2px solid var(--acc)}
+#exp p{margin:.5em 0}
+#exp .sub,#exp .pt{color:var(--mute);font-family:system-ui,sans-serif;font-size:.9rem}
+#exp .pt{display:block;font-style:italic;margin-top:2px}
+#exp .box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0}
+#exp .q{font-family:system-ui,sans-serif;font-weight:600;margin:0 0 6px}
+#exp .ans{background:var(--ans);border-left:4px solid var(--acc);padding:8px 12px;border-radius:4px;margin:6px 0;font-weight:600}
+#exp .ans .pt{font-weight:400}
+#exp .why{color:var(--mute);font-size:.93rem;margin:6px 0 0}
+#exp .t{color:var(--ok);font-weight:700}.f{color:var(--no);font-weight:700}
+#exp table{width:100%;border-collapse:collapse;font-size:.95rem}
+#exp td,#exp th{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+#exp .scroll{overflow-x:auto}
+#exp code{font-family:ui-monospace,monospace;background:var(--ans);padding:1px 5px;border-radius:3px}
+#exp mark{background:var(--hl);color:var(--hlt);padding:0 2px;border-radius:3px;font-weight:700}
+#exp .src{background:var(--src);border-radius:3px;padding:0 2px}
+#exp .src sup{font-family:system-ui,sans-serif;font-weight:700;color:var(--acc);margin-left:2px}
+#exp .leg{font-family:system-ui,sans-serif;font-size:.85rem}
+#ws{background:#e9edf2;color:#000;font:11pt/1.45 Arial,Helvetica,sans-serif;padding-bottom:20px;min-height:100vh}
+#ws *{box-sizing:border-box}
+#ws .page{background:#fff;width:100%;max-width:210mm;min-height:297mm;margin:10px auto;padding:15mm 16mm;box-shadow:0 1px 6px rgba(0,0,0,.25);overflow:hidden}
+#ws h1{font-size:17pt;text-align:center;margin:0 0 14px}
+#ws .hd{display:flex;gap:14px;font-weight:700;margin-bottom:12px;font-size:10.5pt}
+#ws .hd span{flex:1;border-bottom:1px solid #000;padding-bottom:1px;min-height:1.4em}
+#ws .hd .n{flex:2.4}
+#ws p{margin:0 0 7px}
+#ws h2{font-size:12pt;margin:14px 0 6px}
+#ws .q{margin:8px 0 2px;font-weight:700}
+#ws .ruled{min-height:1.7em;line-height:1.7em;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(1.7em - 1px),#000 calc(1.7em - 1px),#000 1.7em)}
+#ws .ruled.two{min-height:3.4em}
+#ws .a{color:#1740b8;font-family:"Comic Sans MS","Segoe Print",cursive;font-weight:400}
+#ws .blank .a{color:transparent}
+#ws .bl{display:inline-block;min-width:80px;border-bottom:1px solid #000;text-align:center;line-height:1.2}
+#ws .arrow{display:flex;gap:6px}
+#ws .arrow .ruled{flex:1}
+#ws .tr{font-size:10.5pt}
+#ws .tr p{color:#1740b8}
+#ws .blank .tr{display:none}
+#ws .pf{font-size:9pt}
+@media print{
+ .bar{display:none}
+ body,#ws{background:#fff}
+ #exp{min-height:0}
+ #ws .page{margin:0;box-shadow:none;max-width:none;width:210mm;height:297mm;min-height:0}
+ #ws .page+.page{break-before:page}
+ #ws .a{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
-<body>
-<main>
+<body data-view="exp">
+<nav class="bar">
+ <button data-v="exp" class="on">📖 Explicações</button>
+ <button data-v="ans">✅ Folha com respostas</button>
+ <button data-v="blank">📝 Folha em branco</button>
+ <button class="p" onclick="window.print()">🖨 Imprimir esta folha</button>
+</nav>
+<div id="exp"><main>
 <h1>The Future with WILL</h1>
 <p class="sub">Respostas, tradução de tudo e explicações da atividade de inglês (8º D). Cada texto em inglês vem com a tradução logo abaixo, em itálico cinza.</p>
 
@@ -136,6 +177,97 @@ mark{background:var(--hl);color:var(--hlt);padding:0 2px;border-radius:3px;font-
 <p>Afirmativa: <b>will + verbo</b> · Negativa: <b>will not / won't + verbo</b> · Pergunta: <b>Will + sujeito + verbo?</b></p>
 <p class="why">Dica: reescreva uma ou duas respostas com suas próprias palavras para fixar o conteúdo.</p>
 </div>
-</main>
+</main></div>
+<div id="ws"><div id="d1" class="doc">
+
+<section class="page">
+<h1>ENGLISH ACTIVITY – THE FUTURE WITH <i>WILL</i></h1>
+<div class="hd"><span class="n">Names:</span><span>Class:</span><span>Date:</span></div>
+<p><b>Read the text carefully, and translate:</b></p>
+<p><b>A Look into the Future</b></p>
+<p>In the year 2050, life will probably be very different from today. Technology will be an important part of our daily lives. People will use intelligent computers to help them at work, at school, and even at home.</p>
+<p>Scientists believe that many cities will have more electric cars and fewer vehicles that use gasoline. Public transportation will become faster and more environmentally friendly. Some people will also use flying taxis to travel around large cities.</p>
+<p>Education will change too. Students will have classes with teachers from different countries through the internet. They will use virtual reality to visit historical places and explore other parts of the world without leaving the classroom.</p>
+<p>However, the future will not be perfect. People will still need to protect the environment. If we continue to pollute rivers and forests, some animals will disappear. For this reason, people will have to make better choices and take care of the planet.</p>
+<p>The future is uncertain, but one thing is certain: the decisions we make today will influence the world of tomorrow.</p>
+
+<h2>1. Answer the questions in English.</h2>
+<div class="q">a) How will technology influence people's daily lives?</div>
+<div class="ruled two a">Technology will be an important part of our daily lives. People will use intelligent computers to help them at work, at school and at home.</div>
+<div class="q">b) What type of cars will become more common?</div>
+<div class="ruled a">Electric cars will become more common.</div>
+<div class="q">c) How will education change in the future?</div>
+<div class="ruled two a">Students will have classes with teachers from different countries through the internet. They will use virtual reality to visit historical places.</div>
+<div class="q">d) Why will people need to protect the environment?</div>
+<div class="ruled two a">Because if we continue to pollute rivers and forests, some animals will disappear.</div>
+<div class="q">e) According to the text, how will today's decisions affect the future?</div>
+<div class="ruled two a">The decisions we make today will influence the world of tomorrow.</div>
+
+<h2>2. Mark TRUE or FALSE.</h2>
+<p>a) ( <span class="a">TRUE</span> ) Life in 2050 will probably be different from life today.</p>
+<p>b) ( <span class="a">FALSE</span> ) Scientists believe that gasoline cars will become more common.</p>
+<p>c) ( <span class="a">TRUE</span> ) Students will be able to have classes with teachers from other countries.</p>
+<p>d) ( <span class="a">TRUE</span> ) Virtual reality will be used in education.</p>
+<p>e) ( <span class="a">FALSE</span> ) The future will be perfect and there will be no environmental problems.</p>
+</section>
+
+<section class="page">
+<h2 style="margin-top:0">3. Find examples of the future with <i>WILL</i> in the text.</h2>
+<p>Write five sentences from the text that contain <i>will</i>.</p>
+<div class="arrow"><b>1.</b><div class="ruled a">Technology will be an important part of our daily lives.</div></div>
+<div class="arrow"><b>2.</b><div class="ruled a">People will use intelligent computers to help them at work.</div></div>
+<div class="arrow"><b>3.</b><div class="ruled a">Public transportation will become faster and more environmentally friendly.</div></div>
+<div class="arrow"><b>4.</b><div class="ruled a">Students will have classes with teachers from different countries.</div></div>
+<div class="arrow"><b>5.</b><div class="ruled a">Education will change too.</div></div>
+
+<h2>4. Complete the sentences with WILL + the verb in parentheses.</h2>
+<p>a) People <span class="bl a">will use</span> more electric cars. (use)</p>
+<p>b) Technology <span class="bl a">will play</span> an important role in our lives. (play)</p>
+<p>c) Students <span class="bl a">will use</span> virtual reality in their classes. (use)</p>
+<p>d) Public transportation <span class="bl a">will become</span> faster. (become)</p>
+<p>e) Some animals <span class="bl a">will disappear</span> if we continue to destroy their habitats. (disappear)</p>
+
+<h2>5. Change the sentences to the negative form.</h2>
+<p><b>Example:</b> People will use flying taxis. → People will <b>not (won't)</b> use flying taxis.</p>
+<p>a) People will drive gasoline cars.</p>
+<div class="arrow">→<div class="ruled a">People will not (won't) drive gasoline cars.</div></div>
+<p style="margin-top:6px">b) Students will study only inside traditional classrooms.</p>
+<div class="arrow">→<div class="ruled a">Students will not (won't) study only inside traditional classrooms.</div></div>
+<p style="margin-top:6px">c) Technology will solve all environmental problems.</p>
+<div class="arrow">→<div class="ruled a">Technology will not (won't) solve all environmental problems.</div></div>
+
+<h2>6. Write questions using WILL.</h2>
+<p><b>Example:</b> People / use / electric cars? → <b>Will people use electric cars?</b></p>
+<p>a) students / use / virtual reality?</p>
+<div class="arrow">→<div class="ruled a">Will students use virtual reality?</div></div>
+<p style="margin-top:6px">b) cities / have / flying taxis?</p>
+<div class="arrow">→<div class="ruled a">Will cities have flying taxis?</div></div>
+<p style="margin-top:6px">c) technology / change / education?</p>
+<div class="arrow">→<div class="ruled a">Will technology change education?</div></div>
+</section>
+
+<section class="page tr">
+<h2 style="margin-top:0">Tradução do texto: A Look into the Future (Uma olhada no futuro)</h2>
+<p>No ano de 2050, a vida provavelmente será muito diferente da de hoje. A tecnologia será uma parte importante do nosso dia a dia. As pessoas usarão computadores inteligentes para ajudá-las no trabalho, na escola e até em casa.</p>
+<p>Cientistas acreditam que muitas cidades terão mais carros elétricos e menos veículos que usam gasolina. O transporte público ficará mais rápido e mais ecológico. Algumas pessoas também usarão táxis voadores para se deslocar por grandes cidades.</p>
+<p>A educação também vai mudar. Os alunos terão aulas com professores de diferentes países pela internet. Eles usarão realidade virtual para visitar lugares históricos e explorar outras partes do mundo sem sair da sala de aula.</p>
+<p>No entanto, o futuro não será perfeito. As pessoas ainda precisarão proteger o meio ambiente. Se continuarmos a poluir rios e florestas, alguns animais desaparecerão. Por isso, as pessoas terão que fazer escolhas melhores e cuidar do planeta.</p>
+<p>O futuro é incerto, mas uma coisa é certa: as decisões que tomamos hoje influenciarão o mundo de amanhã.</p>
+</section>
+</div></div>
+<script>
+var d1=document.getElementById('d1'),d2=d1.cloneNode(true);
+d2.id='d2';d2.classList.add('blank');d1.after(d2);
+var btns=document.querySelectorAll('.bar button[data-v]');
+function show(v){
+ document.body.setAttribute('data-view',v);
+ btns.forEach(function(b){b.classList.toggle('on',b.dataset.v===v);});
+ window.scrollTo(0,0);
+ try{history.replaceState(null,'','#'+v);}catch(e){}
+}
+btns.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.v);});});
+var h=location.hash.replace('#','');
+if(h==='ans'||h==='blank')show(h);
+</script>
 </body>
 </html>
