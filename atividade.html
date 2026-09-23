@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>English Activity – The Future with WILL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 @page{size:A4;margin:0}
 body{margin:0;font:16px/1.6 system-ui,sans-serif}
@@ -57,6 +58,28 @@ body:not([data-view="exp"]) #exp,body[data-view="exp"] #ws,body[data-view="ans"]
 #ws .tr p{color:#1740b8}
 #ws .blank .tr{display:none}
 #ws .pf{font-size:9pt}
+:root{--font:"Nunito","Quicksand","Varela Round","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif}
+.bar{background:#17212b;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.bar button{font-family:var(--font);font-weight:700;border-radius:999px;padding:9px 15px;background:#2c3b4c}
+.bar button.on{background:#fff;color:#17212b}
+.bar button.p{background:#ffd54a;color:#17212b}
+#exp,#exp *{font-family:var(--font)}
+#exp code{font-family:ui-monospace,Menlo,monospace}
+#exp{font-size:16.5px;line-height:1.7}
+#exp main{max-width:760px}
+#exp h1{font-size:1.9rem;font-weight:800;letter-spacing:-.01em}
+#exp h2{border:0;border-left:5px solid var(--acc);padding:.15em 0 .15em .6em;margin:2.2em 0 .8em;font-size:1.3rem;font-weight:800}
+#exp .box{border-radius:14px;padding:16px 18px;margin:14px 0;box-shadow:0 1px 4px rgba(20,40,70,.08)}
+#exp .ans{border-radius:10px;font-weight:700;padding:10px 14px;line-height:1.55}
+#exp .pt{font-style:normal;color:var(--mute);margin-top:4px;font-size:.92rem}
+#exp .ans .pt{font-weight:600}
+#exp .q{font-weight:800}
+#exp th{background:var(--ans);font-weight:800}
+#ws{background:#dfe6ee}
+#ws .page{border-radius:6px}
+#ws .a{font-family:var(--font);font-weight:700;font-size:10.5pt;color:#1746c4}
+#ws .a i{font-family:inherit}
+
 @media print{
  .bar{display:none}
  body,#ws{background:#fff}
@@ -65,9 +88,43 @@ body:not([data-view="exp"]) #exp,body[data-view="exp"] #ws,body[data-view="ans"]
  #ws .page+.page{break-before:page}
  #ws .a{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+:root{--bg:#e7ebf0;--card:#e7ebf0;--ink:#1f2a44;--mute:#66758c;--line:#d3dae3;--acc:#2f7cf6;--ans:#e7ebf0;--ok:#149a5b;--no:#d6453d;--hl:#ffe76a;--hlt:#1f2a44;--src:#cfe4ff;--font:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;--out:10px 10px 22px rgba(163,177,198,.55),-10px -10px 22px rgba(255,255,255,.9);--outs:5px 5px 10px rgba(163,177,198,.55),-5px -5px 10px rgba(255,255,255,.9);--ins:inset 4px 4px 8px rgba(163,177,198,.55),inset -4px -4px 8px rgba(255,255,255,.9)}
+@media screen{
+body{background:#e7ebf0}
+#exp,#ws{background:transparent;color:var(--ink)}
+#ws{color:#000}
+.bg-circle{position:fixed;border-radius:50%;background:#e7ebf0;box-shadow:15px 15px 30px rgba(163,177,198,.55),-15px -15px 30px rgba(255,255,255,.9);z-index:-5;pointer-events:none;animation:floating 6s ease-in-out infinite}
+.c1{width:220px;height:220px;top:-90px;left:-80px}
+.c2{width:260px;height:260px;right:-120px;top:38%;animation-delay:-2s}
+.c3{width:200px;height:200px;left:-70px;bottom:-70px;animation-delay:-4s}
+@keyframes floating{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.bar{background:#e7ebf0;box-shadow:0 10px 22px rgba(163,177,198,.45);padding-bottom:12px}
+.bar button{font-family:var(--font);background:#e7ebf0;color:#3b4a63;box-shadow:var(--outs)}
+.bar button.on{box-shadow:var(--ins);color:#2f7cf6}
+.bar button.p{background:linear-gradient(135deg,#5aa7ff,#2f7cf6);color:#fff;box-shadow:0 8px 18px rgba(47,124,246,.35)}
+#exp,#exp *{font-family:var(--font)}
+#exp code{font-family:ui-monospace,Menlo,monospace;background:#111a2e;color:#8fe3ff;padding:2px 8px;border-radius:8px;font-size:.88em}
+#exp h1{color:var(--ink);font-weight:800;font-size:2rem;letter-spacing:-.02em;margin:.6em 0 .3em}
+#exp h1 .hb{color:var(--acc)}
+#exp .sub{display:inline-block;padding:8px 16px;border-radius:999px;box-shadow:var(--outs);color:var(--mute);font-size:.88rem;line-height:1.45}
+#exp h2{display:flex;align-items:center;gap:10px;border:0;padding:0;margin:2.3em 0 .8em;font-size:1.3rem;font-weight:800}
+#exp h2::before{content:"";width:6px;height:1.2em;border-radius:6px;background:linear-gradient(#5aa7ff,#2f7cf6);flex:none}
+#exp .box{background:#e7ebf0;border:0;border-radius:28px;padding:20px;margin:16px 0;box-shadow:var(--out)}
+#exp .ans{background:#e7ebf0;border:0;border-left:4px solid var(--acc);border-radius:16px;box-shadow:var(--ins);padding:12px 16px;font-weight:700}
+#exp .leg{display:inline-block;padding:6px 14px;border-radius:999px;box-shadow:var(--outs)}
+#exp td,#exp th{border:0;border-bottom:1px solid var(--line);padding:9px 8px}
+#exp th{background:transparent;color:#3b4a63}
+#exp tr:last-child td{border-bottom:0}
+#exp .why{color:var(--mute)}
+#ws .page{background:#fbfcfe;border-radius:28px;box-shadow:var(--out)}
+#ws .a{font-family:"Nunito","Quicksand","Varela Round","Segoe UI",system-ui,sans-serif;color:#1c5fe0}
+}
+@media print{.bg-circle{display:none}body{background:#fff}#exp .box{box-shadow:none;border:1px solid #ccd3dc;border-radius:12px}#exp .ans{box-shadow:none;background:#f2f5fa}}
 </style>
 </head>
 <body data-view="exp">
+<div class="bg-circle c1"></div><div class="bg-circle c2"></div><div class="bg-circle c3"></div>
 <nav class="bar">
  <button data-v="exp" class="on">📖 Explicações</button>
  <button data-v="ans">✅ Folha com respostas</button>
@@ -75,7 +132,7 @@ body:not([data-view="exp"]) #exp,body[data-view="exp"] #ws,body[data-view="ans"]
  <button class="p" onclick="window.print()">🖨 Imprimir esta folha</button>
 </nav>
 <div id="exp"><main>
-<h1>The Future with WILL</h1>
+<h1>The Future with <span class="hb">WILL</span></h1>
 <p class="sub">Respostas, tradução de tudo e explicações da atividade de inglês (8º D). Cada texto em inglês vem com a tradução logo abaixo, em itálico cinza.</p>
 
 <h2>Como funciona o WILL</h2>
