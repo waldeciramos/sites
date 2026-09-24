@@ -1,0 +1,14 @@
+FonoPlay - arquivos para GitHub Pages
+
+index.html      -> aplicativo (abre na raiz do site)
+relatorio.html  -> ferramenta de relatorio de evolucao (importa os JSON das sessoes)
+alunos.json     -> cadastro dos alunos (edite direto no arquivo)
+
+Como publicar:
+1. Crie um repositorio no GitHub.
+2. Envie os 3 arquivos para a raiz do repositorio.
+3. Settings > Pages > Deploy from a branch > main > / (root).
+4. Abra https://SEUUSUARIO.github.io/NOME-DO-REPOSITORIO
+   (relatorio em .../relatorio.html)
+
+Use Chrome ou Edge com o microfone liberado para voz e comandos de voz.

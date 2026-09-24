@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório de Evolução</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--n:#0f1c40;--o:#f47a0b;--b:#2f6bff;--p:#6b5cff;--g:#17c34a;--mu:#6c7893;--ln:#e3e8f3}
+*{box-sizing:border-box}body{margin:0;background:#dfe6ee;font:14px/1.55 Poppins,system-ui,sans-serif;color:#16213e}
+.tool{background:#fff;max-width:900px;margin:14px auto;padding:18px;border-radius:20px;box-shadow:0 8px 24px #16213e22}
+.tool h1{margin:0 0 4px;font-size:1.3rem}.tool p{margin:0 0 12px;color:var(--mu);font-size:.85rem}
+.tool input,.tool textarea,.tool select{width:100%;padding:10px 12px;margin:4px 0 10px;border:1px solid var(--ln);border-radius:12px;font:500 .9rem Poppins,sans-serif}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:14px;padding:11px 16px;font:700 .9rem Poppins,sans-serif;color:#fff;cursor:pointer;background:linear-gradient(#ffa031,var(--o));box-shadow:0 4px 0 #0003;margin:3px 2px;display:inline-block}
+.btn.b{background:linear-gradient(#5a8cff,var(--b))}.btn.g{background:linear-gradient(#3bea70,var(--g))}.btn.p{background:linear-gradient(#8a7bff,var(--p))}
+#dz{border:2px dashed #b9c4dd;border-radius:16px;padding:18px;text-align:center;color:var(--mu);margin-bottom:10px}#dz.on{background:#eef4ff;border-color:var(--b)}
+.sheet{max-width:900px;margin:0 auto 30px;background:#fff;box-shadow:0 10px 30px #16213e30}
+table.pg{width:100%;border-collapse:collapse}.pg td.c{padding:0}
+.hd{display:flex;align-items:center;gap:14px;background:var(--n);color:#fff;padding:16px 26px;border-bottom:5px solid var(--o)}
+.pill{background:linear-gradient(#ffe066,#ffc21a);color:#111;font-size:1.5rem;padding:2px 12px 5px;border-radius:14px;box-shadow:0 4px 0 #c98f00;transform:rotate(-4deg)}
+.hd .t{flex:1}.hd b{font-size:1.15rem;display:block;line-height:1.2}.hd small{opacity:.8}.hd .r{text-align:right}
+.body{padding:20px 26px}.sec{margin:0 0 18px;break-inside:avoid}
+h2{font-size:1.02rem;color:var(--n);border-left:5px solid var(--o);padding-left:10px;margin:0 0 10px}
+.pat{background:linear-gradient(135deg,#f4f7fc,#fff);border:1px solid var(--ln);border-radius:16px;padding:14px 16px}
+.pat h3{margin:0 0 8px;font-size:1.3rem;color:var(--n)}.info{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 16px;font-size:.85rem}.info span{color:var(--mu)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{border:1px solid var(--ln);border-radius:14px;padding:10px;text-align:center;background:linear-gradient(#fff,#f4f7fc)}
+.kpi b{display:block;font-size:1.5rem;color:var(--n);line-height:1.2}.kpi small{color:var(--mu);font-size:.72rem}.up{color:#0d9a3f!important}.dn{color:#c2410c!important}
+.txt{font-size:.9rem;text-align:justify}
+table.t{width:100%;border-collapse:collapse;font-size:.78rem}.t th{background:var(--n);color:#fff;padding:6px;text-align:left}.t td{padding:5px 6px;border-bottom:1px solid var(--ln)}.t tr:nth-child(even) td{background:#f7f9fd}
+.bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:.8rem}.bar i{display:block;height:14px;border-radius:8px;background:linear-gradient(90deg,var(--o),#ffd23f)}.bar .k{width:120px}.bar .tr{flex:1;background:#eef1f7;border-radius:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:38px}.sign div{border-top:1px solid #16213e;padding-top:4px;text-align:center;font-size:.8rem}
+.ft{display:flex;justify-content:space-between;gap:10px;border-top:3px solid var(--n);padding:10px 26px;font-size:.68rem;color:var(--mu)}
+.empty{padding:60px 20px;text-align:center;color:var(--mu)}
+@media(max-width:700px){.kpis{grid-template-columns:1fr 1fr}.info,.two,.row{grid-template-columns:1fr}.hd{padding:14px}.body{padding:14px}}
+@media print{body{background:#fff}.tool{display:none}.sheet{box-shadow:none;max-width:none;margin:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}thead{display:table-header-group}tfoot{display:table-footer-group}@page{size:A4;margin:8mm 0;@bottom-right{content:"Página " counter(page);font-size:9px;color:#6c7893;margin-right:10mm}}}
+</style></head><body>
+<div class="tool"><h1>📊 Relatório de Evolução</h1><p>Importe os arquivos JSON salvos em cada teste (e, se quiser, o alunos.json). O relatório reúne todas as sessões e mostra a evolução desde a primeira.</p>
+<div id="dz">Arraste os arquivos .json aqui ou<br><label class="btn b">Selecionar arquivos<input type="file" id="fi" accept=".json,application/json" multiple hidden></label> <button class="btn p" onclick="demo()">Ver exemplo</button> <button class="btn" onclick="S=[];PT={};CUR=null;sel();render()">Limpar</button></div>
+<select id="ps" onchange="CUR=this.value;render()" style="display:none"></select>
+<div class="row"><div><small>Profissional responsável</small><input id="pro" oninput="render()" placeholder="Nome do profissional"></div><div><small>Registro profissional</small><input id="reg" oninput="render()" placeholder="Ex.: CRFa / CREFITO / CRM"></div></div>
+<small>Considerações do profissional (entram no relatório)</small><textarea id="obs" rows="3" oninput="render()" placeholder="Escreva aqui as considerações, condutas e orientações."></textarea>
+<button class="btn g" onclick="window.print()">🖨 Imprimir / Salvar PDF</button></div>
+<div class="sheet"><div id="rep"></div></div>
+<script>
+var S=[],PT={},CUR=null,$=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+fdt=d=>d.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}),fd=d=>d.toLocaleDateString('pt-BR'),
+pc=x=>x.n?x.ok/x.n*100:0,avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0,r1=x=>Math.round(x*10)/10,
+age=n=>{if(!n)return'';var q=String(n).slice(0,10).split('-').map(Number),t=new Date(),a=t.getFullYear()-q[0],m=t.getMonth()+1;if(m<q[1]||(m==q[1]&&t.getDate()<q[2]))a--;return a};
+function norm(x,pac){var m=x.metadados||{},s=x.sessao||{},p=pac||{};return{pid:p.id||p.nome||'?',p:p,d:new Date(m.data_hora||Date.now()),m:m,at:s.atividade||'Atividade',n:+s.tentativas||0,ok:+s.acertos||0,sec:+s.duracao_s||0,it:x.itens||[],obs:s.observacao||''}}
+function add(j){if(j.alunos)j.alunos.forEach(a=>{var k=a.id||a.nome;PT[k]=Object.assign(PT[k]||{},a)});
+var l=j.tipo=='sessao'?[j]:(j.sessoes||[]);l.forEach(x=>{var o=norm(x,x.paciente||j.paciente),k=o.pid+'|'+o.d.getTime()+'|'+o.at+'|'+o.n;if(S.some(y=>y.k==k))return;o.k=k;S.push(o);PT[o.pid]=Object.assign({},o.p,PT[o.pid]||{})})}
+async function load(fs){for(var f of fs){try{add(JSON.parse(await f.text()))}catch(e){alert('Arquivo inválido: '+f.name)}}sel();render()}
+$('fi').onchange=e=>load(e.target.files);
+['dragover','dragleave','drop'].forEach(v=>document.addEventListener(v,e=>{e.preventDefault();$('dz').classList.toggle('on',v=='dragover');if(v=='drop')load(e.dataTransfer.files)}));
+function sel(){var ids=[...new Set(S.map(x=>x.pid))],s=$('ps');if(!ids.includes(CUR))CUR=ids[0]||null;s.innerHTML=ids.map(i=>'<option value="'+esc(i)+'" '+(i==CUR?'selected':'')+'>'+esc((PT[i]||{}).nome||i)+'</option>').join('');s.style.display=ids.length>1?'':'none'}
+function line(v,lab,col,unit,id){var W=720,H=250,l=42,r=16,t=28,b=38,n=v.length,mx=unit=='s'?Math.max(1,...v)*1.2:100,X=i=>l+(n>1?i*(W-l-r)/(n-1):(W-l-r)/2),Y=y=>t+(H-t-b)*(1-y/mx),g='',k,y;
+for(k=0;k<=4;k++){y=Y(mx*k/4);g+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+y+'" y2="'+y+'" stroke="#e3e8f3"/><text x="'+(l-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="#6c7893">'+r1(mx*k/4)+(unit=='%'?'%':'')+'</text>'}
+var pts=v.map((q,i)=>X(i)+','+Y(q)).join(' '),tr='';
+if(n>1){var mxx=(n-1)/2,my=avg(v),sxy=0,sxx=0;v.forEach((q,i)=>{sxy+=(i-mxx)*(q-my);sxx+=(i-mxx)*(i-mxx)});var sl=sxy/sxx,ic=my-sl*mxx;tr='<line x1="'+X(0)+'" y1="'+Y(Math.max(0,Math.min(mx,ic)))+'" x2="'+X(n-1)+'" y2="'+Y(Math.max(0,Math.min(mx,ic+sl*(n-1))))+'" stroke="#6b5cff" stroke-width="2" stroke-dasharray="6 5"/>'}
+var st=Math.ceil(n/9);
+return'<svg viewBox="0 0 '+W+' '+H+'" width="100%"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".35"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>'+g+
+(n>1?'<polygon points="'+X(0)+','+Y(0)+' '+pts+' '+X(n-1)+','+Y(0)+'" fill="url(#'+id+')"/><polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="3" stroke-linejoin="round"/>':'')+tr+
+v.map((q,i)=>'<circle cx="'+X(i)+'" cy="'+Y(q)+'" r="5" fill="#fff" stroke="'+col+'" stroke-width="3"/>'+(n<=14?'<text x="'+X(i)+'" y="'+(Y(q)-10)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#16213e">'+(unit=='s'?r1(q):Math.round(q))+'</text>':'')+(i%st==0?'<text x="'+X(i)+'" y="'+(H-18)+'" text-anchor="middle" font-size="10" fill="#6c7893">S'+(i+1)+'</text><text x="'+X(i)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9" fill="#9aa7c7">'+lab[i]+'</text>':'')).join('')+'</svg>'}
+function render(){var el=$('rep');if(!S.length||!CUR){el.innerHTML='<div class="empty">Nenhuma sessão importada ainda.<br>Selecione os arquivos JSON salvos em cada teste ou clique em “Ver exemplo”.</div>';return}
+var ss=S.filter(x=>x.pid==CUR).sort((a,b)=>a.d-b.d),p=PT[CUR]||{},v=ss.map(pc),f=v[0],l=v[v.length-1],dl=l-f,tot=ss.reduce((a,x)=>a+x.n,0),tok=ss.reduce((a,x)=>a+x.ok,0),
+ms=[].concat(...ss.map(x=>x.it.filter(i=>i.tempo_ms>0).map(i=>i.tempo_ms))),rt=avg(ms)/1000,best=ss.reduce((a,x)=>pc(x)>pc(a)?x:a,ss[0]),
+A={},W={};ss.forEach(x=>{var a=A[x.at]=A[x.at]||{n:0,ok:0,s:0};a.n+=x.n;a.ok+=x.ok;a.s++;x.it.forEach(i=>{if(i.acerto==null)return;var w=W[i.esperado]=W[i.esperado]||{n:0,ok:0};w.n++;w.ok+=i.acerto?1:0})});
+var wl=Object.keys(W).map(k=>({k:k,n:W[k].n,ok:W[k].ok,p:W[k].ok/W[k].n*100})).filter(x=>x.n>=2).sort((a,b)=>a.p-b.p),
+ed=p.endereco||{},rp=p.responsavel,rpn=rp&&rp.nome?rp.nome:(typeof rp=='string'?rp:''),app=(ss[0].m.app||'FonoPlay'),now=new Date(),
+devs=[...new Set(ss.map(x=>{var u=x.m.dispositivo||'';return(/Android|iPhone|iPad|Windows|Mac|Linux/.exec(u)||['—'])[0]+' · '+((/Edg|Chrome|Safari|Firefox/.exec(u)||['—'])[0])}))].join('; ');
+var txt='No período de <b>'+fd(ss[0].d)+'</b> a <b>'+fd(ss[ss.length-1].d)+'</b> foram registradas <b>'+ss.length+' sessão(ões)</b>, com <b>'+tot+'</b> tentativas e <b>'+tok+'</b> respostas correspondentes ao estímulo-alvo. '+(ss.length>1?'O percentual de correspondência foi de <b>'+r1(f)+'%</b> na primeira sessão e de <b>'+r1(l)+'%</b> na mais recente, uma variação de <b>'+(dl>=0?'+':'')+r1(dl)+' pontos percentuais</b>. ':'')+'Os valores descrevem o desempenho do paciente nas atividades propostas e devem ser interpretados pelo profissional responsável, em conjunto com sua avaliação clínica.';
+el.innerHTML='<table class="pg"><thead><tr><td class="c"><div class="hd"><span class="pill">🗣️</span><div class="t"><b>'+esc(app)+'</b><small>Relatório de Evolução do Paciente</small></div><div class="r"><small>Emitido em</small><b style="font-size:.95rem">'+fdt(now)+'</b></div></div></td></tr></thead><tbody><tr><td class="c"><div class="body">'+
+'<div class="sec pat"><h3>'+esc(p.nome||CUR)+'</h3><div class="info"><div><span>Nascimento:</span> '+(p.nascimento?fd(new Date(p.nascimento+'T12:00')):'—')+(p.nascimento?' ('+age(p.nascimento)+' anos)':'')+'</div><div><span>Sexo:</span> '+esc(p.sexo||'—')+'</div><div><span>Identificação:</span> '+esc(p.identificacao_interna||'—')+'</div><div><span>Responsável:</span> '+esc(rpn||'—')+'</div><div><span>Cidade:</span> '+esc((ed.cidade||'—')+(ed.uf?'/'+ed.uf:''))+'</div><div><span>Período:</span> '+fd(ss[0].d)+' a '+fd(ss[ss.length-1].d)+'</div></div></div>'+
+'<div class="sec"><h2>Resumo da evolução</h2><div class="kpis"><div class="kpi"><b>'+ss.length+'</b><small>Sessões realizadas</small></div><div class="kpi"><b>'+r1(tot?tok/tot*100:0)+'%</b><small>Correspondência média</small></div><div class="kpi"><b class="'+(dl>=0?'up':'dn')+'">'+(ss.length>1?(dl>=0?'▲ +':'▼ ')+r1(dl)+' p.p.':'—')+'</b><small>Da 1ª à última sessão</small></div><div class="kpi"><b>'+(rt?r1(rt)+' s':'—')+'</b><small>Tempo médio de resposta</small></div></div><p class="txt" style="margin-top:12px">'+txt+'</p></div>'+
+'<div class="sec"><h2>Evolução do desempenho por sessão</h2>'+line(v,ss.map(x=>x.d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})),'#f47a0b','%','g1')+'<small style="color:#6c7893">Linha contínua: % de correspondência em cada sessão. Linha tracejada: tendência do período. Melhor sessão: S'+(ss.indexOf(best)+1)+' ('+r1(pc(best))+'%).</small></div>'+
+(rt?'<div class="sec"><h2>Tempo médio de resposta por sessão (segundos)</h2>'+line(ss.map(x=>avg(x.it.filter(i=>i.tempo_ms>0).map(i=>i.tempo_ms))/1000),ss.map(x=>x.d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})),'#2f6bff','s','g2')+'</div>':'')+
+'<div class="two"><div class="sec"><h2>Desempenho por atividade</h2>'+Object.keys(A).map(k=>{var a=A[k],q=a.n?a.ok/a.n*100:0;return'<div class="bar"><span class="k">'+esc(k)+'</span><span class="tr"><i style="width:'+q+'%"></i></span><b>'+Math.round(q)+'%</b></div><small style="color:#6c7893;margin-left:128px">'+a.s+' sessão(ões)</small>'}).join('')+'</div>'+
+'<div class="sec"><h2>Estímulos para atenção</h2>'+(wl.length?'<table class="t"><tr><th>Estímulo<th>Tent.<th>%</tr>'+wl.slice(0,6).map(x=>'<tr><td>'+esc(x.k)+'<td>'+x.n+'<td>'+Math.round(x.p)+'%</tr>').join('')+'</table><small style="color:#6c7893">Menores taxas de correspondência (mín. 2 tentativas). Indicativo de foco para o profissional, não diagnóstico.</small>':'<p class="txt">Sem estímulos com 2 ou mais tentativas registradas.</p>')+'</div></div>'+
+'<div class="sec"><h2>Registro das sessões</h2><table class="t"><tr><th>#<th>Data e hora<th>Atividade<th>Tent.<th>Acertos<th>%<th>Duração</tr>'+ss.map((x,i)=>'<tr><td>S'+(i+1)+'<td>'+fdt(x.d)+'<td>'+esc(x.at)+'<td>'+x.n+'<td>'+x.ok+'<td>'+Math.round(pc(x))+'%<td>'+x.sec+'s</tr>').join('')+'</table></div>'+
+(ss.some(x=>x.obs)?'<div class="sec"><h2>Observações registradas nas sessões</h2>'+ss.filter(x=>x.obs).map(x=>'<p class="txt"><b>'+fdt(x.d)+':</b> '+esc(x.obs)+'</p>').join('')+'</div>':'')+
+($('obs').value.trim()?'<div class="sec"><h2>Considerações do profissional</h2><p class="txt">'+esc($('obs').value).replace(/\n/g,'<br>')+'</p></div>':'')+
+'<div class="sec"><h2>Origem dos registros</h2><p class="txt" style="font-size:.78rem;color:#6c7893">Primeiro registro: '+fdt(ss[0].d)+' · Último registro: '+fdt(ss[ss.length-1].d)+' · Fuso: '+esc(ss[0].m.fuso_horario||'—')+' · Dispositivo(s): '+esc(devs)+' · Versão do aplicativo: '+esc(ss[0].m.app_versao||'—')+'</p></div>'+
+'<div class="sign"><div>'+esc($('pro').value||'Profissional responsável')+'<br><small>'+esc($('reg').value||'Registro profissional')+'</small></div><div>Carimbo e assinatura</div></div>'+
+'</div></td></tr></tbody><tfoot><tr><td class="c"><div class="ft"><span>'+esc(app)+' · Relatório de evolução · '+esc(p.nome||CUR)+'</span><span>Registros de desempenho em atividades de apoio. Não constituem diagnóstico. Emitido em '+fdt(now)+'</span></div></td></tr></tfoot></table>'}
+function demo(){var w=['amarelo','azul','marrom','verde'],ats=['Cores','Animais','Palavras','Sílabas'],b=Date.now()-9*7*864e5,i,j;for(i=0;i<10;i++){var n=8,ok=Math.min(8,Math.round(3+i*.5+Math.random()*1.5)),it=[];for(j=0;j<n;j++)it.push({esperado:w[j%4],reconhecido:'',acerto:j<ok?1:0,tempo_ms:3200-i*140+Math.random()*400,fase:''});add({tipo:'sessao',paciente:{id:'demo',nome:'Paciente Exemplo (dados de demonstração)',nascimento:'1973-04-13',sexo:'Masculino',identificacao_interna:'DEMO-01'},metadados:{data_hora:new Date(b+i*7*864e5).toISOString(),fuso_horario:'America/Sao_Paulo',dispositivo:'Android Chrome',app:'FonoPlay',app_versao:'2.0'},sessao:{atividade:ats[i%4],tentativas:n,acertos:ok,duracao_s:200+i*5},itens:it})}sel();render()}
+render();
+</script></body></html>
