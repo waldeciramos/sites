@@ -1,0 +1,29 @@
+{
+  "paciente": {
+    "id": "f1a5b3c6-0002-4f20-8c22-f1a500000002",
+    "nome": "Flavio Ferreira da Silva",
+    "dataNascimento": "1990-01-01",
+    "idade": null,
+    "sexo": null,
+    "cidade": "",
+    "uf": "MG",
+    "diagnostico": null,
+    "dataCadastro": "2026-09-28T00:00:00.000Z",
+    "terapeuta": {
+      "nome": null,
+      "registro": null,
+      "especialidade": null
+    },
+    "configuracoes": {
+      "maoDominante": "Destra",
+      "dificuldadeInicial": 1,
+      "sensibilidade": 1.0
+    },
+    "sessoes": [],
+    "historico": {
+      "totalSessoes": 0,
+      "mediaDesempenho": 0,
+      "ultimaSessao": null
+    }
+  }
+}
