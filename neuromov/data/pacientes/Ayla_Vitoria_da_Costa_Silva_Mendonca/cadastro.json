@@ -2,13 +2,18 @@
   "paciente": {
     "id": "a7c1e2d4-0001-4a10-9b11-a1a000000001",
     "nome": "Ayla Vitória da Costa Silva Mendonça",
-    "dataNascimento": "2015-01-01",
+    "dataNascimento": null,
     "idade": null,
     "sexo": null,
-    "cidade": "",
-    "uf": "MG",
     "diagnostico": null,
-    "dataCadastro": "2026-09-28T00:00:00.000Z",
+    "telefone": "(35) 99844-3780",
+    "endereco": null,
+    "cidade": null,
+    "uf": null,
+    "tipoAtendimento": "Plano",
+    "inicioTratamento": null,
+    "diaHorario": null,
+    "dataCadastro": "2026-09-29T00:00:00.000Z",
     "terapeuta": {
       "nome": null,
       "registro": null,
@@ -19,6 +24,7 @@
       "dificuldadeInicial": 1,
       "sensibilidade": 1.0
     },
+    "sessoesRealizadasAntes": 6,
     "sessoes": [],
     "historico": {
       "totalSessoes": 0,

@@ -174,6 +174,14 @@ const Storage = {
         idade,
         sexo: dados.sexo || null,
         diagnostico: dados.diagnostico || null,
+        // dados de contato / administrativos (como na ficha da clínica)
+        telefone: dados.telefone || null,
+        endereco: dados.endereco || null,
+        cidade: dados.cidade || null,
+        uf: dados.uf || null,
+        tipoAtendimento: dados.tipoAtendimento || null, // Particular / Convênio / Plano
+        inicioTratamento: dados.inicioTratamento || null,
+        diaHorario: dados.diaHorario || null,
         dataCadastro: new Date().toISOString(),
         terapeuta: {
           nome: dados.terapeutaNome || null,
@@ -185,6 +193,10 @@ const Storage = {
           dificuldadeInicial: dados.dificuldadeInicial || 1,
           sensibilidade: dados.sensibilidade || 1.0
         },
+        // sessões realizadas ANTES de entrar neste sistema (ex.: já vinham de outro
+        // controle da clínica). Entram na contagem do programa (20), mas não têm
+        // dados de exercício/métricas — só as sessões feitas aqui em `sessoes` têm.
+        sessoesRealizadasAntes: dados.sessoesRealizadasAntes || 0,
         sessoes: [],
         historico: { totalSessoes:0, mediaDesempenho:0, ultimaSessao:null }
       }
@@ -231,15 +243,46 @@ function ultimaExecucao(wrapper, nomeExercicio, excluirSessaoAtualIdx){
 const Programa = {
   TOTAL: 20,
   CICLO: 10,
-  feitas(p){ return p.sessoes.length; },
-  concluido(p){ return p.sessoes.length >= Programa.TOTAL; },
-  // sessões do paciente da mais ANTIGA para a mais NOVA (p.sessoes vem ao contrário)
+  DESCANSO_DIAS: 7,
+  // sessões que o paciente já tinha feito ANTES de entrar neste sistema (ex.: vindas
+  // de outro controle da clínica). Contam na meta de 20, mas não têm dados de exercício.
+  offset(p){ return p.sessoesRealizadasAntes || 0; },
+  feitas(p){ return Programa.offset(p) + p.sessoes.length; },
+  concluido(p){ return Programa.feitas(p) >= Programa.TOTAL; },
+  // sessões REGISTRADAS NO APP, da mais ANTIGA para a mais NOVA (p.sessoes vem ao contrário)
   cronologicas(p){ return p.sessoes.slice().reverse(); },
   cicloEmAndamento(n){ return n >= Programa.TOTAL ? 2 : Math.floor(n / Programa.CICLO) + 1; },
-  // sessões (cronológicas) de um ciclo específico (1 ou 2)
+  // sessões (cronológicas, só as com dados no app) que caem dentro do ciclo k (1 ou 2),
+  // já descontando as sessões anteriores ao sistema (offset)
   sessoesDoCiclo(p, k){
+    const off = Programa.offset(p);
     const c = Programa.cronologicas(p);
-    return c.slice((k-1)*Programa.CICLO, k*Programa.CICLO);
+    const a = Math.max(0, (k-1)*Programa.CICLO - off);
+    const b = Math.max(0, k*Programa.CICLO - off);
+    return c.slice(a, b);
+  },
+  // quantas sessões do ciclo k já foram feitas ao todo (contando as de antes do sistema)
+  feitasNoCiclo(p, k){
+    const n = Programa.feitas(p);
+    const ini = (k-1)*Programa.CICLO+1, fim = k*Programa.CICLO;
+    return Math.max(0, Math.min(n,fim) - ini + 1);
+  },
+  // descanso obrigatório de 1 semana entre o ciclo 1 (sessões 1–10) e o ciclo 2 (11–20).
+  // retorna null quando a checagem não se aplica agora; {indisponivel:true} quando o
+  // sistema não tem a data real da 10ª sessão pra calcular (ela é de antes do sistema).
+  descanso(p){
+    const n = Programa.feitas(p);
+    if(n < Programa.CICLO || n >= Programa.TOTAL) return null; // só entre o fim do ciclo 1 e o início do ciclo 2
+    const off = Programa.offset(p);
+    const idxSessao10 = Programa.CICLO - off - 1; // índice local (no app) da 10ª sessão global
+    const cron = Programa.cronologicas(p);
+    if(idxSessao10 < 0 || idxSessao10 >= cron.length) return {indisponivel:true};
+    const dataUltima = new Date(cron[idxSessao10].data);
+    const hoje = new Date();
+    const dias = Math.floor((hoje - dataUltima) / (1000*60*60*24));
+    const faltam = Math.max(0, Programa.DESCANSO_DIAS - dias);
+    const dataLiberacao = new Date(dataUltima.getTime() + Programa.DESCANSO_DIAS*24*60*60*1000);
+    return { dias, faltam, liberado: dias >= Programa.DESCANSO_DIAS, dataUltima, dataLiberacao };
   },
   // estatísticas agregadas de uma sessão (usadas nos relatórios de ciclo)
   stats(s){
@@ -262,7 +305,7 @@ const Programa = {
     const concluido = Programa.concluido(p);
     const ciclo = Programa.cicloEmAndamento(n);
     const noCiclo = concluido ? Programa.CICLO : (n - (ciclo-1)*Programa.CICLO);
-    return { n, concluido, ciclo, noCiclo };
+    return { n, concluido, ciclo, noCiclo, descanso: Programa.descanso(p) };
   },
   // agrupa as sessões do paciente por ciclo, já numeradas, pra tela de histórico
   // retorna [{ciclo, sessoes:[{numero, sessao}]}], mais recente primeiro

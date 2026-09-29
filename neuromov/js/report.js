@@ -65,19 +65,28 @@ const Report = {
 // Usa os dados agregados que já vêm prontos de Programa (storage.js).
 Report.buildCycle = function(wrapper, modo){
   const p = wrapper.paciente;
-  const todas = Programa.cronologicas(p);
-  let inicio, fim, titulo;
-  if(modo === 'geral'){ inicio = 0; fim = Math.min(todas.length, Programa.TOTAL); titulo = 'Relatório geral do programa'; }
-  else { inicio = (modo-1)*Programa.CICLO; fim = Math.min(todas.length, modo*Programa.CICLO); titulo = 'Relatório do ciclo '+modo; }
-  const sess = todas.slice(inicio, fim);
-  if(!sess.length) return `<h2>${titulo}</h2><p>Ainda não há sessões neste período.</p>`;
+  const off = Programa.offset(p);
+  const nTotal = Programa.feitas(p);
+  const todas = Programa.cronologicas(p); // só sessões com dados (feitas no app)
+  let rangeIni, rangeFim, titulo;
+  if(modo === 'geral'){ rangeIni = 1; rangeFim = Programa.TOTAL; titulo = 'Relatório geral do programa'; }
+  else { rangeIni = (modo-1)*Programa.CICLO+1; rangeFim = modo*Programa.CICLO; titulo = 'Relatório do ciclo '+modo; }
+  // recorte local (índices dentro de `todas`, que só tem as sessões com dados no app)
+  const aIdx = Math.max(0, rangeIni-off-1), bIdx = Math.max(0, rangeFim-off);
+  const sess = todas.slice(aIdx, bIdx);
+  const doneNoRange = Math.max(0, Math.min(nTotal,rangeFim) - rangeIni + 1); // conta as de antes do sistema também
+  if(!sess.length && !doneNoRange) return `<h2>${titulo}</h2><p>Ainda não há sessões neste período.</p>`;
+  if(!sess.length) return `<h2>${titulo}</h2><p>As ${doneNoRange} sessão(ões) deste período foram realizadas antes deste sistema, sem dados detalhados de exercício aqui.</p>`;
 
-  const alvo = (modo === 'geral') ? Programa.TOTAL : Programa.CICLO;
-  const completo = sess.length >= alvo;
-  const nIni = inicio+1, nFim = inicio+sess.length;
+  const alvo = rangeFim-rangeIni+1;
+  const completo = doneNoRange >= alvo;
+  const nIni = off + aIdx + 1, nFim = nIni + sess.length - 1;
   const st = sess.map(Programa.stats);
   const ultima = st[st.length-1];
-  const base = Programa.stats(todas[0]); // sessão 1 do programa é sempre a referência
+  // referência de "melhoria desde o início": a 1ª sessão com dados no app (pode não
+  // ser a sessão 1 real do tratamento, se houver sessões de antes do sistema)
+  const base = Programa.stats(todas[0]);
+  const baseRotulo = off>0 ? `Sessão ${off+1} (1ª c/ dados no sistema)` : 'Sessão 1';
 
   const pct = (a,b,inverso)=>{
     if(a==null || b==null || a===0) return null;
@@ -106,17 +115,18 @@ Report.buildCycle = function(wrapper, modo){
     return `<tr><td>${esc(nome)}</td><td>${primeiro.pontuacao}</td><td>${ultimo.pontuacao}</td><td>${fmtPct(d)}</td></tr>`;
   }).join('');
 
+  const ultimaEhBase = (sess[sess.length-1] === todas[0]);
   const dPontos = pct(base.pontos, ultima.pontos, false);
   const dPrec = base.precisao!=null && ultima.precisao!=null ? ultima.precisao-base.precisao : null;
   const dReac = pct(base.reacao, ultima.reacao, true);
   let conclusao = '';
-  if(nFim === 1) conclusao = 'Esta é a sessão inicial (linha de base). A comparação começa a partir da 2ª sessão.';
+  if(ultimaEhBase) conclusao = `Esta é a ${off>0?'primeira sessão com dados no sistema':'sessão inicial'} (linha de base). A comparação começa a partir da sessão seguinte.`;
   else {
     const partes = [];
     if(dPontos!=null) partes.push(`pontuação total ${dPontos>=0?'subiu':'caiu'} ${Math.abs(dPontos)}%`);
     if(dPrec!=null) partes.push(`precisão média ${dPrec>=0?'subiu':'caiu'} ${Math.abs(dPrec)} ponto(s) percentual(is)`);
     if(dReac!=null) partes.push(`tempo de reação ${dReac>=0?'melhorou':'piorou'} ${Math.abs(dReac)}%`);
-    conclusao = `Da sessão 1 até a sessão ${nFim}: ` + (partes.length ? partes.join('; ') + '.' : 'dados insuficientes para comparar.');
+    conclusao = `Da ${baseRotulo.toLowerCase()} até a sessão ${nFim}: ` + (partes.length ? partes.join('; ') + '.' : 'dados insuficientes para comparar.');
   }
 
   const grafico = buildCycleChart(sess.map((s,i)=>({n:nIni+i, pontos:st[i].pontos})), titulo);
@@ -125,13 +135,14 @@ Report.buildCycle = function(wrapper, modo){
     <h2>${titulo} — NeuroMove Rehab</h2>
     <div class="rline"><span>Paciente</span><span>${esc(p.nome)}</span></div>
     <div class="rline"><span>Terapeuta</span><span>${esc(p.terapeuta.nome||'—')}</span></div>
-    <div class="rline"><span>Sessões analisadas</span><span>${nIni} a ${nFim} (${sess.length} de ${alvo})</span></div>
-    <div class="rline"><span>Situação</span><span>${completo ? 'CICLO COMPLETO ✓' : 'PARCIAL — faltam '+(alvo-sess.length)+' sessão(ões)'}</span></div>
+    <div class="rline"><span>Sessões analisadas</span><span>${rangeIni} a ${rangeFim} (${doneNoRange} de ${alvo}${off>0?', '+sess.length+' com dados aqui':''})</span></div>
+    <div class="rline"><span>Situação</span><span>${completo ? 'CICLO COMPLETO ✓' : 'PARCIAL — faltam '+(alvo-doneNoRange)+' sessão(ões)'}</span></div>
     <div class="rline"><span>Período</span><span>${new Date(sess[0].data).toLocaleDateString('pt-BR')} a ${new Date(sess[sess.length-1].data).toLocaleDateString('pt-BR')}</span></div>
+    ${off>0 ? `<div class="rline"><span>Sessões antes deste sistema</span><span>${off} (contam na meta, sem dados de exercício aqui)</span></div>` : ''}
 
-    <h3>Melhoria desde a 1ª sessão</h3>
+    <h3>Melhoria desde ${off>0?'o início do registro no sistema':'a 1ª sessão'}</h3>
     <table>
-      <tr><th>Indicador</th><th>Sessão 1</th><th>Sessão ${nFim}</th><th>Variação</th></tr>
+      <tr><th>Indicador</th><th>${baseRotulo}</th><th>Sessão ${nFim}</th><th>Variação</th></tr>
       ${linha('Pontuação total','pontos',' pts',false)}
       ${linha('Precisão média','precisao','%',false)}
       ${linha('Taxa de acerto','acerto','%',false)}
@@ -154,10 +165,18 @@ Report.buildCycle = function(wrapper, modo){
 
     ${modo==='geral' ? (()=>{
       const c1 = Programa.sessoesDoCiclo(p,1), c2 = Programa.sessoesDoCiclo(p,2);
-      if(!c1.length || !c2.length) return '';
+      let descansoHtml = '';
+      if(c1.length && c2.length){
+        const dias = Math.round((new Date(c2[0].data) - new Date(c1[c1.length-1].data)) / (1000*60*60*24));
+        const ok = dias >= Programa.DESCANSO_DIAS;
+        descansoHtml = `<div class="rline"><span>Descanso entre ciclo 1 e ciclo 2</span><span>${dias} dia(s) ${ok?'✓ dentro do protocolo (mín. '+Programa.DESCANSO_DIAS+')':'⚠ abaixo do mínimo de '+Programa.DESCANSO_DIAS+' dias'}</span></div>`;
+      }
+      if(!c1.length || !c2.length) return descansoHtml;
       const m = (arr,k)=>{ const v = arr.map(Programa.stats).map(x=>x[k]).filter(x=>x!=null); return v.length ? Math.round(v.reduce((a,b)=>a+b,0)/v.length) : null; };
       const row = (nome,k,un,inv)=>{ const a=m(c1,k), b=m(c2,k); return `<tr><td>${nome}</td><td>${a!=null?a+un:'—'}</td><td>${b!=null?b+un:'—'}</td><td>${fmtPct(pct(a,b,inv))}</td></tr>`; };
-      return `<h3>Ciclo 1 × Ciclo 2 (médias)</h3><table>
+      return `<h3>Ciclo 1 × Ciclo 2 (médias)</h3>
+        ${descansoHtml}
+        <table>
         <tr><th>Indicador</th><th>Ciclo 1</th><th>Ciclo 2</th><th>Variação</th></tr>
         ${row('Pontuação total','pontos',' pts',false)}
         ${row('Precisão média','precisao','%',false)}

@@ -116,9 +116,10 @@ function renderFilteredList(){
     const p = w.paciente;
     const { n, concluido } = Programa.painel(p);
     const prog = concluido ? 'Programa concluído ✓ (20/20)' : ('Sessão '+n+' de '+Programa.TOTAL);
+    const meta = [p.telefone, p.tipoAtendimento].filter(Boolean).join(' · ') || (p.sessoes.length+' sessão(ões) · média '+p.historico.mediaDesempenho+' pts');
     const div = document.createElement('div');
     div.className = 'patient-item';
-    div.innerHTML = `<div><div class="pname">${escapeHtml(p.nome)}</div><div class="pmeta">${p.sessoes.length} sessão(ões) · média ${p.historico.mediaDesempenho} pts</div><div class="pprog">${prog}</div></div><div class="pmeta">›</div>`;
+    div.innerHTML = `<div><div class="pname">${escapeHtml(p.nome)}</div><div class="pmeta">${escapeHtml(meta)}</div><div class="pprog">${prog}</div></div><div class="pmeta">›</div>`;
     div.addEventListener('click', ()=>openPatient(p.id));
     el.appendChild(div);
   });
@@ -149,9 +150,12 @@ document.getElementById('btnNewPatient').addEventListener('click', ()=>{
 
 // ---------- CADASTRO ----------
 function clearCadastroForm(){
-  ['fNome','fDiagnostico','fTerapNome','fTerapRegistro','fTerapEsp'].forEach(id=>document.getElementById(id).value='');
+  ['fNome','fDiagnostico','fTerapNome','fTerapRegistro','fTerapEsp',
+   'fTelefone','fEndereco','fCidade','fUf','fInicioTrat','fDiaHorario'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fNascimento').value='';
   document.getElementById('fSexo').value='';
+  document.getElementById('fTipo').value='';
+  document.getElementById('fSessoesAntes').value=0;
   document.getElementById('fMaoDom').value='Destra';
   document.getElementById('fDificuldade').value=1;
   document.getElementById('fSensibilidade').value=1.0;
@@ -169,6 +173,14 @@ document.getElementById('btnSaveCadastro').addEventListener('click', async ()=>{
     dataNascimento: document.getElementById('fNascimento').value || null,
     sexo: document.getElementById('fSexo').value || null,
     diagnostico: document.getElementById('fDiagnostico').value || null,
+    telefone: document.getElementById('fTelefone').value || null,
+    endereco: document.getElementById('fEndereco').value || null,
+    cidade: document.getElementById('fCidade').value || null,
+    uf: document.getElementById('fUf').value || null,
+    tipoAtendimento: document.getElementById('fTipo').value || null,
+    inicioTratamento: document.getElementById('fInicioTrat').value || null,
+    diaHorario: document.getElementById('fDiaHorario').value || null,
+    sessoesRealizadasAntes: parseInt(document.getElementById('fSessoesAntes').value)||0,
     terapeutaNome: document.getElementById('fTerapNome').value || null,
     terapeutaRegistro: document.getElementById('fTerapRegistro').value || null,
     terapeutaEspecialidade: document.getElementById('fTerapEsp').value || null,
@@ -272,7 +284,7 @@ function goToMenu(){
   const p = state.wrapper.paciente;
   document.getElementById('menuPatientName').textContent = p.nome;
   document.getElementById('menuPatientMeta').textContent =
-    `${p.sessoes.length} sessão(ões) registrada(s) · pontuação média ${p.historico.mediaDesempenho} pts` +
+    [p.telefone, p.tipoAtendimento, `${p.sessoes.length} sessão(ões) c/ dados aqui`, `média ${p.historico.mediaDesempenho} pts`].filter(Boolean).join(' · ') +
     (Storage.usandoApi() ? ' · salvando em arquivo no servidor' : ' · salvando neste navegador');
 
   renderProgramPanel();
@@ -299,7 +311,7 @@ function goToMenu(){
 }
 function renderProgramPanel(){
   const p = state.wrapper.paciente;
-  const { n, concluido, ciclo, noCiclo } = Programa.painel(p);
+  const { n, concluido, ciclo, noCiclo, descanso } = Programa.painel(p);
   const el = document.getElementById('programPanel');
   let dots = '';
   for(let i=1;i<=Programa.TOTAL;i++){
@@ -309,10 +321,18 @@ function renderProgramPanel(){
   if(concluido){
     titulo = 'Programa concluído <span class="prog-badge ok">20/20</span>';
     nota = 'Os 2 ciclos foram finalizados. Veja os relatórios completos em "Ver histórico e relatórios". Novas sessões contam como extras.';
+  } else if(descanso && !descanso.indisponivel){
+    // entre o ciclo 1 e o ciclo 2: mostra o status da semana de descanso obrigatória
+    titulo = descanso.liberado
+      ? 'Descanso concluído <span class="prog-badge ok">liberado p/ ciclo 2</span>'
+      : `Em descanso <span class="prog-badge">faltam ${descanso.faltam} dia(s)</span>`;
+    nota = descanso.liberado
+      ? `A semana de descanso após o ciclo 1 (terminou em ${descanso.dataUltima.toLocaleDateString('pt-BR')}) já foi cumprida. Pode iniciar a 11ª sessão (ciclo 2).`
+      : `Ciclo 1 concluído em ${descanso.dataUltima.toLocaleDateString('pt-BR')}. O protocolo pede ${Programa.DESCANSO_DIAS} dias de descanso antes do ciclo 2 — liberado em ${descanso.dataLiberacao.toLocaleDateString('pt-BR')}.`;
   } else {
     titulo = `Ciclo ${ciclo} de 2 <span class="prog-badge">${noCiclo}/${Programa.CICLO}</span>`;
     nota = `Próxima: sessão ${n+1} de ${Programa.TOTAL}. `
-         + (noCiclo===Programa.CICLO-1 ? 'Ao concluí-la, o relatório completo do ciclo '+ciclo+' será gerado.' : `Faltam ${Programa.CICLO-noCiclo} para fechar o ciclo ${ciclo}.`);
+         + (noCiclo===Programa.CICLO-1 ? 'Ao concluí-la, o relatório completo do ciclo '+ciclo+' será gerado — depois é preciso 1 semana de descanso antes do ciclo 2.' : `Faltam ${Programa.CICLO-noCiclo} para fechar o ciclo ${ciclo}.`);
   }
   el.innerHTML = `
     <h3>Programa de tratamento</h3>
@@ -339,9 +359,20 @@ document.getElementById('btnGoHome').addEventListener('click', ()=>{
 
 function chooseNivelAndStart(ex){
   const p = state.wrapper.paciente;
-  if(Programa.concluido(p) && state.sessionExercicios.length===0 && !state.extraOk){
-    if(!confirm('O programa de 20 sessões deste paciente já foi concluído.\n\nDeseja iniciar uma sessão EXTRA (fora do programa)?')) return;
-    state.extraOk = true;
+  if(state.sessionExercicios.length===0 && !state.extraOk){
+    if(Programa.concluido(p)){
+      if(!confirm('O programa de 20 sessões deste paciente já foi concluído.\n\nDeseja iniciar uma sessão EXTRA (fora do programa)?')) return;
+      state.extraOk = true;
+    } else {
+      const d = Programa.descanso(p);
+      if(d && !d.indisponivel && !d.liberado){
+        const msg = `Este paciente terminou o ciclo 1 (10 sessões) em ${d.dataUltima.toLocaleDateString('pt-BR')}.\n`
+          + `O protocolo pede ${Programa.DESCANSO_DIAS} dias de descanso antes do ciclo 2 — faltam ${d.faltam} dia(s) (liberado em ${d.dataLiberacao.toLocaleDateString('pt-BR')}).\n\n`
+          + `Deseja iniciar mesmo assim?`;
+        if(!confirm(msg)) return;
+        state.extraOk = true; // não pergunta de novo nesta sessão
+      }
+    }
   }
   const nivel = Math.max(1, Math.min(ex.niveis, state.wrapper.paciente.configuracoes.dificuldadeInicial));
   state.sessionRepsLocked = true; // a partir do 1º exercício, trava a config de repetições da sessão
