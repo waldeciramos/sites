@@ -5,6 +5,7 @@ const EXERCISE_DEFS = [
   {id:'abrirFechar', icon:'✊', nome:'Abrir e Fechar',      desc:'Responda aos comandos ABRA / FECHE.',              niveis:3, repsDefault:10},
   {id:'seguir',      icon:'➰', nome:'Segue o Movimento',   desc:'Acompanhe o alvo com a mão.',                      niveis:3, repsDefault:10},
   {id:'cantos',      icon:'🎯', nome:'4 Cantos',            desc:'Leve as 4 bolinhas dos cantos até o centro.',      niveis:1, repsDefault:10},
+  {id:'dedos',       icon:'🤏', nome:'Toque dos Dedos',     desc:'Toque a ponta do polegar em cada dedo indicado — trabalha o movimento fino e isolado dos dedos.', niveis:2, repsDefault:10},
 ];
 
 function rand(a,b){ return a+Math.random()*(b-a); }
@@ -99,6 +100,15 @@ class ExerciseBase{
     this.onFinish = null;
     this.finishReason = '';
     this._unsub = [];
+    // séries: exercícios "sem fim" (bolinha e dedos) usam isso pra avisar e
+    // recomeçar a contagem sozinhos, sem nunca parar por conta própria.
+    this.rodada = 1;
+    this.roundProgress = null; // só usado pelos exercícios "sem fim" (bolinha e dedos)
+  }
+  completeRound(msgPrefix){
+    this.roundProgress = 0;
+    this.rodada++;
+    this.feedback((msgPrefix?msgPrefix+' ':'')+`Série ${this.rodada-1} concluída — vamos para a série ${this.rodada}! 💪`, 'ok');
   }
   listen(evt, fn){ Tracking.on(evt, fn); this._unsub.push([evt,fn]); }
   feedback(msg, tipo){ if(this.onFeedback) this.onFeedback(msg, tipo||'ok'); }
@@ -130,7 +140,7 @@ class ExCesto extends ExerciseBase{
   constructor(nivel, sens, reps){
     super(nivel, sens, reps);
     this.held = false;
-    this.timeLimit = nivel>=2 ? 40 : null;
+    this.roundProgress = 0;
     this.hoop = {x:0.78, y:0.28};
     this.newRound();
     this.listen('handClose', (pos)=>{
@@ -145,7 +155,7 @@ class ExCesto extends ExerciseBase{
     });
   }
   newRound(){
-    this.ball = {x:rand(0.18,0.32), y:rand(0.55,0.75), r:0.075};
+    this.ball = {x:rand(0.18,0.32), y:rand(0.55,0.75), r:0.095};
     this.roundStart = performance.now();
   }
   releaseBall(pos){
@@ -157,20 +167,18 @@ class ExCesto extends ExerciseBase{
     const precisao = Math.max(0, 100 - d/rim.rimR*35);
     this.precisions.push(precisao);
     if(d < rim.rimR+0.045){
-      this.correct++; this.score += 10 + (this.timeLimit?3:0); this.beep('hit');
-      this.feedback('Cesta! +'+(10+(this.timeLimit?3:0))+' pontos', 'ok');
+      this.correct++; this.score += 10; this.beep('hit');
+      this.feedback('Cesta! +10 pontos', 'ok');
     } else {
       this.incorrect++; this.beep('miss');
       this.feedback('Quase! Tente mirar na tabela.', 'bad');
     }
-    if(this.correct+this.incorrect >= this.reps){ this.finish('Meta de repetições concluída.'); return; }
+    this.roundProgress++;
+    if(this.roundProgress >= this.reps) this.completeRound();
+    // nunca finaliza sozinho — continua sempre, o terapeuta/paciente encerra manualmente
     this.newRound();
   }
   update(hand, dt, ctx, w, h){
-    if(this.timeLimit!=null){
-      const remaining = this.timeLimit - (performance.now()-this.startTime)/1000;
-      if(remaining<=0){ this.finish('Tempo esgotado.'); return; }
-    }
     this._rim = drawBackboard(ctx, this.hoop.x, this.hoop.y, w, h);
 
     if(!hand) return;
@@ -275,6 +283,7 @@ class ExCantos extends ExerciseBase{
     this.target = {x:0.5, y:0.5, r:0.12};
     this.held = null;
     this.deliveries = 0;
+    this.roundProgress = 0;
     this.newRound();
     this.listen('handClose', (pos)=>{
       if(this.done || this.held) return;
@@ -290,10 +299,10 @@ class ExCantos extends ExerciseBase{
   }
   newRound(){
     this.balls = [
-      {x:0.14, y:0.18, r:0.06, delivered:false, corner:'sup. esq.'},
-      {x:0.86, y:0.18, r:0.06, delivered:false, corner:'sup. dir.'},
-      {x:0.14, y:0.82, r:0.06, delivered:false, corner:'inf. esq.'},
-      {x:0.86, y:0.82, r:0.06, delivered:false, corner:'inf. dir.'},
+      {x:0.14, y:0.18, r:0.075, delivered:false, corner:'sup. esq.'},
+      {x:0.86, y:0.18, r:0.075, delivered:false, corner:'sup. dir.'},
+      {x:0.14, y:0.82, r:0.075, delivered:false, corner:'inf. esq.'},
+      {x:0.86, y:0.82, r:0.075, delivered:false, corner:'inf. dir.'},
     ];
     this.roundStart = performance.now();
   }
@@ -307,13 +316,15 @@ class ExCantos extends ExerciseBase{
     if(d < this.target.r+0.05){
       b.delivered = true;
       this.correct++; this.score += 10; this.deliveries++; this.beep('hit');
+      this.roundProgress++;
       this.feedback('Bola do canto '+b.corner+' entregue!', 'ok');
+      if(this.roundProgress >= this.reps) this.completeRound();
     } else {
       b.x = pos.x; b.y = pos.y; // fica onde caiu, pode tentar de novo dali
       this.incorrect++; this.beep('miss');
       this.feedback('Fora do alvo — tente de novo.', 'bad');
     }
-    if(this.deliveries >= this.reps){ this.finish('Todas as entregas concluídas.'); return; }
+    // nunca finaliza sozinho — continua sempre, o terapeuta/paciente encerra manualmente
     if(this.balls.every(x=>x.delivered)) this.newRound();
   }
   update(hand, dt, ctx, w, h){
@@ -324,6 +335,109 @@ class ExCantos extends ExerciseBase{
     this.speeds.push(hand.speed||0);
     if(this.held){ this.held.x = hand.x; this.held.y = hand.y; }
     drawCursorRing(ctx, hand.x, hand.y, w, h, hand.open);
+  }
+}
+
+// mãozinha esquemática pro exercício de dedos: destaca o dedo-alvo e acende
+// em verde quando o polegar toca no dedo certo
+const FINGER_LABELS = {index:'indicador', middle:'médio', ring:'anelar', pinky:'mindinho'};
+const FINGER_ORDER  = ['index','middle','ring','pinky'];
+
+function drawHandFingerTarget(ctx, cx, cy, size, target, hand){
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.fillStyle='rgba(234,241,238,.95)';
+  ctx.strokeStyle='#0B2E2C'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.ellipse(0, size*0.28, size*0.34, size*0.42, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+  FINGER_ORDER.forEach((f,i)=>{
+    const ang = -Math.PI/2 + (i-1.5)*0.32;
+    const baseX = Math.sin(ang)*size*0.20, baseY = -size*0.02;
+    const len = size*0.58;
+    const tipX = Math.sin(ang)*(size*0.20+len), tipY = baseY - Math.cos(ang)*len*0.75 - len*0.28;
+    const isTarget = f===target;
+    const pinchedNow = hand && hand.pinch && hand.pinch[f];
+    ctx.beginPath(); ctx.moveTo(baseX,baseY); ctx.lineTo(tipX,tipY);
+    ctx.lineWidth = size*0.13; ctx.lineCap='round';
+    ctx.strokeStyle = pinchedNow ? '#3E8E6B' : (isTarget ? '#F2A93B' : 'rgba(11,46,44,.3)');
+    ctx.stroke();
+    if(isTarget){
+      ctx.beginPath(); ctx.arc(tipX,tipY,size*0.115,0,Math.PI*2);
+      ctx.strokeStyle = pinchedNow ? '#3E8E6B' : '#C1502E'; ctx.lineWidth=3; ctx.stroke();
+    }
+  });
+  // polegar
+  const anyPinch = hand && hand.pinch && Object.values(hand.pinch).some(Boolean);
+  ctx.beginPath();
+  ctx.moveTo(-size*0.20, size*0.10);
+  ctx.lineTo(-size*0.46, size*0.32-(anyPinch?size*0.10:0));
+  ctx.lineWidth = size*0.15; ctx.lineCap='round';
+  ctx.strokeStyle = anyPinch ? '#3E8E6B' : '#F2A93B';
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ---------------- Exercício 5: Toque dos Dedos (oposição polegar-dedo) ----------------
+// Isola o movimento de cada dedo contra o polegar — importante pra reabilitação
+// motora fina pós-AVC, complementa bem sessões de neuromodulação (o cérebro é
+// estimulado a "reencontrar" o caminho motor pra cada dedo individualmente).
+class ExDedos extends ExerciseBase{
+  constructor(nivel, sens, reps){
+    super(nivel, sens, reps);
+    this.roundProgress = 0;
+    this.seqIdx = 0;
+    this.waitingRelease = false;
+    this.target = null;
+    this.nextTarget();
+  }
+  nextTarget(){
+    if(this.nivel>=2){
+      let next;
+      do{ next = FINGER_ORDER[Math.floor(Math.random()*FINGER_ORDER.length)]; }
+      while(next===this.target);
+      this.target = next;
+    } else {
+      this.target = FINGER_ORDER[this.seqIdx % FINGER_ORDER.length];
+      this.seqIdx++;
+    }
+    this.promptAt = performance.now();
+    this.waitingRelease = false;
+  }
+  update(hand, dt, ctx, w, h){
+    const promptEl = document.getElementById('gamePrompt');
+    if(promptEl) promptEl.innerHTML = `<span style="font-size:26px;">Toque o polegar no dedo<br><b>${FINGER_LABELS[this.target]}</b></span>`;
+
+    drawHandFingerTarget(ctx, w*0.5, h*0.66, Math.min(w,h)*0.3, this.target, hand);
+
+    if(!hand) return;
+    this.speeds.push(hand.speed||0);
+    const pinchMap = hand.pinch || {};
+    const pinched = pinchMap[this.target];
+    const anyPinch = Object.values(pinchMap).some(Boolean);
+
+    if(this.waitingRelease){
+      if(!anyPinch) this.waitingRelease = false;
+      return;
+    }
+    if(pinched){
+      const reaction = performance.now()-this.promptAt;
+      this.reactionTimes.push(reaction);
+      this.correct++; this.score += 8; this.roundProgress++; this.beep('hit');
+      this.feedback('Isso! Dedo '+FINGER_LABELS[this.target]+' certinho.', 'ok');
+      this.waitingRelease = true;
+      if(this.roundProgress >= this.reps) this.completeRound();
+      this.nextTarget();
+    } else if(anyPinch){
+      const wrong = Object.keys(pinchMap).find(k=>pinchMap[k]);
+      this.incorrect++; this.beep('miss');
+      this.feedback('Esse é o '+FINGER_LABELS[wrong]+' — tente o '+FINGER_LABELS[this.target]+'.', 'bad');
+      this.waitingRelease = true;
+    }
+  }
+  finish(reason){
+    const promptEl = document.getElementById('gamePrompt');
+    if(promptEl) promptEl.innerHTML='';
+    super.finish(reason);
   }
 }
 
@@ -338,7 +452,7 @@ function drawCursorRing(ctx, x, y, w, h, open){
 const ExerciseEngine = {
   instance: null,
   start(id, nivel, sensibilidade, reps){
-    const map = {cesto:ExCesto, abrirFechar:ExAbrirFechar, seguir:ExSeguir, cantos:ExCantos};
+    const map = {cesto:ExCesto, abrirFechar:ExAbrirFechar, seguir:ExSeguir, cantos:ExCantos, dedos:ExDedos};
     const Cls = map[id];
     this.instance = new Cls(nivel, sensibilidade, reps);
     this.exerciseId = id;

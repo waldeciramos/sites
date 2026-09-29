@@ -36,6 +36,48 @@ window.NM_SOUND = (function(){
   return {beep};
 })();
 
+// ---------- Tela cheia + manter em primeiro plano ----------
+// Obs.: por segurança dos navegadores, nenhum site consegue bloquear de fato
+// notificações de outros apps (WhatsApp etc.) — isso depende do sistema
+// (modo "Não perturbe", app fixado/kiosk). Aqui fazemos o que dá pra fazer
+// via navegador: tela cheia + travar a tela pra não apagar (Wake Lock) +
+// tentar voltar sozinho quando o usuário retorna ao app.
+let wakeLock = null;
+async function requestWakeLock(){
+  try{
+    if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
+  }catch(e){ /* sem suporte ou permissão — segue sem travar a tela */ }
+}
+function releaseWakeLock(){
+  if(wakeLock){ wakeLock.release().catch(()=>{}); wakeLock = null; }
+}
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen?.().catch(()=>{});
+  } else {
+    document.exitFullscreen?.().catch(()=>{});
+  }
+}
+document.getElementById('btnFullscreen').addEventListener('click', toggleFullscreen);
+document.getElementById('btnFullscreenSettings').addEventListener('click', ()=>{ toggleFullscreen(); closeSettings(); });
+
+let wasFullscreenBeforeHide = false;
+document.addEventListener('fullscreenchange', ()=>{
+  if(document.fullscreenElement) wasFullscreenBeforeHide = true;
+});
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible'){
+    const emGame = document.getElementById('screen-game').classList.contains('active');
+    const emCalib = document.getElementById('screen-calib').classList.contains('active');
+    if(emGame || emCalib){
+      requestWakeLock();
+      if(document.fullscreenElement===null && wasFullscreenBeforeHide){
+        document.documentElement.requestFullscreen?.().catch(()=>{});
+      }
+    }
+  }
+});
+
 // ---------- Navegação ----------
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -44,27 +86,59 @@ function showScreen(id){
 }
 
 // ---------- HOME / lista de pacientes ----------
+// Todo o cálculo (ordenar, filtrar por busca, recortar os últimos 5, dados do
+// programa de 20 sessões) mora em storage.js (Storage / PatientList / Programa).
+// Aqui só se busca os dados e se desenha a tela.
+let allPatients = [];
+let listMode = 'recent'; // 'recent' = últimos 5 | 'all' = todos
+
 async function renderPatientList(){
   const el = document.getElementById('patientList');
   el.innerHTML = '<div class="empty">Carregando…</div>';
-  const list = await Storage.all();
-  if(!list.length){ el.innerHTML = '<div class="empty">Nenhum paciente cadastrado ainda.</div>'; return; }
+  allPatients = await Storage.all();
+  renderFilteredList();
+}
+
+function renderFilteredList(){
+  const el = document.getElementById('patientList');
+  const info = document.getElementById('patientListInfo');
+  const q = document.getElementById('patientSearch').value;
+  const { list, modo, total } = PatientList.filtrar(allPatients, listMode, q);
+
+  if(!allPatients.length){ info.textContent=''; el.innerHTML = '<div class="empty">Nenhum paciente cadastrado ainda.</div>'; return; }
+  if(modo==='busca') info.textContent = list.length + ' resultado(s) para a busca';
+  else if(modo==='recent') info.textContent = 'Últimos ' + list.length + ' cadastrados (de ' + total + ' no total)';
+  else info.textContent = list.length + ' paciente(s) cadastrado(s)';
+
+  if(!list.length){ el.innerHTML = '<div class="empty">Nenhum paciente encontrado com esse nome.</div>'; return; }
   el.innerHTML = '';
-  list.sort((a,b)=> new Date(b.paciente.dataCadastro)-new Date(a.paciente.dataCadastro));
   list.forEach(w=>{
     const p = w.paciente;
+    const { n, concluido } = Programa.painel(p);
+    const prog = concluido ? 'Programa concluído ✓ (20/20)' : ('Sessão '+n+' de '+Programa.TOTAL);
     const div = document.createElement('div');
     div.className = 'patient-item';
-    div.innerHTML = `<div><div class="pname">${escapeHtml(p.nome)}</div><div class="pmeta">${p.sessoes.length} sessão(ões) · média ${p.historico.mediaDesempenho} pts</div></div><div class="pmeta">›</div>`;
+    div.innerHTML = `<div><div class="pname">${escapeHtml(p.nome)}</div><div class="pmeta">${p.sessoes.length} sessão(ões) · média ${p.historico.mediaDesempenho} pts</div><div class="pprog">${prog}</div></div><div class="pmeta">›</div>`;
     div.addEventListener('click', ()=>openPatient(p.id));
     el.appendChild(div);
   });
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+document.getElementById('patientSearch').addEventListener('input', renderFilteredList);
+document.querySelectorAll('#patientTabs .tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    listMode = btn.dataset.mode;
+    document.querySelectorAll('#patientTabs .tab').forEach(b=>b.classList.toggle('active', b===btn));
+    document.getElementById('patientSearch').value = '';
+    renderFilteredList();
+  });
+});
+
 async function openPatient(id){
   state.wrapper = await Storage.get(id);
   if(!state.wrapper) return;
+  state.extraOk = false;
   goToMenu();
 }
 
@@ -112,6 +186,7 @@ let calibCtx, calibVideoEl;
 
 async function startCalibration(){
   showScreen('screen-calib');
+  requestWakeLock();
   state.calibStep = 1;
   state.calibHandSeen = false;
   state.calibHandOpenSeen = false; state.calibHandCloseSeen = false;
@@ -180,12 +255,13 @@ function renderCalibStep(){
 
 document.getElementById('btnCalibBack').addEventListener('click', ()=>{
   if(state.calibStep>1){ state.calibStep--; renderCalibStep(); }
-  else { Tracking.stop(); showScreen('screen-home'); renderPatientList(); }
+  else { Tracking.stop(); releaseWakeLock(); showScreen('screen-home'); renderPatientList(); }
 });
 document.getElementById('btnCalibNext').addEventListener('click', ()=>{
   if(state.calibStep<2){ state.calibStep++; renderCalibStep(); }
   else {
     Tracking.stop();
+    releaseWakeLock();
     goToMenu();
   }
 });
@@ -198,6 +274,8 @@ function goToMenu(){
   document.getElementById('menuPatientMeta').textContent =
     `${p.sessoes.length} sessão(ões) registrada(s) · pontuação média ${p.historico.mediaDesempenho} pts` +
     (Storage.usandoApi() ? ' · salvando em arquivo no servidor' : ' · salvando neste navegador');
+
+  renderProgramPanel();
 
   const grid = document.getElementById('exerciseGrid');
   grid.innerHTML = '';
@@ -219,6 +297,31 @@ function goToMenu(){
     ? 'Repetições fixadas para esta sessão (definidas no primeiro exercício).'
     : 'Vale para todos os exercícios desta sessão. Pode ajustar antes do primeiro exercício.';
 }
+function renderProgramPanel(){
+  const p = state.wrapper.paciente;
+  const { n, concluido, ciclo, noCiclo } = Programa.painel(p);
+  const el = document.getElementById('programPanel');
+  let dots = '';
+  for(let i=1;i<=Programa.TOTAL;i++){
+    dots += `<span class="${i<=n?'done':(i===n+1?'next':'')}">${i}</span>`;
+  }
+  let titulo, nota;
+  if(concluido){
+    titulo = 'Programa concluído <span class="prog-badge ok">20/20</span>';
+    nota = 'Os 2 ciclos foram finalizados. Veja os relatórios completos em "Ver histórico e relatórios". Novas sessões contam como extras.';
+  } else {
+    titulo = `Ciclo ${ciclo} de 2 <span class="prog-badge">${noCiclo}/${Programa.CICLO}</span>`;
+    nota = `Próxima: sessão ${n+1} de ${Programa.TOTAL}. `
+         + (noCiclo===Programa.CICLO-1 ? 'Ao concluí-la, o relatório completo do ciclo '+ciclo+' será gerado.' : `Faltam ${Programa.CICLO-noCiclo} para fechar o ciclo ${ciclo}.`);
+  }
+  el.innerHTML = `
+    <h3>Programa de tratamento</h3>
+    <div class="prog-top"><span>${titulo}</span><span class="big">${Math.min(n,Programa.TOTAL)}/${Programa.TOTAL}</span></div>
+    <div class="prog-bar"><i style="width:${Math.min(100,n/Programa.TOTAL*100)}%"></i></div>
+    <div class="prog-dots">${dots}</div>
+    <p class="prog-note">${nota}</p>`;
+}
+
 document.getElementById('sessionReps').addEventListener('change', (e)=>{
   const v = parseInt(e.target.value)||10;
   state.sessionReps = Math.max(3, Math.min(30, v));
@@ -235,6 +338,11 @@ document.getElementById('btnGoHome').addEventListener('click', ()=>{
 });
 
 function chooseNivelAndStart(ex){
+  const p = state.wrapper.paciente;
+  if(Programa.concluido(p) && state.sessionExercicios.length===0 && !state.extraOk){
+    if(!confirm('O programa de 20 sessões deste paciente já foi concluído.\n\nDeseja iniciar uma sessão EXTRA (fora do programa)?')) return;
+    state.extraOk = true;
+  }
   const nivel = Math.max(1, Math.min(ex.niveis, state.wrapper.paciente.configuracoes.dificuldadeInicial));
   state.sessionRepsLocked = true; // a partir do 1º exercício, trava a config de repetições da sessão
   startExercise(ex.id, nivel);
@@ -247,6 +355,7 @@ async function startExercise(id, nivel){
   state.currentExerciseId = id;
   state.currentNivel = nivel;
   showScreen('screen-game');
+  requestWakeLock();
   gameVideoEl = document.getElementById('videoGame');
   const overlay = document.getElementById('gameOverlay');
   gameCtx = overlay.getContext('2d');
@@ -288,7 +397,10 @@ function onGameFrame({hand}){
   document.getElementById('statHits').textContent = inst.correct;
   document.getElementById('statErr').textContent = inst.incorrect;
   document.getElementById('statReact').textContent = inst.reactionTimes.length ? Math.round(inst.reactionTimes[inst.reactionTimes.length-1]) : '—';
-  document.getElementById('statRep').textContent = (inst.correct+inst.incorrect)+'/'+state.sessionReps;
+  const repDisplay = inst.roundProgress!=null ? inst.roundProgress : (inst.correct+inst.incorrect);
+  document.getElementById('statRep').textContent = repDisplay+'/'+state.sessionReps;
+  const roundEl = document.getElementById('gameRound');
+  if(roundEl) roundEl.textContent = inst.roundProgress!=null ? ('Série '+inst.rodada) : '';
 }
 
 function fmtTimer(sec){
@@ -312,6 +424,7 @@ document.getElementById('btnEndSession').addEventListener('click', ()=>{
 
 function endExercise(inst){
   Tracking.stop();
+  releaseWakeLock();
   const def = ExerciseEngine.def(state.currentExerciseId);
   const registro = {
     nome: def.nome,
@@ -354,7 +467,17 @@ async function finalizeSession(){
     setTimeout(()=>alert(`Parabéns! Desempenho médio melhorou ${sessao.progresso.melhoriaPrecisao}% em relação às sessões anteriores.`), 100);
   }
 
-  document.getElementById('reportBody').innerHTML = Report.build(state.wrapper, sessao);
+  let html = Report.build(state.wrapper, sessao);
+  const nSessoes = state.wrapper.paciente.sessoes.length;
+  if(nSessoes===Programa.CICLO || nSessoes===Programa.TOTAL){
+    const ciclo = nSessoes/Programa.CICLO;
+    html += '<hr style="margin:26px 0;border:none;border-top:3px double #123C39;">' + Report.buildCycle(state.wrapper, ciclo);
+    if(nSessoes===Programa.TOTAL) html += '<hr style="margin:26px 0;border:none;border-top:3px double #123C39;">' + Report.buildCycle(state.wrapper, 'geral');
+    setTimeout(()=>alert(nSessoes===Programa.TOTAL
+      ? 'Programa concluído! 20 sessões realizadas. O relatório completo (ciclo 2 + geral) está logo abaixo do relatório da sessão.'
+      : 'Ciclo 1 concluído! 10 sessões realizadas. O relatório completo do ciclo está logo abaixo do relatório da sessão.'), 200);
+  }
+  document.getElementById('reportBody').innerHTML = html;
   state.lastSessao = sessao;
   state.sessionExercicios = [];
   state.sessionRepsLocked = false;
@@ -375,23 +498,56 @@ function downloadJson(obj, filename){
 }
 
 // ---------- HISTÓRICO ----------
+// Os dados (agrupamento por ciclo, quais relatórios estão disponíveis) vêm
+// prontos de Programa (storage.js); aqui só se monta o HTML.
 function renderHistory(){
   showScreen('screen-history');
   const p = state.wrapper.paciente;
   document.getElementById('histPatientName').textContent = p.nome;
+  const n = p.sessoes.length;
+
+  const sum = document.getElementById('programSummary');
+  sum.innerHTML = `<div class="panel program-panel"><h3>Relatórios de evolução</h3>
+    <p class="prog-note" style="margin:0 0 10px 0;">Progresso: ${Math.min(n,Programa.TOTAL)} de ${Programa.TOTAL} sessões${n>Programa.TOTAL?' (+'+(n-Programa.TOTAL)+' extra)':''}.</p>
+    <div id="cycleBtns" style="display:flex;flex-direction:column;gap:8px;"></div></div>`;
+  const box = document.getElementById('cycleBtns');
+  const disponiveis = Programa.relatoriosDisponiveis(p);
+  if(!disponiveis.length){
+    box.innerHTML = '<div class="empty" style="color:#4a5f5a;padding:8px;">Disponível após a 1ª sessão.</div>';
+  } else {
+    disponiveis.forEach(r=>{
+      const b = document.createElement('button');
+      b.className = 'btn-primary btn-block';
+      b.textContent = `${r.label} — ${r.qtd===r.meta ? 'completo' : 'parcial '+r.qtd+'/'+r.meta}`;
+      b.addEventListener('click', ()=>openCycleReport(r.modo));
+      box.appendChild(b);
+    });
+  }
+
   const list = document.getElementById('historyList');
-  if(!p.sessoes.length){ list.innerHTML = '<div class="empty">Ainda não há sessões registradas.</div>'; return; }
+  if(!n){ list.innerHTML = '<div class="empty">Ainda não há sessões registradas.</div>'; return; }
   list.innerHTML = '';
-  p.sessoes.forEach(s=>{
-    const div = document.createElement('div');
-    div.className = 'history-item';
-    const total = s.exerciciosRealizados.reduce((a,e)=>a+e.pontuacao,0);
-    div.innerHTML = `<div class="hname">${new Date(s.data).toLocaleString('pt-BR')}</div>
-      <div class="hmeta">${s.exerciciosRealizados.length} exercício(s) · ${total} pts · ${fmtDurMin(s.duracaoTotal)}</div>`;
-    list.appendChild(div);
+  Programa.agrupadoPorCiclo(p).forEach(grupo=>{
+    const h = document.createElement('div');
+    h.className = 'hcycle';
+    h.textContent = grupo.ciclo ? ('Ciclo '+grupo.ciclo+' (sessões '+((grupo.ciclo-1)*10+1)+'–'+(grupo.ciclo*10)+')') : 'Sessões extras';
+    list.appendChild(h);
+    grupo.sessoes.forEach(({numero, sessao:s})=>{
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      const total = s.exerciciosRealizados.reduce((a,e)=>a+e.pontuacao,0);
+      div.innerHTML = `<div class="hname">Sessão ${numero} · ${new Date(s.data).toLocaleString('pt-BR')}</div>
+        <div class="hmeta">${s.exerciciosRealizados.length} exercício(s) · ${total} pts · ${fmtDurMin(s.duracaoTotal)}</div>`;
+      list.appendChild(div);
+    });
   });
 }
 function fmtDurMin(sec){ sec=Math.round(sec||0); return Math.floor(sec/60)+'min '+(sec%60)+'s'; }
+
+function openCycleReport(modo){
+  document.getElementById('reportBody').innerHTML = Report.buildCycle(state.wrapper, modo);
+  showScreen('screen-report');
+}
 
 document.getElementById('btnHistoryBack').addEventListener('click', goToMenu);
 document.getElementById('btnExportPatientJson').addEventListener('click', ()=>{

@@ -122,44 +122,20 @@ async function checkPhpApi(){
   return phpApiAvailable;
 }
 
-// ---------- backend 3: arquivos estáticos (data/pacientes/index.json) ----------
-// Pacientes já cadastrados direto nos arquivos JSON do site. Funcionam sem token e sem PHP.
-async function staticAll(){
-  try{
-    const r = await fetch('data/pacientes/index.json', {cache:'no-store'});
-    if(!r.ok) return [];
-    const idx = await r.json();
-    const out = [];
-    for(const item of idx){
-      const rel = String(item.path).split('/pacientes/')[1];
-      if(!rel) continue;
-      const rr = await fetch('data/pacientes/'+rel, {cache:'no-store'});
-      if(rr.ok) out.push(await rr.json());
-    }
-    return out;
-  }catch(e){ console.warn('staticAll falhou', e); return []; }
-}
-async function withStatic(list){
-  const ids = new Set(list.map(w=>w.paciente.id));
-  const extra = (await staticAll()).filter(w=>!ids.has(w.paciente.id));
-  extra.forEach(localUpsert);
-  return list.concat(extra);
-}
-
 // ---------- fachada única ----------
 const Storage = {
   async all(){
     if(githubEnabled()){
-      try{ return await withStatic(await githubAll()); }
+      try{ return await githubAll(); }
       catch(e){ console.warn('Storage.all via GitHub falhou, tentando outro backend', e); }
     }
     if(await checkPhpApi()){
       try{
         const r = await fetch(API_BASE+'?action=list', {cache:'no-store'});
-        if(r.ok){ const list = await r.json(); if(Array.isArray(list)){ list.forEach(localUpsert); return await withStatic(list); } }
+        if(r.ok){ const list = await r.json(); if(Array.isArray(list)){ list.forEach(localUpsert); return list; } }
       }catch(e){ console.warn('Storage.all via api.php falhou, usando local', e); }
     }
-    return await withStatic(localAll());
+    return localAll();
   },
   async get(id){
     if(githubEnabled()){
@@ -172,9 +148,7 @@ const Storage = {
         if(r.ok){ const w = await r.json(); if(w && w.paciente){ localUpsert(w); return w; } }
       }catch(e){ console.warn('Storage.get via api.php falhou, usando local', e); }
     }
-    const loc = localAll().find(p=>p.paciente.id===id);
-    if(loc) return loc;
-    return (await staticAll()).find(w=>w.paciente.id===id) || null;
+    return localAll().find(p=>p.paciente.id===id) || null;
   },
   async upsert(wrapper){
     localUpsert(wrapper); // sempre guarda local como backup
@@ -248,3 +222,84 @@ function ultimaExecucao(wrapper, nomeExercicio, excluirSessaoAtualIdx){
   }
   return null;
 }
+
+// ======================================================================
+// HISTÓRICO / PROGRAMA — toda a lógica de dados do histórico do paciente
+// e do programa de tratamento (20 sessões = 2 ciclos de 10) mora aqui.
+// app.js só chama estas funções e desenha o resultado na tela.
+// ======================================================================
+const Programa = {
+  TOTAL: 20,
+  CICLO: 10,
+  feitas(p){ return p.sessoes.length; },
+  concluido(p){ return p.sessoes.length >= Programa.TOTAL; },
+  // sessões do paciente da mais ANTIGA para a mais NOVA (p.sessoes vem ao contrário)
+  cronologicas(p){ return p.sessoes.slice().reverse(); },
+  cicloEmAndamento(n){ return n >= Programa.TOTAL ? 2 : Math.floor(n / Programa.CICLO) + 1; },
+  // sessões (cronológicas) de um ciclo específico (1 ou 2)
+  sessoesDoCiclo(p, k){
+    const c = Programa.cronologicas(p);
+    return c.slice((k-1)*Programa.CICLO, k*Programa.CICLO);
+  },
+  // estatísticas agregadas de uma sessão (usadas nos relatórios de ciclo)
+  stats(s){
+    const ex = s.exerciciosRealizados || [];
+    const media = (arr)=> arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : null;
+    const certos = ex.reduce((a,e)=>a+(e.metricas.movimentosCorretos||0),0);
+    const errados = ex.reduce((a,e)=>a+(e.metricas.movimentosIncorretos||0),0);
+    return {
+      pontos: ex.reduce((a,e)=>a+e.pontuacao,0),
+      precisao: media(ex.map(e=>e.metricas.precisaoMedia).filter(v=>v!=null)),
+      reacao: media(ex.map(e=>e.metricas.tempoReacaoMedio).filter(v=>v!=null)),
+      acerto: (certos+errados) ? Math.round(certos/(certos+errados)*100) : null,
+      duracao: s.duracaoTotal || 0,
+      exercicios: ex.length
+    };
+  },
+  // dados prontos para o painel do menu de exercícios
+  painel(p){
+    const n = Programa.feitas(p);
+    const concluido = Programa.concluido(p);
+    const ciclo = Programa.cicloEmAndamento(n);
+    const noCiclo = concluido ? Programa.CICLO : (n - (ciclo-1)*Programa.CICLO);
+    return { n, concluido, ciclo, noCiclo };
+  },
+  // agrupa as sessões do paciente por ciclo, já numeradas, pra tela de histórico
+  // retorna [{ciclo, sessoes:[{numero, sessao}]}], mais recente primeiro
+  agrupadoPorCiclo(p){
+    const n = Programa.feitas(p);
+    const grupos = [];
+    let last = null;
+    p.sessoes.forEach((s,i)=>{
+      const numero = n - i;
+      const ciclo = numero > Programa.TOTAL ? 0 : Math.ceil(numero/Programa.CICLO);
+      if(ciclo !== last){ grupos.push({ciclo, sessoes:[]}); last = ciclo; }
+      grupos[grupos.length-1].sessoes.push({numero, sessao:s});
+    });
+    return grupos;
+  },
+  // quais botões de relatório de ciclo devem aparecer no histórico
+  relatoriosDisponiveis(p){
+    const n = Programa.feitas(p);
+    const out = [];
+    if(n>=1) out.push({modo:1, label:'Ciclo 1 (sessões 1–10)', qtd:Math.min(n,10), meta:10});
+    if(n>10) out.push({modo:2, label:'Ciclo 2 (sessões 11–20)', qtd:Math.min(n-10,10), meta:10});
+    if(n>=2) out.push({modo:'geral', label:'Relatório geral (desde a 1ª sessão)', qtd:Math.min(n,20), meta:20});
+    return out;
+  }
+};
+
+// ---------- busca e "últimos 5" na home ----------
+const PatientList = {
+  norm(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); },
+  // wrappers: lista completa vinda de Storage.all(); modo: 'recent' | 'all'; query: texto da busca
+  filtrar(wrappers, modo, query){
+    const ordenados = wrappers.slice().sort((a,b)=> new Date(b.paciente.dataCadastro)-new Date(a.paciente.dataCadastro));
+    const q = PatientList.norm(query);
+    if(q){
+      return { list: ordenados.filter(w=>PatientList.norm(w.paciente.nome).includes(q)), modo:'busca' };
+    }
+    if(modo==='recent') return { list: ordenados.slice(0,5), modo:'recent', total: ordenados.length };
+    return { list: ordenados, modo:'all' };
+  }
+};

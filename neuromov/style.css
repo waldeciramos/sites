@@ -122,3 +122,36 @@ footer.nav{padding:12px 18px 20px 18px;}
 @media (prefers-reduced-motion: reduce){
   *{transition:none !important;animation:none !important;}
 }
+
+
+/* busca + abas da lista de pacientes */
+.search-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(234,241,238,.35);background:rgba(234,241,238,.08);color:var(--paper);font-size:15px;font-family:var(--sans);margin-bottom:10px;}
+.search-input::placeholder{color:var(--paper2);}
+.search-input:focus{outline:2px solid var(--amber);}
+.tabs{display:flex;gap:8px;margin-bottom:8px;}
+.tab{flex:1;background:rgba(234,241,238,.08);color:var(--paper);padding:10px;border-radius:10px;font-size:13px;}
+.tab.active{background:var(--amber);color:var(--deep);}
+#patientList{margin-bottom:8px;}
+.patient-item .pname{color:var(--paper);}
+
+/* programa de 20 sessões */
+.program-panel h3{margin-top:0;}
+.prog-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;font-weight:600;}
+.prog-top .big{font-family:var(--mono);font-size:22px;color:var(--deep2);}
+.prog-bar{height:12px;background:#c4d3cd;border-radius:6px;overflow:hidden;margin:8px 0 6px 0;position:relative;}
+.prog-bar > i{display:block;height:100%;background:var(--ok);}
+.prog-dots{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.prog-dots span{width:22px;height:22px;border-radius:50%;background:#c4d3cd;font-size:10px;display:flex;align-items:center;justify-content:center;color:var(--deep);font-family:var(--mono);}
+.prog-dots span.done{background:var(--ok);color:#fff;}
+.prog-dots span.next{background:var(--amber);}
+.prog-note{font-size:12px;color:#4a5f5a;margin:6px 0 0 0;}
+.prog-badge{display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:8px;background:var(--amber);color:var(--deep);margin-left:6px;}
+.prog-badge.ok{background:var(--ok);color:#fff;}
+.patient-item .pprog{font-size:11px;color:var(--amber);font-family:var(--mono);margin-top:3px;}
+.hcycle{font-family:var(--serif);font-size:14px;color:var(--amber);margin:14px 0 6px 0;}
+.report .delta-up{color:#2b7a58;font-weight:700;}
+.report .delta-down{color:#C1502E;font-weight:700;}
+.report table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0;}
+.report th,.report td{padding:5px 6px;border-bottom:1px dashed #c4d3cd;text-align:center;}
+.report th:first-child,.report td:first-child{text-align:left;}
+.report th{color:var(--deep2);font-size:11px;}

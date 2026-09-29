@@ -58,12 +58,27 @@ const Tracking = (function(){
     palmIdx.forEach(i=>{ px+=lm[i].x; py+=lm[i].y; });
     px/=palmIdx.length; py/=palmIdx.length;
 
+    const FINGER_NAMES = ['thumb','index','middle','ring','pinky'];
+    const fingers = {};
     let extended = 0;
     for(let f=1; f<5; f++){
-      if(lm[FINGER_TIPS[f]].y < lm[FINGER_PIPS[f]].y - 0.02) extended++;
+      const isExt = lm[FINGER_TIPS[f]].y < lm[FINGER_PIPS[f]].y - 0.02;
+      fingers[FINGER_NAMES[f]] = isExt;
+      if(isExt) extended++;
     }
     const thumbExtended = Math.abs(lm[4].x - lm[0].x) > Math.abs(lm[3].x - lm[0].x);
+    fingers.thumb = thumbExtended;
     if(thumbExtended) extended++;
+
+    // distância polegar->cada dedo, normalizada pelo tamanho da mão, pra detectar "pinça" (toque do polegar em cada dedo)
+    const p2 = (a,b)=>Math.hypot(a.x-b.x, a.y-b.y);
+    const handSize = p2(lm[0], lm[9]) || 0.001;
+    const pinch = {
+      index:  p2(lm[4], lm[8])  < handSize*0.55,
+      middle: p2(lm[4], lm[12]) < handSize*0.55,
+      ring:   p2(lm[4], lm[16]) < handSize*0.55,
+      pinky:  p2(lm[4], lm[20]) < handSize*0.55,
+    };
 
     const isOpen = extended >= 3;
     const wasOpen = lastHand ? lastHand.open : true;
@@ -78,7 +93,7 @@ const Tracking = (function(){
 
     const mx = 1-px; // espelha x para bater com o vídeo espelhado na tela
 
-    lastHand = {x:mx, y:py, open:isOpen, extendedCount:extended, speed};
+    lastHand = {x:mx, y:py, open:isOpen, extendedCount:extended, fingers, pinch, speed};
 
     if(wasOpen && !isOpen) emit('handClose', {x:mx,y:py});
     if(!wasOpen && isOpen) emit('handOpen', {x:mx,y:py});
