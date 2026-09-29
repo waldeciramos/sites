@@ -568,65 +568,6 @@ function closeSettings(){
 document.getElementById('toggleContrast').addEventListener('change', (e)=>document.body.classList.toggle('contrast', e.target.checked));
 document.getElementById('toggleFontSize').addEventListener('change', (e)=>document.body.classList.toggle('bigfont', e.target.checked));
 
-// ---------- Login ----------
-const NM_LOGIN_KEY = 'neuromove_logado';
-
-async function checkCredenciais(usuario, senha){
-  // 1) Tenta o api.php (servidor com PHP) — a senha fica no servidor, nunca
-  //    aparece no navegador nem precisa de token do GitHub.
-  try{
-    const r = await fetch('api.php?action=login', {
-      method:'POST', cache:'no-store',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({usuario, senha})
-    });
-    if(r.ok){
-      const j = await r.json();
-      return !!j.ok;
-    }
-  }catch(e){ /* sem PHP disponível (ex.: GitHub Pages) — tenta o fallback abaixo */ }
-
-  // 2) Fallback: GitHub Pages (estático, sem PHP) — só funciona se GITHUB_CONFIG
-  //    estiver preenchido em config.js.
-  try{
-    const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.basePath}/senha.json`;
-    const r = await fetch(url, {cache:'no-store'});
-    if(!r.ok) return false;
-    const j = await r.json();
-    return j.usuario===usuario && j.senha===senha;
-  }catch(e){ console.warn('checkCredenciais falhou', e); return false; }
-}
-
-document.getElementById('btnLogin').addEventListener('click', doLogin);
-document.getElementById('loginPass').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doLogin(); });
-
-async function doLogin(){
-  const btn = document.getElementById('btnLogin');
-  const user = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const errEl = document.getElementById('loginError');
-  errEl.textContent = '';
-  btn.disabled = true; btn.textContent = 'Verificando…';
-  const ok = await checkCredenciais(user, pass);
-  btn.disabled = false; btn.textContent = 'Entrar';
-  if(ok){
-    sessionStorage.setItem(NM_LOGIN_KEY, '1');
-    showScreen('screen-home');
-    renderPatientList();
-  } else {
-    errEl.textContent = 'Usuário ou senha incorretos.';
-  }
-}
-
-document.getElementById('btnLogout').addEventListener('click', ()=>{
-  sessionStorage.removeItem(NM_LOGIN_KEY);
-  closeSettings();
-  state.wrapper = null;
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
-  showScreen('screen-login');
-});
-
 // ---------- Init ----------
 window.addEventListener('resize', ()=>{
   if(document.getElementById('screen-calib').classList.contains('active')){
@@ -637,10 +578,6 @@ window.addEventListener('resize', ()=>{
   }
 });
 
-if(sessionStorage.getItem(NM_LOGIN_KEY)==='1'){
-  showScreen('screen-home');
-  renderPatientList();
-} else {
-  showScreen('screen-login');
-}
+showScreen('screen-home');
+renderPatientList();
 })();
