@@ -5,6 +5,8 @@
 <link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <title>Infinity Ponto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#eef3f8;--cd:#fff;--c2:#dfe8f3;--tx:#0f2a4a;--mu:#5d7290;--ac:#0f2a4a;--pu:#ffb400;--ok:#12a36b;--wa:#d98a00;--bad:#d9382e;--bd:#d3deec}
 @media(prefers-color-scheme:dark){:root{--bg:#0a1524;--cd:#12233b;--c2:#1a3050;--tx:#e6eefb;--mu:#8ba2c4;--ac:#e6eefb;--ok:#38d39a;--wa:#ffb400;--bad:#ff6b5e;--bd:#223a5e}}
@@ -50,7 +52,7 @@ button,input{font:inherit;color:inherit}
 .it small{color:var(--mu)}.it .r{text-align:right}
 .bd{font-size:12px;font-weight:700}.bd.ok{color:var(--ok)}.bd.pa{color:var(--wa)}.bd.fa{color:var(--bad)}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-nav{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
 nav button{background:none;border:0;padding:12px 0;font-size:12px;color:var(--mu);cursor:pointer}
 nav button.on{color:var(--tx);font-weight:700;box-shadow:inset 0 3px 0 var(--pu)}
 label{display:block;font-size:12px;color:var(--mu);margin-bottom:10px}
@@ -63,6 +65,48 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 .fl.t{font-size:18px;font-weight:700;border:0}
 #toast{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:488px;margin:0 auto;padding:13px 16px;border-radius:14px;background:var(--ac);color:var(--bg);font-weight:600;z-index:9;text-align:center}
 #toast.ok{background:var(--ok);color:#fff}#toast.wa{background:var(--wa);color:#2b1c00}#toast.bad{background:var(--bad);color:#fff}
+
+/* Impressora térmica */
+.maq{position:relative;width:100%;max-width:340px;margin:6px auto 0;height:118px;border-radius:24px;background:var(--c2);
+ box-shadow:10px 10px 22px var(--bd),-8px -8px 18px var(--cd),inset 2px 2px 4px var(--cd);
+ display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:2}
+.lcd{flex:1;max-width:200px;height:42px;border-radius:10px;background:#10181f;box-shadow:inset 3px 3px 8px #000a,inset -1px -1px 3px #ffffff14;
+ display:flex;align-items:center;padding:0 14px;font:400 14px 'Courier Prime',monospace;color:#7be08f}
+.lcd.oc::after{content:"";width:8px;height:14px;margin-left:4px;background:#7be08f;animation:pisc .7s steps(1) infinite}
+@keyframes pisc{50%{opacity:0}}
+.btmaq{width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;background:var(--c2);
+ box-shadow:6px 6px 14px var(--bd),-6px -6px 14px var(--cd);display:grid;place-items:center;transition:box-shadow .15s}
+.btmaq:active,.btmaq[disabled]{box-shadow:inset 4px 4px 10px var(--bd),inset -4px -4px 10px var(--cd)}
+.btmaq i{width:18px;height:18px;border-radius:50%;background:var(--pu);box-shadow:0 0 12px var(--pu)}
+.fenda{position:relative;width:min(280px,90%);margin:-4px auto 0;overflow:hidden;padding-bottom:10px;z-index:1;min-height:34px}
+.fenda::before{content:"";position:absolute;inset:0 0 auto 0;height:8px;z-index:3;pointer-events:none;background:linear-gradient(#0003,transparent)}
+.papel{position:relative;background:#fcfcfa;padding:18px 16px 22px;transform:translateY(-101%);
+ font:400 12.5px/1.45 'Courier Prime',monospace;color:#2b2b2b;box-shadow:0 8px 18px #0000002a;border-radius:2px}
+.papel::after{content:"";position:absolute;left:0;right:0;top:calc(100% - 1px);height:8px;
+ background:linear-gradient(135deg,#fcfcfa 25%,transparent 25%) -6px 0/11px 11px,linear-gradient(225deg,#fcfcfa 25%,transparent 25%) -6px 0/11px 11px}
+.papel h2{font-size:13px;font-weight:700;text-transform:uppercase}
+.papel .fraco{color:#77777a}
+.papel hr{border:0;border-top:1px dashed #b9b9b9;margin:8px 0}
+.plinha{display:flex;justify-content:space-between;gap:8px}
+.pcab{font-weight:700}
+.pq{min-width:0;text-align:right;flex:none}.pv{min-width:60px;text-align:right;flex:none}
+.pnome{flex:1}
+.ptotal{font-size:14px;font-weight:700}
+.pcodigo{height:30px;margin:12px auto 0;width:70%;background:repeating-linear-gradient(90deg,#333 0 2px,transparent 2px 4px,#333 4px 5px,transparent 5px 8px,#333 8px 11px,transparent 11px 13px)}
+.pcentro{text-align:center}
+.modoImp{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.modoImp label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx);margin:0}
+.modoImp input[type=radio]{width:auto}
+@media print{
+ body *{display:none!important}
+ #v-imp,#v-imp *{display:revert!important}
+ #v-imp{display:block!important;position:static}
+ .maq,.modoImp,.acts,nav,header,.h2title{display:none!important}
+ #impFenda{width:80mm;margin:0;padding:0;overflow:visible;min-height:0!important}
+ #impFenda::before,.papel::after{display:none!important}
+ #impPapel{transform:none!important;box-shadow:none;width:80mm;padding:6mm 5mm;font-size:12px}
+ @page{size:80mm auto;margin:0}
+}
 </style></head><body>
 <header><b>∞ Infinity</b><span id="per"></span></header>
 <main>
@@ -86,6 +130,22 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <div class="acts"><button class="ghost" onclick="abrirEd(null)">+ Dia extra</button><button class="ghost" onclick="fech()">Fechar mês</button><button class="ghost" onclick="csv()">CSV</button></div>
  <div id="ls"></div>
 </section>
+<section id="v-imp" class="vw h">
+ <p class="h2title" style="font-weight:700;margin-bottom:4px">Imprimir relatório</p>
+ <div class="modoImp">
+  <label><input type="radio" name="impModo" value="dia" checked> Só hoje</label>
+  <label><input type="radio" name="impModo" value="semana"> Últimos 7 dias</label>
+  <label><input type="radio" name="impModo" value="periodo"> Período completo <span id="impPerLbl" class="fraco" style="font-size:11px"></span></label>
+  <label><input type="radio" name="impModo" value="custom"> Personalizado</label>
+  <div class="g2" id="impCustom" style="display:none"><label>De<input type="date" id="impDe"></label><label>Até<input type="date" id="impAte"></label></div>
+ </div>
+ <div class="maq"><div class="lcd" id="impLcd">Pronto</div><button class="btmaq" id="impBtn" aria-label="Gerar"><i></i></button></div>
+ <div class="fenda" id="impFenda"><div class="papel" id="impPapel" aria-live="polite"></div></div>
+ <div class="acts" style="justify-content:center;margin-top:10px">
+  <button class="ghost" id="impImprimir" style="display:none">Imprimir</button>
+  <button class="ghost" id="impLimpar" style="display:none">Nova consulta</button>
+ </div>
+</section>
 <section id="v-cfg" class="vw h">
  <div class="box"><div class="g2">
  <label>Jornada (horas)<input type="number" id="c1" step="0.5"></label><label>Intervalo mín. (min)<input type="number" id="c2" step="5"></label>
@@ -106,7 +166,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <p class="bk" style="text-align:center">Desenvolvido por Waldeci Ramos</p>
 </section>
 </main>
-<nav id="nav"><button data-v="hoje" class="on">Hoje</button><button data-v="cal">Calendário</button><button data-v="rel">Relatório</button><button data-v="cfg">Ajustes</button></nav>
+<nav id="nav"><button data-v="hoje" class="on">Hoje</button><button data-v="cal">Calendário</button><button data-v="rel">Relatório</button><button data-v="imp">Imprimir</button><button data-v="cfg">Ajustes</button></nav>
 <dialog id="ed"><h3 id="edT"></h3><div class="g2">
  <label>Data<input type="date" id="fD"></label><label>Entrada<input type="time" id="fE"></label>
  <label>Saída intervalo<input type="time" id="fA"></label><label>Volta intervalo<input type="time" id="fB"></label>
@@ -225,8 +285,9 @@ function rRel(){const R=resumo(),J=C.jornadaDiaria*60,md=C.metaSemanas*5,pc=Math
  $('mh').textContent=`Faltam ${Math.max(0,md-R.D)} dias • Média/dia ${R.D?HM(R.T/R.D):'00:00'}`;
  $('rs').innerHTML=[['Trabalhadas',HM(R.T)],['Extras',HM(R.X)],['Faltas',HM(R.F)],['Atrasos',HM(R.A)],['Saldo',HM(R.saldo)],['Dias úteis',R.U]].map(([a,b])=>`<div><span class="lb">${a}</span><b>${b}</b></div>`).join('');
  $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro'}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta'}</span></div></div>`).join('')}
-function render(){const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,cfg:()=>{}})[vw]()}
+function render(){const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,imp:()=>{},cfg:()=>{}})[vw]()}
 function go(v){vw=v;document.querySelectorAll('.vw').forEach(s=>s.classList.toggle('h',s.id!=='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+ if(v==='imp'){const p=per();$('impPerLbl').textContent='('+BR(p.i)+' a '+BR(p.f)+')';if(!$('impDe').value){$('impDe').value=K(p.i);$('impAte').value=K(new Date())}}
  if(v==='cfg'){[['c1','jornadaDiaria'],['c2','intervaloMinimo'],['c3','tolerancia'],['c4','diaFechamento'],['c5','valorHora'],['c6','metaSemanas']].forEach(([i,k])=>$(i).value=C[k]);$('cDig').checked=!!C.digitalAtiva;digSt();bkSt();$('gT').value=C.githubToken||'';$('gR').value=C.githubRepo||'';$('gB').value=C.githubBranch||'main';$('gP').value=C.githubPath||'Pontos/dados.json';$('cGh').checked=!!C.githubAtivo;ghSt()}
  render();scrollTo(0,0)}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
@@ -248,6 +309,51 @@ function fech(){const R=resumo(),vh=C.valorHora||0,h=R.T/60,L=(a,b)=>`<div class
 function csv(){const R=resumo();let s='Data;Dia;Entrada;Saida Intervalo;Volta Intervalo;Saida;Trabalhado;Saldo\n';
  R.dias.forEach(({d,r,x})=>s+=[BR(d),DS[d.getDay()],r?.entrada||'',r?.saidaIntervalo||'',r?.voltaIntervalo||'',r?.saida||'',x.t>0?HM(x.t):'',r?HM(x.s):''].join(';')+'\n');
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+s],{type:'text/csv;charset=utf-8'}));a.download=`ponto_${K(R.p.i)}_a_${K(R.p.f)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+
+/* Impressão do relatório (recibo térmico) */
+const escI=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function diasEntre(ini,fim){const a=[],lim=new Date();lim.setHours(23,59,59,999);for(let c=new Date(ini);c<=fim&&c<=lim;c.setDate(c.getDate()+1))a.push(new Date(c));return a}
+function linhasImp(dias){
+ return dias.map(d=>{const r=E[K(d)],x=calc(r,d),w=fds(d);
+  const iv=r&&r.entrada?`${r.entrada} → ${r.saida||'em aberto'}`:(w?'Folga':'Falta');
+  const sld=r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):(w?'--:--':'-'+HM(C.jornadaDiaria*60));
+  return{nome:`${pad(d.getDate())}/${pad(d.getMonth()+1)} ${DS[d.getDay()]}`,qtd:iv,valor:sld}})}
+function totaisImp(dias){let T=0,S=0;dias.forEach(d=>{const r=E[K(d)],x=calc(r,d),w=fds(d);if(!w||r){T+=Math.max(0,x.t);S+=r&&r.entrada?x.s:(w?0:-C.jornadaDiaria*60)}});return{T,S}}
+function dadosImpressao(){
+ const modo=document.querySelector('input[name=impModo]:checked').value,hoje=new Date();let ini,fim,titulo;
+ if(modo==='dia'){ini=fim=hoje;titulo='Relatório do dia'}
+ else if(modo==='semana'){fim=hoje;ini=new Date(hoje);ini.setDate(ini.getDate()-6);titulo='Últimos 7 dias'}
+ else if(modo==='periodo'){const p=per();ini=p.i;fim=p.f;titulo='Relatório do período'}
+ else{ini=new Date($('impDe').value+'T00:00');fim=new Date($('impAte').value+'T00:00');titulo='Relatório personalizado'}
+ const dias=diasEntre(ini,fim),linhas=linhasImp(dias),{T,S}=totaisImp(dias);
+ return{empresa:'Infinity Ponto',endereco:['Controle de jornada'],titulo,periodo:`${BR(ini)} a ${BR(dias.length?dias[dias.length-1]:ini)}`,
+  colunas:['Data','Entrada → Saída','Saldo'],itens:linhas,resumo:[{rotulo:'Horas trabalhadas',valor:HM(T)}],
+  total:{rotulo:'Saldo do período',valor:(S>=0?'+':'')+HM(S)},rodape:'Desenvolvido por Waldeci Ramos'}}
+function montarPapel(d){
+ const agora=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}).replace(',',' -'),[c1,c2,c3]=d.colunas;
+ return`<h2>${escI(d.empresa)}</h2>${(d.endereco||[]).map(l=>`<div class="fraco">${escI(l)}</div>`).join('')}<hr>
+  <div><b>${escI(d.titulo)}</b></div><div class="fraco">${escI(d.periodo)}</div><div class="fraco">${agora}</div><hr>
+  <div class="plinha pcab"><span class="pnome">${escI(c1)}</span><span class="pq">${escI(c2)}</span><span class="pv">${escI(c3)}</span></div>
+  ${d.itens.map(i=>`<div class="plinha"><span class="pnome">${escI(i.nome)}</span><span class="pq">${escI(i.qtd)}</span><span class="pv">${escI(i.valor)}</span></div>`).join('')}
+  ${d.resumo.length?'<hr>':''}${d.resumo.map(r=>`<div class="plinha"><span>${escI(r.rotulo)}</span><span>${escI(r.valor)}</span></div>`).join('')}
+  <hr><div class="plinha ptotal"><span>${escI(d.total.rotulo)}</span><span>${escI(d.total.valor)}</span></div>
+  <div class="pcodigo" aria-hidden="true"></div><div class="pcentro" style="margin-top:10px">${escI(d.rodape)}</div>`}
+let impOcupado=false;
+function gerarImpressao(){
+ if(impOcupado)return;impOcupado=true;$('impBtn').disabled=true;$('impImprimir').style.display=$('impLimpar').style.display='none';
+ $('impLcd').textContent='Imprimindo...';$('impLcd').classList.add('oc');
+ const papel=$('impPapel'),fenda=$('impFenda');papel.style.transition='none';papel.style.transform='translateY(-101%)';
+ papel.innerHTML=montarPapel(dadosImpressao());const alt=papel.offsetHeight;fenda.style.minHeight=(alt+10)+'px';void papel.offsetHeight;
+ const reduzido=matchMedia('(prefers-reduced-motion: reduce)').matches,dur=reduzido?0:Math.min(6000,1200+alt*6);
+ papel.style.transition=`transform ${dur}ms steps(${Math.max(8,Math.round(alt/5))},end)`;papel.style.transform='translateY(0)';
+ setTimeout(()=>{$('impLcd').classList.remove('oc');$('impLcd').textContent='Concluído';$('impBtn').disabled=false;
+  $('impImprimir').style.display=$('impLimpar').style.display='inline-block';impOcupado=false},dur+60)}
+function limparImpressao(){const papel=$('impPapel');papel.style.transition='none';papel.style.transform='translateY(-101%)';papel.innerHTML='';
+ $('impFenda').style.minHeight='';$('impLcd').textContent='Pronto';$('impImprimir').style.display=$('impLimpar').style.display='none'}
+$('impBtn').addEventListener('click',gerarImpressao);
+$('impImprimir').addEventListener('click',()=>window.print());
+$('impLimpar').addEventListener('click',limparImpressao);
+document.querySelectorAll('input[name=impModo]').forEach(r=>r.addEventListener('change',()=>{$('impCustom').style.display=r.value==='custom'&&r.checked?'grid':'none'}));
 
 /* Início */
 (async()=>{
