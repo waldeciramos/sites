@@ -126,7 +126,7 @@ HMS=s=>{s=Math.max(0,Math.floor(s));return pad(s/3600|0)+':'+pad(s%3600/60|0)+':
 TM=t=>{if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m},
 NOW=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60},
 AG=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())},
-dump=()=>JSON.stringify({versao:1,dataBackup:new Date().toISOString(),config:C,registros:E},null,2);
+dump=()=>{const{githubToken,...c2}=C;return JSON.stringify({versao:1,dataBackup:new Date().toISOString(),config:c2,registros:E},null,2)};
 function salvar(){localStorage.setItem(SK,JSON.stringify(E));localStorage.setItem(CK,JSON.stringify(C));idbSet('dump',dump())}
 let tt;function toast(m,t='ok',ms=4000){const e=$('toast');e.textContent=m;e.className=t;clearTimeout(tt);tt=setTimeout(()=>e.className='h',ms)}
 
