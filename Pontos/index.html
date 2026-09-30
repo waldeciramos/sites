@@ -97,6 +97,12 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <label style="margin-top:12px;display:flex;gap:8px;align-items:center"><input type="checkbox" id="cDig" style="width:auto" onchange="C.digitalAtiva=this.checked;salvar()"> Exigir digital ao bater ponto</label></div>
  <div class="box"><b>Backup</b><p class="bk" id="bkSt"></p>
  <div class="acts"><button class="ghost" onclick="escolherPasta()">Escolher pasta (PC)</button><button class="ghost" onclick="bkManual()">Salvar / compartilhar</button><button class="ghost" onclick="$('fr').click()">Restaurar</button></div></div>
+ <div class="box"><b>Sincronização com GitHub</b><p class="bk" id="ghSt"></p>
+ <label>Personal Access Token<input type="text" id="gT" placeholder="github_pat_..."></label>
+ <div class="g2"><label>Repositório<input type="text" id="gR" placeholder="usuario/repo"></label><label>Branch<input type="text" id="gB" placeholder="main"></label></div>
+ <label>Caminho do arquivo<input type="text" id="gP" placeholder="Pontos/dados.json"></label>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="cGh" style="width:auto"> Sincronizar automaticamente ao bater ponto</label>
+ <div class="acts" style="margin-top:8px"><button class="ghost" onclick="salvarGh()">Salvar dados</button><button class="ghost" onclick="syncGithub(true)">Sincronizar agora</button><button class="ghost" onclick="restaurarGithub(true)">Restaurar do GitHub</button></div></div>
  <p class="bk" style="text-align:center">Desenvolvido por Waldeci Ramos</p>
 </section>
 </main>
@@ -110,7 +116,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 <div id="toast" class="h"></div><input type="file" id="fr" accept=".json" class="h">
 <script>
 const $=i=>document.getElementById(i),pad=n=>String(n).padStart(2,'0'),SK='infinity_ponto_v1',CK='infinity_ponto_config_v1',BIO='infinity_biometria_cred';
-const CP={jornadaDiaria:5,intervaloMinimo:20,avisoAntesIntervalo:20,diaFechamento:26,tolerancia:5,valorHora:0,metaSemanas:25,digitalAtiva:false};
+const CP={jornadaDiaria:5,intervaloMinimo:20,avisoAntesIntervalo:20,diaFechamento:26,tolerancia:5,valorHora:0,metaSemanas:25,digitalAtiva:false,githubAtivo:false,githubToken:'',githubRepo:'',githubPath:'Pontos/dados.json',githubBranch:'main'};
 const jp=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};
 let C={...CP,...jp(CK,{})},E=jp(SK,{}),mc=new Date(),edD=null,vw='hoje';
 const K=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,BR=d=>`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`,
@@ -154,6 +160,26 @@ async function digital(){const id=localStorage.getItem(BIO);if(!C.digitalAtiva||
  try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{id:ub64(id),type:'public-key'}],userVerification:'required',timeout:60000}});return true}catch{toast('Digital não confirmada','bad');return false}}
 function digSt(){$('digSt').textContent=!okDig()?'Indisponível: abra pelo link https.':localStorage.getItem(BIO)?'Digital cadastrada neste aparelho.':'Nenhuma digital cadastrada.'}
 
+/* GitHub sync */
+function ghOk(){return C.githubToken&&C.githubRepo&&C.githubPath}
+function ghB64e(s){return btoa(encodeURIComponent(s).replace(/%([0-9A-F]{2})/g,(m,p)=>String.fromCharCode('0x'+p)))}
+function ghB64d(s){return decodeURIComponent(atob(s.replace(/\n/g,'')).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''))}
+async function ghGet(){if(!ghOk())return null;const u=`https://api.github.com/repos/${C.githubRepo}/contents/${encodeURI(C.githubPath)}?ref=${C.githubBranch||'main'}`;
+ const r=await fetch(u,{headers:{Authorization:`Bearer ${C.githubToken}`,Accept:'application/vnd.github+json'}});
+ if(r.status===404)return{sha:null,dados:null};if(!r.ok)throw Error('GitHub '+r.status+': '+(await r.text()).slice(0,150));
+ const j=await r.json();return{sha:j.sha,dados:JSON.parse(ghB64d(j.content))}}
+async function ghPut(obj,sha){const u=`https://api.github.com/repos/${C.githubRepo}/contents/${encodeURI(C.githubPath)}`;
+ const b={message:'Atualização de ponto - '+new Date().toLocaleString('pt-BR'),content:ghB64e(JSON.stringify(obj,null,2)),branch:C.githubBranch||'main'};if(sha)b.sha=sha;
+ const r=await fetch(u,{method:'PUT',headers:{Authorization:`Bearer ${C.githubToken}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(b)});
+ if(!r.ok)throw Error('GitHub '+r.status+': '+(await r.text()).slice(0,150));return await r.json()}
+async function syncGithub(msg){if(!C.githubAtivo&&!msg)return;if(!ghOk()){if(msg)toast('Preencha token, repositório e caminho','bad');return}
+ try{const a=await ghGet();await ghPut(JSON.parse(dump()),a?a.sha:null);if(msg)toast('Sincronizado com o GitHub','ok')}catch(e){toast('Falha ao sincronizar: '+e.message,'bad',8000)}}
+async function restaurarGithub(msg){if(!ghOk()){if(msg)toast('Preencha token, repositório e caminho','bad');return false}
+ try{const a=await ghGet();if(!a||!a.dados){if(msg)toast('Nenhum dado encontrado ainda','wa');return false}
+ aplicar(a.dados);if(msg){toast('Restaurado do GitHub','ok');render()}return true}catch(e){toast('Falha ao restaurar: '+e.message,'bad',8000);return false}}
+function ghSt(){$('ghSt').textContent=ghOk()?`Pronto: ${C.githubRepo} / ${C.githubPath}`:'Preencha token, repositório e caminho do arquivo.'}
+function salvarGh(){C.githubToken=$('gT').value.trim();C.githubRepo=$('gR').value.trim();C.githubBranch=$('gB').value.trim()||'main';C.githubPath=$('gP').value.trim()||'Pontos/dados.json';C.githubAtivo=$('cGh').checked;salvar();ghSt();toast('Dados do GitHub salvos','ok')}
+
 /* Cálculo */
 function calc(r,d=new Date()){const J=C.jornadaDiaria*60;if(!r||!r.entrada)return{t:0,s:-J,iv:0,st:'fa',prev:0};
  const e=TM(r.entrada),a=TM(r.saidaIntervalo),b=TM(r.voltaIntervalo),f=TM(r.saida),hj=K(d)===K(new Date());
@@ -177,7 +203,8 @@ async function bater(campo){const d=new Date(),r=E[K(d)];campo=campo||prox(r)[1]
  if(navigator.vibrate)navigator.vibrate(campo==='saida'?[80,60,80]:60);
  render();const x=calc(n);toast(campo==='saida'?`Saída ${n.saida} • saldo ${x.s>=0?'+':''}${HM(x.s)}`:`Registrado: ${n[campo]}`,'ok');
  if(campo==='voltaIntervalo'){const dur=TM(n.voltaIntervalo)-TM(n.saidaIntervalo);if(dur>C.intervaloMinimo)toast(`Intervalo de ${dur} min (excedeu ${dur-C.intervaloMinimo}); saída empurrada`,'wa',7000)}
- if(campo==='saida')setTimeout(()=>backupAuto(h),1500)}
+ if(campo==='saida')setTimeout(()=>backupAuto(h),1500);
+ if(C.githubAtivo)syncGithub(false)}
 
 /* Telas */
 function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),J=C.jornadaDiaria*60,[tx,c]=prox(r);
@@ -200,7 +227,7 @@ function rRel(){const R=resumo(),J=C.jornadaDiaria*60,md=C.metaSemanas*5,pc=Math
  $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro'}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta'}</span></div></div>`).join('')}
 function render(){const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,cfg:()=>{}})[vw]()}
 function go(v){vw=v;document.querySelectorAll('.vw').forEach(s=>s.classList.toggle('h',s.id!=='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
- if(v==='cfg'){[['c1','jornadaDiaria'],['c2','intervaloMinimo'],['c3','tolerancia'],['c4','diaFechamento'],['c5','valorHora'],['c6','metaSemanas']].forEach(([i,k])=>$(i).value=C[k]);$('cDig').checked=!!C.digitalAtiva;digSt();bkSt()}
+ if(v==='cfg'){[['c1','jornadaDiaria'],['c2','intervaloMinimo'],['c3','tolerancia'],['c4','diaFechamento'],['c5','valorHora'],['c6','metaSemanas']].forEach(([i,k])=>$(i).value=C[k]);$('cDig').checked=!!C.digitalAtiva;digSt();bkSt();$('gT').value=C.githubToken||'';$('gR').value=C.githubRepo||'';$('gB').value=C.githubBranch||'main';$('gP').value=C.githubPath||'Pontos/dados.json';$('cGh').checked=!!C.githubAtivo;ghSt()}
  render();scrollTo(0,0)}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
 const mm=n=>{mc.setDate(1);mc.setMonth(mc.getMonth()+n);rCal()};
@@ -211,8 +238,8 @@ function abrirEd(d){edD=d;const r=d&&E[K(d)]||{};$('edT').textContent=d?`${BR(d)
  $('fD').value=K(d||new Date());$('fD').disabled=!!d;$('fE').value=r.entrada||'';$('fA').value=r.saidaIntervalo||'';$('fB').value=r.voltaIntervalo||'';$('fS').value=r.saida||'';$('fO').value=r.obs||'';
  $('fX').classList.toggle('h',!(d&&E[K(d)]));$('ed').showModal()}
 function salvarEd(){const k=$('fD').value;if(!k)return toast('Informe a data','bad');if(!$('fE').value)return toast('Informe ao menos a entrada','bad');
- E[k]={entrada:$('fE').value,saidaIntervalo:$('fA').value||null,voltaIntervalo:$('fB').value||null,saida:$('fS').value||null,obs:$('fO').value};salvar();$('ed').close();render();toast('Registro salvo','ok')}
-function delEd(){if(edD&&confirm(`Excluir o registro de ${BR(edD)}?`)){delete E[K(edD)];salvar();$('ed').close();render()}}
+ E[k]={entrada:$('fE').value,saidaIntervalo:$('fA').value||null,voltaIntervalo:$('fB').value||null,saida:$('fS').value||null,obs:$('fO').value};salvar();$('ed').close();render();toast('Registro salvo','ok');if(C.githubAtivo)syncGithub(false)}
+function delEd(){if(edD&&confirm(`Excluir o registro de ${BR(edD)}?`)){delete E[K(edD)];salvar();$('ed').close();render();if(C.githubAtivo)syncGithub(false)}}
 
 /* Fechamento e CSV */
 function fech(){const R=resumo(),vh=C.valorHora||0,h=R.T/60,L=(a,b)=>`<div class="fl"><span>${a}</span><b>${b}</b></div>`;
@@ -224,7 +251,10 @@ function csv(){const R=resumo();let s='Data;Dia;Entrada;Saida Intervalo;Volta In
 
 /* Início */
 (async()=>{
- if(!Object.keys(E).length){try{const j=JSON.parse(await idbGet('dump'));if(j.registros&&Object.keys(j.registros).length){aplicar(j);toast('Dados restaurados do backup interno','ok',6000)}}catch{}}
+ if(!Object.keys(E).length){
+   let ok=false;if(C.githubAtivo)ok=await restaurarGithub(false).then(x=>{if(x)toast('Dados restaurados do GitHub','ok',6000);return x});
+   if(!ok){try{const j=JSON.parse(await idbGet('dump'));if(j.registros&&Object.keys(j.registros).length){aplicar(j);toast('Dados restaurados do backup interno','ok',6000)}}catch{}}
+ }
  render();setInterval(()=>{if(vw==='hoje')rHoje()},1000);
  let dia=K(new Date());setInterval(()=>{if(K(new Date())!==dia){dia=K(new Date());mc=new Date();render()}},60000);
  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
