@@ -97,6 +97,37 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 .modoImp{display:flex;flex-direction:column;gap:8px;margin:14px 0}
 .modoImp label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx);margin:0}
 .modoImp input[type=radio]{width:auto}
+/* Painel do relógio de ponto (REP) */
+.rep{background:linear-gradient(160deg,#2c3644,#141a20);border-radius:24px;padding:18px 18px 22px;
+ box-shadow:0 14px 30px #0007,inset 0 1px 0 #ffffff17;margin:4px 0 14px;color:#dfe8f3}
+.repTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.marca{font-size:10px;letter-spacing:1.6px;color:#8ba2c4;text-transform:uppercase}
+.marca b{color:#fff}
+.led{width:9px;height:9px;border-radius:50%;background:#3a4653;box-shadow:inset 0 0 3px #000a;transition:.2s}
+.led.on{background:#3ddc84;box-shadow:0 0 8px #3ddc84}
+.led.err{background:#ff5b5b;box-shadow:0 0 8px #ff5b5b}
+.lcdBig{font:700 clamp(28px,9vw,38px) 'Courier Prime',monospace;text-align:center;color:#7be08f;
+ text-shadow:0 0 8px #7be08f77;letter-spacing:2px;background:#0c1116;border-radius:10px;padding:10px 0;
+ box-shadow:inset 0 2px 8px #000c}
+.lcdSt{text-align:center;font-size:12px;color:#9fb3cf;margin:9px 0 18px}
+.sensorWrap{display:flex;justify-content:center}
+.sensor{position:relative;width:96px;height:96px;border-radius:50%;border:0;cursor:pointer;
+ background:radial-gradient(circle at 35% 30%,#3d4956,#141a20 72%);
+ box-shadow:0 6px 16px #0009,inset 0 2px 4px #ffffff20,inset 0 -3px 7px #000a;
+ display:grid;place-items:center;transition:transform .12s}
+.sensor::before{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid #ffb40055;animation:respirar 2.2s ease-in-out infinite}
+.sensor:disabled::before{display:none}
+@keyframes respirar{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.1);opacity:0}}
+.sensor:active{transform:scale(.95)}
+.sensor svg{width:44px;height:44px;fill:none;stroke:#6c7f9a;stroke-width:4.5;stroke-linecap:round;transition:stroke .25s}
+.sensor.lendo svg{stroke:#ffb400}.sensor.ok svg{stroke:#3ddc84}.sensor.err svg{stroke:#ff5b5b}
+.scanline{position:absolute;left:16%;right:16%;height:3px;top:14%;background:#ffb400;border-radius:2px;box-shadow:0 0 8px #ffb400;opacity:0}
+.sensor.lendo .scanline{animation:varre .8s ease-in-out}
+@keyframes varre{0%{opacity:1;top:14%}50%{opacity:1;top:72%}100%{opacity:0;top:72%}}
+.sensorLabel{text-align:center;font-size:12.5px;color:#9fb3cf;margin-top:12px}
+.tempoHoje{text-align:center;font-size:12px;color:var(--mu);margin:2px 0 14px}
+.pqr{text-align:center;margin-top:10px}
+.pqr svg{width:92px;height:92px}
 @media print{
  body *{display:none!important}
  main,#v-imp,#v-imp *{display:revert!important}
@@ -105,15 +136,32 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  #impFenda{width:80mm;margin:0;padding:0;overflow:visible;min-height:0!important}
  #impFenda::before,.papel::after{display:none!important}
  #impPapel{transform:none!important;box-shadow:none;width:80mm;padding:6mm 5mm;font-size:12px}
+ .pqr svg{width:26mm;height:26mm}
  @page{size:80mm auto;margin:0}
 }
 </style></head><body>
 <header><b>∞ Infinity</b><span id="per"></span></header>
 <main>
 <section id="v-hoje" class="vw">
- <div class="dial"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" fill="none" stroke="var(--bd)" stroke-width="8" stroke-dasharray="1.5 8.2"/><circle cx="100" cy="100" r="78" fill="none" stroke="var(--c2)" stroke-width="12"/><circle id="ring" cx="100" cy="100" r="78" fill="none" stroke="var(--pu)" stroke-width="12" stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490" style="transition:stroke-dashoffset .6s"/></svg>
- <div class="in"><span id="tempo">00:00:00</span><span id="st">Aguardando entrada</span></div></div>
- <button id="bt" class="big" onclick="bater()">Bater entrada</button>
+ <div class="rep">
+  <div class="repTop"><span class="marca">SISTEMA <b>WALDECI RAMOS</b></span><span class="led" id="led"></span></div>
+  <div class="lcdBig" id="relogio">00:00:00</div>
+  <div class="lcdSt" id="st">Aguardando entrada</div>
+  <div class="sensorWrap">
+   <button id="bt" class="sensor" onclick="tocarSensor()" aria-label="Bater ponto pela digital">
+    <svg viewBox="0 0 100 100">
+     <path d="M50 20C25 20 15 45 15 60 15 78 28 90 40 90"/>
+     <path d="M50 28C32 28 24 48 24 60 24 74 34 84 44 84"/>
+     <path d="M50 36C38 36 33 50 33 60 33 70 40 78 48 78"/>
+     <path d="M50 44C43 44 42 52 42 60"/>
+     <path d="M62 22C78 30 82 48 78 64 75 76 66 84 58 86"/>
+    </svg>
+    <span class="scanline"></span>
+   </button>
+  </div>
+  <div class="sensorLabel" id="btLabel">Toque para registrar</div>
+ </div>
+ <div id="tempo" class="tempoHoje">Trabalhado hoje: 00:00:00</div>
  <button id="sem" class="ghost sem h" onclick="bater('saida')">Encerrar sem intervalo</button>
  <div class="tl" id="tl"></div>
  <div class="st3"><div><span>Saída prevista</span><b id="prev">--:--</b></div><div><span>Saldo do dia</span><b id="sd">--:--</b></div><div><span>Intervalo</span><b id="ivl">--:--</b></div></div>
@@ -174,6 +222,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <div class="acts" style="margin:8px 0 0"><button class="big" style="height:48px;flex:1" onclick="salvarEd()">Salvar</button><button class="ghost" id="fX" onclick="delEd()">Excluir</button><button class="ghost" onclick="$('ed').close()">Cancelar</button></div></dialog>
 <dialog id="fc"><h3>Fechamento do mês</h3><div id="fcB"></div><div class="acts" style="margin:14px 0 0"><button class="ghost" onclick="$('fc').close()">Fechar</button></div></dialog>
 <div id="toast" class="h"></div><input type="file" id="fr" accept=".json" class="h">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
 const $=i=>document.getElementById(i),pad=n=>String(n).padStart(2,'0'),SK='infinity_ponto_v1',CK='infinity_ponto_config_v1',BIO='infinity_biometria_cred';
 const CP={jornadaDiaria:5,intervaloMinimo:20,avisoAntesIntervalo:20,diaFechamento:26,tolerancia:5,valorHora:0,metaSemanas:25,digitalAtiva:false,githubAtivo:false,githubToken:'',githubRepo:'',githubPath:'Pontos/dados.json',githubBranch:'main'};
@@ -255,21 +304,37 @@ function resumo(){const p=per(),J=C.jornadaDiaria*60,lim=new Date();lim.setHours
 
 /* Ação principal */
 const prox=r=>!r||!r.entrada?['Bater entrada','entrada']:r.saida?['Jornada concluída','']:!r.saidaIntervalo?['Sair para intervalo','saidaIntervalo']:!r.voltaIntervalo?['Voltar do intervalo','voltaIntervalo']:['Bater saída','saida'];
-async function bater(campo){const d=new Date(),r=E[K(d)];campo=campo||prox(r)[1];if(!campo)return;
+async function bater(campo){const d=new Date(),r=E[K(d)];campo=campo||prox(r)[1];if(!campo)return false;
  const h=campo==='saida'?await permPasta():null;
- if(!(await digital()))return;
- if(campo==='entrada'&&r&&r.entrada&&!confirm('Já existe entrada hoje. Substituir?'))return;
+ if(!(await digital()))return false;
+ if(campo==='entrada'&&r&&r.entrada&&!confirm('Já existe entrada hoje. Substituir?'))return false;
  const n=campo==='entrada'?{entrada:AG(),saidaIntervalo:null,voltaIntervalo:null,saida:null,obs:''}:r;n[campo]=AG();E[K(d)]=n;salvar();
  if(navigator.vibrate)navigator.vibrate(campo==='saida'?[80,60,80]:60);
  render();const x=calc(n);toast(campo==='saida'?`Saída ${n.saida} • saldo ${x.s>=0?'+':''}${HM(x.s)}`:`Registrado: ${n[campo]}`,'ok');
  if(campo==='voltaIntervalo'){const dur=TM(n.voltaIntervalo)-TM(n.saidaIntervalo);if(dur>C.intervaloMinimo)toast(`Intervalo de ${dur} min (excedeu ${dur-C.intervaloMinimo}); saída empurrada`,'wa',7000)}
  if(campo==='saida')setTimeout(()=>backupAuto(h),1500);
- if(C.githubAtivo)syncGithub(false)}
+ if(C.githubAtivo)syncGithub(false);
+ return true}
+
+/* Sensor de digital (visual) */
+function bip(freq,ms,vol=.05){try{const ctx=new(window.AudioContext||window.webkitAudioContext)(),o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=freq;g.gain.value=vol;o.start();setTimeout(()=>{o.stop();ctx.close()},ms)}catch{}}
+async function tocarSensor(){
+ const btn=$('bt');if(btn.disabled||btn.classList.contains('lendo'))return;
+ btn.classList.add('lendo');$('led').className='led';bip(720,90,.04);
+ await new Promise(r=>setTimeout(r,700));
+ const ok=await bater();
+ btn.classList.remove('lendo');
+ if(ok){btn.classList.add('ok');$('led').classList.add('on');bip(1060,140,.05)}
+ else{btn.classList.add('err');$('led').classList.add('err');bip(220,220,.05)}
+ setTimeout(()=>{btn.classList.remove('ok','err');$('led').className='led'},900)
+}
 
 /* Telas */
-function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),J=C.jornadaDiaria*60,[tx,c]=prox(r);
- $('bt').textContent=tx;$('bt').dataset.c=c;$('bt').disabled=!c;$('sem').classList.toggle('h',!(r&&r.entrada&&!r.saidaIntervalo&&!r.saida));
- $('tempo').textContent=HMS(x.t*60);$('ring').style.strokeDashoffset=490*(1-Math.min(1,Math.max(0,x.t)/J));
+function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),[tx,c]=prox(r);
+ $('relogio').textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+ $('btLabel').textContent=c?'Toque para: '+tx:tx;$('bt').dataset.c=c;$('bt').disabled=!c;
+ $('sem').classList.toggle('h',!(r&&r.entrada&&!r.saidaIntervalo&&!r.saida));
+ $('tempo').textContent='Trabalhado hoje: '+HMS(Math.max(0,x.t)*60);
  $('st').textContent=!r||!r.entrada?(fds(d)?'Fim de semana':'Aguardando entrada'):r.saida?'Jornada concluída':r.saidaIntervalo&&!r.voltaIntervalo?'Em intervalo':'Em jornada';
  $('tl').innerHTML=[['Entrada','entrada'],['Intervalo','saidaIntervalo'],['Volta','voltaIntervalo'],['Saída','saida']].map(([n,k])=>`<div class="${r&&r[k]?'on':''}"><i></i><b>${r&&r[k]||'--:--'}</b>${n}</div>`).join('');
  const on=r&&r.entrada;$('prev').textContent=on?HM(x.prev):'--:--';$('sd').textContent=on?HM(x.s):'--:--';$('sd').style.color=on?(x.s>=0?'var(--ok)':'var(--bad)'):'';$('ivl').textContent=x.iv?HM(x.iv):'--:--'}
@@ -326,9 +391,10 @@ function dadosImpressao(){
  else if(modo==='periodo'){const p=per();ini=p.i;fim=p.f;titulo='Relatório do período'}
  else{ini=new Date($('impDe').value+'T00:00');fim=new Date($('impAte').value+'T00:00');titulo='Relatório personalizado'}
  const dias=diasEntre(ini,fim),linhas=linhasImp(dias),{T,S}=totaisImp(dias);
- return{empresa:'Infinity Ponto',endereco:['Controle de jornada'],titulo,periodo:`${BR(ini)} a ${BR(dias.length?dias[dias.length-1]:ini)}`,
+ return{empresa:'SISTEMA WALDECI RAMOS',endereco:['Comprovante de Ponto — Infinity'],titulo,periodo:`${BR(ini)} a ${BR(dias.length?dias[dias.length-1]:ini)}`,
   colunas:['Data','Entrada → Saída','Saldo'],itens:linhas,resumo:[{rotulo:'Horas trabalhadas',valor:HM(T)}],
-  total:{rotulo:'Saldo do período',valor:(S>=0?'+':'')+HM(S)},rodape:'Desenvolvido por Waldeci Ramos'}}
+  total:{rotulo:'Saldo do período',valor:(S>=0?'+':'')+HM(S)},rodape:'github.io/waldeciramos/sites/Pontos'}}
+function qrTag(texto){try{const q=qrcode(0,'M');q.addData(texto);q.make();return q.createSvgTag({cellSize:3,margin:2,scalable:true})}catch{return''}}
 function montarPapel(d){
  const agora=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}).replace(',',' -'),[c1,c2,c3]=d.colunas;
  return`<h2>${escI(d.empresa)}</h2>${(d.endereco||[]).map(l=>`<div class="fraco">${escI(l)}</div>`).join('')}<hr>
@@ -337,7 +403,9 @@ function montarPapel(d){
   ${d.itens.map(i=>`<div class="plinha"><span class="pnome">${escI(i.nome)}</span><span class="pq">${escI(i.qtd)}</span><span class="pv">${escI(i.valor)}</span></div>`).join('')}
   ${d.resumo.length?'<hr>':''}${d.resumo.map(r=>`<div class="plinha"><span>${escI(r.rotulo)}</span><span>${escI(r.valor)}</span></div>`).join('')}
   <hr><div class="plinha ptotal"><span>${escI(d.total.rotulo)}</span><span>${escI(d.total.valor)}</span></div>
-  <div class="pcodigo" aria-hidden="true"></div><div class="pcentro" style="margin-top:10px">${escI(d.rodape)}</div>`}
+  <div class="pcodigo" aria-hidden="true"></div>
+  <div class="pqr">${qrTag('https://waldeciramos.github.io/sites/Pontos/')}</div>
+  <div class="pcentro" style="margin-top:6px;font-size:10px">${escI(d.rodape)}</div>`}
 let impOcupado=false;
 function gerarImpressao(){
  if(impOcupado)return;impOcupado=true;$('impBtn').disabled=true;$('impImprimir').style.display=$('impLimpar').style.display='none';
