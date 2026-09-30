@@ -13,7 +13,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--tx);font:15px system-ui,'Segoe UI',sans-serif;max-width:520px;margin:0 auto;padding-top:env(safe-area-inset-top,0px);font-variant-numeric:tabular-nums}
 .h{display:none!important}
-header{display:flex;justify-content:space-between;align-items:baseline;padding:14px 18px 4px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;padding:14px 18px 4px}
 header b{font-size:20px;letter-spacing:.5px}header span{font-size:12px;color:var(--mu)}
 main{padding:8px 16px calc(96px + env(safe-area-inset-bottom,0px))}
 button,input{font:inherit;color:inherit}
@@ -41,7 +41,7 @@ button,input{font:inherit;color:inherit}
 .gr{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .dc{aspect-ratio:1;border-radius:10px;background:var(--cd);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer}
 .dc small{font-size:9px;font-weight:600}.dc.v{background:none;cursor:default}.dc.w{opacity:.45}
-.dc.ok{background:var(--ok);color:#fff}.dc.pa{background:var(--wa);color:#2b1c00}.dc.fa{background:var(--bad);color:#fff}
+.dc.ok{background:var(--ok);color:#fff}.dc.pa{background:var(--wa);color:#2b1c00}.dc.fa{background:var(--bad);color:#fff}.dc.fe{background:#8a6bff;color:#fff}.dc.w{background:var(--c2);color:var(--mu)}
 .dc.hj{outline:3px solid var(--pu);outline-offset:1px}
 .lg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--mu);margin-top:12px}
 .lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
@@ -50,7 +50,7 @@ button,input{font:inherit;color:inherit}
 .bar{height:10px;border-radius:6px;background:var(--c2);overflow:hidden;margin:8px 0 4px}.bar i{display:block;height:100%;background:var(--pu)}
 .it{display:flex;justify-content:space-between;align-items:center;background:var(--cd);border-radius:14px;padding:12px;margin-bottom:8px;cursor:pointer}
 .it small{color:var(--mu)}.it .r{text-align:right}
-.bd{font-size:12px;font-weight:700}.bd.ok{color:var(--ok)}.bd.pa{color:var(--wa)}.bd.fa{color:var(--bad)}
+.bd{font-size:12px;font-weight:700}.bd.ok{color:var(--ok)}.bd.pa{color:var(--wa)}.bd.fa{color:var(--bad)}.bd.fe{color:#8a6bff}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 nav{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
 nav button{background:none;border:0;padding:12px 0;font-size:12px;color:var(--mu);cursor:pointer}
@@ -101,7 +101,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 .rep{background:linear-gradient(160deg,#2c3644,#141a20);border-radius:24px;padding:18px 18px 22px;
  box-shadow:0 14px 30px #0007,inset 0 1px 0 #ffffff17;margin:4px 0 14px;color:#dfe8f3}
 .repTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.marca{font-size:10px;letter-spacing:1.6px;color:#8ba2c4;text-transform:uppercase}
+.marca{font-size:10px;letter-spacing:1.6px;color:#8ba2c4;text-transform:uppercase;line-height:1.5}
 .marca b{color:#fff}
 .led{width:9px;height:9px;border-radius:50%;background:#3a4653;box-shadow:inset 0 0 3px #000a;transition:.2s}
 .led.on{background:#3ddc84;box-shadow:0 0 8px #3ddc84}
@@ -140,11 +140,11 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  @page{size:80mm auto;margin:0}
 }
 </style></head><body>
-<header><b>∞ Infinity</b><span id="per"></span></header>
+<header><div style="display:flex;align-items:center;gap:8px"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><span id="per"></span></header>
 <main>
 <section id="v-hoje" class="vw">
  <div class="rep">
-  <div class="repTop"><span class="marca">SISTEMA <b>WALDECI RAMOS</b></span><span class="led" id="led"></span></div>
+  <div class="repTop"><span class="marca" id="marcaUser">SISTEMA</span><span class="led" id="led"></span></div>
   <div class="lcdBig" id="relogio">00:00:00</div>
   <div class="lcdSt" id="st">Aguardando entrada</div>
   <div class="sensorWrap">
@@ -170,7 +170,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <div class="nv"><button onclick="mm(-1)">‹</button><b id="mes" style="text-transform:capitalize"></b><button onclick="mm(1)">›</button></div>
  <div class="sm"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
  <div class="gr" id="gr"></div>
- <div class="lg"><span><i style="background:var(--ok)"></i>Trabalhado</span><span><i style="background:var(--wa)"></i>Parcial</span><span><i style="background:var(--bad)"></i>Falta</span><span><i style="outline:2px solid var(--pu)"></i>Hoje</span></div>
+ <div class="lg"><span><i style="background:var(--ok)"></i>Trabalhado</span><span><i style="background:var(--wa)"></i>Parcial</span><span><i style="background:var(--bad)"></i>Falta</span><span><i style="background:#8a6bff"></i>Feriado</span><span><i style="background:var(--c2)"></i>Fim de semana</span><span><i style="outline:2px solid var(--pu)"></i>Hoje</span></div>
 </section>
 <section id="v-rel" class="vw h">
  <div class="box"><span class="lb" id="mt">--</span><div class="bar"><i id="mb" style="width:0"></i></div><span class="lb" id="mh">--</span></div>
@@ -215,19 +215,54 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 </section>
 </main>
 <nav id="nav"><button data-v="hoje" class="on">Hoje</button><button data-v="cal">Calendário</button><button data-v="rel">Relatório</button><button data-v="imp">Imprimir</button><button data-v="cfg">Ajustes</button></nav>
-<dialog id="ed"><h3 id="edT"></h3><div class="g2">
- <label>Data<input type="date" id="fD"></label><label>Entrada<input type="time" id="fE"></label>
- <label>Saída intervalo<input type="time" id="fA"></label><label>Volta intervalo<input type="time" id="fB"></label>
- <label>Saída final<input type="time" id="fS"></label><label>Observação<input type="text" id="fO"></label></div>
+<dialog id="ed"><h3 id="edT"></h3>
+ <label>Tipo do dia<select id="fTipo" onchange="tipoMudou()">
+  <option value="">Normal (com horários)</option>
+  <option value="falta">Falta (desconta a jornada)</option>
+  <option value="feriado">Feriado / dispensado (não conta negativo)</option>
+ </select></label>
+ <div class="g2"><label>Data<input type="date" id="fD"></label><label>Observação<input type="text" id="fO"></label></div>
+ <div class="g2" id="edHorarios">
+  <label>Entrada<input type="time" id="fE"></label><label>Saída intervalo<input type="time" id="fA"></label>
+  <label>Volta intervalo<input type="time" id="fB"></label><label>Saída final<input type="time" id="fS"></label></div>
  <div class="acts" style="margin:8px 0 0"><button class="big" style="height:48px;flex:1" onclick="salvarEd()">Salvar</button><button class="ghost" id="fX" onclick="delEd()">Excluir</button><button class="ghost" onclick="$('ed').close()">Cancelar</button></div></dialog>
 <dialog id="fc"><h3>Fechamento do mês</h3><div id="fcB"></div><div class="acts" style="margin:14px 0 0"><button class="ghost" onclick="$('fc').close()">Fechar</button></div></dialog>
+<dialog id="usr"><h3>Perfil</h3>
+ <div id="usrLista"></div>
+ <div class="box" style="margin-top:12px"><b>Novo usuário</b>
+  <label>Nome<input type="text" id="nuNome"></label>
+  <label>Empresa<input type="text" id="nuEmpresa"></label>
+  <label>Cargo<input type="text" id="nuCargo"></label>
+  <button class="ghost" onclick="criarUsuario()">Criar e usar este perfil</button>
+ </div>
+ <div class="acts" style="margin-top:10px"><button class="ghost" onclick="$('usr').close()">Fechar</button></div></dialog>
 <div id="toast" class="h"></div><input type="file" id="fr" accept=".json" class="h">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
-const $=i=>document.getElementById(i),pad=n=>String(n).padStart(2,'0'),SK='infinity_ponto_v1',CK='infinity_ponto_config_v1',BIO='infinity_biometria_cred';
-const CP={jornadaDiaria:5,intervaloMinimo:20,avisoAntesIntervalo:20,diaFechamento:26,tolerancia:5,valorHora:0,metaSemanas:25,digitalAtiva:false,githubAtivo:false,githubToken:'',githubRepo:'',githubPath:'Pontos/dados.json',githubBranch:'main'};
+const $=i=>document.getElementById(i),pad=n=>String(n).padStart(2,'0');
 const jp=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};
+
+/* Perfis (usuários independentes no mesmo aparelho) */
+const UK='infinity_usuarios',UC='infinity_usuario_atual';
+function seedUsuarios(){const u=[
+ {id:'waldeci',nome:'Waldeci Ramos',empresa:'Rede Dom Pedro de Postos',cargo:'Analista de Serviços Internos'},
+ {id:'thais',nome:'Thais Pereira Xavier',empresa:'APAE de Estiva',cargo:'Fisioterapeuta'}];
+ localStorage.setItem(UK,JSON.stringify(u));return u}
+let USERS=jp(UK,null)||seedUsuarios();
+let UID=localStorage.getItem(UC)||(USERS[0]&&USERS[0].id)||'';
+if(UID&&!USERS.find(u=>u.id===UID))UID=(USERS[0]&&USERS[0].id)||'';
+if(UID)localStorage.setItem(UC,UID);
+const usuarioAtual=()=>USERS.find(u=>u.id===UID)||{nome:'',empresa:'',cargo:''};
+const SK='infinity_ponto_v1_'+UID,CK='infinity_ponto_config_v1_'+UID,BIO='infinity_biometria_cred_'+UID;
+const CP={jornadaDiaria:5,intervaloMinimo:20,avisoAntesIntervalo:20,diaFechamento:26,tolerancia:5,valorHora:0,metaSemanas:25,digitalAtiva:false,githubAtivo:false,githubToken:'',githubRepo:'',githubPath:'Pontos/'+UID+'.json',githubBranch:'main'};
 let C={...CP,...jp(CK,{})},E=jp(SK,{}),mc=new Date(),edD=null,vw='hoje';
+function abrirUsr(){$('usrLista').innerHTML=USERS.map(u=>`<div class="it" onclick="trocarUsuario('${u.id}')"><div><b>${escI(u.nome)}</b><br><small>${escI(u.empresa)}${u.cargo?' • '+escI(u.cargo):''}</small></div>${u.id===UID?'<span class="bd ok">Atual</span>':''}</div>`).join('');$('usr').showModal()}
+function trocarUsuario(id){localStorage.setItem(UC,id);location.reload()}
+function criarUsuario(){const nome=$('nuNome').value.trim(),empresa=$('nuEmpresa').value.trim(),cargo=$('nuCargo').value.trim();
+ if(!nome)return toast('Informe o nome','bad');
+ let id=nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+ if(!id||USERS.find(u=>u.id===id))id=(id||'usuario')+'-'+Date.now().toString(36).slice(-4);
+ USERS.push({id,nome,empresa,cargo});localStorage.setItem(UK,JSON.stringify(USERS));trocarUsuario(id)}
 const K=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,BR=d=>`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`,
 DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],fds=d=>d.getDay()%6==0,
 HM=m=>{const n=m<0;m=Math.abs(Math.round(m));return(n?'-':'')+pad(m/60|0)+':'+pad(m%60)},
@@ -245,13 +280,13 @@ async function idbGet(k){try{const d=await idb();return await new Promise(y=>{co
 async function idbSet(k,v){try{const d=await idb();return await new Promise(y=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>y(1);t.onerror=()=>y(0)})}catch{return 0}}
 
 /* Backup em pasta: sobrescreve sempre o mesmo arquivo (o antigo é substituído) */
-async function permPasta(){const h=await idbGet('dir');if(!h)return null;try{let p=await h.queryPermission({mode:'readwrite'});if(p!=='granted')p=await h.requestPermission({mode:'readwrite'});return p==='granted'?h:null}catch{return null}}
-async function backupAuto(h){const t=dump();await idbSet('dump',t);
- if(h){try{const f=await h.getFileHandle('infinity_backup.json',{create:true}),w=await f.createWritable();await w.write(t);await w.close();toast('Backup atualizado na pasta ✔','ok');return}catch{}}
+async function permPasta(){const h=await idbGet('dir_'+UID);if(!h)return null;try{let p=await h.queryPermission({mode:'readwrite'});if(p!=='granted')p=await h.requestPermission({mode:'readwrite'});return p==='granted'?h:null}catch{return null}}
+async function backupAuto(h){const t=dump();await idbSet('dump_'+UID,t);
+ if(h){try{const f=await h.getFileHandle('infinity_backup_'+UID+'.json',{create:true}),w=await f.createWritable();await w.write(t);await w.close();toast('Backup atualizado na pasta ✔','ok');return}catch{}}
  toast('Backup interno atualizado (sem pasta vinculada)','wa',5000)}
 async function escolherPasta(){if(!window.showDirectoryPicker)return toast('Vincular pasta só funciona no Chrome/Edge do computador','bad',6000);
- try{const h=await showDirectoryPicker({mode:'readwrite',id:'infinity'});await idbSet('dir',h);await backupAuto(h);bkSt()}catch{}}
-async function bkSt(){const h=await idbGet('dir');$('bkSt').textContent=h?`Pasta vinculada: ${h.name}. Ao bater a saída final, infinity_backup.json é substituído pelo atual.`:'Sem pasta vinculada. No celular o backup interno é atualizado a cada registro; use "Salvar / compartilhar" para guardar uma cópia.'}
+ try{const h=await showDirectoryPicker({mode:'readwrite',id:'infinity'});await idbSet('dir_'+UID,h);await backupAuto(h);bkSt()}catch{}}
+async function bkSt(){const h=await idbGet('dir_'+UID);$('bkSt').textContent=h?`Pasta vinculada: ${h.name}. Ao bater a saída final, infinity_backup_${UID}.json é substituído pelo atual.`:'Sem pasta vinculada. No celular o backup interno é atualizado a cada registro; use "Salvar / compartilhar" para guardar uma cópia.'}
 async function bkManual(){const f=new File([dump()],'infinity_backup.json',{type:'application/json'});
  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]})}catch{}return}
  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download='infinity_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
@@ -290,16 +325,19 @@ function ghSt(){$('ghSt').textContent=ghOk()?`Pronto: ${C.githubRepo} / ${C.gith
 function salvarGh(){C.githubToken=$('gT').value.trim();C.githubRepo=$('gR').value.trim();C.githubBranch=$('gB').value.trim()||'main';C.githubPath=$('gP').value.trim()||'Pontos/dados.json';C.githubAtivo=$('cGh').checked;salvar();ghSt();toast('Dados do GitHub salvos','ok')}
 
 /* Cálculo */
-function calc(r,d=new Date()){const J=C.jornadaDiaria*60;if(!r||!r.entrada)return{t:0,s:-J,iv:0,st:'fa',prev:0};
+function calc(r,d=new Date()){const J=C.jornadaDiaria*60;
+ if(r&&r.tipo==='feriado')return{t:0,s:0,iv:0,st:'fe',prev:0};
+ if(r&&r.tipo==='falta')return{t:0,s:-J,iv:0,st:'fa',prev:0};
+ if(!r||!r.entrada)return{t:0,s:-J,iv:0,st:'fa',prev:0};
  const e=TM(r.entrada),a=TM(r.saidaIntervalo),b=TM(r.voltaIntervalo),f=TM(r.saida),hj=K(d)===K(new Date());
  const end=f!=null?f:!hj?(b??a??e):(a!=null&&b==null)?a:Math.max(NOW(),e);
  const iv=a!=null&&b!=null?b-a:0,ie=iv>0?Math.max(iv,C.intervaloMinimo):0,t=end-e-ie,s=t-J;
  return{t,s,iv,st:t<=0?'fa':s<-C.tolerancia?'pa':'ok',prev:e+J+(ie||C.intervaloMinimo)}}
 function per(ref=new Date()){const g=C.diaFechamento,d=ref.getDate(),m=ref.getMonth(),y=ref.getFullYear();return d>=g?{i:new Date(y,m,g),f:new Date(y,m+1,g-1)}:{i:new Date(y,m-1,g),f:new Date(y,m,g-1)}}
 function resumo(){const p=per(),J=C.jornadaDiaria*60,lim=new Date();lim.setHours(23,59,59,999);let T=0,X=0,F=0,A=0,U=0,D=0,dias=[];
- for(let c=new Date(p.i);c<=p.f&&c<=lim;c.setDate(c.getDate()+1)){const d=new Date(c),r=E[K(d)],x=calc(r,d),w=fds(d);if(!w)U++;
+ for(let c=new Date(p.i);c<=p.f&&c<=lim;c.setDate(c.getDate()+1)){const d=new Date(c),r=E[K(d)],x=calc(r,d),fim=fds(d),w=fim||(r&&r.tipo==='feriado');if(!w)U++;
   if(!w||r){T+=Math.max(0,x.t);if(x.st==='fa'){if(!w)F+=J}else if(x.s>0)X+=x.s;else if(x.s<0)A-=x.s}
-  if(r&&x.t>0)D++;dias.push({d,r,x,w})}
+  if(r&&x.t>0)D++;dias.push({d,r,x,w:fim})}
  return{p,T,X,F,A,U,D,dias,saldo:T-U*J}}
 
 /* Ação principal */
@@ -330,7 +368,8 @@ async function tocarSensor(){
 }
 
 /* Telas */
-function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),[tx,c]=prox(r);
+function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),[tx,c]=prox(r),u=usuarioAtual();
+ $('marcaUser').innerHTML='<b>'+escI((u.nome||'').toUpperCase())+'</b>'+(u.empresa?' · '+escI(u.empresa):'');
  $('relogio').textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
  $('btLabel').textContent=c?'Toque para: '+tx:tx;$('bt').dataset.c=c;$('bt').disabled=!c;
  $('sem').classList.toggle('h',!(r&&r.entrada&&!r.saidaIntervalo&&!r.saida));
@@ -342,14 +381,17 @@ function rCal(){const y=mc.getFullYear(),m=mc.getMonth(),g=$('gr'),h=new Date();
  $('mes').textContent=mc.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
  for(let i=0;i<new Date(y,m,1).getDay();i++)g.innerHTML+='<div class="dc v"></div>';
  for(let n=1;n<=new Date(y,m+1,0).getDate();n++){const d=new Date(y,m,n),r=E[K(d)],x=calc(r,d),w=fds(d),e=document.createElement('div');let c='';
-  if(r&&r.entrada)c=x.st;else if(!w&&K(d)<K(h))c='fa';
-  e.className='dc '+c+(w?' w':'')+(K(d)===K(h)?' hj':'');e.innerHTML=`${n}${r&&r.entrada?`<small>${HM(x.s)}</small>`:''}`;
+  if(r&&r.tipo==='feriado')c='fe';else if(r&&r.tipo==='falta')c='fa';else if(r&&r.entrada)c=x.st;else if(!w&&K(d)<K(h))c='fa';
+  e.className='dc '+(c||(w?'w':''))+(K(d)===K(h)?' hj':'');
+  e.innerHTML=`${n}${x.st==='fe'?'<small>Feriado</small>':(r&&r.entrada)?`<small>${HM(x.s)}</small>`:''}`;
   e.onclick=()=>abrirEd(d);g.appendChild(e)}}
 function rRel(){const R=resumo(),J=C.jornadaDiaria*60,md=C.metaSemanas*5,pc=Math.min(100,R.D/md*100);
  $('mt').textContent=`Meta: ${R.D} de ${md} dias (${(R.D/5).toFixed(1)} de ${C.metaSemanas} semanas)`;$('mb').style.width=pc+'%';
  $('mh').textContent=`Faltam ${Math.max(0,md-R.D)} dias • Média/dia ${R.D?HM(R.T/R.D):'00:00'}`;
  $('rs').innerHTML=[['Trabalhadas',HM(R.T)],['Extras',HM(R.X)],['Faltas',HM(R.F)],['Atrasos',HM(R.A)],['Saldo',HM(R.saldo)],['Dias úteis',R.U]].map(([a,b])=>`<div><span class="lb">${a}</span><b>${b}</b></div>`).join('');
- $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro'}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta'}</span></div></div>`).join('')}
+ $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>{const desc=r&&r.tipo==='feriado'?'Feriado / dispensado':r&&r.tipo==='falta'?'Falta registrada':r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro';
+  const val=x.st==='fe'?'Feriado':r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta';
+  return`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${desc}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${val}</span></div></div>`}).join('')}
 function render(){const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,imp:()=>{},cfg:()=>{}})[vw]()}
 function go(v){vw=v;document.querySelectorAll('.vw').forEach(s=>s.classList.toggle('h',s.id!=='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
  if(v==='imp'){const p=per();$('impPerLbl').textContent='('+BR(p.i)+' a '+BR(p.f)+')';if(!$('impDe').value){$('impDe').value=K(p.i);$('impAte').value=K(new Date())}}
@@ -360,11 +402,14 @@ const mm=n=>{mc.setDate(1);mc.setMonth(mc.getMonth()+n);rCal()};
 function salvarCfg(){C.jornadaDiaria=parseFloat($('c1').value)||5;C.intervaloMinimo=parseInt($('c2').value)||0;C.tolerancia=parseInt($('c3').value)||0;C.diaFechamento=parseInt($('c4').value)||26;C.valorHora=parseFloat($('c5').value)||0;C.metaSemanas=parseInt($('c6').value)||25;salvar();toast('Ajustes salvos','ok')}
 
 /* Editar / novo dia */
+function tipoMudou(){$('edHorarios').classList.toggle('h',$('fTipo').value!=='')}
 function abrirEd(d){edD=d;const r=d&&E[K(d)]||{};$('edT').textContent=d?`${BR(d)} • ${DS[d.getDay()]}`:'Registrar dia extra';
- $('fD').value=K(d||new Date());$('fD').disabled=!!d;$('fE').value=r.entrada||'';$('fA').value=r.saidaIntervalo||'';$('fB').value=r.voltaIntervalo||'';$('fS').value=r.saida||'';$('fO').value=r.obs||'';
- $('fX').classList.toggle('h',!(d&&E[K(d)]));$('ed').showModal()}
-function salvarEd(){const k=$('fD').value;if(!k)return toast('Informe a data','bad');if(!$('fE').value)return toast('Informe ao menos a entrada','bad');
- E[k]={entrada:$('fE').value,saidaIntervalo:$('fA').value||null,voltaIntervalo:$('fB').value||null,saida:$('fS').value||null,obs:$('fO').value};salvar();$('ed').close();render();toast('Registro salvo','ok');if(C.githubAtivo)syncGithub(false)}
+ $('fD').value=K(d||new Date());$('fD').disabled=!!d;$('fTipo').value=r.tipo||'';$('fE').value=r.entrada||'';$('fA').value=r.saidaIntervalo||'';$('fB').value=r.voltaIntervalo||'';$('fS').value=r.saida||'';$('fO').value=r.obs||'';
+ tipoMudou();$('fX').classList.toggle('h',!(d&&E[K(d)]));$('ed').showModal()}
+function salvarEd(){const k=$('fD').value;if(!k)return toast('Informe a data','bad');const tipo=$('fTipo').value;
+ if(tipo){E[k]={tipo,obs:$('fO').value}}
+ else{if(!$('fE').value)return toast('Informe ao menos a entrada','bad');E[k]={entrada:$('fE').value,saidaIntervalo:$('fA').value||null,voltaIntervalo:$('fB').value||null,saida:$('fS').value||null,obs:$('fO').value}}
+ salvar();$('ed').close();render();toast('Registro salvo','ok');if(C.githubAtivo)syncGithub(false)}
 function delEd(){if(edD&&confirm(`Excluir o registro de ${BR(edD)}?`)){delete E[K(edD)];salvar();$('ed').close();render();if(C.githubAtivo)syncGithub(false)}}
 
 /* Fechamento e CSV */
@@ -379,11 +424,12 @@ function csv(){const R=resumo();let s='Data;Dia;Entrada;Saida Intervalo;Volta In
 const escI=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function diasEntre(ini,fim){const a=[],lim=new Date();lim.setHours(23,59,59,999);for(let c=new Date(ini);c<=fim&&c<=lim;c.setDate(c.getDate()+1))a.push(new Date(c));return a}
 function linhasImp(dias){
- return dias.map(d=>{const r=E[K(d)],x=calc(r,d),w=fds(d);
-  const iv=r&&r.entrada?`${r.entrada} → ${r.saida||'em aberto'}`:(w?'Folga':'Falta');
-  const sld=r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):(w?'--:--':'-'+HM(C.jornadaDiaria*60));
+ return dias.map(d=>{const r=E[K(d)],x=calc(r,d),w=fds(d);let iv,sld;
+  if(r&&r.tipo==='feriado'){iv='Feriado';sld='--:--'}
+  else if(r&&r.tipo==='falta'){iv='Falta';sld='-'+HM(C.jornadaDiaria*60)}
+  else{iv=r&&r.entrada?`${r.entrada} → ${r.saida||'em aberto'}`:(w?'Folga':'Falta');sld=r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):(w?'--:--':'-'+HM(C.jornadaDiaria*60))}
   return{nome:`${pad(d.getDate())}/${pad(d.getMonth()+1)} ${DS[d.getDay()]}`,qtd:iv,valor:sld}})}
-function totaisImp(dias){let T=0,S=0;dias.forEach(d=>{const r=E[K(d)],x=calc(r,d),w=fds(d);if(!w||r){T+=Math.max(0,x.t);S+=r&&r.entrada?x.s:(w?0:-C.jornadaDiaria*60)}});return{T,S}}
+function totaisImp(dias){let T=0,S=0;dias.forEach(d=>{const r=E[K(d)],x=calc(r,d),fe=r&&r.tipo==='feriado',w=fds(d)||fe;if(!w||r){T+=Math.max(0,x.t);S+=r&&r.entrada?x.s:(w?0:-C.jornadaDiaria*60)}});return{T,S}}
 function dadosImpressao(){
  const modo=document.querySelector('input[name=impModo]:checked').value,hoje=new Date();let ini,fim,titulo;
  if(modo==='dia'){ini=fim=hoje;titulo='Relatório do dia'}
@@ -391,7 +437,8 @@ function dadosImpressao(){
  else if(modo==='periodo'){const p=per();ini=p.i;fim=p.f;titulo='Relatório do período'}
  else{ini=new Date($('impDe').value+'T00:00');fim=new Date($('impAte').value+'T00:00');titulo='Relatório personalizado'}
  const dias=diasEntre(ini,fim),linhas=linhasImp(dias),{T,S}=totaisImp(dias);
- return{empresa:'SISTEMA WALDECI RAMOS',endereco:['Comprovante de Ponto — Infinity'],titulo,periodo:`${BR(ini)} a ${BR(dias.length?dias[dias.length-1]:ini)}`,
+ const u=usuarioAtual();
+ return{empresa:(u.empresa||'Infinity Ponto').toUpperCase(),endereco:[u.nome+(u.cargo?' — '+u.cargo:'')],titulo,periodo:`${BR(ini)} a ${BR(dias.length?dias[dias.length-1]:ini)}`,
   colunas:['Data','Entrada → Saída','Saldo'],itens:linhas,resumo:[{rotulo:'Horas trabalhadas',valor:HM(T)}],
   total:{rotulo:'Saldo do período',valor:(S>=0?'+':'')+HM(S)},rodape:'github.io/waldeciramos/sites/Pontos'}}
 function qrTag(texto){try{const q=qrcode(0,'M');q.addData(texto);q.make();return q.createSvgTag({cellSize:3,margin:2,scalable:true})}catch{return''}}
@@ -427,7 +474,7 @@ document.querySelectorAll('input[name=impModo]').forEach(r=>r.addEventListener('
 (async()=>{
  if(!Object.keys(E).length){
    let ok=false;if(C.githubAtivo)ok=await restaurarGithub(false).then(x=>{if(x)toast('Dados restaurados do GitHub','ok',6000);return x});
-   if(!ok){try{const j=JSON.parse(await idbGet('dump'));if(j.registros&&Object.keys(j.registros).length){aplicar(j);toast('Dados restaurados do backup interno','ok',6000)}}catch{}}
+   if(!ok){try{const j=JSON.parse(await idbGet('dump_'+UID));if(j.registros&&Object.keys(j.registros).length){aplicar(j);toast('Dados restaurados do backup interno','ok',6000)}}catch{}}
  }
  render();setInterval(()=>{if(vw==='hoje')rHoje()},1000);
  let dia=K(new Date());setInterval(()=>{if(K(new Date())!==dia){dia=K(new Date());mc=new Date();render()}},60000);
