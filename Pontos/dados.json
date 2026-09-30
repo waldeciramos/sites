@@ -1,0 +1,19 @@
+{
+  "versao": 1,
+  "dataBackup": "2026-09-30T00:29:24.074Z",
+  "config": {
+    "jornadaDiaria": 5,
+    "intervaloMinimo": 20,
+    "avisoAntesIntervalo": 20,
+    "diaFechamento": 26,
+    "tolerancia": 5,
+    "valorHora": 0,
+    "metaSemanas": 25,
+    "digitalAtiva": true,
+    "githubAtivo": true,
+    "githubRepo": "waldeciramos/sites",
+    "githubPath": "Pontos/dados.json",
+    "githubBranch": "main"
+  },
+  "registros": {}
+}
