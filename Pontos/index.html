@@ -58,6 +58,9 @@ nav button.on{color:var(--tx);font-weight:700;box-shadow:inset 0 3px 0 var(--pu)
 label{display:block;font-size:12px;color:var(--mu);margin-bottom:10px}
 input[type=text],input[type=number],input[type=time],input[type=date]{width:100%;padding:11px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);margin-top:4px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;background:var(--c2);border-radius:12px;padding:3px;margin:4px 0 14px;gap:3px}
+.segBtn{flex:1;border:0;background:none;padding:9px 4px;border-radius:9px;font-size:12.5px;color:var(--mu);cursor:pointer;font-weight:600;font-family:inherit}
+.segBtn.on{background:var(--cd);color:var(--tx);box-shadow:0 1px 3px #0003}
 .bk{font-size:12px;color:var(--mu);margin:6px 0 10px;line-height:1.5}
 dialog{border:0;border-radius:20px;padding:20px;width:min(92vw,440px);background:var(--cd);color:var(--tx);margin:auto}
 dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
@@ -216,11 +219,13 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 </main>
 <nav id="nav"><button data-v="hoje" class="on">Hoje</button><button data-v="cal">Calendário</button><button data-v="rel">Relatório</button><button data-v="imp">Imprimir</button><button data-v="cfg">Ajustes</button></nav>
 <dialog id="ed"><h3 id="edT"></h3>
- <label>Tipo do dia<select id="fTipo" onchange="tipoMudou()">
-  <option value="">Normal (com horários)</option>
-  <option value="falta">Falta (desconta a jornada)</option>
-  <option value="feriado">Feriado / dispensado (não conta negativo)</option>
- </select></label>
+ <label>Tipo do dia</label>
+ <input type="hidden" id="fTipo" value="">
+ <div class="seg">
+  <button type="button" class="segBtn on" data-t="">Normal</button>
+  <button type="button" class="segBtn" data-t="falta">Falta</button>
+  <button type="button" class="segBtn" data-t="feriado">Feriado</button>
+ </div>
  <div class="g2"><label>Data<input type="date" id="fD"></label><label>Observação<input type="text" id="fO"></label></div>
  <div class="g2" id="edHorarios">
   <label>Entrada<input type="time" id="fE"></label><label>Saída intervalo<input type="time" id="fA"></label>
@@ -403,8 +408,11 @@ function salvarCfg(){C.jornadaDiaria=parseFloat($('c1').value)||5;C.intervaloMin
 
 /* Editar / novo dia */
 function tipoMudou(){$('edHorarios').classList.toggle('h',$('fTipo').value!=='')}
+document.querySelectorAll('.segBtn').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.segBtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('fTipo').value=b.dataset.t;tipoMudou()}));
 function abrirEd(d){edD=d;const r=d&&E[K(d)]||{};$('edT').textContent=d?`${BR(d)} • ${DS[d.getDay()]}`:'Registrar dia extra';
  $('fD').value=K(d||new Date());$('fD').disabled=!!d;$('fTipo').value=r.tipo||'';$('fE').value=r.entrada||'';$('fA').value=r.saidaIntervalo||'';$('fB').value=r.voltaIntervalo||'';$('fS').value=r.saida||'';$('fO').value=r.obs||'';
+ document.querySelectorAll('.segBtn').forEach(b=>b.classList.toggle('on',b.dataset.t===(r.tipo||'')));
  tipoMudou();$('fX').classList.toggle('h',!(d&&E[K(d)]));$('ed').showModal()}
 function salvarEd(){const k=$('fD').value;if(!k)return toast('Informe a data','bad');const tipo=$('fTipo').value;
  if(tipo){E[k]={tipo,obs:$('fO').value}}
