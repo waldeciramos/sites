@@ -41,6 +41,10 @@ O sistema pede usuário e senha antes de mostrar qualquer coisa. Estão definido
 Pra trocar, edite esse arquivo (direto no GitHub ou local) e suba de novo. O login
 fica válido só durante a aba aberta — fecha o navegador, pede de novo.
 
+## Pacientes fixos
+
+Os pacientes ficam cadastrados direto em `js/pacientes.js` (lista `PACIENTES_FIXOS`). Pra incluir outro, copie o bloco, troque `id` e dados e suba o arquivo. As sessões de cada um são guardadas por `id`.
+
 ## Como os dados são salvos
 
 Ordem de tentativa, automática:

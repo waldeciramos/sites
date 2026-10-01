@@ -30,7 +30,6 @@
     </div>
     <p class="sub" id="patientListInfo"></p>
     <div id="patientList"></div>
-    <button class="btn-primary btn-block" id="btnNewPatient">+ Novo cadastro de paciente</button>
   </section>
 
   <!-- ===================== CADASTRO ===================== -->
@@ -55,6 +54,43 @@
       </div>
       <label>Diagnóstico / condição
         <input type="text" id="fDiagnostico" placeholder="Ex.: AVE isquêmico, sequela de hemiparesia...">
+      </label>
+
+      <h3>Contato</h3>
+      <div class="row">
+        <label>Telefone
+          <input type="tel" id="fTelefone" placeholder="(00) 00000-0000">
+        </label>
+        <label>Tipo de atendimento
+          <select id="fTipo">
+            <option value="">—</option>
+            <option value="Particular">Particular</option>
+            <option value="Convênio">Convênio</option>
+            <option value="Plano">Plano</option>
+          </select>
+        </label>
+      </div>
+      <label>Endereço
+        <input type="text" id="fEndereco" placeholder="Rua, número, bairro">
+      </label>
+      <div class="row">
+        <label>Cidade
+          <input type="text" id="fCidade" placeholder="Cidade">
+        </label>
+        <label>UF
+          <input type="text" id="fUf" maxlength="2" placeholder="UF" style="text-transform:uppercase;">
+        </label>
+      </div>
+      <div class="row">
+        <label>Início do tratamento
+          <input type="date" id="fInicioTrat">
+        </label>
+        <label>Dia / horário fixo
+          <input type="text" id="fDiaHorario" placeholder="Ex.: Ter e Qui, 14h">
+        </label>
+      </div>
+      <label>Sessões já realizadas antes deste sistema
+        <input type="number" id="fSessoesAntes" min="0" max="20" value="0">
       </label>
 
       <h3>Terapeuta responsável</h3>
@@ -197,6 +233,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
 
 <script src="js/config.js"></script>
+<script src="js/pacientes.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/tracking.js"></script>
 <script src="js/exercises.js"></script>
