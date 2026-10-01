@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "dataBackup": "2026-09-30T09:38:54.248Z",
+  "dataBackup": "",
   "config": {
     "jornadaDiaria": 5,
     "intervaloMinimo": 20,
@@ -9,6 +9,9 @@
     "tolerancia": 5,
     "valorHora": 0,
     "metaSemanas": 25,
+    "metaMensal": 120,
+    "baseMensal": 100,
+    "limiteDireto": 300,
     "digitalAtiva": false,
     "githubAtivo": true,
     "githubRepo": "waldeciramos/sites",

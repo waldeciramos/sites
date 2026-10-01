@@ -131,6 +131,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 .tempoHoje{text-align:center;font-size:12px;color:var(--mu);margin:2px 0 14px}
 .pqr{text-align:center;margin-top:10px}
 .pqr svg{width:92px;height:92px}
+@page{size:80mm auto;margin:0}
 @media print{
  body *{display:none!important}
  main,#v-imp,#v-imp *{display:revert!important}
@@ -146,6 +147,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 <header><div style="display:flex;align-items:center;gap:8px"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><span id="per"></span></header>
 <main>
 <section id="v-hoje" class="vw">
+ <div id="alertas"></div>
  <div class="rep">
   <div class="repTop"><span class="marca" id="marcaUser">SISTEMA</span><span class="led" id="led"></span></div>
   <div class="lcdBig" id="relogio">00:00:00</div>
@@ -201,7 +203,7 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <div class="box"><div class="g2">
  <label>Jornada (horas)<input type="number" id="c1" step="0.5"></label><label>Intervalo mín. (min)<input type="number" id="c2" step="5"></label>
  <label>Tolerância (min)<input type="number" id="c3"></label><label>Fecha no dia<input type="number" id="c4" min="1" max="31"></label>
- <label>Valor da hora (R$)<input type="number" id="c5" step="0.01"></label><label>Meta (semanas)<input type="number" id="c6"></label></div>
+ <label>Valor da hora (R$)<input type="number" id="c5" step="0.01"></label><label>Meta mensal (horas)<input type="number" id="c6"></label></div>
  <button class="big" style="height:52px" onclick="salvarCfg()">Salvar ajustes</button></div>
  <div class="box"><b>Digital / Face ID</b><p class="bk" id="digSt"></p>
  <button class="ghost" onclick="cadDigital()">Cadastrar neste aparelho</button>
@@ -223,7 +225,9 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <input type="hidden" id="fTipo" value="">
  <div class="seg">
   <button type="button" class="segBtn on" data-t="">Normal</button>
-  <button type="button" class="segBtn" data-t="falta">Falta</button>
+  <button type="button" class="segBtn" data-t="falta">Falta (devo)</button>
+  <button type="button" class="segBtn" data-t="folga">Folga</button>
+  <button type="button" class="segBtn" data-t="atestado">Atestado</button>
   <button type="button" class="segBtn" data-t="feriado">Feriado</button>
  </div>
  <div class="g2"><label>Data<input type="date" id="fD"></label><label>Observação<input type="text" id="fO"></label></div>
@@ -259,7 +263,9 @@ if(UID&&!USERS.find(u=>u.id===UID))UID=(USERS[0]&&USERS[0].id)||'';
 if(UID)localStorage.setItem(UC,UID);
 const usuarioAtual=()=>USERS.find(u=>u.id===UID)||{nome:'',empresa:'',cargo:''};
 const SK='infinity_ponto_v1_'+UID,CK='infinity_ponto_config_v1_'+UID,BIO='infinity_biometria_cred_'+UID;
-const CP={jornadaDiaria:5,intervaloMinimo:20,avisoAntesIntervalo:20,diaFechamento:26,tolerancia:5,valorHora:0,metaSemanas:25,digitalAtiva:false,githubAtivo:false,githubToken:'',githubRepo:'',githubPath:'Pontos/'+UID+'.json',githubBranch:'main'};
+const CP={jornadaDiaria:5,intervaloMinimo:20,avisoAntesIntervalo:20,diaFechamento:26,tolerancia:5,valorHora:0,metaSemanas:25,metaMensal:120,baseMensal:100,limiteDireto:300,digitalAtiva:false,githubAtivo:true,githubToken:'',githubRepo:'waldeciramos/sites',githubPath:'Pontos/'+UID+'.json',githubBranch:'main'};
+const TK='infinity_gh_token',PK='infinity_pend_'+UID,tok=()=>localStorage.getItem(TK)||C.githubToken||'';
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch{}
 let C={...CP,...jp(CK,{})},E=jp(SK,{}),mc=new Date(),edD=null,vw='hoje';
 function abrirUsr(){$('usrLista').innerHTML=USERS.map(u=>`<div class="it" onclick="trocarUsuario('${u.id}')"><div><b>${escI(u.nome)}</b><br><small>${escI(u.empresa)}${u.cargo?' • '+escI(u.cargo):''}</small></div>${u.id===UID?'<span class="bd ok">Atual</span>':''}</div>`).join('');$('usr').showModal()}
 function trocarUsuario(id){localStorage.setItem(UC,id);location.reload()}
@@ -295,7 +301,7 @@ async function bkSt(){const h=await idbGet('dir_'+UID);$('bkSt').textContent=h?`
 async function bkManual(){const f=new File([dump()],'infinity_backup.json',{type:'application/json'});
  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]})}catch{}return}
  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download='infinity_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-function aplicar(j){if(!j||!j.registros)throw Error('Arquivo inválido');E=j.registros;C={...CP,...j.config};salvar()}
+function aplicar(j){if(!j||!j.registros)throw Error('Arquivo inválido');E=j.registros;C={...CP,...j.config,githubToken:C.githubToken||'',githubAtivo:true};salvar()}
 $('fr').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!confirm('Restaurar backup e substituir os registros atuais?'))return;aplicar(j);render();toast('Backup restaurado','ok')}catch(x){toast('Erro: '+x.message,'bad')}};r.readAsText(f)};
 
 /* Digital (WebAuthn) */
@@ -310,51 +316,62 @@ async function digital(){const id=localStorage.getItem(BIO);if(!C.digitalAtiva||
 function digSt(){$('digSt').textContent=!okDig()?'Indisponível: abra pelo link https.':localStorage.getItem(BIO)?'Digital cadastrada neste aparelho.':'Nenhuma digital cadastrada.'}
 
 /* GitHub sync */
-function ghOk(){return C.githubToken&&C.githubRepo&&C.githubPath}
+function ghOk(){return tok()&&C.githubRepo&&C.githubPath}
 function ghB64e(s){return btoa(encodeURIComponent(s).replace(/%([0-9A-F]{2})/g,(m,p)=>String.fromCharCode('0x'+p)))}
 function ghB64d(s){return decodeURIComponent(atob(s.replace(/\n/g,'')).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''))}
 async function ghGet(){if(!ghOk())return null;const u=`https://api.github.com/repos/${C.githubRepo}/contents/${encodeURI(C.githubPath)}?ref=${C.githubBranch||'main'}`;
- const r=await fetch(u,{headers:{Authorization:`Bearer ${C.githubToken}`,Accept:'application/vnd.github+json'}});
+ const r=await fetch(u,{headers:{Authorization:`Bearer ${tok()}`,Accept:'application/vnd.github+json'}});
  if(r.status===404)return{sha:null,dados:null};if(!r.ok)throw Error('GitHub '+r.status+': '+(await r.text()).slice(0,150));
  const j=await r.json();return{sha:j.sha,dados:JSON.parse(ghB64d(j.content))}}
 async function ghPut(obj,sha){const u=`https://api.github.com/repos/${C.githubRepo}/contents/${encodeURI(C.githubPath)}`;
  const b={message:'Atualização de ponto - '+new Date().toLocaleString('pt-BR'),content:ghB64e(JSON.stringify(obj,null,2)),branch:C.githubBranch||'main'};if(sha)b.sha=sha;
- const r=await fetch(u,{method:'PUT',headers:{Authorization:`Bearer ${C.githubToken}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(b)});
+ const r=await fetch(u,{method:'PUT',headers:{Authorization:`Bearer ${tok()}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(b)});
  if(!r.ok)throw Error('GitHub '+r.status+': '+(await r.text()).slice(0,150));return await r.json()}
-async function syncGithub(msg){if(!C.githubAtivo&&!msg)return;if(!ghOk()){if(msg)toast('Preencha token, repositório e caminho','bad');return}
- try{const a=await ghGet();await ghPut(JSON.parse(dump()),a?a.sha:null);if(msg)toast('Sincronizado com o GitHub','ok')}catch(e){toast('Falha ao sincronizar: '+e.message,'bad',8000)}}
+let syncing=false;
+async function syncGithub(msg){if(!C.githubAtivo&&!msg)return;
+ if(!ghOk()){localStorage.setItem(PK,'1');toast('Falta o token do GitHub (Ajustes). Dados guardados no aparelho.','wa',8000);return}
+ if(syncing)return;syncing=true;
+ try{for(let i=0;i<3;i++){try{const a=await ghGet();await ghPut(JSON.parse(dump()),a?a.sha:null);break}catch(e){if(i==2||!/ 409| 422/.test(e.message))throw e}}
+  localStorage.removeItem(PK);toast('Gravado no GitHub ✓','ok')}
+ catch(e){localStorage.setItem(PK,'1');toast('Falha ao gravar no GitHub: '+e.message+' (tento de novo quando possível)','bad',9000)}
+ syncing=false}
+addEventListener('online',()=>{if(localStorage.getItem(PK))syncGithub(false)});
 async function restaurarGithub(msg){if(!ghOk()){if(msg)toast('Preencha token, repositório e caminho','bad');return false}
  try{const a=await ghGet();if(!a||!a.dados){if(msg)toast('Nenhum dado encontrado ainda','wa');return false}
  aplicar(a.dados);if(msg){toast('Restaurado do GitHub','ok');render()}return true}catch(e){toast('Falha ao restaurar: '+e.message,'bad',8000);return false}}
 function ghSt(){$('ghSt').textContent=ghOk()?`Pronto: ${C.githubRepo} / ${C.githubPath}`:'Preencha token, repositório e caminho do arquivo.'}
-function salvarGh(){C.githubToken=$('gT').value.trim();C.githubRepo=$('gR').value.trim();C.githubBranch=$('gB').value.trim()||'main';C.githubPath=$('gP').value.trim()||'Pontos/dados.json';C.githubAtivo=$('cGh').checked;salvar();ghSt();toast('Dados do GitHub salvos','ok')}
+function salvarGh(){{const t=$('gT').value.trim();if(t&&!/^•+$/.test(t))localStorage.setItem(TK,t);C.githubToken=''}C.githubRepo=$('gR').value.trim();C.githubBranch=$('gB').value.trim()||'main';C.githubPath=$('gP').value.trim()||'Pontos/dados.json';C.githubAtivo=$('cGh').checked;salvar();ghSt();toast('Dados do GitHub salvos','ok')}
 
 /* Cálculo */
+const isOff=r=>!!r&&['feriado','folga','atestado'].includes(r.tipo),offL=r=>({feriado:'Feriado',folga:'Folga',atestado:'Atestado'})[r&&r.tipo]||'';
 function calc(r,d=new Date()){const J=C.jornadaDiaria*60;
- if(r&&r.tipo==='feriado')return{t:0,s:0,iv:0,st:'fe',prev:0};
+ if(isOff(r))return{t:0,s:0,iv:0,st:'fe',prev:0};
  if(r&&r.tipo==='falta')return{t:0,s:-J,iv:0,st:'fa',prev:0};
  if(!r||!r.entrada)return{t:0,s:-J,iv:0,st:'fa',prev:0};
  const e=TM(r.entrada),a=TM(r.saidaIntervalo),b=TM(r.voltaIntervalo),f=TM(r.saida),hj=K(d)===K(new Date());
  const end=f!=null?f:!hj?(b??a??e):(a!=null&&b==null)?a:Math.max(NOW(),e);
  const iv=a!=null&&b!=null?b-a:0,ie=iv>0?Math.max(iv,C.intervaloMinimo):0,t=end-e-ie,s=t-J;
  return{t,s,iv,st:t<=0?'fa':s<-C.tolerancia?'pa':'ok',prev:e+J+(ie||C.intervaloMinimo)}}
-function per(ref=new Date()){const g=C.diaFechamento,d=ref.getDate(),m=ref.getMonth(),y=ref.getFullYear();return d>=g?{i:new Date(y,m,g),f:new Date(y,m+1,g-1)}:{i:new Date(y,m-1,g),f:new Date(y,m,g-1)}}
+function ini(y,m){const d=new Date(y,m,C.diaFechamento);while(fds(d))d.setDate(d.getDate()+1);return d}
+function per(ref=new Date()){const r=new Date(ref.getFullYear(),ref.getMonth(),ref.getDate()),y=r.getFullYear(),m=r.getMonth(),a=ini(y,m);
+ if(r>=a){const f=ini(y,m+1);f.setDate(f.getDate()-1);return{i:a,f}}
+ const i=ini(y,m-1),f=new Date(a);f.setDate(f.getDate()-1);return{i,f}}
 function resumo(){const p=per(),J=C.jornadaDiaria*60,lim=new Date();lim.setHours(23,59,59,999);let T=0,X=0,F=0,A=0,U=0,D=0,dias=[];
- for(let c=new Date(p.i);c<=p.f&&c<=lim;c.setDate(c.getDate()+1)){const d=new Date(c),r=E[K(d)],x=calc(r,d),fim=fds(d),w=fim||(r&&r.tipo==='feriado');if(!w)U++;
+ for(let c=new Date(p.i);c<=p.f&&c<=lim;c.setDate(c.getDate()+1)){const d=new Date(c),r=E[K(d)],x=calc(r,d),fim=fds(d),w=fim||isOff(r);if(!w)U++;
   if(!w||r){T+=Math.max(0,x.t);if(x.st==='fa'){if(!w)F+=J}else if(x.s>0)X+=x.s;else if(x.s<0)A-=x.s}
   if(r&&x.t>0)D++;dias.push({d,r,x,w:fim})}
  return{p,T,X,F,A,U,D,dias,saldo:T-U*J}}
 
 /* Ação principal */
 const prox=r=>!r||!r.entrada?['Bater entrada','entrada']:r.saida?['Jornada concluída','']:!r.saidaIntervalo?['Sair para intervalo','saidaIntervalo']:!r.voltaIntervalo?['Voltar do intervalo','voltaIntervalo']:['Bater saída','saida'];
-async function bater(campo){const d=new Date(),r=E[K(d)];campo=campo||prox(r)[1];if(!campo)return false;
+async function bater(campo){const d=new Date(),r=E[K(d)];if(window.Notification&&Notification.permission==='default')Notification.requestPermission();campo=campo||prox(r)[1];if(!campo)return false;
  const h=campo==='saida'?await permPasta():null;
  if(!(await digital()))return false;
  if(campo==='entrada'&&r&&r.entrada&&!confirm('Já existe entrada hoje. Substituir?'))return false;
  const n=campo==='entrada'?{entrada:AG(),saidaIntervalo:null,voltaIntervalo:null,saida:null,obs:''}:r;n[campo]=AG();E[K(d)]=n;salvar();
  if(navigator.vibrate)navigator.vibrate(campo==='saida'?[80,60,80]:60);
  render();const x=calc(n);toast(campo==='saida'?`Saída ${n.saida} • saldo ${x.s>=0?'+':''}${HM(x.s)}`:`Registrado: ${n[campo]}`,'ok');
- if(campo==='voltaIntervalo'){const dur=TM(n.voltaIntervalo)-TM(n.saidaIntervalo);if(dur>C.intervaloMinimo)toast(`Intervalo de ${dur} min (excedeu ${dur-C.intervaloMinimo}); saída empurrada`,'wa',7000)}
+ if(campo==='voltaIntervalo'){const dur=TM(n.voltaIntervalo)-TM(n.saidaIntervalo);if(dur>C.intervaloMinimo){const ex=dur-C.intervaloMinimo;toast(`Intervalo passou ${ex} min do limite. Faça +${ex} min a mais; saída prevista ${HM(x.prev)}`,'wa',15000);bip(300,300,.08)}}
  if(campo==='saida')setTimeout(()=>backupAuto(h),1500);
  if(C.githubAtivo)syncGithub(false);
  return true}
@@ -372,7 +389,23 @@ async function tocarSensor(){
  setTimeout(()=>{btn.classList.remove('ok','err');$('led').className='led'},900)
 }
 
+/* Alertas */
+const AL=jp('infinity_al',{});
+function avisar(ch,msg){const k=K(new Date())+ch;if(AL[k])return;AL[k]=1;localStorage.setItem('infinity_al',JSON.stringify(AL));toast(msg,'wa',20000);bip(880,200,.08);if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);try{if(window.Notification&&Notification.permission==='granted')new Notification('Infinity Ponto',{body:msg,tag:ch})}catch{}}
+function checarAlertas(){const r=E[K(new Date())];if(!r||!r.entrada||r.saida)return;const n=NOW(),e=TM(r.entrada),a=TM(r.saidaIntervalo),b=TM(r.voltaIntervalo),L=C.limiteDireto,av=C.avisoAntesIntervalo,J=C.jornadaDiaria*60;
+ if(a!=null&&b==null){const ex=n-a-C.intervaloMinimo;if(ex>=0)avisar('iv','Intervalo passou de '+C.intervaloMinimo+' min. Volte: você terá que fazer +'+Math.ceil(ex)+' min a mais. Saída prevista ~'+HM(e+J+(n-a)));return}
+ const seg=b!=null?'b':'a',el=n-(b!=null?b:e);
+ if(el>=L)avisar('d5'+seg,'Você completou '+HM(L)+' direto. Faça o intervalo!');
+ else if(el>=L-av)avisar('p5'+seg,'Faltam '+Math.ceil(L-el)+' min para '+HM(L)+' direto. Prepare o intervalo.')}
 /* Telas */
+function metaInfo(){const R=resumo(),M=C.metaMensal*60,B=C.baseMensal*60,hk=K(new Date());let dias=0;
+ for(let c=new Date(R.p.f);K(c)>=hk;c.setDate(c.getDate()-1)){const r=E[K(c)];if(!fds(c)&&!isOff(r)&&!(K(c)===hk&&r&&r.saida))dias++}
+ const f=Math.max(0,M-R.T);return{R,dias,f,fb:Math.max(0,B-R.T),dia:dias?f/dias:f}}
+function metaTxt(){const m=metaInfo();return m.f<=0?'Meta batida!':`Faltam ${HM(m.f)} • ${HM(m.dia)}/dia em ${m.dias} dias úteis • base ${C.baseMensal}h: ${m.fb?'faltam '+HM(m.fb):'ok'}`}
+function rAlertas(){const m=metaInfo(),p=m.R.dias.filter(z=>!z.w&&!z.r&&K(z.d)<K(new Date())),a=[];
+ a.push(`<div class="box"><b>Meta ${C.metaMensal}h</b><br><small>${m.f<=0?'Meta batida':`Faltam ${HM(m.f)} • preciso de <b>${HM(m.dia)}</b> por dia (${m.dias} dias úteis)`}</small></div>`);
+ if(p.length)a.push(`<div class="box" onclick="abrirEd(new Date(${p[0].d.getFullYear()},${p[0].d.getMonth()},${p[0].d.getDate()}))"><b>${p.length} dia(s) sem marcação</b><br><small>Toque para marcar falta, folga ou lançar manual</small></div>`);
+ $('alertas').innerHTML=a.join('')}
 function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),[tx,c]=prox(r),u=usuarioAtual();
  $('marcaUser').innerHTML='<b>'+escI((u.nome||'').toUpperCase())+'</b>'+(u.empresa?' · '+escI(u.empresa):'');
  $('relogio').textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
@@ -381,30 +414,30 @@ function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),[tx,c]=prox(r),u=usuar
  $('tempo').textContent='Trabalhado hoje: '+HMS(Math.max(0,x.t)*60);
  $('st').textContent=!r||!r.entrada?(fds(d)?'Fim de semana':'Aguardando entrada'):r.saida?'Jornada concluída':r.saidaIntervalo&&!r.voltaIntervalo?'Em intervalo':'Em jornada';
  $('tl').innerHTML=[['Entrada','entrada'],['Intervalo','saidaIntervalo'],['Volta','voltaIntervalo'],['Saída','saida']].map(([n,k])=>`<div class="${r&&r[k]?'on':''}"><i></i><b>${r&&r[k]||'--:--'}</b>${n}</div>`).join('');
- const on=r&&r.entrada;$('prev').textContent=on?HM(x.prev):'--:--';$('sd').textContent=on?HM(x.s):'--:--';$('sd').style.color=on?(x.s>=0?'var(--ok)':'var(--bad)'):'';$('ivl').textContent=x.iv?HM(x.iv):'--:--'}
+ const on=r&&r.entrada;$('prev').textContent=on?HM(x.prev):'--:--';$('sd').textContent=on?HM(x.s):'--:--';$('sd').style.color=on?(x.s>=0?'var(--ok)':'var(--bad)'):'';$('ivl').textContent=x.iv?HM(x.iv):'--:--';rAlertas()}
 function rCal(){const y=mc.getFullYear(),m=mc.getMonth(),g=$('gr'),h=new Date();g.innerHTML='';
  $('mes').textContent=mc.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
  for(let i=0;i<new Date(y,m,1).getDay();i++)g.innerHTML+='<div class="dc v"></div>';
  for(let n=1;n<=new Date(y,m+1,0).getDate();n++){const d=new Date(y,m,n),r=E[K(d)],x=calc(r,d),w=fds(d),e=document.createElement('div');let c='';
-  if(r&&r.tipo==='feriado')c='fe';else if(r&&r.tipo==='falta')c='fa';else if(r&&r.entrada)c=x.st;else if(!w&&K(d)<K(h))c='fa';
+  if(isOff(r))c='fe';else if(r&&r.tipo==='falta')c='fa';else if(r&&r.entrada)c=x.st;else if(!w&&K(d)<K(h))c='fa';
   e.className='dc '+(c||(w?'w':''))+(K(d)===K(h)?' hj':'');
-  e.innerHTML=`${n}${x.st==='fe'?'<small>Feriado</small>':(r&&r.entrada)?`<small>${HM(x.s)}</small>`:''}`;
+  e.innerHTML=`${n}${x.st==='fe'?'<small>${offL(r)}</small>':(r&&r.entrada)?`<small>${HM(x.s)}</small>`:''}`;
   e.onclick=()=>abrirEd(d);g.appendChild(e)}}
-function rRel(){const R=resumo(),J=C.jornadaDiaria*60,md=C.metaSemanas*5,pc=Math.min(100,R.D/md*100);
- $('mt').textContent=`Meta: ${R.D} de ${md} dias (${(R.D/5).toFixed(1)} de ${C.metaSemanas} semanas)`;$('mb').style.width=pc+'%';
- $('mh').textContent=`Faltam ${Math.max(0,md-R.D)} dias • Média/dia ${R.D?HM(R.T/R.D):'00:00'}`;
+function rRel(){const R=resumo(),J=C.jornadaDiaria*60,M=C.metaMensal*60,pc=Math.min(100,R.T/M*100);
+ $('mt').textContent=`Meta ${C.metaMensal}h: ${HM(R.T)} feitas (${pc.toFixed(0)}%)`;$('mb').style.width=pc+'%';
+ $('mh').textContent=metaTxt();
  $('rs').innerHTML=[['Trabalhadas',HM(R.T)],['Extras',HM(R.X)],['Faltas',HM(R.F)],['Atrasos',HM(R.A)],['Saldo',HM(R.saldo)],['Dias úteis',R.U]].map(([a,b])=>`<div><span class="lb">${a}</span><b>${b}</b></div>`).join('');
- $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>{const desc=r&&r.tipo==='feriado'?'Feriado / dispensado':r&&r.tipo==='falta'?'Falta registrada':r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro';
-  const val=x.st==='fe'?'Feriado':r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta';
+ $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>{const desc=isOff(r)?offL(r):r&&r.tipo==='falta'?'Falta registrada':r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro';
+  const val=x.st==='fe'?offL(r):r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta';
   return`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${desc}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${val}</span></div></div>`}).join('')}
 function render(){const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,imp:()=>{},cfg:()=>{}})[vw]()}
 function go(v){vw=v;document.querySelectorAll('.vw').forEach(s=>s.classList.toggle('h',s.id!=='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
  if(v==='imp'){const p=per();$('impPerLbl').textContent='('+BR(p.i)+' a '+BR(p.f)+')';if(!$('impDe').value){$('impDe').value=K(p.i);$('impAte').value=K(new Date())}}
- if(v==='cfg'){[['c1','jornadaDiaria'],['c2','intervaloMinimo'],['c3','tolerancia'],['c4','diaFechamento'],['c5','valorHora'],['c6','metaSemanas']].forEach(([i,k])=>$(i).value=C[k]);$('cDig').checked=!!C.digitalAtiva;digSt();bkSt();$('gT').value=C.githubToken||'';$('gR').value=C.githubRepo||'';$('gB').value=C.githubBranch||'main';$('gP').value=C.githubPath||'Pontos/dados.json';$('cGh').checked=!!C.githubAtivo;ghSt()}
+ if(v==='cfg'){[['c1','jornadaDiaria'],['c2','intervaloMinimo'],['c3','tolerancia'],['c4','diaFechamento'],['c5','valorHora'],['c6','metaMensal']].forEach(([i,k])=>$(i).value=C[k]);$('cDig').checked=!!C.digitalAtiva;digSt();bkSt();$('gT').value=tok()?'••••••••':'';$('gR').value=C.githubRepo||'';$('gB').value=C.githubBranch||'main';$('gP').value=C.githubPath||'Pontos/dados.json';$('cGh').checked=!!C.githubAtivo;ghSt()}
  render();scrollTo(0,0)}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
 const mm=n=>{mc.setDate(1);mc.setMonth(mc.getMonth()+n);rCal()};
-function salvarCfg(){C.jornadaDiaria=parseFloat($('c1').value)||5;C.intervaloMinimo=parseInt($('c2').value)||0;C.tolerancia=parseInt($('c3').value)||0;C.diaFechamento=parseInt($('c4').value)||26;C.valorHora=parseFloat($('c5').value)||0;C.metaSemanas=parseInt($('c6').value)||25;salvar();toast('Ajustes salvos','ok')}
+function salvarCfg(){C.jornadaDiaria=parseFloat($('c1').value)||5;C.intervaloMinimo=parseInt($('c2').value)||0;C.tolerancia=parseInt($('c3').value)||0;C.diaFechamento=parseInt($('c4').value)||26;C.valorHora=parseFloat($('c5').value)||0;C.metaMensal=parseInt($('c6').value)||120;salvar();toast('Ajustes salvos','ok')}
 
 /* Editar / novo dia */
 function tipoMudou(){$('edHorarios').classList.toggle('h',$('fTipo').value!=='')}
@@ -433,11 +466,11 @@ const escI=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 function diasEntre(ini,fim){const a=[],lim=new Date();lim.setHours(23,59,59,999);for(let c=new Date(ini);c<=fim&&c<=lim;c.setDate(c.getDate()+1))a.push(new Date(c));return a}
 function linhasImp(dias){
  return dias.map(d=>{const r=E[K(d)],x=calc(r,d),w=fds(d);let iv,sld;
-  if(r&&r.tipo==='feriado'){iv='Feriado';sld='--:--'}
+  if(isOff(r)){iv=offL(r);sld='--:--'}
   else if(r&&r.tipo==='falta'){iv='Falta';sld='-'+HM(C.jornadaDiaria*60)}
   else{iv=r&&r.entrada?`${r.entrada} → ${r.saida||'em aberto'}`:(w?'Folga':'Falta');sld=r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):(w?'--:--':'-'+HM(C.jornadaDiaria*60))}
   return{nome:`${pad(d.getDate())}/${pad(d.getMonth()+1)} ${DS[d.getDay()]}`,qtd:iv,valor:sld}})}
-function totaisImp(dias){let T=0,S=0;dias.forEach(d=>{const r=E[K(d)],x=calc(r,d),fe=r&&r.tipo==='feriado',w=fds(d)||fe;if(!w||r){T+=Math.max(0,x.t);S+=r&&r.entrada?x.s:(w?0:-C.jornadaDiaria*60)}});return{T,S}}
+function totaisImp(dias){let T=0,S=0;dias.forEach(d=>{const r=E[K(d)],x=calc(r,d),fe=isOff(r),w=fds(d)||fe;if(!w||r){T+=Math.max(0,x.t);S+=r&&r.entrada?x.s:(w?0:-C.jornadaDiaria*60)}});return{T,S}}
 function dadosImpressao(){
  const modo=document.querySelector('input[name=impModo]:checked').value,hoje=new Date();let ini,fim,titulo;
  if(modo==='dia'){ini=fim=hoje;titulo='Relatório do dia'}
@@ -474,7 +507,10 @@ function gerarImpressao(){
 function limparImpressao(){const papel=$('impPapel');papel.style.transition='none';papel.style.transform='translateY(-101%)';papel.innerHTML='';
  $('impFenda').style.minHeight='';$('impLcd').textContent='Pronto';$('impImprimir').style.display=$('impLimpar').style.display='none'}
 $('impBtn').addEventListener('click',gerarImpressao);
-$('impImprimir').addEventListener('click',()=>window.print());
+function imprimir80(){const h=$('impPapel').innerHTML;if(!h)return;let f=$('pf');if(f)f.remove();f=document.createElement('iframe');f.id='pf';f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(f);
+ const css="@page{size:80mm auto;margin:0}*{box-sizing:border-box}html,body{margin:0;background:#fff;color:#000}body{width:80mm;padding:4mm;font:400 12.5px/1.45 'Courier New',monospace}h2{font-size:14px;margin:0 0 2px;text-transform:uppercase}.fraco{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}.plinha{display:flex;justify-content:space-between;gap:6px}.pcab{font-weight:700}.pq{flex:1;text-align:center}.ptotal{font-size:14px;font-weight:700}.pcodigo{display:none}.pcentro{text-align:center}.pqr{text-align:center;margin-top:6px}.pqr svg{width:26mm;height:26mm}";
+ const d=f.contentWindow.document;d.open();d.write('<!doctype html><meta charset=utf-8><style>'+css+'</style>'+h);d.close();setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print()},300)}
+$('impImprimir').addEventListener('click',imprimir80);
 $('impLimpar').addEventListener('click',limparImpressao);
 document.querySelectorAll('input[name=impModo]').forEach(r=>r.addEventListener('change',()=>{$('impCustom').style.display=r.value==='custom'&&r.checked?'grid':'none'}));
 
@@ -484,7 +520,7 @@ document.querySelectorAll('input[name=impModo]').forEach(r=>r.addEventListener('
    let ok=false;if(C.githubAtivo)ok=await restaurarGithub(false).then(x=>{if(x)toast('Dados restaurados do GitHub','ok',6000);return x});
    if(!ok){try{const j=JSON.parse(await idbGet('dump_'+UID));if(j.registros&&Object.keys(j.registros).length){aplicar(j);toast('Dados restaurados do backup interno','ok',6000)}}catch{}}
  }
- render();setInterval(()=>{if(vw==='hoje')rHoje()},1000);
+ render();checarAlertas();setInterval(checarAlertas,20000);if(localStorage.getItem(PK))syncGithub(false);setInterval(()=>{if(vw==='hoje')rHoje()},1000);
  let dia=K(new Date());setInterval(()=>{if(K(new Date())!==dia){dia=K(new Date());mc=new Date();render()}},60000);
  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
