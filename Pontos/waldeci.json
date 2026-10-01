@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "dataBackup": "2026-10-01T01:35:58.276Z",
+  "dataBackup": "2026-10-01T01:36:39.231Z",
   "config": {
     "jornadaDiaria": 5,
     "intervaloMinimo": 20,
@@ -14,9 +14,31 @@
     "limiteDireto": 300,
     "digitalAtiva": false,
     "githubAtivo": true,
-    "githubRepo": "waldeciramos/sites",
+    "githubRepo": "Waldeciramos/sites",
     "githubPath": "Pontos/waldeci.json",
     "githubBranch": "main"
   },
-  "registros": {}
+  "registros": {
+    "2026-09-30": {
+      "entrada": "07:07",
+      "saidaIntervalo": "12:04",
+      "voltaIntervalo": "12:24",
+      "saida": "13:11",
+      "obs": ""
+    },
+    "2026-09-28": {
+      "entrada": "07:17",
+      "saidaIntervalo": "12:04",
+      "voltaIntervalo": "12:25",
+      "saida": "13:05",
+      "obs": ""
+    },
+    "2026-09-29": {
+      "entrada": "07:09",
+      "saidaIntervalo": "12:06",
+      "voltaIntervalo": "12:26",
+      "saida": "12:56",
+      "obs": ""
+    }
+  }
 }
