@@ -142,8 +142,10 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  .pqr svg{width:26mm;height:26mm}
  @page{size:80mm auto;margin:0}
 }
+.ck{display:flex;flex-wrap:wrap;gap:4px 12px;margin-bottom:8px}.ck label{display:flex;gap:4px;align-items:center;margin:0}.ck input{width:auto}
+.fi{background:var(--c2);border-radius:14px;padding:10px;margin-bottom:8px}.fi label{margin-bottom:6px}
 </style></head><body>
-<header><div style="display:flex;align-items:center;gap:8px"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><span id="per"></span></header>
+<header><div style="display:flex;align-items:center;gap:8px"><img id="avH" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--pu)"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><span id="per"></span></header>
 <main>
 <section id="v-hoje" class="vw">
  <div class="rep">
@@ -178,11 +180,13 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 <section id="v-rel" class="vw h">
  <div class="box"><span class="lb" id="mt">--</span><div class="bar"><i id="mb" style="width:0"></i></div><span class="lb" id="mh">--</span></div>
  <div class="rs" id="rs"></div>
- <div class="acts"><button class="ghost" onclick="abrirEd(null)">+ Dia extra</button><button class="ghost" onclick="fech()">Fechar mês</button><button class="ghost" onclick="csv()">CSV</button></div>
+ <div class="box" id="fbox"></div>
+ <div class="acts"><button class="ghost" onclick="abrirEd(null)">+ Dia extra</button><button class="ghost" onclick="fech()">Fechar mês</button><button class="ghost" onclick="csv()">CSV</button><button class="ghost" onclick="abrirRel()">📄 Relatório</button></div>
  <div id="ls"></div>
 </section>
 <section id="v-imp" class="vw h">
  <p class="h2title" style="font-weight:700;margin-bottom:4px">Imprimir relatório</p>
+ <div class="modoImp" style="margin-bottom:8px"><label><input type="radio" name="impTipo" value="horas" checked> ⏱ Horas</label><label><input type="radio" name="impTipo" value="ganhos"> 💰 Ganhos (folha)</label></div>
  <div class="modoImp">
   <label><input type="radio" name="impModo" value="dia" checked> Só hoje</label>
   <label><input type="radio" name="impModo" value="semana"> Últimos 7 dias</label>
@@ -201,8 +205,31 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
  <div class="box"><div class="g2">
  <label>Jornada (horas)<input type="number" id="c1" step="0.5"></label><label>Intervalo mín. (min)<input type="number" id="c2" step="5"></label>
  <label>Tolerância (min)<input type="number" id="c3"></label><label>Fecha no dia<input type="number" id="c4" min="1" max="31"></label>
- <label>Valor da hora (R$)<input type="number" id="c5" step="0.01"></label><label>Meta (semanas)<input type="number" id="c6"></label></div>
+ </div>
  <button class="big" style="height:52px" onclick="salvarCfg()">Salvar ajustes</button></div>
+ <div class="box" id="fper"><b>👤 Meu perfil e foto</b><p class="bk">Aparece no cabeçalho do app e no relatório para a chefia.</p>
+ <div style="display:flex;gap:12px;align-items:center;margin:8px 0"><img id="pFt" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;background:var(--c2)"><div class="acts" style="margin:0"><button class="ghost" onclick="$('pArq').click()">📷 Escolher foto</button><button class="ghost" onclick="tirarFoto()">Remover</button></div><input type="file" id="pArq" accept="image/*" class="h" onchange="fotoArquivo(this)"></div>
+ <label>Nome completo<input type="text" id="pNome"></label><div class="g2"><label>Cargo<input type="text" id="pCargo"></label><label>Empresa<input type="text" id="pEmp"></label></div>
+ <button class="ghost" onclick="salvarPerfil()">Salvar perfil</button></div>
+<div class="box" id="fcfg"><b>💰 Configuração salarial</b><p class="bk">Tudo editável. Os % são encadeados como na simulação da empresa (cada adicional diz sobre o que incide). "Valor anterior" mostra se houve aumento.</p>
+ <div class="g2">
+  <label>Contrato<select id="fContrato"><option value="horista">Horista (por hora)</option><option value="mensalista">Mensalista (fixo)</option></select></label>
+  <label>Salário base ref. (R$, 220h)<input type="number" id="fBase" step="0.01" oninput="atualizaVH()"></label>
+  <label>Divisor (horas/mês)<input type="number" id="fDiv" oninput="atualizaVH()"></label>
+  <label>Valor hora fixo (0 = automático)<input type="number" id="fVH" step="0.01" oninput="atualizaVH()"></label>
+  <label>Meta de horas no período<input type="number" id="fMeta"></label>
+  <label>Horas extras desejadas (+)<input type="number" id="fExtra"></label>
+  <label>FGTS empresa (%, info)<input type="number" id="fFgtsP" step="0.01"></label></div>
+ <p class="bk" id="fVHc"></p><div id="fItens"></div>
+ <div class="acts"><button class="ghost" onclick="addItem('v')">+ Vencimento</button><button class="ghost" onclick="addItem('d')">+ Desconto</button><button class="ghost" onclick="addItem('i')">+ Informativo</button></div>
+ <b style="display:block;margin:12px 0 4px">Impostos (tabelas 2026 — edite se mudarem)</b>
+ <label>INSS faixas (limite:alíquota%, ...)<input type="text" id="fInss"></label>
+ <div class="g2"><label>Dependentes p/ IR<input type="number" id="fDep"></label><label>Dedução por dependente (R$)<input type="number" id="fDepV" step="0.01"></label>
+  <label>Desconto simplificado (R$)<input type="number" id="fSimp" step="0.01"></label><label>Isenção total até (R$, 0 = sem redutor)<input type="number" id="fR1" step="0.01"></label>
+  <label>Redução máx. até a isenção (R$)<input type="number" id="fR1m" step="0.01"></label><label>Redutor parcial até (R$)<input type="number" id="fR2" step="0.01"></label>
+  <label>Redutor: A (R$)<input type="number" id="fRA" step="0.01"></label><label>Redutor: B (× rendimento)<input type="number" id="fRB" step="0.000001"></label></div>
+ <label>IRRF faixas (limite:alíquota%:deduzir, ...)<input type="text" id="fIrTab"></label>
+ <button class="big" style="height:52px" onclick="salvarFolha()">Salvar configuração salarial</button></div>
  <div class="box"><b>Digital / Face ID</b><p class="bk" id="digSt"></p>
  <button class="ghost" onclick="cadDigital()">Cadastrar neste aparelho</button>
  <label style="margin-top:12px;display:flex;gap:8px;align-items:center"><input type="checkbox" id="cDig" style="width:auto" onchange="C.digitalAtiva=this.checked;salvar()"> Exigir digital ao bater ponto</label></div>
@@ -232,7 +259,18 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
   <label>Entrada<input type="time" id="fE"></label><label>Saída intervalo<input type="time" id="fA"></label>
   <label>Volta intervalo<input type="time" id="fB"></label><label>Saída final<input type="time" id="fS"></label></div>
  <div class="acts" style="margin:8px 0 0"><button class="big" style="height:48px;flex:1" onclick="salvarEd()">Salvar</button><button class="ghost" id="fX" onclick="delEd()">Excluir</button><button class="ghost" onclick="$('ed').close()">Cancelar</button></div></dialog>
-<dialog id="fc"><h3>Fechamento do mês</h3><div id="fcB"></div><div class="acts" style="margin:14px 0 0"><button class="ghost" onclick="$('fc').close()">Fechar</button></div></dialog>
+<dialog id="fo"><h3>💰 Folha estimada</h3><div id="foB"></div><div class="acts" style="margin:14px 0 0"><button class="ghost" onclick="imprimirGanhos()">Imprimir</button><button class="ghost" onclick="$('fo').close()">Fechar</button></div></dialog>
+<dialog id="rl"><h3>📄 Relatório de fechamento</h3>
+ <label>Período<select id="rlP"></select></label>
+ <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="rlV" style="width:auto"> Incluir valores em R$ (vencimentos, descontos, líquido)</label>
+ <p class="bk">O link é público: quem tiver o endereço só consegue <b>visualizar</b>. Sem a opção acima, nenhum valor em R$ aparece no relatório.</p>
+ <div class="acts"><button class="ghost" onclick="relVer()">👁 Visualizar</button><button class="ghost" onclick="relBaixar()">⬇ Baixar HTML</button></div>
+ <button class="big" style="height:52px" onclick="relPublicar()">🔗 Publicar e gerar link</button>
+ <div id="rlL" style="display:none;margin-top:10px"><textarea readonly id="rlU" rows="2" style="width:100%;font-size:12px"></textarea>
+  <div class="acts"><button class="ghost" onclick="relCopiar()">Copiar</button><button class="ghost" onclick="relZap()">WhatsApp</button><button class="ghost" onclick="relShare()">Compartilhar</button></div>
+  <p class="bk">O GitHub leva cerca de 1 minuto para publicar; se der "não encontrado", espere e atualize.</p></div>
+ <div class="acts" style="margin-top:8px"><button class="ghost" onclick="$('rl').close()">Fechar</button></div></dialog>
+<dialog id="fc"><h3>Fechamento do mês</h3><div id="fcB"></div><div class="acts" style="margin:14px 0 0"><button class="ghost" onclick="$('fc').close();abrirRel()">📄 Relatório p/ chefia</button><button class="ghost" onclick="$('fc').close()">Fechar</button></div></dialog>
 <dialog id="lk"><h3>Configurar outro aparelho</h3>
  <p class="bk">Abra este link (ou escaneie o QR) no outro celular/PC: ele já fica configurado e puxa seus pontos. <b>O link contém o token — mande só pra você e apague depois.</b></p>
  <div id="lkQ" style="width:220px;max-width:100%;margin:10px auto;background:#fff;padding:6px;border-radius:8px"></div>
@@ -256,7 +294,7 @@ const jp=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch{return 
 /* Perfis (usuários independentes no mesmo aparelho) */
 const UK='infinity_usuarios',UC='infinity_usuario_atual';
 function seedUsuarios(){const u=[
- {id:'waldeci',nome:'Waldeci Ramos',empresa:'Rede Dom Pedro de Postos',cargo:'Analista de Serviços Internos'},
+ {id:'waldeci',nome:'Waldeci de Andrade Ramos',empresa:'Rede Dom Pedro de Postos',cargo:'Analista de Serviços Internos'},
  {id:'thais',nome:'Thais Pereira Xavier',empresa:'APAE de Estiva',cargo:'Fisioterapeuta'}];
  localStorage.setItem(UK,JSON.stringify(u));return u}
 /* Link de configuração (#cfg=...): configura este aparelho (token, repositório, perfil). Roda antes de ler o perfil. */
@@ -272,6 +310,7 @@ let CFGLINK=false;
  history.replaceState(null,'',location.pathname+location.search);CFGLINK=true}catch{}})();
 
 let USERS=jp(UK,null)||seedUsuarios();
+{const w=USERS.find(u=>u.id==='waldeci');if(w&&w.nome==='Waldeci Ramos'){w.nome='Waldeci de Andrade Ramos';localStorage.setItem(UK,JSON.stringify(USERS))}}
 let UID=localStorage.getItem(UC)||(USERS[0]&&USERS[0].id)||'';
 if(UID&&!USERS.find(u=>u.id===UID))UID=(USERS[0]&&USERS[0].id)||'';
 if(UID)localStorage.setItem(UC,UID);
@@ -368,8 +407,10 @@ async function syncUma(){
  for(let t=0;t<6;t++){
   const a=await ghGet(),antes=sig(E,DEL);
   if(a&&a.dados&&a.dados.registros){const m=mesclar(a.dados);E=m.registros;DEL=m.excluidos;gravar();
+   const rc=a.dados.config||{};if(rc.folha&&(+rc.folhaT||0)>(+C.folhaT||0)){C.folha=rc.folha;C.folhaT=rc.folhaT;gravar();render()}
+   if(!C.foto&&rc.foto){C.foto=rc.foto;gravar();render()}
    if(sig(E,DEL)!==antes)render();
-   if(sig(a.dados.registros,a.dados.excluidos||{})===sig(E,DEL))return}
+   if(sig(a.dados.registros,a.dados.excluidos||{})===sig(E,DEL)&&(+rc.folhaT||0)>=(+C.folhaT||0))return}
   try{await ghPut(JSON.parse(dump()),a?a.sha:null);return}
   catch(e){if((e.status===409||e.status===422)&&t<5){await espera(400*(t+1)+Math.random()*600);continue}throw e}}}
 let syncEm=null,syncDeNovo=false;
@@ -393,6 +434,154 @@ function gerarLink(){salvarGh();if(!ghOk())return toast('Preencha token, reposit
 async function copiarLink(){const t=$('lkT');try{await navigator.clipboard.writeText(t.value)}catch{t.select();document.execCommand('copy')}toast('Link copiado','ok')}
 async function compartilharLink(){if(navigator.share){try{await navigator.share({title:'Infinity Ponto',url:$('lkT').value})}catch{}}else copiarLink()}
 
+/* ===== FOLHA v2: ganhos, descontos e líquido (bases encadeadas como na simulação da empresa) ===== */
+const FV=2,INSS26='1621:7.5, 2902.84:9, 4354.27:12, 8475.55:14',IRRF26='2428.8:0:0, 2826.65:7.5:182.16, 3751.05:15:394.16, 4664.68:22.5:675.49, 1000000000:27.5:908.73';
+const FP0=()=>({v:FV,contrato:'horista',base:1800,divisor:220,valorHoraFixo:0,metaHoras:100,extraHoras:20,fgtsPct:8,inss:INSS26,
+ irrf:{dep:1,depValor:189.59,simpl:607.2,tab:IRRF26,red1:5000,red1Max:312.89,red2:7350,redA:978.62,redB:0.133145},itens:[
+ {id:'peric',nome:'Periculosidade',nat:'v',tipo:'pct',valor:30,sobre:['sal']},
+ {id:'quebra',nome:'Quebra de Caixa',nat:'v',tipo:'pct',valor:10,sobre:['sal','peric']},
+ {id:'adic',nome:'Gratif. Adic. Função',nat:'v',tipo:'pct',valor:0,sobre:['sal','peric']},
+ {id:'dupla',nome:'Adicional de Dupla Função',nat:'v',tipo:'pct',valor:20,sobre:['sal','peric','quebra']},
+ {id:'gratif',nome:'Gratif. Cargo Confiança',nat:'v',tipo:'pct',valor:40,sobre:['sal','peric']},
+ {id:'acad',nome:'Auxílio Acadêmico',nat:'v',tipo:'fixo',valor:0},
+ {id:'dsr',nome:'DSR (horista: sobre as horas)',nat:'v',tipo:'pct',valor:16.67,dsr:1,sobre:['sal','peric','quebra','adic','dupla','gratif']},
+ {id:'inss',nome:'INSS',nat:'d',tipo:'inss'},{id:'irrf',nome:'IRRF',nat:'d',tipo:'irrf'},
+ {id:'saude',nome:'Plano Saúde Titular',nat:'d',tipo:'fixo',valor:100,plano:1},
+ {id:'odonto',nome:'Plano Odontológico',nat:'d',tipo:'fixo',valor:7.5,plano:1},
+ {id:'va',nome:'Vale-Alimentação (coparticipação)',nat:'d',tipo:'fixo',valor:10.25},
+ {id:'vtdesc',nome:'Vale-Transporte (desconto 6%)',nat:'d',tipo:'pct',valor:0,base:'sal'},
+ {id:'gestao',nome:'Complem. Custos Gestão',nat:'d',tipo:'fixo',valor:0},
+ {id:'saudedep',nome:'Plano Saúde Dependentes (por pessoa)',nat:'d',tipo:'fixo',valor:234,qtd:2,plano:1},
+ {id:'vac',nome:'Cartão Vale-Alimentação (crédito)',nat:'i',tipo:'fixo',valor:170}]});
+function F(){if(!C.folha||C.folha.v!==FV){const o=C.folha&&C.folha.itens?C.folha:null,n=FP0();
+  if(o&&C.folhaT){['contrato','base','divisor','valorHoraFixo','metaHoras','extraHoras'].forEach(k=>{if(o[k]!=null)n[k]=o[k]});
+   n.itens.forEach(i=>{const x=o.itens.find(z=>z.id===i.id);if(x)['valor','qtd','ref','nome','plano'].forEach(k=>{if(x[k]!==undefined&&x[k]!=='')i[k]=x[k]})});
+   o.itens.filter(x=>/^x/.test(x.id)).forEach(x=>n.itens.push({...x,sobre:x.nat==='v'&&x.tipo==='pct'?['sal']:undefined}))}
+  C.folha=n}return C.folha}
+const R2=n=>Math.round((n+Number.EPSILON)*100)/100,RS=n=>(n<0?'-':'')+'R$ '+Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const folhaVH=()=>{const f=F();return f.valorHoraFixo>0?f.valorHoraFixo:(f.divisor?f.base/f.divisor:0)};
+const qd=i=>i.tipo==='fixo'?(+i.qtd||1):1,rot=(i,q)=>i.nome+(i.tipo==='pct'?` (${i.valor}%)`:q>1?` (${q}×)`:''),
+ tab=t=>String(t||'').split(',').map(x=>x.trim().split(':').map(Number)).filter(a=>a.length>=2&&a.every(n=>!isNaN(n)));
+function inssTab(base,fx){let ant=0,t=0;for(const[l,a]of fx){if(base>ant)t+=(Math.min(base,l)-ant)*a/100;ant=l}return R2(t)}
+function irrfTab(bruto,inss,f){const c=f.irrf,ded=Math.max(c.simpl,inss+c.dep*c.depValor),base=Math.max(0,bruto-ded);let imp=0;
+ for(const[l,a,d]of tab(c.tab)){if(base<=l){imp=a?base*a/100-d:0;break}}
+ let red=0;if(c.red1>0&&bruto<=c.red1)red=c.red1Max;else if(c.red2>0&&bruto<=c.red2)red=c.redA-c.redB*bruto;
+ return R2(Math.max(0,imp-Math.max(0,red)))}
+function folha(min){const f=F(),vh=folhaVH(),h=min/60,hor=f.contrato!=='mensalista',sal=R2(hor?h*vh:f.base),V={sal},L=[{nome:hor?`Salário base (${h.toFixed(1)}h × ${RS(vh)})`:'Salário base (fixo)',nat:'v',v:sal}],
+  soma=i=>(i.sobre||['sal']).reduce((x,id)=>x+(V[id]||0),0);
+ f.itens.filter(i=>i.nat==='v'&&!i.dsr).forEach(i=>{const q=qd(i),v=R2(i.tipo==='fixo'?i.valor*q:i.valor/100*soma(i));V[i.id]=v;L.push({nome:rot(i,q),nat:'v',v,it:i})});
+ if(hor)f.itens.filter(i=>i.nat==='v'&&i.dsr).forEach(i=>{const v=R2(i.valor/100*soma(i));V[i.id]=v;L.push({nome:rot(i,1),nat:'v',v,it:i})});
+ const totV=R2(L.reduce((x,l)=>x+l.v,0)),inss=f.itens.some(i=>i.nat==='d'&&i.tipo==='inss')?inssTab(totV,tab(f.inss)):0;
+ f.itens.filter(i=>i.nat==='d').forEach(i=>{const q=qd(i);let v,nome=rot(i,q);
+  if(i.tipo==='inss'){v=inssTab(totV,tab(f.inss));nome=i.nome+' (tabela)'}else if(i.tipo==='irrf'){v=irrfTab(totV,inss,f);nome=i.nome+' (tabela)'}
+  else v=R2(i.tipo==='fixo'?i.valor*q:i.valor/100*(i.base==='sal'?sal:totV));L.push({nome,nat:'d',v,it:i})});
+ const totD=R2(L.filter(l=>l.nat==='d').reduce((x,l)=>x+l.v,0)),pl=f.itens.filter(i=>i.plano),sem=i=>i.ref===''||i.ref==null?i.valor:+i.ref;
+ return{vh,h,sal,L,totV,totD,liq:R2(totV-totD),fgts:R2(totV*(f.fgtsPct||0)/100),info:f.itens.filter(i=>i.nat==='i').map(i=>({nome:i.nome,v:R2(i.valor*(+i.qtd||1))})),
+  planos:{atual:R2(pl.reduce((x,i)=>x+i.valor*(+i.qtd||1),0)),ant:R2(pl.reduce((x,i)=>x+sem(i)*(+i.qtd||1),0))}}}
+function mults(){const f=F(),M={sal:1};let tot=1,d=0;const so=i=>(i.sobre||['sal']).reduce((x,id)=>x+(M[id]||0),0);
+ f.itens.filter(i=>i.nat==='v'&&i.tipo==='pct'&&!i.dsr).forEach(i=>{const m=i.valor/100*so(i);M[i.id]=m;tot+=m});
+ f.itens.filter(i=>i.nat==='v'&&i.tipo==='pct'&&i.dsr).forEach(i=>{d+=i.valor/100*so(i)});return{M:tot,D:f.contrato==='mensalista'?0:d}}
+function ganhoDia(min,U){const f=F(),m=mults();return R2((f.contrato==='mensalista'?f.base/Math.max(1,U):(min/60)*folhaVH())*(m.M+m.D))}
+function chip(it){if(!it||it.ref===''||it.ref==null)return'';const d=it.valor-it.ref;if(Math.abs(d)<.005)return' <span class="bd ok">= anterior</span>';
+ return` <span class="bd ${d>0?'fa':'ok'}">${d>0?'▲ +':'▼ -'}${RS(Math.abs(d))}${+it.ref?' ('+(d>0?'+':'-')+Math.abs(d/it.ref*100).toFixed(1)+'%)':''}</span>`}
+function rFolha(R){const f=F(),a=folha(R.T),m=folha(f.metaHoras*60),e=f.extraHoras?folha((f.metaHoras+f.extraHoras)*60):null;
+ $('fbox').innerHTML=`<b>💰 Ganhos do período</b><div class="rs" style="margin:8px 0"><div><span class="lb">Vencimentos</span><b>${RS(a.totV)}</b></div><div><span class="lb">Líquido hoje</span><b>${RS(a.liq)}</b></div><div><span class="lb">Na meta ${f.metaHoras}h</span><b>${RS(m.liq)}</b></div></div>`
+ +(e?`<span class="lb">Com extras (${f.metaHoras+f.extraHoras}h): líquido ${RS(e.liq)}</span><br>`:'')+(m.liq<0?'<span class="bd fa">⚠ Descontos maiores que os vencimentos — confira os planos de saúde</span>':'')
+ +`<div class="acts" style="margin-top:8px"><button class="ghost" onclick="abrirFolha()">Ver detalhes</button><button class="ghost" onclick="imprimirGanhos()">Imprimir ganhos</button></div>`}
+function abrirFolha(){const R=resumo(),f=F(),a=folha(R.T),m=folha(f.metaHoras*60),ln=(x,y,c)=>`<div class="fl"${c?` style="color:${c}"`:''}><span>${x}</span><b>${y}</b></div>`;
+ let h=`<p class="bk">Valor/hora: ${RS(a.vh)} • Horas no período: ${a.h.toFixed(1)}h</p>`+a.L.filter(l=>l.nat==='v').map(l=>ln(escI(l.nome),RS(l.v))).join('')+ln('<b>Total de vencimentos</b>',RS(a.totV))
+ +a.L.filter(l=>l.nat==='d').map(l=>ln('(-) '+escI(l.nome)+chip(l.it),'−'+RS(l.v).replace('-',''))).join('')+ln('<b>Total de descontos</b>','−'+RS(a.totD))
+ +ln('<b>LÍQUIDO ESTIMADO</b>',`<b>${RS(a.liq)}</b>`,a.liq<0?'#ff6b6b':'')+a.info.filter(i=>i.v).map(i=>ln(escI(i.nome),RS(i.v))).join('')+(f.fgtsPct?ln(`FGTS depositado pela empresa (${f.fgtsPct}%)`,RS(a.fgts)):'');
+ const pl=m.planos,dif=R2(pl.atual-pl.ant);
+ h+=`<hr><b>Planos de saúde</b>`+ln('Atual',RS(pl.atual))+ln('Anterior',RS(pl.ant))+ln('Variação',dif?`${dif>0?'▲ +':'▼ '}${RS(Math.abs(dif))}`:'= sem aumento',dif>0?'#ff6b6b':'')+(m.totV?ln('Peso nos vencimentos (na meta)',(pl.atual/m.totV*100).toFixed(1)+'%'):'')
+ +`<hr><b>Se bater a meta (${f.metaHoras}h)</b>`+ln('Vencimentos',RS(m.totV))+ln('Líquido',RS(m.liq),m.liq<0?'#ff6b6b':'');
+ $('foB').innerHTML=h;$('fo').showModal()}
+function imprimirGanhos(){$('fo').close();go('imp');document.querySelector('input[name=impTipo][value=ganhos]').checked=true;document.querySelector('input[name=impModo][value=periodo]').checked=true;$('impCustom').style.display='none'}
+/* editor da configuração salarial */
+let FED=[];const vhEd=()=>{const v=+$('fVH').value;return v>0?v:(+$('fDiv').value?(+$('fBase').value)/(+$('fDiv').value):0)};
+const atualizaVH=()=>{$('fVHc').textContent='Valor hora calculado: '+RS(vhEd())};
+function itemHTML(it,x){const T=it.tipo,t=(v,l)=>`<option value="${v}"${T===v?' selected':''}>${l}</option>`,auto=T==='inss'||T==='irrf',
+  tipos=it.nat==='v'?t('pct','% sobre…')+t('fixo','R$ fixo'):it.nat==='d'?t('pct','% (porcentagem)')+t('fixo','R$ fixo')+t('inss','INSS (tabela auto)')+t('irrf','IRRF (tabela auto)'):t('fixo','R$');
+ let sob='';if(it.nat==='v'&&T==='pct'){const ops=[{id:'sal',nome:'Salário'}].concat(FED.filter(z=>z.nat==='v'&&z.tipo==='pct'&&!z.dsr&&z.id!==it.id).map(z=>({id:z.id,nome:z.nome})));
+  sob=`<div class="bk" style="margin:4px 0">Calcula sobre:</div><div class="ck">${ops.map(o=>`<label><input type="checkbox" data-sob="${o.id}"${(it.sobre||['sal']).includes(o.id)?' checked':''}> ${escI(o.nome)}</label>`).join('')}</div>`}
+ else if(it.nat==='d'&&T==='pct')sob=`<label>Calcula sobre<select data-k="base"><option value="total"${it.base!=='sal'?' selected':''}>Total de vencimentos</option><option value="sal"${it.base==='sal'?' selected':''}>Salário das horas</option></select></label>`;
+ return`<div class="fi" data-i="${x}"><div class="g2"><label>Nome<input type="text" data-k="nome" value="${escI(it.nome)}"></label><label>Tipo<select data-k="tipo" onchange="lerEd();pintaEd()">${tipos}</select></label>`
+ +(auto?'':`<label>Valor ${T==='pct'?'(%)':'(R$)'}<input type="number" step="0.01" data-k="valor" value="${it.valor}"></label>`)
+ +(T==='fixo'?`<label>Qtd (pessoas/vezes)<input type="number" data-k="qtd" value="${it.qtd||1}"></label><label>Valor anterior (compara)<input type="number" step="0.01" data-k="ref" value="${it.ref??''}"></label>`:'')+`</div>${sob}`
+ +(it.nat==='d'&&T==='fixo'?`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-k="plano" style="width:auto"${it.plano?' checked':''}> É plano de saúde (entra no comparativo)</label>`:'')+`<button class="ghost" onclick="rmItem(${x})">Remover</button></div>`}
+function pintaEd(){const T={v:'Vencimentos',d:'Descontos',i:'Informativos (não entram no cálculo)'};
+ $('fItens').innerHTML=['v','d','i'].map(n=>`<p class="bk" style="margin:10px 0 6px"><b>${T[n]}</b></p>`+FED.map((it,x)=>it.nat===n?itemHTML(it,x):'').join('')).join('');atualizaVH()}
+function renderFolhaEd(){const f=F(),c=f.irrf,set=(i,v)=>$(i).value=v;set('fContrato',f.contrato);set('fBase',f.base);set('fDiv',f.divisor);set('fVH',f.valorHoraFixo);set('fMeta',f.metaHoras);set('fExtra',f.extraHoras);set('fFgtsP',f.fgtsPct);
+ set('fInss',f.inss);set('fDep',c.dep);set('fDepV',c.depValor);set('fSimp',c.simpl);set('fR1',c.red1);set('fR1m',c.red1Max);set('fR2',c.red2);set('fRA',c.redA);set('fRB',c.redB);set('fIrTab',c.tab);FED=JSON.parse(JSON.stringify(f.itens));pintaEd()}
+function lerEd(){document.querySelectorAll('#fItens .fi').forEach(el=>{const it=FED[+el.dataset.i];el.querySelectorAll('[data-k]').forEach(c=>{const k=c.dataset.k;it[k]=c.type==='checkbox'?(c.checked?1:0):(k==='valor'||k==='qtd')?(parseFloat(c.value)||0):k==='ref'?(c.value===''?'':parseFloat(c.value)):c.value});
+ const cs=el.querySelectorAll('[data-sob]');if(cs.length)it.sobre=[...cs].filter(c=>c.checked).map(c=>c.dataset.sob)})}
+function addItem(n){lerEd();FED.push({id:'x'+Date.now().toString(36),nome:'Novo item',nat:n,tipo:n==='v'?'pct':'fixo',valor:0,base:'total',sobre:['sal']});pintaEd()}
+function rmItem(x){lerEd();FED.splice(x,1);pintaEd()}
+function salvarFolha(){lerEd();const n=i=>+$(i).value||0;
+ C.folha={v:FV,contrato:$('fContrato').value,base:n('fBase'),divisor:n('fDiv')||220,valorHoraFixo:n('fVH'),metaHoras:n('fMeta')||100,extraHoras:n('fExtra'),fgtsPct:n('fFgtsP'),inss:$('fInss').value,
+  irrf:{dep:n('fDep'),depValor:n('fDepV'),simpl:n('fSimp'),tab:$('fIrTab').value,red1:n('fR1'),red1Max:n('fR1m'),red2:n('fR2'),redA:n('fRA'),redB:n('fRB')},itens:FED};
+ C.folhaT=Date.now();C.valorHora=folhaVH();salvar();toast('Configuração salarial salva','ok');render();if(C.githubAtivo)syncGithub(false)}
+
+/* perfil + foto */
+function pPerfil(){const u=usuarioAtual();$('pNome').value=u.nome||'';$('pCargo').value=u.cargo||'';$('pEmp').value=u.empresa||'';$('pFt').src=C.foto||'icon-192.png'}
+function salvarPerfil(){const u=USERS.find(x=>x.id===UID);if(!u)return;u.nome=$('pNome').value.trim()||u.nome;u.cargo=$('pCargo').value.trim();u.empresa=$('pEmp').value.trim();localStorage.setItem(UK,JSON.stringify(USERS));toast('Perfil salvo','ok');render()}
+function fotoArquivo(inp){const f=inp.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);img.onload=()=>{const sz=240,c=document.createElement('canvas');c.width=c.height=sz;const m=Math.min(img.width,img.height);
+ c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,sz,sz);C.foto=c.toDataURL('image/jpeg',.82);URL.revokeObjectURL(u);salvar();pPerfil();pAv();toast('Foto salva','ok')};img.onerror=()=>toast('Não consegui ler essa imagem','bad');img.src=u;inp.value=''}
+function tirarFoto(){delete C.foto;salvar();pPerfil();pAv()}
+
+/* ===== RELATÓRIO DE FECHAMENTO (HTML independente, só visualização) ===== */
+const REL_CSS=`*{box-sizing:border-box;margin:0}body{font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#eef3f8;color:#0f2a4a}.pg{max-width:900px;margin:0 auto;background:#fff;box-shadow:0 10px 40px #0f2a4a22}
+.hd{background:linear-gradient(135deg,#0f2a4a,#1c4a7e);color:#fff;padding:22px 28px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:5px solid #ffb400}.brand{display:flex;gap:12px;align-items:center}.inf{font-size:42px;color:#ffb400;line-height:1}.brand b{font-size:22px;display:block}.brand small,.hd small{opacity:.8;display:block;font-size:12px}.hr{text-align:right}.hr b{font-size:15px;letter-spacing:1px;display:block}
+.id{display:flex;gap:18px;align-items:center;padding:22px 28px;border-bottom:1px solid #d3deec;flex-wrap:wrap}.av{width:104px;height:104px;border-radius:50%;object-fit:cover;border:4px solid #ffb400;background:#dfe8f3;display:grid;place-items:center;font-size:34px;font-weight:700;color:#0f2a4a}.id h1{font-size:24px}.id p{color:#5d7290}.id .st{margin-left:auto}
+.bdg{display:inline-block;padding:6px 14px;border-radius:99px;font-weight:700;font-size:13px}.bdg.ok{background:#d8f5e9;color:#0b7a50}.bdg.wa{background:#fff2d1;color:#9a6200}.bdg.fa{background:#ffe0dd;color:#b3261e}
+.sec{padding:20px 28px}.sec h2{font-size:14px;letter-spacing:1px;text-transform:uppercase;color:#5d7290;margin-bottom:10px;border-left:4px solid #ffb400;padding-left:8px}.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.kp div{background:#eef3f8;border-radius:12px;padding:12px}.kp span{display:block;font-size:11px;color:#5d7290;text-transform:uppercase}.kp b{font-size:22px}
+.bar{height:14px;background:#dfe8f3;border-radius:8px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,#ffb400,#12a36b)}.rs{background:#f6f9fc;border-left:4px solid #0f2a4a;padding:12px 14px;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}th{background:#0f2a4a;color:#fff;text-align:left;padding:8px;font-weight:600}td{padding:7px 8px;border-bottom:1px solid #e3ebf5}tr.fa td{background:#fff1f0}tr.fe td{background:#fff8e0}tr.sb td{background:#eef3f8;font-weight:700}td.n,th.n{text-align:right}.tw{overflow-x:auto}
+.ln{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #d3deec}.ln.t{font-weight:800;border-top:2px solid #0f2a4a;border-bottom:0;font-size:17px;margin-top:6px}.sig{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:36px 28px 10px}.sig div{border-top:1px solid #0f2a4a;text-align:center;padding-top:6px;font-size:12px;color:#5d7290}
+.ft{background:#0f2a4a;color:#cfe0f5;padding:18px 28px;text-align:center;font-size:12px;border-top:5px solid #ffb400}.ft b{color:#fff}.bt{display:block;margin:14px auto;padding:10px 20px;border:0;border-radius:10px;background:#ffb400;color:#0f2a4a;font-weight:700;cursor:pointer}
+@media print{body{background:#fff}.pg{box-shadow:none;max-width:none}.bt{display:none}tr,.kp div,.sec{break-inside:avoid}.hd,th,.ft{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
+function semanasRel(R){const m=new Map();R.dias.forEach(({d,r,x})=>{const s=new Date(d);s.setDate(d.getDate()-((d.getDay()+6)%7));const k=K(s);if(!m.has(k))m.set(k,{i:d,f:d,t:0,s:0,n:0,g:0});const w=m.get(k);w.f=d;
+ if(x.t>0){w.t+=x.t;w.n++;w.g+=ganhoDia(x.t,R.U)}if(!(fds(d)||(r&&r.tipo==='feriado'))||r)w.s+=x.s});return[...m.values()]}
+function relatorioHTML(ref,comV){const R=resumo(ref),u=usuarioAtual(),f=F(),mh=f.metaHoras*60,ex=f.extraHoras*60,pc=mh?Math.min(100,R.T/mh*100):0,hoje=new Date(),aberto=hoje<=R.p.f,sg=n=>(n>=0?'+':'')+HM(n),
+ ini=(u.nome||'?').split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase(),dl=d=>`${pad(d.getDate())}/${pad(d.getMonth()+1)}`,
+ st=R.T>=mh?['ok','Meta de horas atingida']:aberto?['wa','Período em andamento']:['fa','Abaixo da meta'],now=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
+ const wk=semanasRel(R),dias=R.dias.filter(z=>!z.w||z.r),obs=R.dias.filter(z=>z.r&&z.r.obs);
+ const sit=(r,x)=>x.st==='fe'?'Feriado / dispensado':r&&r.tipo==='falta'?'Falta':!r||!r.entrada?'Sem registro':!r.saida&&K(hoje)===K(new Date())?'Em andamento':x.st==='pa'?'Abaixo da jornada':'Jornada cumprida';
+ let fin='';if(comV){const a=folha(R.T),dt=a.planos,dif=R2(dt.atual-dt.ant),l=(x,y,c)=>`<div class="ln${c||''}"><span>${escI(x)}</span><b>${y}</b></div>`;
+  fin=`<section class="sec"><h2>Demonstrativo financeiro estimado</h2><div class="kp"><div><span>Valor da hora</span><b>${RS(a.vh)}</b></div><div><span>Total de vencimentos</span><b>${RS(a.totV)}</b></div><div><span>Descontos</span><b>${RS(a.totD)}</b></div><div><span>Líquido estimado</span><b>${RS(a.liq)}</b></div></div>
+  <div style="margin-top:12px"><b>Vencimentos</b>${a.L.filter(z=>z.nat==='v').map(z=>l(z.nome,RS(z.v))).join('')}${l('Total de vencimentos',RS(a.totV),' t')}</div>
+  <div style="margin-top:12px"><b>Descontos</b>${a.L.filter(z=>z.nat==='d'&&z.v).map(z=>l('(-) '+z.nome,RS(z.v))).join('')}${l('Total de descontos',RS(a.totD),' t')}</div>
+  <div style="margin-top:12px">${l('LÍQUIDO ESTIMADO',RS(a.liq),' t')}${f.fgtsPct?l('FGTS depositado pela empresa ('+f.fgtsPct+'%)',RS(a.fgts)):''}</div>
+  ${dt.atual?`<p class="rs" style="margin-top:12px"><b>Planos de saúde:</b> ${RS(dt.atual)} no mês${dif?` (${dif>0?'aumento':'redução'} de ${RS(Math.abs(dif))} sobre o valor anterior)`:' — sem variação'}.</p>`:''}
+  <p style="font-size:11px;color:#5d7290;margin-top:8px">Valores estimados; o holerite oficial prevalece.</p></section>`}
+ return`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Relatório de Ponto — ${escI(u.nome)} — ${BR(R.p.i)} a ${BR(R.p.f)}</title><style>${REL_CSS}</style></head><body><div class="pg">
+<header class="hd"><div class="brand"><span class="inf">∞</span><div><b>Infinity Ponto</b><small>Sistema de Controle de Ponto</small></div></div><div class="hr"><b>RELATÓRIO DE ${aberto?'ACOMPANHAMENTO':'FECHAMENTO'}</b><small>Período: ${BR(R.p.i)} a ${BR(R.p.f)}</small></div></header>
+<section class="id">${C.foto?`<img class="av" src="${C.foto}" alt="Foto de ${escI(u.nome)}">`:`<div class="av">${escI(ini)}</div>`}<div><h1>${escI(u.nome)}</h1><p><b>${escI(u.cargo||'')}</b></p><p>${escI(u.empresa||'')}</p></div><div class="st"><span class="bdg ${st[0]}">${st[1]}</span></div></section>
+<section class="sec"><h2>Resumo executivo</h2><p class="rs">No período de ${BR(R.p.i)} a ${BR(R.p.f)}${aberto?' (parcial até '+BR(hoje)+')':''}, foram registrados <b>${R.D} dia(s) trabalhado(s)</b>, totalizando <b>${HM(R.T)}</b> horas — ${pc.toFixed(0)}% da meta de ${HM(mh)}${ex?` (${HM(mh+ex)} com extras)`:''}. Saldo do período: <b>${sg(R.saldo)}</b>${R.A?`, com ${HM(R.A)} de atrasos`:''}${R.F?` e ${HM(R.F)} de faltas`:''}.</p></section>
+<section class="sec"><h2>Indicadores</h2><div class="kp"><div><span>Horas trabalhadas</span><b>${HM(R.T)}</b></div><div><span>Meta do período</span><b>${HM(mh)}</b></div><div><span>Saldo</span><b>${sg(R.saldo)}</b></div><div><span>Horas extras</span><b>${HM(R.X)}</b></div><div><span>Atrasos</span><b>${HM(R.A)}</b></div><div><span>Faltas</span><b>${HM(R.F)}</b></div><div><span>Dias trabalhados</span><b>${R.D} / ${R.U}</b></div><div><span>Média por dia</span><b>${R.D?HM(R.T/R.D):'00:00'}</b></div></div>
+<div class="bar"><i style="width:${pc}%"></i></div><small style="color:#5d7290">${pc.toFixed(1)}% da meta de ${HM(mh)}${R.T<mh?` • faltam ${HM(mh-R.T)}`:' • meta batida'}</small></section>
+<section class="sec"><h2>Resumo por semana</h2><div class="tw"><table><tr><th>Semana</th><th class="n">Dias</th><th class="n">Horas</th><th class="n">Saldo</th>${comV?'<th class="n">Ganho bruto</th>':''}</tr>${wk.map(w=>`<tr><td>${dl(w.i)} a ${dl(w.f)}</td><td class="n">${w.n}</td><td class="n">${HM(w.t)}</td><td class="n">${sg(w.s)}</td>${comV?`<td class="n">${RS(w.g)}</td>`:''}</tr>`).join('')}<tr class="sb"><td>Total</td><td class="n">${R.D}</td><td class="n">${HM(R.T)}</td><td class="n">${sg(R.saldo)}</td>${comV?`<td class="n">${RS(wk.reduce((x,w)=>x+w.g,0))}</td>`:''}</tr></table></div></section>
+<section class="sec"><h2>Registro diário</h2><div class="tw"><table><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída int.</th><th>Volta</th><th>Saída</th><th class="n">Horas</th><th class="n">Saldo</th><th>Situação</th></tr>${dias.map(({d,r,x})=>`<tr class="${x.st==='fa'?'fa':x.st==='fe'?'fe':''}"><td>${BR(d)}</td><td>${DS[d.getDay()]}</td><td>${r&&r.entrada||'--'}</td><td>${r&&r.saidaIntervalo||'--'}</td><td>${r&&r.voltaIntervalo||'--'}</td><td>${r&&r.saida||'--'}</td><td class="n">${x.t>0?HM(x.t):'--'}</td><td class="n">${x.st==='fe'?'--':sg(x.s)}</td><td>${sit(r,x)}</td></tr>`).join('')}</table></div></section>
+${obs.length?`<section class="sec"><h2>Observações</h2>${obs.map(({d,r})=>`<div class="ln"><span>${BR(d)}</span><span>${escI(r.obs)}</span></div>`).join('')}</section>`:''}${fin}
+<div class="sig"><div>${escI(u.nome)}<br>${escI(u.cargo||'Colaborador')}</div><div>Gestor responsável<br>Ciente em ___/___/______</div></div>
+<footer class="ft"><b>∞ Infinity Ponto</b> — Sistema de ponto desenvolvido por <b>Waldeci de Andrade Ramos</b><br>Analista de Serviços Internos${u.empresa?' • '+escI(u.empresa):''}<br><span style="opacity:.7">Documento gerado automaticamente em ${now} • somente visualização</span><button class="bt" onclick="window.print()">🖨 Imprimir / salvar em PDF</button></footer></div></body></html>`}
+function abrirRel(){const p=per(),o=[p,per(new Date(p.i.getTime()-864e5))];o.push(per(new Date(o[1].i.getTime()-864e5)));
+ $('rlP').innerHTML=o.map((x,i)=>`<option value="${K(x.i)}">${i?'':'Atual: '}${BR(x.i)} a ${BR(x.f)}</option>`).join('');$('rlL').style.display='none';$('rl').showModal()}
+const relRef=()=>new Date($('rlP').value+'T12:00:00'),relNome=()=>{const r=relRef(),k='infinity_rel_'+UID+'_'+$('rlP').value;let n=localStorage.getItem(k);if(!n){n=`${UID}_${K(per(r).f).slice(0,7)}_${Math.random().toString(36).slice(2,8)}.html`;localStorage.setItem(k,n)}return n};
+const relHtml=()=>relatorioHTML(relRef(),$('rlV').checked);
+function relVer(){const w=window.open('','_blank');if(!w)return relBaixar();w.document.open();w.document.write(relHtml());w.document.close()}
+function relBaixar(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([relHtml()],{type:'text/html;charset=utf-8'}));a.download='relatorio_ponto_'+$('rlP').value+'.html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+async function ghPutFile(path,texto,msg){const H={Authorization:`Bearer ${C.githubToken}`,Accept:'application/vnd.github+json'},u=`https://api.github.com/repos/${C.githubRepo}/contents/${encodeURI(path)}`;
+ for(let t=0;t<4;t++){const g=await fetch(u+`?ref=${C.githubBranch||'main'}&_=${Date.now()}`,{cache:'no-store',headers:H});let sha=null;if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw Error('GitHub '+g.status);
+  const b={message:msg,content:ghB64e(texto),branch:C.githubBranch||'main'};if(sha)b.sha=sha;const r=await fetch(u,{method:'PUT',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify(b)});
+  if(r.ok)return;if((r.status===409||r.status===422)&&t<3){await espera(500*(t+1));continue}throw Error('GitHub '+r.status+': '+(await r.text()).slice(0,120))}}
+function relUrl(nome){const[o,r]=C.githubRepo.split('/'),dir=C.githubPath.split('/').slice(0,-1).join('/');return`https://${o}.github.io/${r===o+'.github.io'?'':r+'/'}${dir?dir+'/':''}relatorios/${nome}`}
+async function relPublicar(){if(!ghOk())return toast('Configure o GitHub em Ajustes primeiro','bad');const nome=relNome(),dir=C.githubPath.split('/').slice(0,-1).join('/');
+ try{toast('Publicando…','wa',15000);await ghPutFile((dir?dir+'/':'')+'relatorios/'+nome,relHtml(),'Relatório de ponto '+$('rlP').value);const l=relUrl(nome);$('rlU').value=l;$('rlL').style.display='block';toast('Link gerado ✔','ok',5000)}catch(e){toast('Falha ao publicar: '+e.message,'bad',8000)}}
+async function relCopiar(){const t=$('rlU');try{await navigator.clipboard.writeText(t.value)}catch{t.select();document.execCommand('copy')}toast('Link copiado','ok')}
+const relZap=()=>window.open('https://wa.me/?text='+encodeURIComponent('Relatório de ponto: '+$('rlU').value),'_blank');
+async function relShare(){if(navigator.share){try{await navigator.share({title:'Relatório de ponto',url:$('rlU').value})}catch{}}else relCopiar()}
+
 /* Cálculo */
 function calc(r,d=new Date()){const J=C.jornadaDiaria*60;
  if(r&&r.tipo==='feriado')return{t:0,s:0,iv:0,st:'fe',prev:0};
@@ -403,7 +592,7 @@ function calc(r,d=new Date()){const J=C.jornadaDiaria*60;
  const iv=a!=null&&b!=null?b-a:0,ie=iv>0?Math.max(iv,C.intervaloMinimo):0,t=end-e-ie,s=t-J;
  return{t,s,iv,st:t<=0?'fa':s<-C.tolerancia?'pa':'ok',prev:e+J+(ie||C.intervaloMinimo)}}
 function per(ref=new Date()){const g=C.diaFechamento,d=ref.getDate(),m=ref.getMonth(),y=ref.getFullYear();return d>=g?{i:new Date(y,m,g),f:new Date(y,m+1,g-1)}:{i:new Date(y,m-1,g),f:new Date(y,m,g-1)}}
-function resumo(){const p=per(),J=C.jornadaDiaria*60,lim=new Date();lim.setHours(23,59,59,999);let T=0,X=0,F=0,A=0,U=0,D=0,dias=[];
+function resumo(ref){const p=per(ref),J=C.jornadaDiaria*60,lim=new Date();lim.setHours(23,59,59,999);let T=0,X=0,F=0,A=0,U=0,D=0,dias=[];
  for(let c=new Date(p.i);c<=p.f&&c<=lim;c.setDate(c.getDate()+1)){const d=new Date(c),r=E[K(d)],x=calc(r,d),fim=fds(d),w=fim||(r&&r.tipo==='feriado');if(!w)U++;
   if(!w||r){T+=Math.max(0,x.t);if(x.st==='fa'){if(!w)F+=J}else if(x.s>0)X+=x.s;else if(x.s<0)A-=x.s}
   if(r&&x.t>0)D++;dias.push({d,r,x,w:fim})}
@@ -454,21 +643,23 @@ function rCal(){const y=mc.getFullYear(),m=mc.getMonth(),g=$('gr'),h=new Date();
   e.className='dc '+(c||(w?'w':''))+(K(d)===K(h)?' hj':'');
   e.innerHTML=`${n}${x.st==='fe'?'<small>Feriado</small>':(r&&r.entrada)?`<small>${HM(x.s)}</small>`:''}`;
   e.onclick=()=>abrirEd(d);g.appendChild(e)}}
-function rRel(){const R=resumo(),J=C.jornadaDiaria*60,md=C.metaSemanas*5,pc=Math.min(100,R.D/md*100);
- $('mt').textContent=`Meta: ${R.D} de ${md} dias (${(R.D/5).toFixed(1)} de ${C.metaSemanas} semanas)`;$('mb').style.width=pc+'%';
- $('mh').textContent=`Faltam ${Math.max(0,md-R.D)} dias • Média/dia ${R.D?HM(R.T/R.D):'00:00'}`;
+function diasRest(p){let n=0,hj=new Date();hj.setHours(0,0,0,0);for(let c=new Date(Math.max(hj,p.i));c<=p.f;c.setDate(c.getDate()+1)){const r=E[K(c)];if(fds(c)||(r&&r.tipo==='feriado'))continue;if(K(c)===K(hj)&&r&&r.saida)continue;n++}return n}
+function rRel(){const R=resumo(),J=C.jornadaDiaria*60,f=F(),mh=f.metaHoras*60,ex=f.extraHoras*60,pc=Math.min(100,mh?R.T/mh*100:0),rest=diasRest(R.p),nd=Math.max(1,rest),fa=Math.max(0,mh-R.T),fe=Math.max(0,mh+ex-R.T);
+ $('mt').textContent=`Meta do período: ${HM(R.T)} de ${HM(mh)}`+(ex?` (com extras: ${HM(mh+ex)})`:'');$('mb').style.width=pc+'%';
+ $('mh').innerHTML=(fa?`Faltam ${HM(fa)} • ${HM(fa/nd)}/dia útil`:'Meta batida ✔')+(ex?`<br>Com extras: faltam ${HM(fe)} • ${HM(fe/nd)}/dia útil`:'')+`<br>${rest} dias úteis restantes no período`;rFolha(R);
  $('rs').innerHTML=[['Trabalhadas',HM(R.T)],['Extras',HM(R.X)],['Faltas',HM(R.F)],['Atrasos',HM(R.A)],['Saldo',HM(R.saldo)],['Dias úteis',R.U]].map(([a,b])=>`<div><span class="lb">${a}</span><b>${b}</b></div>`).join('');
  $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>{const desc=r&&r.tipo==='feriado'?'Feriado / dispensado':r&&r.tipo==='falta'?'Falta registrada':r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro';
   const val=x.st==='fe'?'Feriado':r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta';
   return`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${desc}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${val}</span></div></div>`}).join('')}
-function render(){const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,imp:()=>{},cfg:()=>{}})[vw]()}
+function pAv(){const i=$('avH');if(!i)return;if(C.foto){i.src=C.foto;i.style.display='block'}else i.style.display='none'}
+function render(){pAv();const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,imp:()=>{},cfg:()=>{}})[vw]()}
 function go(v){vw=v;document.querySelectorAll('.vw').forEach(s=>s.classList.toggle('h',s.id!=='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
  if(v==='imp'){const p=per();$('impPerLbl').textContent='('+BR(p.i)+' a '+BR(p.f)+')';if(!$('impDe').value){$('impDe').value=K(p.i);$('impAte').value=K(new Date())}}
- if(v==='cfg'){[['c1','jornadaDiaria'],['c2','intervaloMinimo'],['c3','tolerancia'],['c4','diaFechamento'],['c5','valorHora'],['c6','metaSemanas']].forEach(([i,k])=>$(i).value=C[k]);$('cDig').checked=!!C.digitalAtiva;digSt();bkSt();$('gT').value=C.githubToken||'';$('gR').value=C.githubRepo||'';$('gB').value=C.githubBranch||'main';$('gP').value=C.githubPath||'Pontos/dados.json';$('cGh').checked=!!C.githubAtivo;ghSt()}
+ if(v==='cfg'){renderFolhaEd();pPerfil();[['c1','jornadaDiaria'],['c2','intervaloMinimo'],['c3','tolerancia'],['c4','diaFechamento']].forEach(([i,k])=>$(i).value=C[k]);$('cDig').checked=!!C.digitalAtiva;digSt();bkSt();$('gT').value=C.githubToken||'';$('gR').value=C.githubRepo||'';$('gB').value=C.githubBranch||'main';$('gP').value=C.githubPath||'Pontos/dados.json';$('cGh').checked=!!C.githubAtivo;ghSt()}
  render();scrollTo(0,0)}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
 const mm=n=>{mc.setDate(1);mc.setMonth(mc.getMonth()+n);rCal()};
-function salvarCfg(){C.jornadaDiaria=parseFloat($('c1').value)||5;C.intervaloMinimo=parseInt($('c2').value)||0;C.tolerancia=parseInt($('c3').value)||0;C.diaFechamento=parseInt($('c4').value)||26;C.valorHora=parseFloat($('c5').value)||0;C.metaSemanas=parseInt($('c6').value)||25;salvar();toast('Ajustes salvos','ok')}
+function salvarCfg(){C.jornadaDiaria=parseFloat($('c1').value)||5;C.intervaloMinimo=parseInt($('c2').value)||0;C.tolerancia=parseInt($('c3').value)||0;C.diaFechamento=parseInt($('c4').value)||26;salvar();toast('Ajustes salvos','ok')}
 
 /* Editar / novo dia */
 function tipoMudou(){$('edHorarios').classList.toggle('h',$('fTipo').value!=='')}
@@ -485,7 +676,7 @@ function salvarEd(){const k=$('fD').value;if(!k)return toast('Informe a data','b
 function delEd(){if(edD&&confirm(`Excluir o registro de ${BR(edD)}?`)){delete E[K(edD)];salvar();$('ed').close();render();if(C.githubAtivo)syncGithub(false)}}
 
 /* Fechamento e CSV */
-function fech(){const R=resumo(),vh=C.valorHora||0,h=R.T/60,L=(a,b)=>`<div class="fl"><span>${a}</span><b>${b}</b></div>`;
+function fech(){const R=resumo(),vh=folhaVH(),h=R.T/60,L=(a,b)=>`<div class="fl"><span>${a}</span><b>${b}</b></div>`;
  $('fcB').innerHTML=`<p class="bk">${BR(R.p.i)} a ${BR(R.p.f)}</p>`+L('Dias úteis',R.U)+L('Dias trabalhados',R.D)+L('Semanas equivalentes',(R.D/5).toFixed(2))+L('Horas trabalhadas',`${HM(R.T)} (${h.toFixed(2)}h)`)+L('Horas extras',HM(R.X))+L('Faltas',HM(R.F))+(vh>0?L('Valor/hora','R$ '+vh.toFixed(2).replace('.',','))+`<div class="fl t"><span>Total</span><span>R$ ${(h*vh).toFixed(2).replace('.',',')}</span></div>`:`<div class="fl t"><span>Total de horas</span><span>${h.toFixed(2)} h</span></div>`);
  $('fc').showModal()}
 function csv(){const R=resumo();let s='Data;Dia;Entrada;Saida Intervalo;Volta Intervalo;Saida;Trabalhado;Saldo\n';
@@ -502,12 +693,22 @@ function linhasImp(dias){
   else{iv=r&&r.entrada?`${r.entrada} → ${r.saida||'em aberto'}`:(w?'Folga':'Falta');sld=r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):(w?'--:--':'-'+HM(C.jornadaDiaria*60))}
   return{nome:`${pad(d.getDate())}/${pad(d.getMonth()+1)} ${DS[d.getDay()]}`,qtd:iv,valor:sld}})}
 function totaisImp(dias){let T=0,S=0;dias.forEach(d=>{const r=E[K(d)],x=calc(r,d),fe=r&&r.tipo==='feriado',w=fds(d)||fe;if(!w||r){T+=Math.max(0,x.t);S+=r&&r.entrada?x.s:(w?0:-C.jornadaDiaria*60)}});return{T,S}}
+function dadosGanhos(ini,fim,titulo,modo){const dias=diasEntre(ini,fim),U=resumo().U,u=usuarioAtual(),itens=[],lb=z=>pad(z.getDate())+'/'+pad(z.getMonth()+1);
+ let T=0,G=0,sT=0,sG=0,wk=null,wi='',wf='';const fecha=()=>{if(sT>0)itens.push({nome:`Sem ${wi}-${wf}`,qtd:HM(sT),valor:RS(sG),sub:true});sT=sG=0};
+ dias.forEach(d=>{const t=Math.max(0,calc(E[K(d)],d).t);if(t<=0)return;const seg=new Date(d);seg.setDate(d.getDate()-((d.getDay()+6)%7));const k=K(seg);
+  if(k!==wk){fecha();wk=k;wi=lb(d)}wf=lb(d);const g=ganhoDia(t,U);itens.push({nome:`${lb(d)} ${DS[d.getDay()]}`,qtd:HM(t),valor:RS(g)});T+=t;G+=g;sT+=t;sG+=g});fecha();
+ const res=[{rotulo:'Horas trabalhadas',valor:HM(T)},{rotulo:'Ganho dos dias (c/ adic. e DSR)',valor:RS(G)}];let total={rotulo:'Ganho bruto',valor:RS(G)};
+ if(modo==='periodo'){const a=folha(T),fx=R2(a.totV-G);if(Math.abs(fx)>=.01)res.push({rotulo:'Itens fixos (auxílio etc.)',valor:RS(fx)});res.push({rotulo:'TOTAL VENCIMENTOS',valor:RS(a.totV)});
+  a.L.filter(l=>l.nat==='d'&&l.v).forEach(l=>res.push({rotulo:'(-) '+l.nome,valor:RS(l.v)}));res.push({rotulo:'TOTAL DESCONTOS',valor:RS(a.totD)});total={rotulo:'LÍQUIDO ESTIMADO',valor:RS(a.liq)}}
+ return{empresa:(u.empresa||'Infinity Ponto').toUpperCase(),endereco:[u.nome+(u.cargo?' — '+u.cargo:'')],titulo:titulo.replace('Relatório','Ganhos'),periodo:`${BR(ini)} a ${BR(dias.length?dias[dias.length-1]:ini)}`,
+  colunas:['Data','Horas','Ganho'],itens,resumo:res,total,rodape:'Valores estimados — conferir com o holerite'}}
 function dadosImpressao(){
  const modo=document.querySelector('input[name=impModo]:checked').value,hoje=new Date();let ini,fim,titulo;
  if(modo==='dia'){ini=fim=hoje;titulo='Relatório do dia'}
  else if(modo==='semana'){fim=hoje;ini=new Date(hoje);ini.setDate(ini.getDate()-6);titulo='Últimos 7 dias'}
  else if(modo==='periodo'){const p=per();ini=p.i;fim=p.f;titulo='Relatório do período'}
  else{ini=new Date($('impDe').value+'T00:00');fim=new Date($('impAte').value+'T00:00');titulo='Relatório personalizado'}
+ if(document.querySelector('input[name=impTipo]:checked').value==='ganhos')return dadosGanhos(ini,fim,titulo,modo);
  const dias=diasEntre(ini,fim),linhas=linhasImp(dias),{T,S}=totaisImp(dias);
  const u=usuarioAtual();
  return{empresa:(u.empresa||'Infinity Ponto').toUpperCase(),endereco:[u.nome+(u.cargo?' — '+u.cargo:'')],titulo,periodo:`${BR(ini)} a ${BR(dias.length?dias[dias.length-1]:ini)}`,
@@ -519,7 +720,7 @@ function montarPapel(d){
  return`<h2>${escI(d.empresa)}</h2>${(d.endereco||[]).map(l=>`<div class="fraco">${escI(l)}</div>`).join('')}<hr>
   <div><b>${escI(d.titulo)}</b></div><div class="fraco">${escI(d.periodo)}</div><div class="fraco">${agora}</div><hr>
   <div class="plinha pcab"><span class="pnome">${escI(c1)}</span><span class="pq">${escI(c2)}</span><span class="pv">${escI(c3)}</span></div>
-  ${d.itens.map(i=>`<div class="plinha"><span class="pnome">${escI(i.nome)}</span><span class="pq">${escI(i.qtd)}</span><span class="pv">${escI(i.valor)}</span></div>`).join('')}
+  ${d.itens.map(i=>`<div class="plinha"${i.sub?' style="font-weight:700;border-top:1px dashed #999;margin:2px 0 4px"':''}><span class="pnome">${escI(i.nome)}</span><span class="pq">${escI(i.qtd)}</span><span class="pv">${escI(i.valor)}</span></div>`).join('')}
   ${d.resumo.length?'<hr>':''}${d.resumo.map(r=>`<div class="plinha"><span>${escI(r.rotulo)}</span><span>${escI(r.valor)}</span></div>`).join('')}
   <hr><div class="plinha ptotal"><span>${escI(d.total.rotulo)}</span><span>${escI(d.total.valor)}</span></div>
   <div class="pcodigo" aria-hidden="true"></div>
