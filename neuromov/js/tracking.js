@@ -7,43 +7,71 @@ const Tracking = (function(){
 
   let handsModel=null;
   let videoEl=null;
+  let stream=null;
   let running=false;
+  let loopId=0;          // evita dois loops rodando ao mesmo tempo (duplicava eventos)
   let onFrameCb=null;
   let lastHand=null;
   let prevPalm=null, prevT=0;
+  let mapper=null;       // converte coordenadas do vídeo -> coordenadas do palco (object-fit:cover)
 
   const listeners = {};
   function on(evt, fn){ (listeners[evt]=listeners[evt]||[]).push(fn); }
-  function emit(evt, data){ (listeners[evt]||[]).forEach(fn=>fn(data)); }
+  function off(evt, fn){ listeners[evt]=(listeners[evt]||[]).filter(f=>f!==fn); }
+  function clearListeners(){ Object.keys(listeners).forEach(k=>{ listeners[k]=[]; }); }
+  function emit(evt, data){ (listeners[evt]||[]).slice().forEach(fn=>{ try{ fn(data); }catch(e){ console.error(e); } }); }
+  function setMapper(fn){ mapper = fn || null; }
 
-  async function init(videoElement){
+  function releaseCamera(){
+    if(stream){ try{ stream.getTracks().forEach(t=>t.stop()); }catch(e){} stream=null; }
+    if(videoEl){ try{ videoEl.srcObject=null; }catch(e){} }
+  }
+
+  // aspect = largura/altura do palco; no celular em pé (aspect<1) pede vídeo em pé
+  async function init(videoElement, aspect){
+    releaseCamera();
     videoEl = videoElement;
-    handsModel = new Hands({locateFile:(f)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${f}`});
-    handsModel.setOptions({maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.6});
-    handsModel.onResults(onHandResults);
-
-    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:640}, height:{ideal:480}}, audio:false});
+    if(!handsModel){
+      handsModel = new Hands({locateFile:(f)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${f}`});
+      handsModel.setOptions({maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.6});
+      handsModel.onResults(onHandResults);
+    }
+    const portrait = aspect && aspect < 1;
+    stream = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user', width:{ideal: portrait?480:640}, height:{ideal: portrait?640:480}},
+      audio:false
+    });
     videoEl.srcObject = stream;
     await new Promise(res=>{
-      if(videoEl.readyState>=2) res(); else videoEl.onloadedmetadata=()=>res();
+      if(videoEl.readyState>=2) return res();
+      videoEl.onloadeddata = ()=>res();
+      setTimeout(res, 4000);
     });
+    try{ await videoEl.play(); }catch(e){}
+    lastHand = null; prevPalm = null;
     return stream;
   }
 
   function start(frameCb){
     onFrameCb = frameCb;
     running = true;
-    loop();
+    const id = ++loopId;
+    loop(id);
   }
-  function stop(){ running = false; }
+  function stop(){
+    running = false; loopId++; onFrameCb = null;
+    releaseCamera();       // libera a câmera (antes ficava ligada o tempo todo)
+    lastHand = null; prevPalm = null;
+  }
 
-  async function loop(){
-    if(!running) return;
+  async function loop(id){
+    if(!running || id!==loopId) return;
     if(videoEl && videoEl.readyState>=2){
-      await handsModel.send({image:videoEl});
+      try{ await handsModel.send({image:videoEl}); }catch(e){ console.warn('hands.send', e); }
+      if(!running || id!==loopId) return;
       if(onFrameCb) onFrameCb({hand:lastHand});
     }
-    requestAnimationFrame(loop);
+    requestAnimationFrame(()=>loop(id));
   }
 
   function onHandResults(results){
@@ -91,15 +119,17 @@ const Tracking = (function(){
     }
     prevPalm = {x:px,y:py}; prevT = now;
 
-    const mx = 1-px; // espelha x para bater com o vídeo espelhado na tela
+    // espelha x para bater com o vídeo espelhado e ajusta ao recorte do palco
+    const m = mapper ? mapper(1-px, py) : {x:1-px, y:py};
+    const mx = m.x, my = m.y;
 
-    lastHand = {x:mx, y:py, open:isOpen, extendedCount:extended, fingers, pinch, speed};
+    lastHand = {x:mx, y:my, open:isOpen, extendedCount:extended, fingers, pinch, speed};
 
-    if(wasOpen && !isOpen) emit('handClose', {x:mx,y:py});
-    if(!wasOpen && isOpen) emit('handOpen', {x:mx,y:py});
+    if(wasOpen && !isOpen) emit('handClose', {x:mx,y:my});
+    if(!wasOpen && isOpen) emit('handOpen', {x:mx,y:my});
   }
 
   function getLastHand(){ return lastHand; }
 
-  return { init, start, stop, on, getLastHand };
+  return { init, start, stop, on, off, clearListeners, setMapper, getLastHand };
 })();

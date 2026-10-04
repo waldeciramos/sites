@@ -47,3 +47,57 @@ button{font-family:var(--sans)}
 .dlg-emoji{font-size:64px}.dlg-score{font-size:30px;font-weight:700;color:#FF8A00;margin:4px 0 16px}
 .dlg-box .btn-block{margin-top:10px}
 .cores-frame{width:100%;height:76vh;border:5px solid #fff;border-radius:24px;box-shadow:0 0 0 4px #6CC4FF,0 8px 0 #2A74D0;background:#35d1ee;margin-bottom:14px}
+
+/* ================= Celular: enquadramento, textos sem cortar, rodapé ================= */
+html,body{overflow-x:hidden}
+#app{min-height:100vh;min-height:100dvh;}
+.screen{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));}
+header.top{padding-top:max(14px,env(safe-area-inset-top));gap:8px}
+.brand{min-width:0}
+h1{font-size:clamp(18px,5.4vw,24px);line-height:1.15;overflow-wrap:anywhere}
+.ex-card .txt{min-width:0}
+.ex-card .txt h3,.ex-card .txt p{overflow-wrap:anywhere;word-break:normal}
+.ex-icon{flex-shrink:0}
+.dlg-box{max-height:92vh;overflow:auto}
+.dlg-box p{overflow-wrap:anywhere}
+
+/* rodapé "By Waldeci Ramos" */
+.credit{flex:none;text-align:center;color:#fff;font-weight:700;font-size:13px;letter-spacing:.05em;
+  text-shadow:0 2px 0 rgba(18,64,110,.6);padding:12px 12px calc(16px + env(safe-area-inset-bottom));opacity:.95}
+
+/* chip do HUD compacto (não quebra em várias linhas no celular) */
+.hud{gap:5px;flex-wrap:nowrap}
+.chip{font-size:11px;padding:4px 8px;white-space:nowrap}
+#gameRound:empty{display:none}
+/* aviso/prompt em cápsula: não corta o nome da cor */
+.prompt{padding:0 10px}
+.prompt span.pp{display:inline-block;max-width:100%;background:rgba(18,64,110,.82);color:#fff;border:3px solid #fff;
+  border-radius:16px;padding:5px 14px;-webkit-text-stroke:0;paint-order:normal;text-shadow:none;
+  font-size:clamp(15px,4.8vw,26px);line-height:1.2;font-weight:700;overflow-wrap:anywhere}
+
+/* ===== durante o jogo: tela inteira, palco ocupa o espaço que sobra ===== */
+body.playing header.top,body.playing footer.nav{display:none!important}
+body.playing #app{max-width:640px;height:100vh;height:100dvh;min-height:0;overflow:hidden}
+body.playing .credit{padding:3px 8px calc(4px + env(safe-area-inset-bottom));font-size:11px}
+body.playing .screen.active{min-height:0}
+
+#screen-game.active{padding-top:max(8px,env(safe-area-inset-top));padding-bottom:4px;gap:6px;overflow:hidden}
+#screen-game .stage{flex:1 1 0;min-height:0;aspect-ratio:auto;max-height:none;margin:0}
+#screen-game .stat-row{flex:none;margin:0;gap:6px}
+#screen-game .stat{padding:5px 4px}
+#screen-game .stat .num{font-size:16px}
+#screen-game .stat .lbl{font-size:9px}
+#screen-game #btnEndSession{flex:none;padding:10px}
+@media (max-height:480px){
+  #screen-game .stat .lbl{display:none}
+  #screen-game .stat{padding:3px}
+}
+
+#screen-cores.active{padding:max(6px,env(safe-area-inset-top)) 6px 4px;gap:6px;overflow:hidden}
+#screen-cores .cores-frame{flex:1 1 0;min-height:0;height:auto;margin:0;border-width:4px}
+#screen-cores #btnCoresBack{flex:none;padding:9px 12px}
+
+/* contraste e fundo seguro (evita faixa branca ao rolar) */
+html{background-color:#1D5BB0}
+.panel .sub,.panel p.sub{color:#2A6AB0}
+.btn-ghost{background:rgba(255,255,255,.28);color:#fff;border:2px solid rgba(255,255,255,.7);font-weight:700;text-shadow:0 1px 0 rgba(0,0,0,.25)}

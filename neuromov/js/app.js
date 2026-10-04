@@ -94,6 +94,26 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.getElementById('globalNav').style.display = (id==='screen-home'||id==='screen-login')?'none':'flex';
+  // jogos ocupam a tela inteira (sem cabeçalho) pra caber certinho no celular
+  document.body.classList.toggle('playing', id==='screen-game' || id==='screen-cores');
+  window.scrollTo(0,0);
+}
+
+// Converte a posição da mão no vídeo para a posição no palco (o vídeo usa object-fit:cover,
+// então parte da imagem fica cortada). Assim o cursor/bolinhas ficam alinhados com o que se vê.
+function makeMapper(videoEl, stage){
+  return (x,y)=>{
+    const vw=videoEl.videoWidth||640, vh=videoEl.videoHeight||480;
+    const W=stage.clientWidth||1, H=stage.clientHeight||1;
+    const sc=Math.max(W/vw, H/vh), dw=vw*sc, dh=vh*sc, ox=(W-dw)/2, oy=(H-dh)/2;
+    return { x:Math.min(1,Math.max(0,(x*dw+ox)/W)), y:Math.min(1,Math.max(0,(y*dh+oy)/H)) };
+  };
+}
+function watchStage(stage, canvas){
+  if(!stage._ro && window.ResizeObserver){
+    stage._ro = new ResizeObserver(()=>{ if(stage.clientWidth){ canvas.width=stage.clientWidth; canvas.height=stage.clientHeight; } });
+    stage._ro.observe(stage);
+  }
 }
 
 // ---------- HOME: só pede o nome (sem login, sem cadastro) ----------
@@ -141,13 +161,16 @@ async function startCalibration(){
     return;
   }
 
+  const calibStage = document.getElementById('calibStage');
   try{
-    await Tracking.init(calibVideoEl);
+    await Tracking.init(calibVideoEl, calibStage.clientWidth/Math.max(1,calibStage.clientHeight));
   }catch(e){
     document.getElementById('calibStepText').textContent = 'Não foi possível acessar a câmera. Verifique as permissões do navegador.';
     return;
   }
-  resizeCanvas(overlay, document.getElementById('calibStage'));
+  resizeCanvas(overlay, calibStage);
+  watchStage(calibStage, overlay);
+  Tracking.setMapper(makeMapper(calibVideoEl, calibStage));
   Tracking.start(onCalibFrame);
 }
 
@@ -306,11 +329,16 @@ async function startExercise(id, nivel){
   const overlay = document.getElementById('gameOverlay');
   gameCtx = overlay.getContext('2d');
   gameStage = document.getElementById('gameStage');
-  document.getElementById('gamePrompt').innerHTML='';
+  const promptEl = document.getElementById('gamePrompt');
+  promptEl.innerHTML=''; promptEl.style.top=''; promptEl.style.transform='';
 
-  if(typeof Hands==='undefined'){ return; }
-  try{ await Tracking.init(gameVideoEl); }catch(e){ return; }
+  const avisar = (t)=>{ promptEl.style.top='30%'; promptEl.style.transform='none'; promptEl.innerHTML='<span class="pp">'+t+'</span>'; };
+  if(typeof Hands==='undefined'){ avisar('Não carregou o rastreador da mão. Confira a internet e tente de novo.'); return; }
+  try{ await Tracking.init(gameVideoEl, gameStage.clientWidth/Math.max(1,gameStage.clientHeight)); }
+  catch(e){ avisar('Não consegui abrir a câmera. Permita o acesso à câmera no navegador.'); return; }
   resizeCanvas(overlay, gameStage);
+  watchStage(gameStage, overlay);
+  Tracking.setMapper(makeMapper(gameVideoEl, gameStage));
 
   const sens = state.wrapper.paciente.configuracoes.sensibilidade || 1.0;
   const inst = ExerciseEngine.start(id, nivel, sens, state.sessionReps);
@@ -394,11 +422,11 @@ function endExercise(inst){
 function askContinueOrFinish(){
   const n=primeiroNome();
   const ult=state.sessionExercicios[state.sessionExercicios.length-1];
-  document.getElementById('dlgTitle').textContent='Mandou bem!';
+  document.getElementById('dlgTitle').textContent='Parabéns'+(n?', '+n:'')+'!';
   document.getElementById('dlgEmoji').textContent=pick(['🏆','🌟','🎉','🥳']);
   document.getElementById('dlgMsg').textContent=pick([`${n}, que partida! Nem o cronômetro acreditou 😄`,`Uau, ${n}! Essa mão está afiada ✨`,`${n} no comando! Bora pro próximo jogo? 🚀`,`Respira, ${n}... você merece um aplauso! 👏`]);
   document.getElementById('dlgScore').textContent='⭐ '+(ult?ult.pontuacao:0)+' pontos';
-  NM_SPEAK(document.getElementById('dlgMsg').textContent);
+  NM_SPEAK('Parabéns'+(n?', '+n:'')+'! Você terminou o jogo.');
   const d=document.getElementById('dlg'); d.classList.add('open');
   document.getElementById('dlgNext').onclick=()=>{ d.classList.remove('open'); goToMenu(); };
   document.getElementById('dlgEnd').onclick=()=>{ d.classList.remove('open'); finalizeSession(); };
@@ -540,6 +568,7 @@ window.addEventListener('resize', ()=>{
 });
 
 document.getElementById('btnCoresBack').addEventListener('click', ()=>{ document.getElementById('coresFrame').src='about:blank'; try{speechSynthesis.cancel();}catch(e){} goToMenu(); });
+window.addEventListener('orientationchange', ()=>setTimeout(()=>window.dispatchEvent(new Event('resize')),300));
 showScreen('screen-home'); renderPatientList();
 renderPatientList();
 })();

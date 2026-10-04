@@ -22,6 +22,15 @@ antes do primeiro exercício da sessão — depois disso fica travada e vale pra
 os exercícios daquela sessão. O relatório só é gerado ao final do **último**
 exercício da sessão (quando a sessão é encerrada).
 
+## Correções recentes (celular, voz e cores)
+
+- **Jogo das Cores**: corrigido erro que travava o início do jogo (ficava só o cartão cinza, sem número nem bolinhas). Layout refeito pra caber em qualquer celular (em pé e deitado), com as bolinhas coloridas sempre visíveis; o título e o nome da cor não são mais cortados.
+- **Voz**: cada jogo fala só no **começo** (explica o que fazer + nome do paciente) e no **final** (parabéns). Nada de falas repetidas durante a partida. No Jogo das Cores, o botão 🔊 repete a cor quando quiser; em Ajustes dá pra ligar a fala da cor a cada tentativa.
+- **Vazamento de ouvintes**: os jogos antigos continuavam "ouvindo" a mão depois de terminar e falavam por cima dos novos. Agora são desligados ao fim de cada jogo, e a câmera é liberada.
+- **Enquadramento no celular**: durante os jogos a tela é inteira (sem cabeçalho), o palco ocupa o espaço que sobra e o cursor da mão fica alinhado com a imagem da câmera.
+- **Bolas coloridas**: "Bolas na Cesta" agora usa 4 cores; "Bolinhas no Lixinho" mostra as 4 cores sempre separadas e o nome da cor pedida aparece numa faixa sem cortar; no Basquete a bola não some mais quando a mão sai do quadro.
+- Rodapé **By Waldeci Ramos** em todas as telas.
+
 ## Por que não funciona no preview do Claude.ai
 
 O MediaPipe só é distribuído via jsDelivr/npm, e o sandbox de preview de artifacts

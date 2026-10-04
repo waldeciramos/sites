@@ -4,16 +4,19 @@
 <title>Jogo das Cores</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1e3a52;--sz:min(15vw,11dvh);--cs:min(38vw,22dvh)}
-@media(orientation:landscape){:root{--sz:min(10vw,15dvh);--cs:min(26vw,28dvh)}}
+:root{--ink:#1e3a52;--vh:1vh}
+@supports(height:1dvh){:root{--vh:1dvh}}
+:root{--sz:min(14vw,calc(9.5*var(--vh)));--cs:min(36vw,calc(20*var(--vh)))}
+@media(orientation:landscape){:root{--sz:min(9vw,calc(14*var(--vh)));--cs:min(22vw,calc(30*var(--vh)))}}
 *{box-sizing:border-box}
-body{margin:0;min-height:100dvh;color:var(--ink);font-family:"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;font-weight:800;-webkit-user-select:none;user-select:none;
+body{margin:0;min-height:100vh;min-height:calc(100*var(--vh));color:var(--ink);font-family:"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;font-weight:800;-webkit-user-select:none;user-select:none;
 background:radial-gradient(circle at 15% 12%,#8cebf9 0,#0000 38%),radial-gradient(circle at 88% 72%,#74e0f4 0,#0000 36%),linear-gradient(#35d1ee,#10a2d4) fixed}
-.scr{display:none;min-height:100dvh;padding:14px;max-width:980px;margin:auto;flex-direction:column;align-items:center;gap:14px}
+.scr{display:none;min-height:100vh;min-height:calc(100*var(--vh));padding:14px;max-width:980px;margin:auto;flex-direction:column;align-items:center;gap:14px}
 .scr.on{display:flex}
-#ttl{font-size:clamp(2.6rem,11vw,5rem);line-height:1;text-align:center;font-weight:900;margin-top:8px}
-#ttl span{display:inline-block;-webkit-text-stroke:8px #fff;paint-order:stroke fill;text-shadow:0 6px 0 #0003}
-#ttl span:nth-child(odd){transform:rotate(-4deg)}#ttl span:nth-child(even){transform:rotate(3deg)}
+#ttl{font-size:clamp(2rem,min(10vw,calc(8*var(--vh))),4.6rem);line-height:1.05;text-align:center;font-weight:900;margin-top:4px;max-width:100%}
+#ttl .w{display:inline-block;white-space:nowrap}
+#ttl span{display:inline-block;-webkit-text-stroke:6px #fff;paint-order:stroke fill;text-shadow:0 6px 0 #0003}
+#ttl .w span:nth-child(odd){transform:rotate(-4deg)}#ttl .w span:nth-child(even){transform:rotate(3deg)}
 .sub{background:linear-gradient(#ffd54a,#f4a300);color:#fff;text-shadow:0 3px 0 #b36b00;padding:.25em 1.1em;border-radius:18px;border:4px solid #fff;font-size:clamp(1.1rem,4vw,1.6rem);box-shadow:0 5px 0 #0003}
 .cb{position:relative;border:0;color:#fff;font:inherit;font-weight:900;font-size:clamp(1.2rem,4.8vw,1.9rem);letter-spacing:.04em;padding:.65em 1.4em;border-radius:24px;text-shadow:0 3px 0 #0003;min-width:min(78vw,380px);cursor:pointer;
 background:linear-gradient(var(--a),var(--b));box-shadow:0 7px 0 var(--d),0 11px 14px #0004,inset 0 3px 0 #fff7}
@@ -35,14 +38,16 @@ input[type=text],select{width:100%;font:inherit;font-size:1.1rem;padding:12px;bo
 .h{padding:8px 0;border-bottom:2px solid #dff3f9;font-size:.95rem}
 #warn{display:none;background:#fff1d6;border:3px solid #f0b43c;border-radius:14px;padding:10px;width:100%}
 /* jogo */
-#s1.on{height:100dvh;overflow:hidden;padding:10px;gap:8px;max-width:1100px}
+#s1.on{height:100vh;height:calc(100*var(--vh));min-height:0;overflow:hidden;padding:max(8px,env(safe-area-inset-top)) 10px 2px;gap:6px;max-width:1100px}
+#s1>*{flex:none}
 .top{display:flex;align-items:center;gap:8px;width:100%}
 .pill{background:#fff;border-radius:999px;padding:6px 14px;box-shadow:0 4px 0 #0003}
 #tm{margin-left:auto;font-size:clamp(1.2rem,4vw,1.8rem);font-variant-numeric:tabular-nums}
-#card{position:relative;flex:1;min-height:0;width:100%;border-radius:30px;border:6px solid #fff;box-shadow:0 8px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2dvh;background:#999;transition:background .3s}
+#s1>#card{flex:1 1 0;min-height:0}
+#card{position:relative;width:100%;border-radius:30px;border:6px solid #fff;box-shadow:0 8px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(1.2*var(--vh));background:#999;transition:background .3s;overflow:hidden}
 #card::after{content:"";position:absolute;inset:0;border-radius:24px;background:linear-gradient(#fff5,#0000 45%);pointer-events:none}
 .circ{width:var(--cs);aspect-ratio:1;border-radius:50%;border:9px solid #111c;background:#fff4;display:grid;place-items:center;font-size:calc(var(--cs)*.62);font-weight:900;color:#111;line-height:1}
-#slots,#tray{display:flex;justify-content:center;gap:2.5vw;width:100%}
+#slots,#tray{display:flex;justify-content:center;gap:2vw;width:100%;min-height:var(--sz)}
 .slot{position:relative;width:var(--sz);aspect-ratio:1;border-radius:50%;border:6px solid #fff;display:grid;place-items:center;font-size:calc(var(--sz)*.5);font-weight:900;color:#fff;text-shadow:0 3px 0 #0a6f9a;transition:transform .15s,box-shadow .15s;
 background:radial-gradient(circle at 50% 30%,#ffffffcc 0,#ffffff55 38%,#0a77a466 100%);box-shadow:inset 0 9px 16px #0a5f8a88,inset 0 -5px 9px #fff8,0 7px 0 #0a6f9a99,0 0 0 5px #ffffff55}
 .slot.hot{transform:scale(1.14);box-shadow:inset 0 9px 16px #0a5f8a55,0 0 26px 8px #fff,0 0 0 5px #fff}
@@ -50,12 +55,30 @@ background:radial-gradient(circle at 50% 30%,#ffffffcc 0,#ffffff55 38%,#0a77a466
 @keyframes pop{40%{transform:scale(1.25)}}
 .ball{width:var(--sz);aspect-ratio:1;border-radius:50%;touch-action:none;cursor:grab;border:3px solid #fff8;box-shadow:inset -9px -11px 18px #0004,inset 7px 7px 12px #fff6,0 5px 9px #0003}
 .ball.in{position:absolute;inset:-5px;width:auto;cursor:default}
-#msg{min-height:2.7em;text-align:center;font-size:clamp(1rem,3.4vw,1.5rem);color:#fff;text-shadow:0 2px 0 #0005;width:100%}
+#msg{min-height:2.4em;text-align:center;font-size:clamp(.9rem,3.4vw,1.4rem);line-height:1.2;color:#fff;text-shadow:0 2px 0 #0005;width:100%;overflow-wrap:anywhere}
 #msg.ok{color:#d9ff9f}#msg.bad{color:#ffd2cd}
-#mic{cursor:pointer;display:none;background:#ff4b4b;color:#fff;padding:6px 18px;border-radius:999px;border:3px solid #fff;animation:pl 1s infinite;font-size:clamp(1rem,3.4vw,1.4rem)}
+#mic{cursor:pointer;display:none;background:#ff4b4b;color:#fff;padding:5px 14px;border-radius:999px;border:3px solid #fff;animation:pl 1s infinite;font-size:clamp(.8rem,3.2vw,1.2rem);line-height:1.2;text-align:center;max-width:100%;overflow-wrap:anywhere}
 @keyframes pl{50%{transform:scale(1.07)}}
-.top{flex-wrap:wrap;gap:6px}.pill{font-size:.9rem;padding:5px 11px}
-#syl{display:flex;gap:.2em;justify-content:center;font-size:clamp(1.8rem,9vw,3.6rem);font-weight:900;color:#fff;text-shadow:0 4px 0 #0006}
+.top{flex-wrap:wrap;gap:6px}.pill{font-size:.85rem;padding:4px 10px;white-space:nowrap}
+#s1 .rb.s{width:46px;font-size:1.2rem}
+.credit{flex:none;text-align:center;color:#fff;font-weight:700;font-size:.85rem;letter-spacing:.05em;text-shadow:0 2px 0 rgba(18,64,110,.6);padding:4px 0 calc(8px + env(safe-area-inset-bottom))}
+#s1 .credit{font-size:.68rem;padding:0 0 calc(3px + env(safe-area-inset-bottom))}
+.circ{flex:none}
+@media(max-height:760px){#s0{gap:9px}#mascote{font-size:44px}.cb{padding:.5em 1.2em}.sub{font-size:1rem}}
+/* celular deitado: cartão da cor à esquerda, números e bolinhas à direita */
+@media(orientation:landscape) and (max-height:520px){
+ :root{--sz:min(8vw,calc(12.5*var(--vh)));--cs:min(17vw,calc(32*var(--vh)))}
+ #s1.on{display:grid;align-items:stretch;grid-template-columns:1fr 1.15fr;grid-template-rows:auto 1fr 1fr auto auto auto;column-gap:10px;row-gap:4px}
+ #s1 .top{grid-column:1/-1;grid-row:1}
+ #s1>#card{grid-column:1;grid-row:2/6;min-height:0}
+ #s1>#slots{grid-column:2;grid-row:2;align-self:end}
+ #s1>#tray{grid-column:2;grid-row:3;align-self:start}
+ #s1>#mic{grid-column:2;grid-row:4;justify-self:center}
+ #s1>#msg{grid-column:2;grid-row:5;min-height:1.2em}
+ #s1 .credit{grid-column:1/-1;grid-row:6}
+ #syl{font-size:clamp(1.3rem,5vw,2.4rem)}
+}
+#syl{display:flex;flex-wrap:wrap;gap:.1em;justify-content:center;max-width:100%;padding:0 4px;font-size:clamp(1.5rem,min(8vw,calc(6.5*var(--vh))),3.4rem);font-weight:900;color:#fff;text-shadow:0 4px 0 #0006;line-height:1.1}
 #syl span{padding:0 .18em;border-radius:14px;opacity:.6;transition:.2s}#syl span.on{opacity:1;background:#fff;color:var(--ink);text-shadow:none;transform:scale(1.15)}
 .cf{position:fixed;top:-2.5rem;font-size:2rem;z-index:20;pointer-events:none;animation:fall 3.2s linear forwards}@keyframes fall{to{transform:translateY(112dvh) rotate(360deg)}}
 .shake{animation:sk .35s}@keyframes sk{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
@@ -69,7 +92,7 @@ body{font-family:Fredoka,"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-s
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 20% 8%,rgba(255,255,255,.35),transparent 40%),repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 14px,transparent 14px 28px)}
 .scr{position:relative}
 .sub{background:linear-gradient(#FFB23E,#FF8A00)!important;text-shadow:0 3px 0 #C2610A!important;border-radius:12px!important;box-shadow:0 4px 0 #C2610A!important;text-transform:uppercase;letter-spacing:.05em}
-#ttl span{-webkit-text-stroke:8px #1D5BB0!important}
+#ttl span{-webkit-text-stroke:6px #1D5BB0!important}
 .pan,#card{border:4px solid #fff!important;box-shadow:0 0 0 3px #6CC4FF,0 8px 0 #2A74D0!important}
 .pan{background:linear-gradient(#fff,#DDF1FF)!important}
 .pill{background:linear-gradient(#fff,#DDF1FF)!important;border:3px solid #6CC4FF;box-shadow:0 3px 0 #2A74D0!important}
@@ -95,9 +118,11 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
   <label for="mode">Onde coloca a bolinha</label>
   <select id="mode"><option value="tela">Na tela (arrastar)</option><option value="mesa">Na mesa (bolinhas de verdade)</option></select>
   <div class="chk"><input type="checkbox" id="vn"><label for="vn">A voz também fala o número</label></div>
-  <div style="margin-top:8px;font-size:.9rem">Fácil: 3 cores · Médio: 4 · Difícil: 5. Números de 1 a 5 e cores são sempre sorteados. A cor aparece em sílabas e a voz fala devagar.</div>
+  <div class="chk"><input type="checkbox" id="vc"><label for="vc">A voz fala a cor a cada tentativa (padrão: só no começo e no final)</label></div>
+  <div style="margin-top:8px;font-size:.9rem">Fácil: 3 cores · Médio: 4 · Difícil: 5. Números de 1 a 5 e cores são sempre sorteados. A cor aparece em sílabas. O botão 🔊 repete a cor quando quiser.</div>
  </div>
  <div class="pan" id="pHist"><div id="hist"></div><button class="cb rd" id="clr" style="min-width:0;font-size:1rem;margin-top:10px">Apagar histórico</button></div>
+ <div class="credit">By Waldeci Ramos</div>
 </div>
 
 <div class="scr" id="s1">
@@ -106,11 +131,13 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
  <div id="card"><div class="circ" id="num"></div><div id="syl"></div></div>
  <div id="slots"></div><div id="tray"></div>
  <div id="mic"></div><div id="msg"></div>
+ <div class="credit">By Waldeci Ramos</div>
 </div>
 
 <div class="scr" id="s2" style="justify-content:center">
  <div class="pan on" style="text-align:center"><h2 id="l2"></h2><div id="l2t" style="font-size:1.3rem"></div></div>
  <button class="cb or" id="nxt"></button>
+ <div class="credit">By Waldeci Ramos</div>
 </div>
 
 <div class="scr" id="s3">
@@ -118,6 +145,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
   <table><thead><tr><th>Nível</th><th>Nº</th><th>Cor</th><th>Alvo</th><th>Tempo</th><th>Pts</th><th>Erros</th><th>Aceite</th></tr></thead><tbody id="rows"></tbody></table>
   <div class="tot" id="tot"></div></div>
  <div class="row np"><button class="cb gr" style="min-width:0" onclick="print()">🖨 Imprimir</button><button class="cb bl" style="min-width:0" id="cp">Copiar</button><button class="cb or" style="min-width:0" id="again">Menu</button></div>
+ <div class="credit">By Waldeci Ramos</div>
 </div>
 
 <script>
@@ -141,11 +169,13 @@ const avg=a=>a.length?a.reduce((x,r)=>x+r.ms,0)/a.length:0;
 function beep(ok){if(mute)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=ok?'sine':'square';o.frequency.value=ok?880:200;g.gain.value=.08;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+(ok?.25:.3))}catch(_){}}
 
 // título colorido
-'Jogo das Cores'.split('').forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch===' '?'\u00a0':ch;s.style.color=['#ff4f9a','#ff5a36','#ffb800','#a45cf0','#17c3e6','#5fd02b'][i%6];$('ttl').append(s)});
+(()=>{let i=0;'Jogo das Cores'.split(' ').forEach(w=>{const g=document.createElement('span');g.className='w';
+ w.split('').forEach(ch=>{const s=document.createElement('span');s.textContent=ch;s.style.color=['#ff4f9a','#ff5a36','#ffb800','#a45cf0','#17c3e6','#5fd02b'][i++%6];g.append(s)});
+ $('ttl').append(g,' ')})})();
 
 const T=()=>S.trials[S.ti];
 const phrase=t=>$('req').value==='numero'?NN[t.num]:$('req').value==='cor'?t.cor.n:t.cor.n+' '+NN[t.num];
-function mic(){const on=S.run&&!S.busy;$('mic').style.display=on?'block':'none';if(on)$('mic').textContent=S.nomic?'⚠ Toque aqui para ativar o microfone (ou use o ✓)':(S.micOn?'🎤 Ouvindo':'🎤 Ligando…')+' · fale: “'+phrase(T())+'”'}
+function mic(){const on=S.run&&!S.busy&&!!T();$('mic').style.display=on?'block':'none';if(on)$('mic').textContent=S.nomic?'⚠ Toque aqui para ativar o microfone (ou use o ✓)':(S.micOn?'🎤 Ouvindo':'🎤 Ligando…')+' · fale: “'+phrase(T())+'”'}
 
 const hi=i=>document.querySelectorAll('#syl span').forEach((e,k)=>e.classList.toggle('on',i===99||k===i));
 function say(parts){
@@ -157,15 +187,25 @@ function say(parts){
   speechSynthesis.speak(u)});
  setTimeout(()=>{if(id===S.sid)speaking=false},15000);
 }
+const first=()=>(S.nome||'').split(' ')[0];
+const comNome=()=>first()?', '+first():'';
+// COMEÇO: explica o que fazer e fala o nome (uma vez só)
+function intro(primeiro){
+ const l=LV[S.lvs[S.li]],mesa=$('mode').value==='mesa',q=$('req').value;
+ if(!primeiro){say([{t:'Agora o nível '+l.k.toLowerCase()+comNome()+'!',i:-1,r:.95}]);return}
+ const como=mesa?'Coloque a bolinha da mesma cor no número':'Arraste a bolinha da mesma cor até o número';
+ const fala=q==='numero'?'e fale o número':q==='ambos'?'e fale a cor e o número':'e fale a cor';
+ say([{t:'Oi'+comNome()+'! Vamos brincar de cores. Olhe a cor grande. '+como+' '+fala+' em voz alta.',i:-1,r:.9}]);
+}
 const sayColor=()=>{const c=T().cor,p=c.v.map((t,i)=>({t,i,r:.5}));p.push({t:c.n,i:99,r:.8});if($('vn').checked)p.push({t:'Número '+NN[T().num],i:-1,r:.85});say(p)};
 
-function startLevel(){
+function startLevel(primeiro){
  const l=LV[S.lvs[S.li]],n=+$('cnt').value;
  const cs=seq(C.slice(0,l.nc),n),ns=[];for(let i=0;i<n;i++){let x;do{x=1+Math.random()*5|0}while((i&&x===ns[i-1])||(i>1&&x===ns[i-2]&&Math.random()<.7));ns.push(x)}
  S.trials=cs.map((c,i)=>({cor:c,num:ns[i]}));S.ti=0;
  $('slots').innerHTML='';
  for(let k=1;k<=l.nn;k++){const s=document.createElement('div');s.className='slot';s.dataset.n=k;s.textContent=k;$('slots').append(s)}
- next();
+ next();intro(!!primeiro);
 }
 function next(){
  if(S.ti>=S.trials.length)return levelDone();
@@ -177,7 +217,8 @@ function next(){
  $('tray').innerHTML='';
  shuf(C.slice(0,l.nc)).forEach(c=>{const b=document.createElement('div');b.className='ball';b.style.background='radial-gradient(circle at 32% 28%,#fff9 0,#0000 28%),'+c.h;b.dataset.c=c.n;b.dataset.h=c.h;b.onpointerdown=drag;$('tray').append(b)});
  msg($('mode').value==='tela'?'Arraste a bolinha da mesma cor até o número '+t.num:'Coloque a bolinha no número '+t.num+' e fale: “'+phrase(t)+'”');
- mic();S.t0=performance.now();sayColor();
+ mic();S.t0=performance.now();
+ if($('vc').checked)sayColor();
 }
 function pts(ms,e){const s=ms/1000;return Math.max(10,Math.round(Math.max(20,Math.min(100,100-(s-4)*5)))-e*10)}
 function check(){if(S.placed&&S.spoken)accept();else if(S.spoken)msg('Muito bem! Agora coloque a bolinha no número '+T().num,'ok')}
@@ -185,7 +226,7 @@ function accept(){
  if(S.busy)return;S.busy=true;mic();const t=T(),ms=performance.now()-S.t0,p=pts(ms,S.err);
  S.score+=p;$('pts').textContent='⭐ '+S.score;
  S.res.push({l:S.lvs[S.li],cor:t.cor,num:t.num,ms,err:S.err,how:S.how,pt:p});
- beep(true);msg('⭐ Muito bem! +'+p+' pontos','ok');say([{t:['Muito bem','Que lindo','Você é demais','Arrasou'][Math.random()*4|0]+((S.nome||'').split(' ')[0]?', '+(S.nome||'').split(' ')[0]:'')+'!',i:-1,r:.95}]);
+ beep(true);msg('⭐ Muito bem'+comNome()+'! +'+p+' pontos','ok');
  setTimeout(()=>{S.ti++;next()},1800);
 }
 function levelDone(){
@@ -197,7 +238,7 @@ function levelDone(){
  $('nxt').textContent='CONTINUAR: '+LV[S.lvs[S.li+1]].k.toUpperCase();
  show('s2');cheer();S.tmo=setTimeout(go,7000);
 }
-function go(){clearTimeout(S.tmo);if(!$('s2').classList.contains('on'))return;S.li++;show('s1');S.busy=false;startLevel()}
+function go(){clearTimeout(S.tmo);if(!$('s2').classList.contains('on'))return;S.li++;show('s1');S.busy=false;startLevel(false)}
 function party(){for(let i=0;i<18;i++){const e=document.createElement('span');e.className='cf';e.textContent=['🎉','⭐','🎈','🎊'][i%4];e.style.left=Math.random()*94+'vw';e.style.animationDelay=Math.random()*1.5+'s';document.body.append(e);setTimeout(()=>e.remove(),5200)}}
 function cheer(){party();say([{t:'Parabéns'+(S.nome?', '+S.nome:'')+'!',i:-1,r:.9}])}
 
@@ -248,7 +289,7 @@ function drag(e){
    S.placed=true;sl.classList.add('fx');sl.textContent='';b.className='ball in';b.onpointerdown=null;sl.append(b);
    beep(true);mic();if(S.spoken)accept();else msg('Bolinha fixada! Agora fale a cor 🎤','ok');
   }else{
-   S.err++;beep(false);say([{t:'Quase'+((S.nome||'').split(' ')[0]?', '+(S.nome||'').split(' ')[0]:'')+'! Tente de novo.',i:-1,r:.95}]);
+   S.err++;beep(false);
    msg(b.dataset.c!==t.cor.n?'Essa não é a cor. Olhe a cor grande 🙂':'Esse não é o número. Procure o '+t.num,'bad');
    sl.classList.remove('shake');void sl.offsetWidth;sl.classList.add('shake');
   }};
@@ -261,7 +302,7 @@ function begin(w){
  document.body.classList.toggle('mesa',$('mode').value==='mesa');
  $('warn').style.display='none';
  try{speechSynthesis.speak(new SpeechSynthesisUtterance(''))}catch(_){}
- show('s1');askMic(true);startLevel();
+ show('s1');startLevel(true);askMic(true);
  clearInterval(timer);timer=setInterval(()=>{if(S.run&&!S.busy)$('tm').textContent=fmt(performance.now()-S.t0)},100);
 }
 function stop(){S.run=false;clearInterval(timer);clearTimeout(S.tmo);const r0=rec;rec=null;try{r0&&r0.abort()}catch(_){};try{speechSynthesis.cancel()}catch(_){}}

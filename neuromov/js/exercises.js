@@ -146,10 +146,16 @@ class ExerciseBase{
   feedback(msg, tipo){ if(this.onFeedback) this.onFeedback(msg, tipo||'ok'); }
   say(t){ falar(t); }
   beep(tipo){ if(window.NM_SOUND) window.NM_SOUND.beep(tipo); }
+  dispose(){
+    // remove os ouvintes de mão deste exercício (antes ficavam ativos e falavam por cima dos próximos jogos)
+    this._unsub.forEach(([evt,fn])=>Tracking.off(evt,fn));
+    this._unsub = [];
+  }
   finish(reason){
     if(this.done) return;
     this.done = true;
     this.finishReason = reason;
+    this.dispose();
     if(this.onFinish) this.onFinish();
   }
   metricas(){
@@ -180,7 +186,7 @@ class ExCesto extends ExerciseBase{
       if(dist(pos.x,pos.y,this.ball.x,this.ball.y) < this.ball.r+0.06){ this.held=true; this.grabAt=performance.now(); this.beep('grab'); }
     });
     this.listen('handOpen', (pos)=>{ if(this.done || !this.held) return; this.releaseBall(pos); });
-    this.say('Vamos jogar basquete'+(NOME()?', '+NOME():'')+'! Feche a mão pra pegar a bola e leve até a cesta.');
+    this.say('Vamos jogar basquete'+(NOME()?', '+NOME():'')+'! Feche a mão para pegar a bola, leve até a cesta e abra a mão para soltar.');
   }
   newRound(){ this.ball={x:rand(0.15,0.3), y:rand(0.6,0.78), r:0.11}; this.roundStart=performance.now(); }
   releaseBall(pos){
@@ -193,10 +199,8 @@ class ExCesto extends ExerciseBase{
       this.correct++; this.score+=10; this.beep('hit'); this.netAmp=1;
       this.fall={x:rim.rimX, y:rim.rimY, vy:0.15, t:0};
       this.feedback('Cesta! +10 pontos','ok');
-      this.say(pick(['Cesta! Muito bem','Boa! Que lindo','Uau, você acertou','Isso aí'])+(n?', '+n:'')+'! Agora pegue a próxima bola.');
     } else {
       this.incorrect++; this.beep('miss'); this.feedback('Quase! Tente mirar na cesta.','bad');
-      this.say('Quase'+(n?', '+n:'')+'! Leve a bola até a cesta e abra a mão.');
     }
     this.roundProgress++;
     if(this.roundProgress >= this.reps) this.completeRound();
@@ -206,11 +210,13 @@ class ExCesto extends ExerciseBase{
     this.tt+=dt; this.netAmp=Math.max(0,this.netAmp-dt*0.7);
     const f=this.fall; if(f){ f.t+=dt; f.vy+=dt*0.9; f.y+=f.vy*dt; if(f.t>0.8) this.fall=null; }
     this._rim=drawHoop(ctx,this.hoop.x,this.hoop.y,w,h,this.netAmp,this.tt,()=>{ if(f) drawBall(ctx,f.x,f.y,this.ball.r*0.8,w,h,false); });
-    if(!hand) return;
-    this.speeds.push(hand.speed||0);
-    if(this.held){ this.ball.x=hand.x; this.ball.y=hand.y; }
+    if(hand){
+      this.speeds.push(hand.speed||0);
+      if(this.held){ this.ball.x=hand.x; this.ball.y=hand.y; }
+    }
+    // a bola é sempre desenhada, mesmo quando a mão some do enquadramento
     drawBall(ctx, this.ball.x, this.ball.y, this.ball.r, w, h, this.held);
-    drawCursorRing(ctx, hand.x, hand.y, w, h, hand.open);
+    if(hand) drawCursorRing(ctx, hand.x, hand.y, w, h, hand.open);
   }
 }
 
@@ -220,6 +226,7 @@ class ExAbrirFechar extends ExerciseBase{
     super(nivel, sens, reps);
     this.commandInterval = Math.max(1600 - nivel*300, 800);
     this.roundIdx = 0;
+    this.say('Vamos treinar a mão'+(NOME()?', '+NOME():'')+'! Quando aparecer ABRA, abra a mão. Quando aparecer FECHE, feche a mão.');
     this.nextRound();
   }
   nextRound(){
@@ -279,7 +286,7 @@ class ExLabirinto extends ExerciseBase{
       if(pxd(pos,this.ball,this.w,this.h) < this.w*0.14){ this.held=true; this.grabAt=performance.now(); this.beep('grab'); }
     });
     this.listen('handOpen', ()=>{ this.held=false; });
-    this.say('Vamos passar pelo labirinto'+(NOME()?', '+NOME():'')+'! Feche a mão na bola e leve até a estrela.');
+    this.say('Vamos passar pelo labirinto'+(NOME()?', '+NOME():'')+'! Feche a mão na bola, siga o caminho sem sair dele e leve até a estrela.');
   }
   load(){
     const m=MAZES[this.mi%MAZES.length]; this.maze=m; this.segs=[];
@@ -317,7 +324,6 @@ class ExLabirinto extends ExerciseBase{
       this.reactionTimes.push(performance.now()-this.startedAt);
       this.precisions.push(Math.max(40,100-this.bumps*15));
       this.feedback('Chegou na estrela! +15 pontos','ok');
-      const n=NOME(); this.say(pick(['Chegou! Parabéns','Que caminho lindo','Você conseguiu'])+(n?', '+n:'')+'! Vamos para o próximo labirinto.');
       if(this.roundProgress>=this.reps) this.completeRound();
       this.mi++; this.load();
     }
@@ -335,10 +341,12 @@ class ExCantos extends ExerciseBase{
       for(const b of this.balls){ if(!b.delivered && dist(pos.x,pos.y,b.x,b.y) < b.r+0.06){ this.held=b; this.grabAt=performance.now(); this.beep('grab'); break; } }
     });
     this.listen('handOpen', (pos)=>{ if(this.done || !this.held) return; this.releaseBall(pos); });
-    this.say('Agora vamos encher a cesta'+(NOME()?', '+NOME():'')+'! Leve uma bolinha de cada canto até a cesta do meio.');
+    this.say('Agora vamos encher a cesta'+(NOME()?', '+NOME():'')+'! Feche a mão numa bolinha colorida, leve até a cesta do meio e abra a mão.');
   }
   newRound(){
-    this.balls=[{x:.13,y:.17},{x:.87,y:.17},{x:.13,y:.85},{x:.87,y:.85}].map(p=>({x:p.x,y:p.y,r:0.085,delivered:false}));
+    // 4 bolinhas coloridas, uma em cada canto (cores em ordem aleatória a cada rodada)
+    const cores=CORES.slice().sort(()=>Math.random()-.5);
+    this.balls=[{x:.15,y:.22},{x:.85,y:.22},{x:.15,y:.82},{x:.85,y:.82}].map((p,i)=>({x:p.x,y:p.y,r:0.085,delivered:false,c:cores[i]}));
   }
   releaseBall(pos){
     const b=this.held; this.held=null;
@@ -349,11 +357,9 @@ class ExCantos extends ExerciseBase{
       b.delivered=true; this.correct++; this.score+=10; this.roundProgress++; this.beep('hit'); this.netAmp=1;
       this.fall={x:rim.rimX,y:rim.rimY,vy:0.15,t:0};
       this.feedback('Na cesta! +10 pontos','ok');
-      this.say(pick(['Na cesta! Muito bem','Que beleza','Isso mesmo'])+(n?', '+n:'')+'! Agora pegue a próxima bolinha.');
       if(this.roundProgress >= this.reps) this.completeRound();
     } else {
       b.x=pos.x; b.y=pos.y; this.incorrect++; this.beep('miss'); this.feedback('Quase! A cesta é no meio.','bad');
-      this.say('Quase'+(n?', '+n:'')+'! Leve até a cesta do meio.');
     }
     if(this.balls.every(x=>x.delivered)) this.newRound();
   }
@@ -361,7 +367,7 @@ class ExCantos extends ExerciseBase{
     this.tt+=dt; this.netAmp=Math.max(0,this.netAmp-dt*0.7);
     const f=this.fall; if(f){ f.t+=dt; f.vy+=dt*0.9; f.y+=f.vy*dt; if(f.t>0.8) this.fall=null; }
     this._rim=drawHoop(ctx,this.hoop.x,this.hoop.y,w,h,this.netAmp,this.tt,()=>{ if(f) drawBall(ctx,f.x,f.y,0.07,w,h,false); });
-    this.balls.forEach(b=>{ if(!b.delivered) drawBall(ctx,b.x,b.y,b.r,w,h,this.held===b); });
+    this.balls.forEach(b=>{ if(!b.delivered) drawColorBall(ctx,b.x,b.y,b.r,w,h,b.c,this.held===b); });
     if(!hand) return;
     this.speeds.push(hand.speed||0);
     if(this.held){ this.held.x=hand.x; this.held.y=hand.y; }
@@ -375,45 +381,55 @@ class ExPega extends ExerciseBase{
     super(nivel, sens, reps);
     this.roundProgress=0; this.held=null; this.lock=false; this.binGlow=0; this.w=1; this.h=1;
     this.bin={x:0.5,y:0.82,r:0.14};
-    this.balls=CORES.map(c=>({c,x:0,y:0,r:0.06})); this.balls.forEach(b=>this.place(b));
-    this.target=null; this.pickTarget('Vamos brincar'+(NOME()?', '+NOME():'')+'!');
+    this.balls=CORES.map(c=>({c,x:0,y:0,r:0.075}));
+    this.shuffleHomes();
+    this.target=null;
+    this.pickTarget();
+    // explica só no começo: nome + o que fazer
+    this.say('Vamos brincar'+(NOME()?', '+NOME():'')+'! Olhe o nome da cor lá em cima, pegue a bola dessa cor com a ponta dos dedos e solte em cima do lixinho.');
   }
-  place(b){ b.x=rand(0.12,0.88); b.y=rand(0.14,0.55); }
-  pickTarget(prefix){
+  // 4 posições fixas (2x2) sem sobreposição: as 4 cores ficam sempre visíveis
+  shuffleHomes(){
+    const homes=[{x:.27,y:.30},{x:.73,y:.30},{x:.27,y:.56},{x:.73,y:.56}].sort(()=>Math.random()-.5);
+    this.balls.forEach((b,i)=>{ if(this.held===b) return; b.x=homes[i].x; b.y=homes[i].y; });
+  }
+  pickTarget(){
     let c; do{ c=pick(CORES); }while(c===this.target);
     this.target=c; this.promptAt=performance.now();
-    this.say((prefix?prefix+' ':'')+'Pegue a bola '+c.n+' com a ponta dos dedos.');
   }
   update(hand, dt, ctx, w, h){
     this.w=w; this.h=h; this.binGlow=Math.max(0,this.binGlow-dt);
     const pe=document.getElementById('gamePrompt');
-    if(pe){ pe.style.top='8%'; pe.style.transform='none'; pe.innerHTML='<span style="font-size:24px;">Pegue a bola <b style="color:'+this.target.l+'">'+this.target.n.toUpperCase()+'</b> 🤏</span>'; }
+    if(pe){
+      pe.style.top='46px'; pe.style.transform='none';
+      pe.innerHTML='<span class="pp">Pegue a bola <b style="color:'+this.target.l+'">'+this.target.n.toUpperCase()+'</b> 🤏</span>';
+    }
     drawBin(ctx,this.bin.x*w,this.bin.y*h,w,this.binGlow);
     this.balls.forEach(b=>drawColorBall(ctx,b.x,b.y,b.r,w,h,b.c,this.held===b));
     if(!hand) return;
     this.speeds.push(hand.speed||0);
-    const pm=hand.pinch||{}, pinching=!!(pm.index||pm.middle||pm.ring||pm.pinky), n=NOME();
+    const pm=hand.pinch||{}, pinching=!!(pm.index||pm.middle||pm.ring||pm.pinky);
     if(this.held){
       this.held.x=hand.x; this.held.y=hand.y;
       if(!pinching){
         const b=this.held; this.held=null;
-        if(pxd(b,this.bin,w,h) < this.bin.r*w + b.r*w*0.5){
+        if(pxd(b,this.bin,w,h) < this.bin.r*w + b.r*Math.min(w,h)*0.5){
           this.correct++; this.score+=10; this.roundProgress++; this.beep('hit'); this.binGlow=0.6;
           this.reactionTimes.push(performance.now()-this.promptAt);
           this.feedback('No lixinho! +10 pontos','ok');
-          this.place(b);
+          this.shuffleHomes();
           if(this.roundProgress>=this.reps) this.completeRound();
-          this.pickTarget(pick(['Muito bem','Que lindo','Isso aí'])+(n?', '+n:'')+'!');
+          this.pickTarget();
         } else {
           this.incorrect++; this.beep('miss'); this.feedback('Solte em cima do lixinho!','bad');
-          this.say('Quase'+(n?', '+n:'')+'! Solte a bola em cima do lixinho.');
+          this.shuffleHomes();
         }
       }
     } else if(pinching && !this.lock){
-      const near=this.balls.find(b=>pxd(hand,b,w,h) < b.r*w + w*0.09);
+      const near=this.balls.find(b=>pxd(hand,b,w,h) < b.r*Math.min(w,h) + Math.min(w,h)*0.09);
       if(near){
         if(near.c===this.target){ this.held=near; this.beep('grab'); }
-        else{ this.lock=true; this.incorrect++; this.beep('miss'); this.feedback('Essa é a bola '+near.c.n+'. Procure a '+this.target.n+'!','bad'); this.say('Essa é a '+near.c.n+(n?', '+n:'')+'. Procure a bola '+this.target.n+'!'); }
+        else{ this.lock=true; this.incorrect++; this.beep('miss'); this.feedback('Essa é a bola '+near.c.n+'. Procure a '+this.target.n+'!','bad'); }
       }
     }
     if(!pinching) this.lock=false;
@@ -542,6 +558,7 @@ const ExerciseEngine = {
   start(id, nivel, sensibilidade, reps){
     const map = {cesto:ExCesto, abrirFechar:ExAbrirFechar, labirinto:ExLabirinto, cantos:ExCantos, pega:ExPega};
     const Cls = map[id];
+    if(this.instance){ this.instance.dispose(); }   // nunca deixar ouvintes do jogo anterior vivos
     this.instance = new Cls(nivel, sensibilidade, reps);
     this.exerciseId = id;
     return this.instance;
