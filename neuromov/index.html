@@ -4,14 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>NeuroMove Rehab — Reabilitação Neuromotora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="game.css">
 </head>
 <body>
 <div id="app">
 
   <header class="top">
     <div class="brand">
-      <span class="eyebrow">NeuroMove Rehab · v2.0</span>
+      <span class="eyebrow">NeuroMove Games · v3.0</span>
       <h1 id="pageTitle">Reabilitação Neuromotora</h1>
     </div>
     <div style="display:flex;gap:6px;">
@@ -22,111 +24,13 @@
 
   <!-- ===================== HOME ===================== -->
   <section class="screen active" id="screen-home">
-    <h2>Pacientes cadastrados</h2>
-    <input type="search" id="patientSearch" class="search-input" placeholder="🔍 Buscar paciente pelo nome…" autocomplete="off">
-    <div class="tabs" id="patientTabs">
-      <button class="tab active" data-mode="recent">Últimos 5</button>
-      <button class="tab" data-mode="all">Todos</button>
-    </div>
-    <p class="sub" id="patientListInfo"></p>
-    <div id="patientList"></div>
-  </section>
-
-  <!-- ===================== CADASTRO ===================== -->
-  <section class="screen" id="screen-cadastro">
-    <h2>Cadastro do paciente</h2>
-    <div class="panel form-grid">
-      <label>Nome completo
-        <input type="text" id="fNome" placeholder="Nome do paciente">
-      </label>
-      <div class="row">
-        <label>Data de nascimento
-          <input type="date" id="fNascimento">
-        </label>
-        <label>Sexo
-          <select id="fSexo">
-            <option value="">—</option>
-            <option value="Feminino">Feminino</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </label>
-      </div>
-      <label>Diagnóstico / condição
-        <input type="text" id="fDiagnostico" placeholder="Ex.: AVE isquêmico, sequela de hemiparesia...">
-      </label>
-
-      <h3>Contato</h3>
-      <div class="row">
-        <label>Telefone
-          <input type="tel" id="fTelefone" placeholder="(00) 00000-0000">
-        </label>
-        <label>Tipo de atendimento
-          <select id="fTipo">
-            <option value="">—</option>
-            <option value="Particular">Particular</option>
-            <option value="Convênio">Convênio</option>
-            <option value="Plano">Plano</option>
-          </select>
-        </label>
-      </div>
-      <label>Endereço
-        <input type="text" id="fEndereco" placeholder="Rua, número, bairro">
-      </label>
-      <div class="row">
-        <label>Cidade
-          <input type="text" id="fCidade" placeholder="Cidade">
-        </label>
-        <label>UF
-          <input type="text" id="fUf" maxlength="2" placeholder="UF" style="text-transform:uppercase;">
-        </label>
-      </div>
-      <div class="row">
-        <label>Início do tratamento
-          <input type="date" id="fInicioTrat">
-        </label>
-        <label>Dia / horário fixo
-          <input type="text" id="fDiaHorario" placeholder="Ex.: Ter e Qui, 14h">
-        </label>
-      </div>
-      <label>Sessões já realizadas antes deste sistema
-        <input type="number" id="fSessoesAntes" min="0" max="20" value="0">
-      </label>
-
-      <h3>Terapeuta responsável</h3>
-      <div class="row">
-        <label>Nome
-          <input type="text" id="fTerapNome" placeholder="Nome do terapeuta">
-        </label>
-        <label>Registro profissional
-          <input type="text" id="fTerapRegistro" placeholder="CREFITO / CRM etc.">
-        </label>
-      </div>
-      <label>Especialidade
-        <input type="text" id="fTerapEsp" placeholder="Ex.: Neurofuncional">
-      </label>
-
-      <h3>Configurações do treino</h3>
-      <div class="row">
-        <label>Mão dominante
-          <select id="fMaoDom">
-            <option value="Destra">Destra</option>
-            <option value="Canhota">Canhota</option>
-            <option value="Ambidestra">Ambidestra</option>
-          </select>
-        </label>
-        <label>Dificuldade inicial (1–5)
-          <input type="number" id="fDificuldade" min="1" max="5" value="1">
-        </label>
-      </div>
-      <label>Sensibilidade de detecção (0.5–1.5)
-        <input type="range" id="fSensibilidade" min="0.5" max="1.5" step="0.05" value="1.0">
-        <span class="range-val" id="fSensibilidadeVal">1.00</span>
-      </label>
-    </div>
-    <div class="row">
-      <button class="btn-secondary btn-block" id="btnCancelCadastro">Cancelar</button>
-      <button class="btn-primary btn-block" id="btnSaveCadastro">Salvar e calibrar</button>
+    <div class="hero">
+      <div class="ribbon">NeuroMove</div>
+      <div class="mascot">🧠</div>
+      <h2>Oi! Qual é o seu nome?</h2>
+      <p class="sub">Vou te chamar por ele durante os jogos 😉</p>
+      <input type="text" id="nameInput" class="name-input" placeholder="Digite seu nome" maxlength="30" autocomplete="off">
+      <button class="btn-primary btn-block" id="btnStartName">▶ Começar</button>
     </div>
   </section>
 
@@ -230,10 +134,16 @@
 <div class="backdrop" id="settingsBackdrop"></div>
 
 <!-- MediaPipe Hands (via jsDelivr — requer hospedagem própria/GitHub Pages, não roda no sandbox de preview do Claude.ai) -->
+<div class="dlg" id="dlg"><div class="dlg-box">
+  <div class="ribbon" id="dlgTitle">Mandou bem!</div>
+  <div class="dlg-emoji" id="dlgEmoji">🏆</div>
+  <p id="dlgMsg"></p><div class="dlg-score" id="dlgScore"></div>
+  <button class="btn-primary btn-block" id="dlgNext">🎮 Próximo jogo</button>
+  <button class="btn-secondary btn-block" id="dlgEnd">🏁 Terminar e ver resultado</button>
+</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
 
 <script src="js/config.js"></script>
-<script src="js/pacientes.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/tracking.js"></script>
 <script src="js/exercises.js"></script>

@@ -29,17 +29,9 @@ do Claude só carrega scripts de `cdnjs.cloudflare.com`. Por isso este projeto �
 entregue como arquivos separados, pra rodar no seu próprio ambiente — local ou no
 GitHub Pages — onde essa restrição não existe.
 
-## Login
+## Acesso
 
-O sistema pede usuário e senha antes de mostrar qualquer coisa. Estão definidos em
-`data/senha.json`:
-
-```json
-{ "usuario": "clinica", "senha": "fisio2026" }
-```
-
-Pra trocar, edite esse arquivo (direto no GitHub ou local) e suba de novo. O login
-fica válido só durante a aba aberta — fecha o navegador, pede de novo.
+Sem login e sem cadastro: a tela inicial pede só o **nome** (uma vez, antes de começar). Os jogos usam esse nome para dar boas-vindas e brincar durante as partidas. As pontuações ficam salvas apenas neste navegador, por nome. Nada é gravado no GitHub nem em servidor.
 
 ## Pacientes fixos
 

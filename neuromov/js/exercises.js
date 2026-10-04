@@ -13,27 +13,29 @@ function dist(x1,y1,x2,y2){ return Math.hypot(x1-x2,y1-y2); }
 
 function drawZone(ctx,x,y,r,w,h,color,label,strokeOnly){
   const px=x*w, py=y*h, pr=r*Math.min(w,h);
-  ctx.beginPath();
-  ctx.arc(px,py,pr,0,Math.PI*2);
-  if(strokeOnly){ ctx.strokeStyle=color; ctx.lineWidth=3; ctx.stroke(); }
-  else { ctx.fillStyle=color; ctx.fill(); }
+  ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2);
+  if(strokeOnly){ ctx.strokeStyle=color; ctx.lineWidth=4; ctx.setLineDash([pr*.35,pr*.2]); ctx.stroke(); ctx.setLineDash([]); }
+  else {
+    ctx.save(); ctx.shadowColor='rgba(0,0,0,.3)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4; ctx.fillStyle=color; ctx.fill(); ctx.restore();
+    ctx.lineWidth=Math.max(2,pr*.07); ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(px-pr*.3,py-pr*.4,pr*.3,pr*.15,-.5,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,.45)'; ctx.fill();
+  }
   if(label){
-    ctx.font=Math.round(pr*1.1)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(11,46,44,.9)';
-    ctx.fillText(label, px, py);
+    ctx.font='700 '+Math.round(pr*1.1)+'px Fredoka,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#fff'; ctx.lineWidth=3; ctx.strokeStyle='rgba(18,64,110,.8)'; ctx.strokeText(label,px,py); ctx.fillText(label, px, py);
   }
 }
 
 function drawBall(ctx,x,y,r,w,h,held){
   const px=x*w, py=y*h, pr=r*Math.min(w,h);
-  ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2);
-  ctx.fillStyle = held? '#F2A93B' : '#E8732A';
-  ctx.fill();
-  ctx.strokeStyle='#0B2E2C'; ctx.lineWidth=Math.max(1,pr*0.06); ctx.stroke();
-  // linhas de bola de basquete
-  ctx.beginPath(); ctx.moveTo(px-pr,py); ctx.lineTo(px+pr,py);
-  ctx.moveTo(px,py-pr); ctx.lineTo(px,py+pr);
-  ctx.strokeStyle='rgba(11,46,44,.5)'; ctx.lineWidth=Math.max(1,pr*0.05); ctx.stroke();
+  const g=ctx.createRadialGradient(px-pr*.35,py-pr*.4,pr*.1,px,py,pr);
+  g.addColorStop(0,held?'#FFE79A':'#FFB86B'); g.addColorStop(.6,held?'#FFAE1F':'#F26B1D'); g.addColorStop(1,'#B8420A');
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=pr*.5; ctx.shadowOffsetY=pr*.2;
+  ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.fillStyle=g; ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.moveTo(px-pr,py); ctx.lineTo(px+pr,py); ctx.moveTo(px,py-pr); ctx.lineTo(px,py+pr);
+  ctx.strokeStyle='rgba(120,40,0,.45)'; ctx.lineWidth=Math.max(1,pr*.05); ctx.stroke();
+  ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.strokeStyle='#fff'; ctx.lineWidth=Math.max(2,pr*.08); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(px-pr*.35,py-pr*.42,pr*.28,pr*.16,-.6,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fill();
 }
 
 function drawBackboard(ctx,x,y,w,h){
@@ -41,7 +43,7 @@ function drawBackboard(ctx,x,y,w,h){
   const bw=w*0.22, bh=h*0.14;
   // tabela
   ctx.fillStyle='rgba(234,241,238,.92)';
-  ctx.strokeStyle='#0B2E2C'; ctx.lineWidth=3;
+  ctx.strokeStyle='#1E5AA8'; ctx.lineWidth=3;
   ctx.fillRect(px-bw/2, py-bh, bw, bh);
   ctx.strokeRect(px-bw/2, py-bh, bw, bh);
   ctx.strokeStyle='#F2A93B'; ctx.lineWidth=2;
@@ -63,7 +65,7 @@ function drawHandIcon(ctx, cx, cy, size, open){
   ctx.save();
   ctx.translate(cx,cy);
   ctx.fillStyle='rgba(234,241,238,.95)';
-  ctx.strokeStyle='#0B2E2C'; ctx.lineWidth=2;
+  ctx.strokeStyle='#1E5AA8'; ctx.lineWidth=2;
   // palma
   ctx.beginPath(); ctx.ellipse(0, size*0.15, size*0.32, size*0.4, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
   // dedos
@@ -347,7 +349,7 @@ function drawHandFingerTarget(ctx, cx, cy, size, target, hand){
   ctx.save();
   ctx.translate(cx, cy);
   ctx.fillStyle='rgba(234,241,238,.95)';
-  ctx.strokeStyle='#0B2E2C'; ctx.lineWidth=2;
+  ctx.strokeStyle='#1E5AA8'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.ellipse(0, size*0.28, size*0.34, size*0.42, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
 
   FINGER_ORDER.forEach((f,i)=>{
@@ -359,7 +361,7 @@ function drawHandFingerTarget(ctx, cx, cy, size, target, hand){
     const pinchedNow = hand && hand.pinch && hand.pinch[f];
     ctx.beginPath(); ctx.moveTo(baseX,baseY); ctx.lineTo(tipX,tipY);
     ctx.lineWidth = size*0.13; ctx.lineCap='round';
-    ctx.strokeStyle = pinchedNow ? '#3E8E6B' : (isTarget ? '#F2A93B' : 'rgba(11,46,44,.3)');
+    ctx.strokeStyle = pinchedNow ? '#3E8E6B' : (isTarget ? '#F2A93B' : 'rgba(30,90,168,.3)');
     ctx.stroke();
     if(isTarget){
       ctx.beginPath(); ctx.arc(tipX,tipY,size*0.115,0,Math.PI*2);

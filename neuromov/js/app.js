@@ -85,101 +85,28 @@ function showScreen(id){
   document.getElementById('globalNav').style.display = (id==='screen-home'||id==='screen-login')?'none':'flex';
 }
 
-// ---------- HOME / lista de pacientes ----------
-// Todo o cálculo (ordenar, filtrar por busca, recortar os últimos 5, dados do
-// programa de 20 sessões) mora em storage.js (Storage / PatientList / Programa).
-// Aqui só se busca os dados e se desenha a tela.
-let allPatients = [];
-let listMode = 'recent'; // 'recent' = últimos 5 | 'all' = todos
-
-async function renderPatientList(){
-  const el = document.getElementById('patientList');
-  el.innerHTML = '<div class="empty">Carregando…</div>';
-  allPatients = await Storage.all();
-  renderFilteredList();
-}
-
-function renderFilteredList(){
-  const el = document.getElementById('patientList');
-  const info = document.getElementById('patientListInfo');
-  const q = document.getElementById('patientSearch').value;
-  const { list, modo, total } = PatientList.filtrar(allPatients, listMode, q);
-
-  if(!allPatients.length){ info.textContent=''; el.innerHTML = '<div class="empty">Nenhum paciente cadastrado ainda.</div>'; return; }
-  if(modo==='busca') info.textContent = list.length + ' resultado(s) para a busca';
-  else if(modo==='recent') info.textContent = 'Últimos ' + list.length + ' cadastrados (de ' + total + ' no total)';
-  else info.textContent = list.length + ' paciente(s) cadastrado(s)';
-
-  if(!list.length){ el.innerHTML = '<div class="empty">Nenhum paciente encontrado com esse nome.</div>'; return; }
-  el.innerHTML = '';
-  list.forEach(w=>{
-    const p = w.paciente;
-    const { n, concluido } = Programa.painel(p);
-    const prog = concluido ? 'Programa concluído ✓ (20/20)' : ('Sessão '+n+' de '+Programa.TOTAL);
-    const div = document.createElement('div');
-    div.className = 'patient-item';
-    div.innerHTML = `<div><div class="pname">${escapeHtml(p.nome)}</div><div class="pmeta">${p.sessoes.length} sessão(ões) · média ${p.historico.mediaDesempenho} pts</div><div class="pprog">${prog}</div></div><div class="pmeta">›</div>`;
-    div.addEventListener('click', ()=>openPatient(p.id));
-    el.appendChild(div);
-  });
-}
+// ---------- HOME: só pede o nome (sem login, sem cadastro) ----------
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-document.getElementById('patientSearch').addEventListener('input', renderFilteredList);
-document.querySelectorAll('#patientTabs .tab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    listMode = btn.dataset.mode;
-    document.querySelectorAll('#patientTabs .tab').forEach(b=>b.classList.toggle('active', b===btn));
-    document.getElementById('patientSearch').value = '';
-    renderFilteredList();
-  });
-});
-
-async function openPatient(id){
-  state.wrapper = await Storage.get(id);
-  if(!state.wrapper) return;
-  state.extraOk = false;
-  goToMenu();
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function primeiroNome(){ return (state.wrapper && state.wrapper.paciente.nome || '').split(' ')[0]; }
+function renderPatientList(){
+  const i=document.getElementById('nameInput'); let n='';
+  try{ n=localStorage.getItem('nm_nome')||''; }catch(e){}
+  if(i && !i.value) i.value=n;
 }
-
-document.getElementById('btnNewPatient').addEventListener('click', ()=>{
-  clearCadastroForm();
-  showScreen('screen-cadastro');
-});
-
-// ---------- CADASTRO ----------
-function clearCadastroForm(){
-  ['fNome','fDiagnostico','fTerapNome','fTerapRegistro','fTerapEsp'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fNascimento').value='';
-  document.getElementById('fSexo').value='';
-  document.getElementById('fMaoDom').value='Destra';
-  document.getElementById('fDificuldade').value=1;
-  document.getElementById('fSensibilidade').value=1.0;
-  document.getElementById('fSensibilidadeVal').textContent='1.00';
-}
-document.getElementById('fSensibilidade').addEventListener('input', (e)=>{
-  document.getElementById('fSensibilidadeVal').textContent = parseFloat(e.target.value).toFixed(2);
-});
-document.getElementById('btnCancelCadastro').addEventListener('click', ()=>showScreen('screen-home'));
-document.getElementById('btnSaveCadastro').addEventListener('click', async ()=>{
-  const nome = document.getElementById('fNome').value.trim();
-  if(!nome){ alert('Informe o nome do paciente.'); return; }
-  const dados = {
-    nome,
-    dataNascimento: document.getElementById('fNascimento').value || null,
-    sexo: document.getElementById('fSexo').value || null,
-    diagnostico: document.getElementById('fDiagnostico').value || null,
-    terapeutaNome: document.getElementById('fTerapNome').value || null,
-    terapeutaRegistro: document.getElementById('fTerapRegistro').value || null,
-    terapeutaEspecialidade: document.getElementById('fTerapEsp').value || null,
-    maoDominante: document.getElementById('fMaoDom').value,
-    dificuldadeInicial: parseInt(document.getElementById('fDificuldade').value)||1,
-    sensibilidade: parseFloat(document.getElementById('fSensibilidade').value)||1.0,
-  };
-  state.wrapper = Storage.novoPaciente(dados);
-  await Storage.upsert(state.wrapper); // já cria o cadastro.json (ou entrada local) na hora do cadastro
+async function startWithName(){
+  const inp=document.getElementById('nameInput'), nome=inp.value.trim();
+  if(!nome){ inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake'); inp.focus(); return; }
+  try{ localStorage.setItem('nm_nome', nome); }catch(e){}
+  const norm=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  const todos=await Storage.all();
+  let w=todos.find(x=>norm(x.paciente.nome)===norm(nome));
+  if(!w){ w=Storage.novoPaciente({nome, sensibilidade:1.0, dificuldadeInicial:1, maoDominante:'Destra'}); await Storage.upsert(w); }
+  state.wrapper=w; state.extraOk=true;
   startCalibration();
-});
+}
+document.getElementById('btnStartName').addEventListener('click', startWithName);
+document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') startWithName(); });
 
 // ---------- CALIBRAÇÃO (só mão) ----------
 let calibCtx, calibVideoEl;
@@ -270,10 +197,11 @@ document.getElementById('btnCalibNext').addEventListener('click', ()=>{
 function goToMenu(){
   showScreen('screen-menu');
   const p = state.wrapper.paciente;
-  document.getElementById('menuPatientName').textContent = p.nome;
+  const n1 = p.nome.split(' ')[0];
+  document.getElementById('menuPatientName').textContent = 'Oi, '+n1+'! 👋';
   document.getElementById('menuPatientMeta').textContent =
-    `${p.sessoes.length} sessão(ões) registrada(s) · pontuação média ${p.historico.mediaDesempenho} pts` +
-    (Storage.usandoApi() ? ' · salvando em arquivo no servidor' : ' · salvando neste navegador');
+    pick([`Que bom te ver por aqui, ${n1}! Escolha um jogo e vamos nessa 🚀`,`${n1}, hoje você vai arrasar! Qual jogo vai ser? 😎`,`${n1}, essa mãozinha está pronta pra brilhar! ✨`]) +
+    (p.sessoes.length ? ` · ${p.sessoes.length} partida(s) · média ${p.historico.mediaDesempenho} pts` : '');
 
   renderProgramPanel();
 
@@ -339,7 +267,7 @@ document.getElementById('btnGoHome').addEventListener('click', ()=>{
 
 function chooseNivelAndStart(ex){
   const p = state.wrapper.paciente;
-  if(Programa.concluido(p) && state.sessionExercicios.length===0 && !state.extraOk){
+  if(false && state.sessionExercicios.length===0 && !state.extraOk){
     if(!confirm('O programa de 20 sessões deste paciente já foi concluído.\n\nDeseja iniciar uma sessão EXTRA (fora do programa)?')) return;
     state.extraOk = true;
   }
@@ -408,10 +336,18 @@ function fmtTimer(sec){
   return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+ms;
 }
 
+let fbN=0;
+function jokeHtml(tipo){
+  fbN++; if(fbN%3!==0) return '';
+  const n=primeiroNome();
+  const ok=[`Mandou bem, ${n}! 🌟`,`${n} está on fire! 🔥`,`Essa foi de craque, ${n}! ⚽`,`Nem o Neymar faz assim, ${n}! 😄`,`Olha esse talento, ${n}! 👏`];
+  const ruim=[`Ops! Acontece, ${n} 😅`,`Quase! Respira e tenta de novo, ${n} 💙`,`Essa escapuliu! Bora de novo, ${n}? 🙈`,`Sem stress, ${n}! A próxima é sua 😉`];
+  return '<small>'+escapeHtml(pick(tipo==='bad'?ruim:ok))+'</small>';
+}
 let feedbackTimeout=null;
 function showFeedback(msg, tipo){
   const el = document.getElementById('feedbackToast');
-  el.textContent = msg;
+  el.innerHTML = escapeHtml(msg) + jokeHtml(tipo);
   el.className = 'feedback-toast show' + (tipo==='bad'?' bad':'');
   clearTimeout(feedbackTimeout);
   feedbackTimeout = setTimeout(()=>el.classList.remove('show'), 1600);
@@ -438,9 +374,15 @@ function endExercise(inst){
 }
 
 function askContinueOrFinish(){
-  const cont = confirm('Exercício concluído! Deseja realizar outro exercício nesta sessão?\n\nOK = escolher outro exercício\nCancelar = encerrar sessão e ver o relatório final');
-  if(cont){ goToMenu(); }
-  else { finalizeSession(); }
+  const n=primeiroNome();
+  const ult=state.sessionExercicios[state.sessionExercicios.length-1];
+  document.getElementById('dlgTitle').textContent='Mandou bem!';
+  document.getElementById('dlgEmoji').textContent=pick(['🏆','🌟','🎉','🥳']);
+  document.getElementById('dlgMsg').textContent=pick([`${n}, que partida! Nem o cronômetro acreditou 😄`,`Uau, ${n}! Essa mão está afiada ✨`,`${n} no comando! Bora pro próximo jogo? 🚀`,`Respira, ${n}... você merece um aplauso! 👏`]);
+  document.getElementById('dlgScore').textContent='⭐ '+(ult?ult.pontuacao:0)+' pontos';
+  const d=document.getElementById('dlg'); d.classList.add('open');
+  document.getElementById('dlgNext').onclick=()=>{ d.classList.remove('open'); goToMenu(); };
+  document.getElementById('dlgEnd').onclick=()=>{ d.classList.remove('open'); finalizeSession(); };
 }
 
 async function finalizeSession(){
@@ -464,7 +406,7 @@ async function finalizeSession(){
   await registrarSessao(state.wrapper, sessao);
 
   if(mediaAnterior!=null && novaMedia>mediaAnterior){
-    setTimeout(()=>alert(`Parabéns! Desempenho médio melhorou ${sessao.progresso.melhoriaPrecisao}% em relação às sessões anteriores.`), 100);
+    setTimeout(()=>alert(`Parabéns, ${primeiroNome()}! Desempenho médio melhorou ${sessao.progresso.melhoriaPrecisao}% em relação às sessões anteriores.`), 100);
   }
 
   let html = Report.build(state.wrapper, sessao);
@@ -578,6 +520,6 @@ window.addEventListener('resize', ()=>{
   }
 });
 
-showScreen('screen-home');
+showScreen('screen-home'); renderPatientList();
 renderPatientList();
 })();
