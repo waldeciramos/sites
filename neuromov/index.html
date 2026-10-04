@@ -62,7 +62,7 @@
     <div class="panel program-panel" id="programPanel"></div>
     <div class="panel reps-panel">
       <label class="reps-label">Repetições por exercício nesta sessão
-        <input type="number" id="sessionReps" min="3" max="30" value="10">
+        <input type="number" id="sessionReps" min="1" max="30" value="10" inputmode="numeric">
       </label>
       <p class="sub" id="sessionRepsHint" style="margin:6px 0 0 0;">Vale para todos os exercícios desta sessão.</p>
     </div>
@@ -134,7 +134,8 @@
   <h3>Acessibilidade</h3>
   <label class="switch-row"><span>Alto contraste</span><input type="checkbox" id="toggleContrast"></label>
   <label class="switch-row"><span>Fonte grande</span><input type="checkbox" id="toggleFontSize"></label>
-  <label class="switch-row"><span>Sons de feedback</span><input type="checkbox" id="toggleSound" checked></label>
+  <label class="switch-row"><span>Sons e voz</span><input type="checkbox" id="toggleSound" checked></label>
+  <label class="voz-row"><span>Voz (escolha a que soar mais natural)</span><select id="selVoz"></select></label>
   <button class="btn-secondary btn-block" id="btnFullscreenSettings" style="margin-bottom:10px;">⛶ Tela cheia</button>
   <p class="sub" style="font-size:11px;line-height:1.4;">Dica: pra evitar que notificações (WhatsApp etc.) apareçam por cima durante a sessão, ative o modo "Não perturbe"/avião no celular ou use o modo de app fixado (Guided Access no iPhone / App Pinning no Android) além da tela cheia.</p>
   <button class="btn-secondary btn-block" id="btnCloseSettings">Fechar</button>
@@ -147,11 +148,13 @@
   <div class="dlg-emoji" id="dlgEmoji">🏆</div>
   <p id="dlgMsg"></p><div class="dlg-score" id="dlgScore"></div>
   <button class="btn-primary btn-block" id="dlgNext">🎮 Próximo jogo</button>
-  <button class="btn-secondary btn-block" id="dlgEnd">🏁 Terminar e ver resultado</button>
+  <button class="btn-secondary btn-block" id="dlgMenu">📋 Menu de jogos</button>
+  <button class="btn-secondary btn-block" id="dlgEnd">🏁 Terminar e ver relatório</button>
 </div></div>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
 
 <script src="js/config.js"></script>
+<script src="js/voz.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/tracking.js"></script>
 <script src="js/exercises.js"></script>

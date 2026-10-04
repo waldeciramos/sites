@@ -31,6 +31,16 @@ exercício da sessão (quando a sessão é encerrada).
 - **Bolas coloridas**: "Bolas na Cesta" agora usa 4 cores; "Bolinhas no Lixinho" mostra as 4 cores sempre separadas e o nome da cor pedida aparece numa faixa sem cortar; no Basquete a bola não some mais quando a mão sai do quadro.
 - Rodapé **By Waldeci Ramos** em todas as telas.
 
+## Novidades (rodada 2)
+
+- **Abrir e Fechar**: agora tem uma mãozinha divertida (amarela, com carinha e punho azul, no estilo do layout) que **mostra o que fazer** — ela abre e fecha para o paciente fazer junto. Embaixo aparece a mãozinha do paciente, que fica verde quando acerta. Os comandos alternam (abre, fecha, abre...), sem pressa e com uma pausa entre eles.
+- **Repetições de verdade**: o número escolhido no menu (de 1 a 30) vale para todos os jogos. Cada jogo termina sozinho ao chegar nele, mostra os **pontos** e o botão **Próximo: (nome do jogo)** leva direto ao jogo seguinte (Basquete → Abrir e Fechar → Labirinto → Bolas na Cesta → Bolinhas no Lixinho → Jogo das Cores). Também vale para o **Jogo das Cores** (tentativas por nível). Antes os jogos reiniciavam em "séries" e nunca terminavam, e o mínimo era 3.
+- **Pegar sem ser "fino"**: gesto de abrir/fechar estável (não pisca; precisa de 2 quadros), funciona com a mão inclinada, posição suavizada, tolerância de ~0,45 s se a câmera perder a mão, área de pegar bem maior e soltar só depois de abrir de verdade. Pinça (Lixinho) com histerese.
+- **Labirinto**: a bolinha **não sai do caminho** nem se a mão atravessar as paredes — ela anda em passos pequenos, desliza na parede e para.
+- **Voz mais leve**: `js/voz.js` escolhe a melhor voz pt-BR do aparelho (Natural/Online/Google/Luciana...), fala frase por frase com pausas e pequena variação de tom, e as falas ficaram mais soltas ("fecha a mãozinha pra pegar a bola..."). Em Configurações (⚙) dá para escolher a voz que soar melhor. No Jogo das Cores a voz não fala mais a cor sílaba por sílaba (as sílabas só acendem na tela).
+- **Mais rápido**: modelo de mão leve em celular, câmera reaproveitada entre um jogo e o próximo, textos da tela atualizados ~8x/s em vez de todo quadro, e menos espera entre tentativas no Jogo das Cores.
+- **Bugs**: no Abrir e Fechar a mão já aberta contava acerto instantâneo; as repetições voltavam para 10 sozinhas ao abrir o histórico; diálogo de parabéns com faixa cortada; confete passando por cima do texto.
+
 ## Por que não funciona no preview do Claude.ai
 
 O MediaPipe só é distribuído via jsDelivr/npm, e o sandbox de preview de artifacts

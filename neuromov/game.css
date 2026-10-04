@@ -101,3 +101,17 @@ body.playing .screen.active{min-height:0}
 html{background-color:#1D5BB0}
 .panel .sub,.panel p.sub{color:#2A6AB0}
 .btn-ghost{background:rgba(255,255,255,.28);color:#fff;border:2px solid rgba(255,255,255,.7);font-weight:700;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+
+/* confete + seletor de voz */
+.cf{position:fixed;top:-2.5rem;font-size:2rem;z-index:60;pointer-events:none;animation:fallcf 3.2s linear forwards}
+@keyframes fallcf{to{transform:translateY(112vh) rotate(360deg)}}
+.voz-row{display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:14px}
+.voz-row select{width:100%;padding:10px;border-radius:10px;border:2px solid #6CC4FF;font:inherit;background:#fff;color:#12406E}
+.settings-panel{overflow-y:auto;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+
+/* diálogo de parabéns: faixa sem corte, confete atrás do cartão */
+.cf{z-index:40!important}
+.dlg-box{overflow:visible!important;max-height:none!important;padding-top:26px}
+.dlg-box .ribbon{margin:0 auto 10px;max-width:100%;padding:8px 16px;letter-spacing:.04em;font-size:clamp(14px,4.4vw,18px);line-height:1.2;overflow-wrap:anywhere}
+.dlg-emoji{font-size:clamp(44px,12vw,64px)}
+@media (max-height:520px){.dlg-box{padding:14px 14px 12px}.dlg-emoji{display:none}.dlg-score{font-size:24px;margin:2px 0 8px}.dlg-box .btn-block{padding:9px;margin-top:6px}}

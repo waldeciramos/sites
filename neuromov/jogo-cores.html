@@ -114,7 +114,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
   <label for="req">A criança precisa falar</label>
   <select id="req"><option value="cor">A cor</option><option value="ambos">A cor e o número</option><option value="numero">Só o número</option></select>
   <label for="cnt">Tentativas por nível</label>
-  <select id="cnt"><option>3</option><option selected>5</option><option>8</option></select>
+  <select id="cnt"><option>1</option><option>2</option><option>3</option><option selected>5</option><option>8</option></select>
   <label for="mode">Onde coloca a bolinha</label>
   <select id="mode"><option value="tela">Na tela (arrastar)</option><option value="mesa">Na mesa (bolinhas de verdade)</option></select>
   <div class="chk"><input type="checkbox" id="vn"><label for="vn">A voz também fala o número</label></div>
@@ -148,6 +148,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
  <div class="credit">By Waldeci Ramos</div>
 </div>
 
+<script src="js/voz.js"></script>
 <script>
 const C=[{n:'vermelho',h:'#e53935',s:['Ver','me','lho'],v:['vêr','mê','lhu']},{n:'azul',h:'#1e5be6',s:['A','zul'],v:['á','zul']},{n:'amarelo',h:'#f9c80e',s:['A','ma','re','lo'],v:['á','má','ré','lu']},{n:'verde',h:'#2ca64a',s:['Ver','de'],v:['vêr','di']},{n:'laranja',h:'#f57c00',s:['La','ran','ja'],v:['la','rãn','ja']}];
 const LV=[{k:'Fácil',nc:3,nn:5},{k:'Médio',nc:4,nn:5},{k:'Difícil',nc:5,nn:5}];
@@ -178,26 +179,30 @@ const phrase=t=>$('req').value==='numero'?NN[t.num]:$('req').value==='cor'?t.cor
 function mic(){const on=S.run&&!S.busy&&!!T();$('mic').style.display=on?'block':'none';if(on)$('mic').textContent=S.nomic?'⚠ Toque aqui para ativar o microfone (ou use o ✓)':(S.micOn?'🎤 Ouvindo':'🎤 Ligando…')+' · fale: “'+phrase(T())+'”'}
 
 const hi=i=>document.querySelectorAll('#syl span').forEach((e,k)=>e.classList.toggle('on',i===99||k===i));
+let sylTm=[];
 function say(parts){
- S.listenAt=performance.now()+900;const id=++S.sid;
- if(mute||!window.speechSynthesis){hi(99);speaking=false;return}
- speechSynthesis.cancel();speaking=true;
- parts.forEach((p,k)=>{const u=new SpeechSynthesisUtterance(p.t);u.lang='pt-BR';u.rate=p.r||.85;u.onstart=()=>hi(p.i);
-  if(k===parts.length-1)u.onend=u.onerror=()=>setTimeout(()=>{if(id===S.sid)speaking=false},800);
-  speechSynthesis.speak(u)});
- setTimeout(()=>{if(id===S.sid)speaking=false},15000);
+ S.listenAt=performance.now()+500;const id=++S.sid;
+ if(mute||!window.NM_VOZ){hi(99);speaking=false;return}
+ speaking=true;
+ NM_VOZ.falar(parts.map(p=>p.t).join(' '),{onend:()=>setTimeout(()=>{if(id===S.sid)speaking=false},250)});
+ setTimeout(()=>{if(id===S.sid)speaking=false},12000);
 }
 const first=()=>(S.nome||'').split(' ')[0];
 const comNome=()=>first()?', '+first():'';
 // COMEÇO: explica o que fazer e fala o nome (uma vez só)
 function intro(primeiro){
  const l=LV[S.lvs[S.li]],mesa=$('mode').value==='mesa',q=$('req').value;
- if(!primeiro){say([{t:'Agora o nível '+l.k.toLowerCase()+comNome()+'!',i:-1,r:.95}]);return}
- const como=mesa?'Coloque a bolinha da mesma cor no número':'Arraste a bolinha da mesma cor até o número';
- const fala=q==='numero'?'e fale o número':q==='ambos'?'e fale a cor e o número':'e fale a cor';
- say([{t:'Oi'+comNome()+'! Vamos brincar de cores. Olhe a cor grande. '+como+' '+fala+' em voz alta.',i:-1,r:.9}]);
+ if(!primeiro){say([{t:'Agora vamos para o nível '+l.k.toLowerCase()+comNome()+'!'}]);return}
+ const como=mesa?'coloca a bolinha da mesma cor no número':'arrasta a bolinha da mesma cor até o número';
+ const fala=q==='numero'?'fala o número':q==='ambos'?'fala a cor e o número':'fala a cor';
+ say([{t:'Oi'+comNome()+'! Vamos brincar de cores? Olha a cor grande, '+como+' e '+fala+'. Vamos lá!'}]);
 }
-const sayColor=()=>{const c=T().cor,p=c.v.map((t,i)=>({t,i,r:.5}));p.push({t:c.n,i:99,r:.8});if($('vn').checked)p.push({t:'Número '+NN[T().num],i:-1,r:.85});say(p)};
+const sayColor=()=>{
+ const c=T().cor;sylTm.forEach(clearTimeout);sylTm=[];
+ say([{t:c.n+($('vn').checked?'. Número '+NN[T().num]:'')}]);
+ c.s.forEach((_,k)=>sylTm.push(setTimeout(()=>hi(k),k*360)));
+ sylTm.push(setTimeout(()=>hi(99),c.s.length*360+250));
+};
 
 function startLevel(primeiro){
  const l=LV[S.lvs[S.li]],n=+$('cnt').value;
@@ -227,7 +232,7 @@ function accept(){
  S.score+=p;$('pts').textContent='⭐ '+S.score;
  S.res.push({l:S.lvs[S.li],cor:t.cor,num:t.num,ms,err:S.err,how:S.how,pt:p});
  beep(true);msg('⭐ Muito bem'+comNome()+'! +'+p+' pontos','ok');
- setTimeout(()=>{S.ti++;next()},1800);
+ setTimeout(()=>{S.ti++;next()},1000);
 }
 function levelDone(){
  S.busy=true;mic();
@@ -236,11 +241,11 @@ function levelDone(){
  $('l2').textContent='🎉 Parabéns'+(S.nome?', '+S.nome:'')+'!';
  $('l2t').textContent='Nível '+k.k+' completo · média '+fmt(avg(r))+' · '+S.score+' pontos';
  $('nxt').textContent='CONTINUAR: '+LV[S.lvs[S.li+1]].k.toUpperCase();
- show('s2');cheer();S.tmo=setTimeout(go,7000);
+ show('s2');cheer();S.tmo=setTimeout(go,4500);
 }
 function go(){clearTimeout(S.tmo);if(!$('s2').classList.contains('on'))return;S.li++;show('s1');S.busy=false;startLevel(false)}
 function party(){for(let i=0;i<18;i++){const e=document.createElement('span');e.className='cf';e.textContent=['🎉','⭐','🎈','🎊'][i%4];e.style.left=Math.random()*94+'vw';e.style.animationDelay=Math.random()*1.5+'s';document.body.append(e);setTimeout(()=>e.remove(),5200)}}
-function cheer(){party();say([{t:'Parabéns'+(S.nome?', '+S.nome:'')+'!',i:-1,r:.9}])}
+function cheer(){party();say([{t:'Parabéns'+comNome()+'! Você foi muito bem!'}])}
 
 // voz
 function hear(alts,fin){
@@ -298,14 +303,14 @@ function drag(e){
 
 // sessão
 function begin(w){
- S.lvs=w==='all'?[0,1,2]:[+w];S.li=0;S.res=[];S.score=0;$('pts').textContent='⭐ 0';S.run=true;S.nome=$('nome').value.trim();
+ S.lvs=w==='all'?[0,1,2]:[+w];S.li=0;S.res=[];S.score=0;S.t00=performance.now();$('pts').textContent='⭐ 0';S.run=true;S.nome=$('nome').value.trim();
  document.body.classList.toggle('mesa',$('mode').value==='mesa');
  $('warn').style.display='none';
  try{speechSynthesis.speak(new SpeechSynthesisUtterance(''))}catch(_){}
  show('s1');startLevel(true);askMic(true);
  clearInterval(timer);timer=setInterval(()=>{if(S.run&&!S.busy)$('tm').textContent=fmt(performance.now()-S.t0)},100);
 }
-function stop(){S.run=false;clearInterval(timer);clearTimeout(S.tmo);const r0=rec;rec=null;try{r0&&r0.abort()}catch(_){};try{speechSynthesis.cancel()}catch(_){}}
+function stop(){try{window.NM_VOZ&&NM_VOZ.parar()}catch(_){};S.run=false;clearInterval(timer);clearTimeout(S.tmo);const r0=rec;rec=null;try{r0&&r0.abort()}catch(_){};try{speechSynthesis.cancel()}catch(_){}}
 function finish(){
  stop();const when=new Date().toLocaleString('pt-BR'),er=S.res.reduce((a,r)=>a+r.err,0);
  const lv=S.lvs.map(i=>({k:LV[i].k,avg:avg(S.res.filter(r=>r.l===i))})),all=avg(S.res);
@@ -313,7 +318,9 @@ function finish(){
  $('rows').innerHTML=S.res.map(r=>'<tr><td>'+LV[r.l].k+'</td><td>'+(S.res.filter(x=>x.l===r.l).indexOf(r)+1)+'</td><td><span class="dot" style="background:'+r.cor.h+'"></span>'+r.cor.n+'</td><td>'+r.num+'</td><td><b>'+fmt(r.ms)+'</b></td><td>'+r.pt+'</td><td>'+r.err+'</td><td>'+r.how+'</td></tr>').join('');
  $('tot').innerHTML=lv.map(x=>'<div>Média '+x.k+'<span>'+fmt(x.avg)+'</span></div>').join('')+(lv.length>1?'<div>Média geral<span>'+fmt(all)+'</span></div>':'')+'<div>Pontos<span>'+S.score+'</span></div><div>Erros<span>'+er+'</span></div>';
  S.txt='Jogo das Cores – '+(S.nome||'Sem nome')+' – '+when+'\n'+S.res.map(r=>LV[r.l].k+': '+r.cor.n+' no '+r.num+' = '+fmt(r.ms)+' ('+r.err+' erros, '+r.how+')').join('\n')+'\n'+lv.map(x=>'Média '+x.k+': '+fmt(x.avg)).join(' | ')+' | Geral: '+fmt(all)+' | Erros: '+er;
- const h=load();h.unshift({nome:S.nome||'Sem nome',when,lv,all:fmt(all),er,pts:S.score});save(h.slice(0,30));show('s3');cheer();
+ const h=load();h.unshift({nome:S.nome||'Sem nome',when,lv,all:fmt(all),er,pts:S.score});save(h.slice(0,30));show('s3');
+ if(EMB){try{parent.postMessage({tipo:'nm-cores-fim',pontos:S.score,acertos:S.res.length,erros:er,reacao:all,duracao:(performance.now()-S.t00)/1000},'*')}catch(_){}}
+ else cheer();
 }
 function load(){try{return JSON.parse(localStorage.getItem('jogoCores2')||'[]')}catch(_){return[]}}
 function save(h){try{localStorage.setItem('jogoCores2',JSON.stringify(h))}catch(_){}}
@@ -330,6 +337,10 @@ $('nxt').onclick=go;
 $('again').onclick=()=>show('s0');
 $('cp').onclick=()=>{try{navigator.clipboard.writeText(S.txt);$('cp').textContent='Copiado ✓'}catch(_){}};
 $('clr').onclick=()=>{if(confirm('Apagar o histórico deste aparelho?')){save([]);hist()}};
+const Q=new URLSearchParams(location.search),REPS=+Q.get('reps')||0,EMB=window.parent!==window&&REPS>0;
+if(Q.get('mudo')==='1'){mute=true;$('snd').textContent='🔇'}
+if(REPS){const sel=$('cnt');if(![...sel.options].some(o=>+o.value===REPS)){const o=document.createElement('option');o.textContent=REPS;sel.append(o)}sel.value=REPS;
+ if(EMB){$('warn').style.display='block';$('warn').textContent='Tentativas por nível: '+REPS+' (escolhido no menu do NeuroMove). Ao terminar, mostra os pontos e segue para o próximo jogo.'}}
 (function(){let n='';try{n=localStorage.getItem('nm_nome')||''}catch(_){}
  if(n){$('nome').value=n;$('nome').style.display='none';document.querySelector('.sub').textContent='Oi, '+n.split(' ')[0]+'! Vamos brincar de cores? 🎨';}})();
 </script></body></html>

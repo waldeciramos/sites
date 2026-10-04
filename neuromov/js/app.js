@@ -38,12 +38,8 @@ window.NM_SOUND = (function(){
 
 window.NM_SPEAK = function(t){
   try{
-    if(!window.speechSynthesis || !t) return;
     const tg=document.getElementById('toggleSound'); if(tg && !tg.checked) return;
-    const limpo=String(t).replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,'');
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(limpo); u.lang='pt-BR'; u.rate=0.95; u.pitch=1.15;
-    speechSynthesis.speak(u);
+    if(window.NM_VOZ) window.NM_VOZ.falar(t);
   }catch(e){}
 };
 
@@ -229,6 +225,7 @@ document.getElementById('btnCalibNext').addEventListener('click', ()=>{
 
 // ---------- MENU DE EXERCÍCIOS ----------
 function goToMenu(){
+  Tracking.stop();                       // no menu a câmera fica desligada
   showScreen('screen-menu');
   const p = state.wrapper.paciente;
   const n1 = p.nome.split(' ')[0];
@@ -250,21 +247,13 @@ function goToMenu(){
     card.addEventListener('click', ()=>chooseNivelAndStart(ex));
     grid.appendChild(card);
   });
-  const cc = document.createElement('div');
-  cc.className = 'ex-card';
-  cc.innerHTML = '<div class="ex-icon">🎨</div><div class="txt"><h3>Jogo das Cores</h3><p>Ouça a cor, fale e arraste a bolinha até o número certo.</p></div>';
-  cc.addEventListener('click', ()=>{ document.getElementById('coresFrame').src='jogo-cores.html'; showScreen('screen-cores'); });
-  grid.appendChild(cc);
-
-  if(state.sessionExercicios.length===0 && !state.sessionRepsLocked){
-    state.sessionReps = EXERCISE_DEFS[0].repsDefault;
-  }
+  if(!state.repsIniciado){ state.sessionReps = EXERCISE_DEFS[0].repsDefault; state.repsIniciado = true; }  // só na 1ª vez (antes voltava pra 10 sozinho)
   const repsInput = document.getElementById('sessionReps');
   repsInput.value = state.sessionReps;
   repsInput.disabled = state.sessionRepsLocked;
   document.getElementById('sessionRepsHint').textContent = state.sessionRepsLocked
-    ? 'Repetições fixadas para esta sessão (definidas no primeiro exercício).'
-    : 'Vale para todos os exercícios desta sessão. Pode ajustar antes do primeiro exercício.';
+    ? 'Repetições fixadas nesta sessão. Cada jogo termina sozinho ao chegar nelas, mostra a pontuação e passa para o próximo.'
+    : 'Quantas vezes fazer em cada jogo (pode ser 1). Ao terminar, mostra a pontuação e passa para o próximo jogo.';
 }
 function renderProgramPanel(){
   const p = state.wrapper.paciente;
@@ -293,13 +282,14 @@ function renderProgramPanel(){
 
 document.getElementById('sessionReps').addEventListener('change', (e)=>{
   const v = parseInt(e.target.value)||10;
-  state.sessionReps = Math.max(3, Math.min(30, v));
+  state.sessionReps = Math.max(1, Math.min(30, v));
   e.target.value = state.sessionReps;
 });
 
 document.getElementById('btnGoHistory').addEventListener('click', renderHistory);
 document.getElementById('btnRecalibrate').addEventListener('click', startCalibration);
 document.getElementById('btnGoHome').addEventListener('click', ()=>{
+  Tracking.stop(); state.repsIniciado = false;
   state.wrapper = null;
   state.sessionExercicios = [];
   state.sessionRepsLocked = false;
@@ -314,11 +304,12 @@ function chooseNivelAndStart(ex){
   }
   const nivel = Math.max(1, Math.min(ex.niveis, state.wrapper.paciente.configuracoes.dificuldadeInicial));
   state.sessionRepsLocked = true; // a partir do 1º exercício, trava a config de repetições da sessão
+  if(ex.id==='cores'){ startCores(); return; }
   startExercise(ex.id, nivel);
 }
 
 // ---------- JOGO ----------
-let gameVideoEl, gameCtx, gameStage, gameStartWallTime=0, lastFrameT=0;
+let gameVideoEl, gameCtx, gameStage, gameStartWallTime=0, lastFrameT=0, lastUi=0;
 
 async function startExercise(id, nivel){
   state.currentExerciseId = id;
@@ -351,6 +342,7 @@ async function startExercise(id, nivel){
   document.getElementById('statErr').textContent='0';
   document.getElementById('statReact').textContent='—';
   document.getElementById('statRep').textContent='0/'+state.sessionReps;
+  document.getElementById('gameRound').textContent='';
 
   Tracking.start(onGameFrame);
 }
@@ -359,12 +351,14 @@ function onGameFrame({hand}){
   const inst = ExerciseEngine.instance;
   if(!inst || inst.done) return;
   const now = performance.now();
-  const dt = (now-lastFrameT)/1000; lastFrameT = now;
+  const dt = Math.min(0.1,(now-lastFrameT)/1000); lastFrameT = now;
 
   const w = gameCtx.canvas.width, h = gameCtx.canvas.height;
   gameCtx.clearRect(0,0,w,h);
   inst.update(hand, dt, gameCtx, w, h);
 
+  if(now-lastUi < 120) return;           // atualiza os textos ~8x por segundo (o desenho continua fluido)
+  lastUi = now;
   document.getElementById('handStateChip').textContent = hand ? (hand.open?'✋ aberta':'✊ fechada') : '— sem mão';
   document.getElementById('gameTimer').textContent = fmtTimer((now-gameStartWallTime)/1000);
   document.getElementById('gameScore').textContent = inst.score+' pts';
@@ -373,8 +367,6 @@ function onGameFrame({hand}){
   document.getElementById('statReact').textContent = inst.reactionTimes.length ? Math.round(inst.reactionTimes[inst.reactionTimes.length-1]) : '—';
   const repDisplay = inst.roundProgress!=null ? inst.roundProgress : (inst.correct+inst.incorrect);
   document.getElementById('statRep').textContent = repDisplay+'/'+state.sessionReps;
-  const roundEl = document.getElementById('gameRound');
-  if(roundEl) roundEl.textContent = inst.roundProgress!=null ? ('Série '+inst.rodada) : '';
 }
 
 function fmtTimer(sec){
@@ -405,8 +397,8 @@ document.getElementById('btnEndSession').addEventListener('click', ()=>{
 });
 
 function endExercise(inst){
-  Tracking.stop();
-  releaseWakeLock();
+  Tracking.pause();                      // mantém a câmera aberta: o próximo jogo abre na hora
+  if(window.NM_VOZ) NM_VOZ.parar();
   const def = ExerciseEngine.def(state.currentExerciseId);
   const registro = {
     nome: def.nome,
@@ -419,18 +411,53 @@ function endExercise(inst){
   askContinueOrFinish();
 }
 
+function party(){
+  for(let i=0;i<20;i++){
+    const e=document.createElement('span'); e.className='cf';
+    e.textContent=['🎉','⭐','🎈','🎊'][i%4]; e.style.left=Math.random()*94+'vw'; e.style.animationDelay=(Math.random()*1.4)+'s';
+    document.body.appendChild(e); setTimeout(()=>e.remove(),5200);
+  }
+}
 function askContinueOrFinish(){
   const n=primeiroNome();
   const ult=state.sessionExercicios[state.sessionExercicios.length-1];
+  const idx=EXERCISE_DEFS.findIndex(e=>e.id===state.currentExerciseId);
+  const prox=EXERCISE_DEFS[idx+1]||null;
   document.getElementById('dlgTitle').textContent='Parabéns'+(n?', '+n:'')+'!';
   document.getElementById('dlgEmoji').textContent=pick(['🏆','🌟','🎉','🥳']);
-  document.getElementById('dlgMsg').textContent=pick([`${n}, que partida! Nem o cronômetro acreditou 😄`,`Uau, ${n}! Essa mão está afiada ✨`,`${n} no comando! Bora pro próximo jogo? 🚀`,`Respira, ${n}... você merece um aplauso! 👏`]);
+  document.getElementById('dlgMsg').textContent=pick([`${n}, que partida! Nem o cronômetro acreditou 😄`,`Uau, ${n}! Essa mão está afiada ✨`,`${n} no comando! 🚀`,`Respira, ${n}... você merece um aplauso! 👏`]);
   document.getElementById('dlgScore').textContent='⭐ '+(ult?ult.pontuacao:0)+' pontos';
-  NM_SPEAK('Parabéns'+(n?', '+n:'')+'! Você terminou o jogo.');
+  NM_SPEAK('Parabéns'+(n?', '+n:'')+'! '+pick(['Você arrasou!','Que partida linda!','Muito bem!']));
+  party();
   const d=document.getElementById('dlg'); d.classList.add('open');
-  document.getElementById('dlgNext').onclick=()=>{ d.classList.remove('open'); goToMenu(); };
-  document.getElementById('dlgEnd').onclick=()=>{ d.classList.remove('open'); finalizeSession(); };
+  const bNext=document.getElementById('dlgNext'), bMenu=document.getElementById('dlgMenu'), bEnd=document.getElementById('dlgEnd');
+  if(prox){ bNext.style.display=''; bNext.textContent='▶ Próximo: '+prox.nome; }
+  else bNext.style.display='none';
+  const fechar=()=>{ d.classList.remove('open'); if(window.NM_VOZ) NM_VOZ.parar(); document.querySelectorAll('.cf').forEach(x=>x.remove()); };
+  bNext.onclick=()=>{ fechar(); chooseNivelAndStart(prox); };      // vai direto pro próximo jogo
+  bMenu.onclick=()=>{ fechar(); goToMenu(); };
+  bEnd.onclick=()=>{ fechar(); finalizeSession(); };
 }
+
+// ---------- Jogo das Cores (roda dentro do app e avisa quando termina) ----------
+function startCores(){
+  state.currentExerciseId='cores'; state.currentNivel=1;
+  Tracking.stop(); releaseWakeLock();
+  const tg=document.getElementById('toggleSound');
+  document.getElementById('coresFrame').src='jogo-cores.html?reps='+state.sessionReps+'&mudo='+((tg&&!tg.checked)?1:0)+'&t='+Date.now();
+  showScreen('screen-cores');
+}
+window.addEventListener('message', (e)=>{
+  const fr=document.getElementById('coresFrame');
+  const d=e.data;
+  if(!d || d.tipo!=='nm-cores-fim' || !fr || e.source!==fr.contentWindow) return;
+  state.sessionExercicios.push({
+    nome:'Jogo das Cores', duracao:Math.round(d.duracao||0), pontuacao:d.pontos||0, nivel:1,
+    metricas:{tempoReacaoMedio:d.reacao!=null?Math.round(d.reacao):null, precisaoMedia:null,
+      movimentosCorretos:d.acertos||0, movimentosIncorretos:d.erros||0, velocidadeMedia:0}
+  });
+  askContinueOrFinish();
+});
 
 async function finalizeSession(){
   if(!state.sessionExercicios.length){ goToMenu(); return; }
@@ -450,6 +477,7 @@ async function finalizeSession(){
     sessao.progresso.melhoriaPrecisao = Math.round(((novaMedia-mediaAnterior)/Math.max(1,mediaAnterior))*100);
   }
 
+  Tracking.stop(); releaseWakeLock();
   await registrarSessao(state.wrapper, sessao);
 
   if(mediaAnterior!=null && novaMedia>mediaAnterior){
@@ -545,6 +573,7 @@ document.getElementById('btnExportPatientJson').addEventListener('click', ()=>{
 
 // ---------- Configurações de acessibilidade ----------
 document.getElementById('btnSettings').addEventListener('click', ()=>{
+  if(window.NM_VOZ) NM_VOZ.preencherSeletor(document.getElementById('selVoz'));
   document.getElementById('settingsPanel').classList.add('open');
   document.getElementById('settingsBackdrop').classList.add('open');
 });
