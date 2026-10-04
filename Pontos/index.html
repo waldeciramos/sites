@@ -132,13 +132,15 @@ dialog::backdrop{background:rgba(5,12,24,.6)}dialog h3{margin-bottom:12px}
 .pqr{text-align:center;margin-top:10px}
 .pqr svg{width:92px;height:92px}
 @media print{
- body *{display:none!important}
- main,#v-imp,#v-imp *{display:revert!important}
- main,#v-imp{display:block!important;position:static}
- .maq,.modoImp,.acts,nav,header,.h2title{display:none!important}
- #impFenda{width:80mm;margin:0;padding:0;overflow:visible;min-height:0!important}
+ html,body{background:#fff!important;max-width:none!important;width:80mm!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important}
+ header,nav,#toast,dialog,.maq,.modoImp,.acts,.h2title,.vw:not(#v-imp){display:none!important}
+ #v-imp>*:not(#impFenda){display:none!important}
+ main{padding:0!important;display:block!important;max-width:none!important}
+ #v-imp{display:block!important}
+ #impFenda{display:block!important;width:80mm;margin:0!important;padding:0!important;overflow:visible!important;min-height:0!important}
  #impFenda::before,.papel::after{display:none!important}
- #impPapel{transform:none!important;box-shadow:none;width:80mm;padding:6mm 5mm;font-size:12px}
+ #impPapel{transform:none!important;transition:none!important;box-shadow:none!important;width:80mm;padding:4mm 4mm 8mm;font-size:12px;border-radius:0;background:#fff;color:#000}
+ #impPapel,#impPapel *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
  .pqr svg{width:26mm;height:26mm}
  @page{size:80mm auto;margin:0}
 }
@@ -162,7 +164,6 @@ nav button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width
 nav button.on{box-shadow:none;color:#fff;background:linear-gradient(135deg,#ff6a00,#ff9a3c)}
 main{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
 #toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
-/* campos e seletores */
 input[type=text],input[type=number],input[type=time],input[type=date],select,textarea{width:100%;padding:12px 14px;border-radius:14px;border:1.5px solid var(--bd);background:var(--cd);color:var(--tx);margin-top:5px;font-size:14px;font-weight:500;outline:none;transition:border-color .15s,box-shadow .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--pu);box-shadow:0 0 0 4px #ff7a1a26}
 select{-webkit-appearance:none;appearance:none;padding-right:42px;cursor:pointer;font-weight:600;
@@ -180,7 +181,6 @@ dialog::backdrop{background:rgba(40,16,0,.55);backdrop-filter:blur(3px)}
 .modoImp label{padding:10px 12px;border-radius:12px;font-weight:600;transition:background .15s}
 .modoImp label:has(input:checked){background:var(--c2);color:var(--ac)}
 .fi{background:var(--c2);border-radius:16px;border:1px solid var(--bd)}
-/* cards estilo Layout Ponto (ícone circular) */
 .cards{display:flex;flex-direction:column;gap:10px;margin:2px 0 14px}
 .cd3{display:flex;align-items:center;gap:14px;background:var(--cd);border:1px solid var(--bd);border-radius:20px;padding:12px 14px;box-shadow:var(--sh)}
 .ic{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff6a00,#ffa04d);box-shadow:0 6px 14px #ff6a0040}
@@ -196,29 +196,48 @@ dialog::backdrop{background:rgba(40,16,0,.55);backdrop-filter:blur(3px)}
 .dc{border:1px solid var(--bd);border-radius:12px}.dc.v{border:0}.dc.hj{outline-color:var(--pu)}
 .nv button{background:var(--c2);color:var(--ac);font-weight:700}
 
+/* ===== Tela inicial (modelo com foto) ===== */
+.hoje2{background:var(--cd);border:1px solid var(--bd);border-radius:30px;overflow:hidden;box-shadow:0 14px 34px #ff6a0030;margin:4px 0 14px}
+.h2top{background:linear-gradient(135deg,#ff6a00,#ff9a3c);color:#fff;padding:14px 20px 16px}
+.h2t{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.h2t svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.h2body{padding:18px 20px 22px;margin-top:-6px;background:var(--cd);border-radius:26px 26px 0 0;text-align:center;position:relative}
+.h2ola{font-size:20px;font-weight:600;color:var(--tx)}.h2ola b{font-weight:800}.h2ola small{display:block;font-size:11px;color:var(--mu);font-weight:600;letter-spacing:.3px;margin-top:2px}
+.h2sub{font-size:12.5px;color:var(--mu);margin:2px 0 6px}
+#relogio.lcdBig{font:800 clamp(38px,12vw,50px)/1.1 system-ui,'Segoe UI',sans-serif;letter-spacing:1px;color:var(--tx);background:none;box-shadow:none;text-shadow:none;padding:4px 0 14px;font-variant-numeric:tabular-nums}
+.h2foto{position:relative;width:min(100%,260px);aspect-ratio:1/1.05;margin:0 auto 18px;border-radius:26px;overflow:hidden;background:var(--c2);box-shadow:0 10px 26px #ff6a0033;border:3px solid #fff}
+@media(prefers-color-scheme:dark){.h2foto{border-color:var(--cd)}}
+.h2foto img{width:100%;height:100%;object-fit:cover;display:block}
+.h2chip{position:absolute;left:10px;right:10px;bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fffffff0;color:#2a1d14;border-radius:99px;padding:8px 12px;font-size:13px;font-weight:700;box-shadow:0 4px 14px #0003}
+.h2chip .led{width:10px;height:10px;background:#c9b4a2;box-shadow:none}.h2chip .led.on{background:#12a36b;box-shadow:0 0 8px #12a36b}.h2chip .led.err{background:#d9382e;box-shadow:0 0 8px #d9382e}
+.batBtn{position:relative;overflow:hidden;width:100%;height:60px;border:0;border-radius:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#ff6a00,#ff9a3c);color:#fff;font-size:16px;font-weight:800;box-shadow:0 10px 22px #ff6a0055;transition:transform .12s,filter .2s}
+.batBtn:active{transform:scale(.97)}.batBtn:disabled{filter:grayscale(.6) opacity(.55);box-shadow:none}
+.batBtn[data-c=saida]{background:linear-gradient(135deg,#d9382e,#ff6b5e);box-shadow:0 10px 22px #d9382e55}
+.batBtn svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round}
+.batBtn .scanline{position:absolute;left:0;right:0;top:0;bottom:auto;height:100%;width:3px;background:#fff;box-shadow:0 0 10px #fff;opacity:0;border-radius:0}
+.batBtn.lendo .scanline{animation:varreH .8s ease-in-out}
+@keyframes varreH{0%{opacity:1;left:0}100%{opacity:0;left:100%}}
+.batBtn.ok{background:linear-gradient(135deg,#0f9a62,#38d39a);box-shadow:0 10px 22px #12a36b55}
+.batBtn.err{background:linear-gradient(135deg,#d9382e,#ff6b5e)}
+
 .ck{display:flex;flex-wrap:wrap;gap:4px 12px;margin-bottom:8px}.ck label{display:flex;gap:4px;align-items:center;margin:0}.ck input{width:auto}
 .fi{background:var(--c2);border-radius:14px;padding:10px;margin-bottom:8px}.fi label{margin-bottom:6px}
 </style></head><body>
 <header><div style="display:flex;align-items:center;gap:8px"><img id="avH" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--pu)"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><span id="per"></span></header>
 <main>
 <section id="v-hoje" class="vw">
- <div class="rep">
-  <div class="repTop"><span class="marca" id="marcaUser">SISTEMA</span><span class="led" id="led"></span></div>
-  <div class="lcdBig" id="relogio">00:00:00</div>
-  <div class="lcdSt" id="st">Aguardando entrada</div>
-  <div class="sensorWrap">
-   <button id="bt" class="sensor" onclick="tocarSensor()" aria-label="Bater ponto pela digital">
-    <svg viewBox="0 0 100 100">
-     <path d="M50 20C25 20 15 45 15 60 15 78 28 90 40 90"/>
-     <path d="M50 28C32 28 24 48 24 60 24 74 34 84 44 84"/>
-     <path d="M50 36C38 36 33 50 33 60 33 70 40 78 48 78"/>
-     <path d="M50 44C43 44 42 52 42 60"/>
-     <path d="M62 22C78 30 82 48 78 64 75 76 66 84 58 86"/>
-    </svg>
-    <span class="scanline"></span>
+ <div class="hoje2">
+  <div class="h2top"><span class="h2t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Ponto</span></div>
+  <div class="h2body">
+   <div class="h2ola" id="marcaUser">Olá!</div>
+   <div class="h2sub">Registre sua jornada com um toque</div>
+   <div class="lcdBig" id="relogio">00:00:00</div>
+   <div class="h2foto"><img id="fotoHoje" alt=""><div class="h2chip"><span class="led" id="led"></span><span id="st">Aguardando entrada</span></div></div>
+   <button id="bt" class="batBtn" onclick="tocarSensor()" aria-label="Bater ponto">
+    <svg viewBox="0 0 100 100"><path d="M50 20C25 20 15 45 15 60 15 78 28 90 40 90"/><path d="M50 28C32 28 24 48 24 60 24 74 34 84 44 84"/><path d="M50 36C38 36 33 50 33 60 33 70 40 78 48 78"/><path d="M50 44C43 44 42 52 42 60"/><path d="M62 22C78 30 82 48 78 64 75 76 66 84 58 86"/></svg>
+    <span id="btLabel">Bater ponto</span><span class="scanline"></span>
    </button>
   </div>
-  <div class="sensorLabel" id="btLabel">Toque para registrar</div>
  </div>
  <div id="tempo" class="tempoHoje">Trabalhado hoje: 00:00:00</div>
  <button id="sem" class="ghost sem h" onclick="bater('saida')">Encerrar sem intervalo</button>
@@ -706,7 +725,7 @@ async function tocarSensor(){
 
 /* Telas */
 function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),[tx,c]=prox(r),u=usuarioAtual();
- $('marcaUser').innerHTML='<b>'+escI((u.nome||'').toUpperCase())+'</b>'+(u.empresa?' · '+escI(u.empresa):'');
+ $('marcaUser').innerHTML='Olá, <b>'+escI((u.nome||'').split(' ')[0])+'</b>!'+(u.empresa?'<small>'+escI(u.empresa)+'</small>':'');
  $('relogio').textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
  $('btLabel').textContent=c?'Toque para: '+tx:tx;$('bt').dataset.c=c;$('bt').disabled=!c;
  $('sem').classList.toggle('h',!(r&&r.entrada&&!r.saidaIntervalo&&!r.saida));
@@ -730,7 +749,7 @@ function rRel(){const R=resumo(),J=C.jornadaDiaria*60,f=F(),mh=f.metaHoras*60,ex
  $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>{const desc=r&&r.tipo==='feriado'?'Feriado / dispensado':r&&r.tipo==='falta'?'Falta registrada':r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro';
   const val=x.st==='fe'?'Feriado':r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta';
   return`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${desc}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${val}</span></div></div>`}).join('')}
-function pAv(){const i=$('avH');if(!i)return;if(C.foto){i.src=C.foto;i.style.display='block'}else i.style.display='none'}
+function pAv(){const ft=$('fotoHoje');if(ft)ft.src=C.foto||'icon-512.png';const i=$('avH');if(!i)return;if(C.foto){i.src=C.foto;i.style.display='block'}else i.style.display='none'}
 function render(){pAv();const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,imp:()=>{},cfg:()=>{}})[vw]()}
 function go(v){vw=v;document.querySelectorAll('.vw').forEach(s=>s.classList.toggle('h',s.id!=='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
  if(v==='imp'){const p=per();$('impPerLbl').textContent='('+BR(p.i)+' a '+BR(p.f)+')';if(!$('impDe').value){$('impDe').value=K(p.i);$('impAte').value=K(new Date())}}
