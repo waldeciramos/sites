@@ -1,11 +1,11 @@
 // exercises.js — 4 exercícios (só mão), gesto direto: mão fecha = agarra, mão abre = solta.
 
 const EXERCISE_DEFS = [
-  {id:'cesto',       icon:'🏀', nome:'Basquete Cerebral', desc:'Feche a mão pra pegar a bola e leve até a tabela.', niveis:3, repsDefault:10},
-  {id:'abrirFechar', icon:'✊', nome:'Abrir e Fechar',      desc:'Responda aos comandos ABRA / FECHE.',              niveis:3, repsDefault:10},
-  {id:'seguir',      icon:'➰', nome:'Segue o Movimento',   desc:'Acompanhe o alvo com a mão.',                      niveis:3, repsDefault:10},
-  {id:'cantos',      icon:'🎯', nome:'4 Cantos',            desc:'Leve as 4 bolinhas dos cantos até o centro.',      niveis:1, repsDefault:10},
-  {id:'dedos',       icon:'🤏', nome:'Toque dos Dedos',     desc:'Toque a ponta do polegar em cada dedo indicado — trabalha o movimento fino e isolado dos dedos.', niveis:2, repsDefault:10},
+  {id:'cesto',       icon:'🏀', nome:'Basquete',             desc:'Feche a mão pra pegar a bola e leve até a cesta.',          niveis:3, repsDefault:10},
+  {id:'abrirFechar', icon:'✊', nome:'Abrir e Fechar',       desc:'Responda aos comandos ABRA / FECHE.',                       niveis:3, repsDefault:10},
+  {id:'labirinto',   icon:'🧩', nome:'Labirinto',            desc:'Segure a bola e passe pelo caminho até a estrela.',         niveis:1, repsDefault:3},
+  {id:'cantos',      icon:'🎯', nome:'Bolas na Cesta',       desc:'Leve as bolinhas dos 4 cantos até a cesta do meio.',        niveis:1, repsDefault:10},
+  {id:'pega',        icon:'🤏', nome:'Bolinhas no Lixinho',  desc:'Pegue com a ponta dos dedos a bola da cor pedida.',         niveis:1, repsDefault:10},
 ];
 
 function rand(a,b){ return a+Math.random()*(b-a); }
@@ -38,26 +38,56 @@ function drawBall(ctx,x,y,r,w,h,held){
   ctx.beginPath(); ctx.ellipse(px-pr*.35,py-pr*.42,pr*.28,pr*.16,-.6,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fill();
 }
 
-function drawBackboard(ctx,x,y,w,h){
-  const px=x*w, py=y*h;
-  const bw=w*0.22, bh=h*0.14;
-  // tabela
-  ctx.fillStyle='rgba(234,241,238,.92)';
-  ctx.strokeStyle='#1E5AA8'; ctx.lineWidth=3;
-  ctx.fillRect(px-bw/2, py-bh, bw, bh);
-  ctx.strokeRect(px-bw/2, py-bh, bw, bh);
-  ctx.strokeStyle='#F2A93B'; ctx.lineWidth=2;
-  ctx.strokeRect(px-bw*0.28, py-bh*0.78, bw*0.56, bh*0.5);
-  // aro
-  const rimY = py-bh*0.06, rimW=bw*0.5;
-  ctx.beginPath(); ctx.ellipse(px, rimY, rimW/2, rimW*0.16, 0, 0, Math.PI*2);
-  ctx.strokeStyle='#C1502E'; ctx.lineWidth=4; ctx.stroke();
-  // rede (linhas simples)
-  ctx.strokeStyle='rgba(234,241,238,.7)'; ctx.lineWidth=1.4;
-  for(let i=-2;i<=2;i++){
-    ctx.beginPath(); ctx.moveTo(px+i*rimW*0.09, rimY+2); ctx.lineTo(px+i*rimW*0.16, rimY+rimW*0.55); ctx.stroke();
-  }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function falar(t){ if(window.NM_SPEAK) window.NM_SPEAK(t); }
+const NOME=()=>window.NM_NOME||'';
+function pxd(a,b,w,h){ return Math.hypot((a.x-b.x)*w,(a.y-b.y)*h); }
+function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+// Cesta grande, bonita, com rede que balança (amp 0..1, tt = tempo). mid() desenha a bola entre o aro de trás e a rede.
+function drawHoop(ctx,x,y,w,h,amp,tt,mid){
+  const px=x*w, py=y*h, bw=w*0.42, bh=h*0.2;
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.3)'; ctx.shadowBlur=12; ctx.shadowOffsetY=5;
+  const g=ctx.createLinearGradient(0,py-bh,0,py); g.addColorStop(0,'#fff'); g.addColorStop(1,'#CFEAFF');
+  rr(ctx,px-bw/2,py-bh,bw,bh,14); ctx.fillStyle=g; ctx.fill(); ctx.restore();
+  rr(ctx,px-bw/2,py-bh,bw,bh,14); ctx.lineWidth=5; ctx.strokeStyle='#2A74D0'; ctx.stroke();
+  rr(ctx,px-bw*0.24,py-bh*0.72,bw*0.48,bh*0.45,6); ctx.lineWidth=3; ctx.strokeStyle='#FF9A1F'; ctx.stroke();
+  const rimW=bw*0.58, rimY=py-bh*0.04, ry=rimW*0.17;
+  ctx.beginPath(); ctx.ellipse(px,rimY,rimW/2,ry,0,Math.PI,Math.PI*2); ctx.strokeStyle='#C23B14'; ctx.lineWidth=6; ctx.stroke();
+  if(mid) mid();
+  const nh=rimW*0.8, sw=amp*Math.sin(tt*16)*rimW*0.14, n=7;
+  ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=2;
+  for(let i=0;i<n;i++){ const f=i/(n-1)-0.5; ctx.beginPath(); ctx.moveTo(px+f*rimW,rimY);
+    ctx.quadraticCurveTo(px+f*rimW*0.8+sw*0.6,rimY+nh*0.5,px+f*rimW*0.45+sw,rimY+nh); ctx.stroke(); }
+  for(let k=1;k<=3;k++){ const t=k/3.4; ctx.beginPath();
+    for(let i=0;i<n;i++){ const f=i/(n-1)-0.5, X=px+f*rimW*(1-0.55*t)+sw*t*t*1.2, Y=rimY+nh*t; if(i) ctx.lineTo(X,Y); else ctx.moveTo(X,Y); }
+    ctx.stroke(); }
+  ctx.beginPath(); ctx.ellipse(px,rimY,rimW/2,ry,0,0,Math.PI); ctx.strokeStyle='#FF5A24'; ctx.lineWidth=7; ctx.stroke();
   return {rimX:px/w, rimY:rimY/h, rimR:(rimW/2)/Math.min(w,h)};
+}
+function drawStar(ctx,cx,cy,r){
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.3)'; ctx.shadowBlur=8; ctx.beginPath();
+  for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, rad=i%2?r*0.45:r; ctx.lineTo(cx+Math.cos(a)*rad, cy+Math.sin(a)*rad); }
+  ctx.closePath(); const g=ctx.createLinearGradient(0,cy-r,0,cy+r); g.addColorStop(0,'#FFE27A'); g.addColorStop(1,'#FF9A1F');
+  ctx.fillStyle=g; ctx.fill(); ctx.lineWidth=4; ctx.strokeStyle='#fff'; ctx.stroke(); ctx.restore();
+}
+const CORES=[{n:'azul',h:'#2B78E6',l:'#8EC5FF'},{n:'amarela',h:'#F5B400',l:'#FFE27A'},{n:'verde',h:'#2FAE2A',l:'#9BE87F'},{n:'vermelha',h:'#E53D2F',l:'#FF9A8F'}];
+function drawColorBall(ctx,x,y,r,w,h,c,held){
+  const px=x*w, py=y*h, pr=r*Math.min(w,h)*(held?1.12:1);
+  const g=ctx.createRadialGradient(px-pr*.35,py-pr*.4,pr*.1,px,py,pr); g.addColorStop(0,c.l); g.addColorStop(.7,c.h); g.addColorStop(1,'#00000055');
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=pr*.5; ctx.shadowOffsetY=pr*.2;
+  ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.fillStyle=g; ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.strokeStyle='#fff'; ctx.lineWidth=Math.max(2,pr*.1); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(px-pr*.35,py-pr*.42,pr*.28,pr*.16,-.6,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fill();
+}
+function drawBin(ctx,px,py,w,glow){
+  const bw=w*0.26, bh=bw*1.05;
+  ctx.save(); if(glow>0){ ctx.shadowColor='#fff'; ctx.shadowBlur=36*glow; }
+  ctx.beginPath(); ctx.moveTo(px-bw/2,py-bh/2); ctx.lineTo(px+bw/2,py-bh/2); ctx.lineTo(px+bw*0.4,py+bh/2); ctx.lineTo(px-bw*0.4,py+bh/2); ctx.closePath();
+  const g=ctx.createLinearGradient(px-bw/2,0,px+bw/2,0); g.addColorStop(0,'#2FAE2A'); g.addColorStop(.5,'#7BE35F'); g.addColorStop(1,'#1B7F1B');
+  ctx.fillStyle=g; ctx.fill(); ctx.lineWidth=5; ctx.strokeStyle='#fff'; ctx.stroke(); ctx.restore();
+  ctx.beginPath(); ctx.ellipse(px,py-bh/2,bw*0.56,bw*0.1,0,0,Math.PI*2); ctx.fillStyle='#1B7F1B'; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.stroke();
+  ctx.font='700 '+Math.round(bw*0.42)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#fff'; ctx.fillText('♻',px,py+bh*0.05);
 }
 
 // mãozinha esquemática que espelha o gesto atual (mão aberta/fechada)
@@ -114,6 +144,7 @@ class ExerciseBase{
   }
   listen(evt, fn){ Tracking.on(evt, fn); this._unsub.push([evt,fn]); }
   feedback(msg, tipo){ if(this.onFeedback) this.onFeedback(msg, tipo||'ok'); }
+  say(t){ falar(t); }
   beep(tipo){ if(window.NM_SOUND) window.NM_SOUND.beep(tipo); }
   finish(reason){
     if(this.done) return;
@@ -141,51 +172,43 @@ class ExerciseBase{
 class ExCesto extends ExerciseBase{
   constructor(nivel, sens, reps){
     super(nivel, sens, reps);
-    this.held = false;
-    this.roundProgress = 0;
-    this.hoop = {x:0.78, y:0.28};
+    this.held=false; this.roundProgress=0; this.hoop={x:0.68,y:0.3};
+    this.netAmp=0; this.tt=0; this.fall=null;
     this.newRound();
     this.listen('handClose', (pos)=>{
       if(this.done || this.held) return;
-      if(dist(pos.x,pos.y,this.ball.x,this.ball.y) < this.ball.r+0.06){
-        this.held = true; this.grabAt = performance.now(); this.beep('grab');
-      }
+      if(dist(pos.x,pos.y,this.ball.x,this.ball.y) < this.ball.r+0.06){ this.held=true; this.grabAt=performance.now(); this.beep('grab'); }
     });
-    this.listen('handOpen', (pos)=>{
-      if(this.done || !this.held) return;
-      this.releaseBall(pos);
-    });
+    this.listen('handOpen', (pos)=>{ if(this.done || !this.held) return; this.releaseBall(pos); });
+    this.say('Vamos jogar basquete'+(NOME()?', '+NOME():'')+'! Feche a mão pra pegar a bola e leve até a cesta.');
   }
-  newRound(){
-    this.ball = {x:rand(0.18,0.32), y:rand(0.55,0.75), r:0.095};
-    this.roundStart = performance.now();
-  }
+  newRound(){ this.ball={x:rand(0.15,0.3), y:rand(0.6,0.78), r:0.11}; this.roundStart=performance.now(); }
   releaseBall(pos){
-    this.held = false;
-    const rim = this._rim || {rimX:this.hoop.x, rimY:this.hoop.y-0.06, rimR:0.09};
-    const d = dist(pos.x,pos.y,rim.rimX,rim.rimY);
-    const reaction = performance.now()-this.grabAt;
-    this.reactionTimes.push(reaction);
-    const precisao = Math.max(0, 100 - d/rim.rimR*35);
-    this.precisions.push(precisao);
-    if(d < rim.rimR+0.045){
-      this.correct++; this.score += 10; this.beep('hit');
-      this.feedback('Cesta! +10 pontos', 'ok');
+    this.held=false;
+    const rim=this._rim||{rimX:this.hoop.x, rimY:this.hoop.y, rimR:0.12};
+    const d=dist(pos.x,pos.y,rim.rimX,rim.rimY), n=NOME();
+    this.reactionTimes.push(performance.now()-this.grabAt);
+    this.precisions.push(Math.max(0, 100 - d/rim.rimR*35));
+    if(d < rim.rimR+0.07){
+      this.correct++; this.score+=10; this.beep('hit'); this.netAmp=1;
+      this.fall={x:rim.rimX, y:rim.rimY, vy:0.15, t:0};
+      this.feedback('Cesta! +10 pontos','ok');
+      this.say(pick(['Cesta! Muito bem','Boa! Que lindo','Uau, você acertou','Isso aí'])+(n?', '+n:'')+'! Agora pegue a próxima bola.');
     } else {
-      this.incorrect++; this.beep('miss');
-      this.feedback('Quase! Tente mirar na tabela.', 'bad');
+      this.incorrect++; this.beep('miss'); this.feedback('Quase! Tente mirar na cesta.','bad');
+      this.say('Quase'+(n?', '+n:'')+'! Leve a bola até a cesta e abra a mão.');
     }
     this.roundProgress++;
     if(this.roundProgress >= this.reps) this.completeRound();
-    // nunca finaliza sozinho — continua sempre, o terapeuta/paciente encerra manualmente
     this.newRound();
   }
   update(hand, dt, ctx, w, h){
-    this._rim = drawBackboard(ctx, this.hoop.x, this.hoop.y, w, h);
-
+    this.tt+=dt; this.netAmp=Math.max(0,this.netAmp-dt*0.7);
+    const f=this.fall; if(f){ f.t+=dt; f.vy+=dt*0.9; f.y+=f.vy*dt; if(f.t>0.8) this.fall=null; }
+    this._rim=drawHoop(ctx,this.hoop.x,this.hoop.y,w,h,this.netAmp,this.tt,()=>{ if(f) drawBall(ctx,f.x,f.y,this.ball.r*0.8,w,h,false); });
     if(!hand) return;
     this.speeds.push(hand.speed||0);
-    if(this.held){ this.ball.x = hand.x; this.ball.y = hand.y; }
+    if(this.held){ this.ball.x=hand.x; this.ball.y=hand.y; }
     drawBall(ctx, this.ball.x, this.ball.y, this.ball.r, w, h, this.held);
     drawCursorRing(ctx, hand.x, hand.y, w, h, hand.open);
   }
@@ -240,103 +263,166 @@ class ExAbrirFechar extends ExerciseBase{
   }
 }
 
-// ---------------- Exercício 3: Segue o Movimento ----------------
-class ExSeguir extends ExerciseBase{
+// ---------------- Exercício 3: Labirinto ----------------
+const MAZES=[
+  {main:[[.12,.15],[.5,.15],[.5,.4],[.15,.4],[.15,.68],[.6,.68],[.6,.88],[.88,.88]], extra:[[[.5,.15],[.88,.15],[.88,.3]],[[.15,.4],[.15,.28]]]},
+  {main:[[.12,.88],[.12,.6],[.45,.6],[.45,.3],[.8,.3],[.8,.12]], extra:[[[.45,.6],[.8,.6],[.8,.78]],[[.12,.6],[.12,.4]]]},
+  {main:[[.88,.12],[.88,.4],[.5,.4],[.5,.62],[.2,.62],[.2,.88],[.7,.88]], extra:[[[.88,.4],[.88,.55]],[[.5,.62],[.5,.8]]]},
+];
+class ExLabirinto extends ExerciseBase{
   constructor(nivel, sens, reps){
     super(nivel, sens, reps);
-    this.duration = reps * 3 + nivel*4;
-    this.pattern = ['horizontal','vertical','diagonal','circular'][Math.floor(Math.random()*4)];
-    this.sampleAcc = 0;
+    this.roundProgress=0; this.mi=0; this.w=1; this.h=1;
+    this.load();
+    this.listen('handClose', (pos)=>{
+      if(this.done || this.held) return;
+      if(pxd(pos,this.ball,this.w,this.h) < this.w*0.14){ this.held=true; this.grabAt=performance.now(); this.beep('grab'); }
+    });
+    this.listen('handOpen', ()=>{ this.held=false; });
+    this.say('Vamos passar pelo labirinto'+(NOME()?', '+NOME():'')+'! Feche a mão na bola e leve até a estrela.');
   }
-  targetPos(t){
-    const speed = 0.55 + this.nivel*0.12;
-    switch(this.pattern){
-      case 'horizontal': return {x:0.5+0.32*Math.sin(t*speed), y:0.5};
-      case 'vertical':   return {x:0.5, y:0.5+0.28*Math.sin(t*speed)};
-      case 'diagonal':   return {x:0.5+0.28*Math.sin(t*speed), y:0.5+0.28*Math.sin(t*speed)};
-      default:           return {x:0.5+0.28*Math.cos(t*speed), y:0.5+0.28*Math.sin(t*speed)};
-    }
+  load(){
+    const m=MAZES[this.mi%MAZES.length]; this.maze=m; this.segs=[];
+    [m.main,...m.extra].forEach(p=>{ for(let i=0;i<p.length-1;i++) this.segs.push([p[i],p[i+1]]); });
+    const s=m.main[0]; this.ball={x:s[0], y:s[1], r:0.055}; this.end=m.main[m.main.length-1];
+    this.held=false; this.bumpAt=0; this.bumps=0; this.startedAt=performance.now();
+  }
+  inside(px,py){
+    const w=this.w,h=this.h,half=w*0.085;
+    return this.segs.some(([a,b])=>{
+      const ax=a[0]*w, ay=a[1]*h, bx=b[0]*w, by=b[1]*h, dx=bx-ax, dy=by-ay;
+      const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy)));
+      return Math.hypot(px-(ax+t*dx), py-(ay+t*dy)) <= half;
+    });
   }
   update(hand, dt, ctx, w, h){
-    const elapsed = (performance.now()-this.startTime)/1000;
-    if(elapsed>=this.duration){ this.finish('Tempo do padrão concluído.'); return; }
-    const t = this.targetPos(elapsed);
-    drawZone(ctx, t.x, t.y, 0.045, w, h, 'rgba(242,169,59,.9)', null);
-
+    this.w=w; this.h=h; const half=w*0.085;
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    const paths=[this.maze.main,...this.maze.extra];
+    const stroke=(wd,col)=>{ ctx.lineWidth=wd; ctx.strokeStyle=col; paths.forEach(p=>{ ctx.beginPath(); p.forEach((q,i)=>{ if(i) ctx.lineTo(q[0]*w,q[1]*h); else ctx.moveTo(q[0]*w,q[1]*h); }); ctx.stroke(); }); };
+    stroke(half*2+14,'#fff'); stroke(half*2+4,'#2A74D0'); stroke(half*2-8,'#BFE3FF');
+    drawStar(ctx,this.end[0]*w,this.end[1]*h,half*0.95);
     if(hand){
       this.speeds.push(hand.speed||0);
-      drawCursorRing(ctx, hand.x, hand.y, w, h, hand.open);
-      this.sampleAcc += dt;
-      if(this.sampleAcc>=0.2){
-        this.sampleAcc = 0;
-        const d = dist(hand.x,hand.y,t.x,t.y);
-        const precisao = Math.max(0, 100 - d*220);
-        this.precisions.push(precisao);
-        if(d < 0.1) this.correct++; else this.incorrect++;
+      if(this.held){
+        const hx=hand.x*w, hy=hand.y*h;
+        if(this.inside(hx,hy) && Math.hypot(hx-this.ball.x*w,hy-this.ball.y*h) < w*0.3){ this.ball.x=hand.x; this.ball.y=hand.y; }
+        else if(performance.now()-this.bumpAt>1800){ this.bumpAt=performance.now(); this.bumps++; this.incorrect++; this.beep('miss'); this.feedback('Opa! Fique dentro do caminho 😉','bad'); }
       }
+    }
+    drawBall(ctx,this.ball.x,this.ball.y,this.ball.r,w,h,this.held);
+    if(hand) drawCursorRing(ctx,hand.x,hand.y,w,h,hand.open);
+    if(pxd(this.ball,{x:this.end[0],y:this.end[1]},w,h) < half*1.1){
+      this.correct++; this.score+=15; this.roundProgress++; this.beep('hit');
+      this.reactionTimes.push(performance.now()-this.startedAt);
+      this.precisions.push(Math.max(40,100-this.bumps*15));
+      this.feedback('Chegou na estrela! +15 pontos','ok');
+      const n=NOME(); this.say(pick(['Chegou! Parabéns','Que caminho lindo','Você conseguiu'])+(n?', '+n:'')+'! Vamos para o próximo labirinto.');
+      if(this.roundProgress>=this.reps) this.completeRound();
+      this.mi++; this.load();
     }
   }
 }
 
-// ---------------- Exercício 4: 4 Cantos ----------------
+// ---------------- Exercício 4: Bolas na Cesta (4 cantos) ----------------
 class ExCantos extends ExerciseBase{
   constructor(nivel, sens, reps){
     super(nivel, sens, reps);
-    this.target = {x:0.5, y:0.5, r:0.12};
-    this.held = null;
-    this.deliveries = 0;
-    this.roundProgress = 0;
+    this.hoop={x:0.5,y:0.5}; this.held=null; this.roundProgress=0; this.netAmp=0; this.tt=0; this.fall=null;
     this.newRound();
     this.listen('handClose', (pos)=>{
       if(this.done || this.held) return;
-      for(const b of this.balls){
-        if(b.delivered) continue;
-        if(dist(pos.x,pos.y,b.x,b.y) < b.r+0.06){ this.held=b; this.grabAt=performance.now(); this.beep('grab'); break; }
-      }
+      for(const b of this.balls){ if(!b.delivered && dist(pos.x,pos.y,b.x,b.y) < b.r+0.06){ this.held=b; this.grabAt=performance.now(); this.beep('grab'); break; } }
     });
-    this.listen('handOpen', (pos)=>{
-      if(this.done || !this.held) return;
-      this.releaseBall(pos);
-    });
+    this.listen('handOpen', (pos)=>{ if(this.done || !this.held) return; this.releaseBall(pos); });
+    this.say('Agora vamos encher a cesta'+(NOME()?', '+NOME():'')+'! Leve uma bolinha de cada canto até a cesta do meio.');
   }
   newRound(){
-    this.balls = [
-      {x:0.14, y:0.18, r:0.075, delivered:false, corner:'sup. esq.'},
-      {x:0.86, y:0.18, r:0.075, delivered:false, corner:'sup. dir.'},
-      {x:0.14, y:0.82, r:0.075, delivered:false, corner:'inf. esq.'},
-      {x:0.86, y:0.82, r:0.075, delivered:false, corner:'inf. dir.'},
-    ];
-    this.roundStart = performance.now();
+    this.balls=[{x:.13,y:.17},{x:.87,y:.17},{x:.13,y:.85},{x:.87,y:.85}].map(p=>({x:p.x,y:p.y,r:0.085,delivered:false}));
   }
   releaseBall(pos){
-    const b = this.held; this.held = null;
-    const d = dist(pos.x,pos.y,this.target.x,this.target.y);
-    const reaction = performance.now()-this.grabAt;
-    this.reactionTimes.push(reaction);
-    const precisao = Math.max(0, 100 - d/this.target.r*35);
-    this.precisions.push(precisao);
-    if(d < this.target.r+0.05){
-      b.delivered = true;
-      this.correct++; this.score += 10; this.deliveries++; this.beep('hit');
-      this.roundProgress++;
-      this.feedback('Bola do canto '+b.corner+' entregue!', 'ok');
+    const b=this.held; this.held=null;
+    const rim=this._rim||{rimX:0.5,rimY:0.5,rimR:0.12}, d=dist(pos.x,pos.y,rim.rimX,rim.rimY), n=NOME();
+    this.reactionTimes.push(performance.now()-this.grabAt);
+    this.precisions.push(Math.max(0, 100 - d/rim.rimR*35));
+    if(d < rim.rimR+0.08){
+      b.delivered=true; this.correct++; this.score+=10; this.roundProgress++; this.beep('hit'); this.netAmp=1;
+      this.fall={x:rim.rimX,y:rim.rimY,vy:0.15,t:0};
+      this.feedback('Na cesta! +10 pontos','ok');
+      this.say(pick(['Na cesta! Muito bem','Que beleza','Isso mesmo'])+(n?', '+n:'')+'! Agora pegue a próxima bolinha.');
       if(this.roundProgress >= this.reps) this.completeRound();
     } else {
-      b.x = pos.x; b.y = pos.y; // fica onde caiu, pode tentar de novo dali
-      this.incorrect++; this.beep('miss');
-      this.feedback('Fora do alvo — tente de novo.', 'bad');
+      b.x=pos.x; b.y=pos.y; this.incorrect++; this.beep('miss'); this.feedback('Quase! A cesta é no meio.','bad');
+      this.say('Quase'+(n?', '+n:'')+'! Leve até a cesta do meio.');
     }
-    // nunca finaliza sozinho — continua sempre, o terapeuta/paciente encerra manualmente
     if(this.balls.every(x=>x.delivered)) this.newRound();
   }
   update(hand, dt, ctx, w, h){
-    drawZone(ctx, this.target.x, this.target.y, this.target.r, w, h, 'rgba(62,142,107,.4)', '◻');
-    this.balls.forEach(b=>{ if(!b.delivered) drawBall(ctx, b.x, b.y, b.r, w, h, this.held===b); });
-
+    this.tt+=dt; this.netAmp=Math.max(0,this.netAmp-dt*0.7);
+    const f=this.fall; if(f){ f.t+=dt; f.vy+=dt*0.9; f.y+=f.vy*dt; if(f.t>0.8) this.fall=null; }
+    this._rim=drawHoop(ctx,this.hoop.x,this.hoop.y,w,h,this.netAmp,this.tt,()=>{ if(f) drawBall(ctx,f.x,f.y,0.07,w,h,false); });
+    this.balls.forEach(b=>{ if(!b.delivered) drawBall(ctx,b.x,b.y,b.r,w,h,this.held===b); });
     if(!hand) return;
     this.speeds.push(hand.speed||0);
-    if(this.held){ this.held.x = hand.x; this.held.y = hand.y; }
-    drawCursorRing(ctx, hand.x, hand.y, w, h, hand.open);
+    if(this.held){ this.held.x=hand.x; this.held.y=hand.y; }
+    drawCursorRing(ctx,hand.x,hand.y,w,h,hand.open);
+  }
+}
+
+// ---------------- Exercício 5: Bolinhas no Lixinho (pinça com a ponta dos dedos) ----------------
+class ExPega extends ExerciseBase{
+  constructor(nivel, sens, reps){
+    super(nivel, sens, reps);
+    this.roundProgress=0; this.held=null; this.lock=false; this.binGlow=0; this.w=1; this.h=1;
+    this.bin={x:0.5,y:0.82,r:0.14};
+    this.balls=CORES.map(c=>({c,x:0,y:0,r:0.06})); this.balls.forEach(b=>this.place(b));
+    this.target=null; this.pickTarget('Vamos brincar'+(NOME()?', '+NOME():'')+'!');
+  }
+  place(b){ b.x=rand(0.12,0.88); b.y=rand(0.14,0.55); }
+  pickTarget(prefix){
+    let c; do{ c=pick(CORES); }while(c===this.target);
+    this.target=c; this.promptAt=performance.now();
+    this.say((prefix?prefix+' ':'')+'Pegue a bola '+c.n+' com a ponta dos dedos.');
+  }
+  update(hand, dt, ctx, w, h){
+    this.w=w; this.h=h; this.binGlow=Math.max(0,this.binGlow-dt);
+    const pe=document.getElementById('gamePrompt');
+    if(pe){ pe.style.top='8%'; pe.style.transform='none'; pe.innerHTML='<span style="font-size:24px;">Pegue a bola <b style="color:'+this.target.l+'">'+this.target.n.toUpperCase()+'</b> 🤏</span>'; }
+    drawBin(ctx,this.bin.x*w,this.bin.y*h,w,this.binGlow);
+    this.balls.forEach(b=>drawColorBall(ctx,b.x,b.y,b.r,w,h,b.c,this.held===b));
+    if(!hand) return;
+    this.speeds.push(hand.speed||0);
+    const pm=hand.pinch||{}, pinching=!!(pm.index||pm.middle||pm.ring||pm.pinky), n=NOME();
+    if(this.held){
+      this.held.x=hand.x; this.held.y=hand.y;
+      if(!pinching){
+        const b=this.held; this.held=null;
+        if(pxd(b,this.bin,w,h) < this.bin.r*w + b.r*w*0.5){
+          this.correct++; this.score+=10; this.roundProgress++; this.beep('hit'); this.binGlow=0.6;
+          this.reactionTimes.push(performance.now()-this.promptAt);
+          this.feedback('No lixinho! +10 pontos','ok');
+          this.place(b);
+          if(this.roundProgress>=this.reps) this.completeRound();
+          this.pickTarget(pick(['Muito bem','Que lindo','Isso aí'])+(n?', '+n:'')+'!');
+        } else {
+          this.incorrect++; this.beep('miss'); this.feedback('Solte em cima do lixinho!','bad');
+          this.say('Quase'+(n?', '+n:'')+'! Solte a bola em cima do lixinho.');
+        }
+      }
+    } else if(pinching && !this.lock){
+      const near=this.balls.find(b=>pxd(hand,b,w,h) < b.r*w + w*0.09);
+      if(near){
+        if(near.c===this.target){ this.held=near; this.beep('grab'); }
+        else{ this.lock=true; this.incorrect++; this.beep('miss'); this.feedback('Essa é a bola '+near.c.n+'. Procure a '+this.target.n+'!','bad'); this.say('Essa é a '+near.c.n+(n?', '+n:'')+'. Procure a bola '+this.target.n+'!'); }
+      }
+    }
+    if(!pinching) this.lock=false;
+    drawCursorRing(ctx,hand.x,hand.y,w,h,hand.open);
+  }
+  finish(reason){
+    const pe=document.getElementById('gamePrompt');
+    if(pe){ pe.innerHTML=''; pe.style.top=''; pe.style.transform=''; }
+    super.finish(reason);
   }
 }
 
@@ -454,7 +540,7 @@ function drawCursorRing(ctx, x, y, w, h, open){
 const ExerciseEngine = {
   instance: null,
   start(id, nivel, sensibilidade, reps){
-    const map = {cesto:ExCesto, abrirFechar:ExAbrirFechar, seguir:ExSeguir, cantos:ExCantos, dedos:ExDedos};
+    const map = {cesto:ExCesto, abrirFechar:ExAbrirFechar, labirinto:ExLabirinto, cantos:ExCantos, pega:ExPega};
     const Cls = map[id];
     this.instance = new Cls(nivel, sensibilidade, reps);
     this.exerciseId = id;

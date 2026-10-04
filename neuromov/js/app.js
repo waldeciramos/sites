@@ -36,6 +36,17 @@ window.NM_SOUND = (function(){
   return {beep};
 })();
 
+window.NM_SPEAK = function(t){
+  try{
+    if(!window.speechSynthesis || !t) return;
+    const tg=document.getElementById('toggleSound'); if(tg && !tg.checked) return;
+    const limpo=String(t).replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,'');
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(limpo); u.lang='pt-BR'; u.rate=0.95; u.pitch=1.15;
+    speechSynthesis.speak(u);
+  }catch(e){}
+};
+
 // ---------- Tela cheia + manter em primeiro plano ----------
 // Obs.: por segurança dos navegadores, nenhum site consegue bloquear de fato
 // notificações de outros apps (WhatsApp etc.) — isso depende do sistema
@@ -102,7 +113,7 @@ async function startWithName(){
   const todos=await Storage.all();
   let w=todos.find(x=>norm(x.paciente.nome)===norm(nome));
   if(!w){ w=Storage.novoPaciente({nome, sensibilidade:1.0, dificuldadeInicial:1, maoDominante:'Destra'}); await Storage.upsert(w); }
-  state.wrapper=w; state.extraOk=true;
+  state.wrapper=w; state.extraOk=true; window.NM_NOME=nome.split(' ')[0]; state.greeted=false;
   startCalibration();
 }
 document.getElementById('btnStartName').addEventListener('click', startWithName);
@@ -198,6 +209,8 @@ function goToMenu(){
   showScreen('screen-menu');
   const p = state.wrapper.paciente;
   const n1 = p.nome.split(' ')[0];
+  window.NM_NOME = n1;
+  if(!state.greeted){ state.greeted=true; NM_SPEAK('Oi, '+n1+'! Que bom te ver! Vamos brincar?'); }
   document.getElementById('menuPatientName').textContent = 'Oi, '+n1+'! 👋';
   document.getElementById('menuPatientMeta').textContent =
     pick([`Que bom te ver por aqui, ${n1}! Escolha um jogo e vamos nessa 🚀`,`${n1}, hoje você vai arrasar! Qual jogo vai ser? 😎`,`${n1}, essa mãozinha está pronta pra brilhar! ✨`]) +
@@ -214,6 +227,11 @@ function goToMenu(){
     card.addEventListener('click', ()=>chooseNivelAndStart(ex));
     grid.appendChild(card);
   });
+  const cc = document.createElement('div');
+  cc.className = 'ex-card';
+  cc.innerHTML = '<div class="ex-icon">🎨</div><div class="txt"><h3>Jogo das Cores</h3><p>Ouça a cor, fale e arraste a bolinha até o número certo.</p></div>';
+  cc.addEventListener('click', ()=>{ document.getElementById('coresFrame').src='jogo-cores.html'; showScreen('screen-cores'); });
+  grid.appendChild(cc);
 
   if(state.sessionExercicios.length===0 && !state.sessionRepsLocked){
     state.sessionReps = EXERCISE_DEFS[0].repsDefault;
@@ -380,6 +398,7 @@ function askContinueOrFinish(){
   document.getElementById('dlgEmoji').textContent=pick(['🏆','🌟','🎉','🥳']);
   document.getElementById('dlgMsg').textContent=pick([`${n}, que partida! Nem o cronômetro acreditou 😄`,`Uau, ${n}! Essa mão está afiada ✨`,`${n} no comando! Bora pro próximo jogo? 🚀`,`Respira, ${n}... você merece um aplauso! 👏`]);
   document.getElementById('dlgScore').textContent='⭐ '+(ult?ult.pontuacao:0)+' pontos';
+  NM_SPEAK(document.getElementById('dlgMsg').textContent);
   const d=document.getElementById('dlg'); d.classList.add('open');
   document.getElementById('dlgNext').onclick=()=>{ d.classList.remove('open'); goToMenu(); };
   document.getElementById('dlgEnd').onclick=()=>{ d.classList.remove('open'); finalizeSession(); };
@@ -520,6 +539,7 @@ window.addEventListener('resize', ()=>{
   }
 });
 
+document.getElementById('btnCoresBack').addEventListener('click', ()=>{ document.getElementById('coresFrame').src='about:blank'; try{speechSynthesis.cancel();}catch(e){} goToMenu(); });
 showScreen('screen-home'); renderPatientList();
 renderPatientList();
 })();
