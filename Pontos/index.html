@@ -197,6 +197,9 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
 .nv button{background:var(--c2);color:var(--ac);font-weight:700}
 
 
+.fotoWrap{display:flex;justify-content:center;margin:0 0 16px}
+#fotoHoje{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #ff7a1a;box-shadow:0 0 0 5px #ff7a1a33,0 8px 20px #0008;background:#0c1116}
+
 .ck{display:flex;flex-wrap:wrap;gap:4px 12px;margin-bottom:8px}.ck label{display:flex;gap:4px;align-items:center;margin:0}.ck input{width:auto}
 .fi{background:var(--c2);border-radius:14px;padding:10px;margin-bottom:8px}.fi label{margin-bottom:6px}
 </style></head><body>
@@ -207,6 +210,7 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
   <div class="repTop"><span class="marca" id="marcaUser">SISTEMA</span><span class="led" id="led"></span></div>
   <div class="lcdBig" id="relogio">00:00:00</div>
   <div class="lcdSt" id="st">Aguardando entrada</div>
+  <div class="fotoWrap"><img id="fotoHoje" alt="" style="display:none"></div>
   <div class="sensorWrap">
    <button id="bt" class="sensor" onclick="tocarSensor()" aria-label="Bater ponto pela digital">
     <svg viewBox="0 0 100 100">
@@ -731,7 +735,7 @@ function rRel(){const R=resumo(),J=C.jornadaDiaria*60,f=F(),mh=f.metaHoras*60,ex
  $('ls').innerHTML=R.dias.filter(z=>!z.w||z.r).reverse().map(({d,r,x})=>{const desc=r&&r.tipo==='feriado'?'Feriado / dispensado':r&&r.tipo==='falta'?'Falta registrada':r&&r.entrada?r.entrada+' → '+(r.saida||'em aberto'):'sem registro';
   const val=x.st==='fe'?'Feriado':r&&r.entrada?(x.s>=0?'+':'')+HM(x.s):'Falta';
   return`<div class="it" onclick="abrirEd(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div><b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b> <small>${DS[d.getDay()]}</small><br><small>${desc}</small></div><div class="r"><b>${x.t>0?HM(x.t):'--:--'}</b><br><span class="bd ${x.st}">${val}</span></div></div>`}).join('')}
-function pAv(){const i=$('avH');if(!i)return;if(C.foto){i.src=C.foto;i.style.display='block'}else i.style.display='none'}
+function pAv(){const ft=$('fotoHoje');if(ft){if(C.foto){ft.src=C.foto;ft.style.display='block'}else ft.style.display='none'}const i=$('avH');if(!i)return;if(C.foto){i.src=C.foto;i.style.display='block'}else i.style.display='none'}
 function render(){pAv();const p=per();$('per').textContent=`${BR(p.i)} a ${BR(p.f)}`;({hoje:rHoje,cal:rCal,rel:rRel,imp:()=>{},cfg:()=>{}})[vw]()}
 function go(v){vw=v;document.querySelectorAll('.vw').forEach(s=>s.classList.toggle('h',s.id!=='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
  if(v==='imp'){const p=per();$('impPerLbl').textContent='('+BR(p.i)+' a '+BR(p.f)+')';if(!$('impDe').value){$('impDe').value=K(p.i);$('impAte').value=K(new Date())}}
