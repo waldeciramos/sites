@@ -222,11 +222,29 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
 .lc b{font:700 20px 'Courier Prime',monospace;letter-spacing:1px;text-shadow:0 0 8px currentColor}
 .lc.am{color:#ffc247}.lc.vm{color:#ff6b5e;animation:pisc2 1s steps(1) infinite}
 @keyframes pisc2{50%{background:#2a0f0d}}
+
+/* ===== v6: efeito aqua ===== */
+.rep{position:relative;overflow:hidden}
+.rep::before{content:"";position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,0));border-radius:24px 24px 60% 60%/24px 24px 36px 36px;pointer-events:none;z-index:2}
+.ondas{position:absolute;left:0;right:0;bottom:0;height:110px;pointer-events:none;z-index:0}
+.ondas i{position:absolute;inset:0;background-repeat:repeat-x;background-position:0 100%;background-size:400px 90px}
+.ondas i:first-child{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 90'%3E%3Cpath d='M0 45 Q100 10 200 45 T400 45 V90 H0Z' fill='rgba(56,189,248,.30)'/%3E%3C/svg%3E");animation:onda 9s linear infinite}
+.ondas i:last-child{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 90'%3E%3Cpath d='M0 55 Q100 85 200 55 T400 55 V90 H0Z' fill='rgba(255,154,60,.28)'/%3E%3C/svg%3E");animation:onda 14s linear infinite reverse;opacity:.9}
+@keyframes onda{to{background-position-x:-400px}}
+.rep>*:not(.ondas){position:relative;z-index:1}
+.sensor.lendo::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid #38bdf8;animation:rip .8s ease-out}
+@keyframes rip{from{transform:scale(1);opacity:.9}to{transform:scale(2.3);opacity:0}}
+.big,nav button.on{position:relative;overflow:hidden}
+.big::after,nav button.on::after{content:"";position:absolute;left:6%;right:6%;top:5%;height:46%;border-radius:30px 30px 60% 60%/30px 30px 22px 22px;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,.04));pointer-events:none}
+.ic{box-shadow:inset 0 3px 6px rgba(255,255,255,.55),inset 0 -4px 8px rgba(0,0,0,.18),0 6px 14px #ff6a0040}
+.cd3,.box,.tl,.rs div,.it{box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.14)}
+@media(prefers-reduced-motion:reduce){.ondas i{animation:none}}
+#faC{width:280px;max-width:100%;border-radius:18px;touch-action:none;background:#000;cursor:grab}
 </style></head><body>
 <header><div style="display:flex;align-items:center;gap:8px"><img id="avH" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--pu)"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><div class="hdr-dir"><button class="ghost" id="btTema" onclick="alternarTema()" aria-label="Alternar tema claro ou escuro">☀️ Claro</button><span id="per"></span></div></header>
 <main>
 <section id="v-hoje" class="vw">
- <div class="rep">
+ <div class="rep"><div class="ondas"><i></i><i></i></div>
   <div class="repTop"><span class="marca" id="marcaUser">SISTEMA</span><span class="dir"><button class="sino" id="sino" onclick="alternarAvisos()" aria-label="Ligar ou desligar avisos">🔔</button><span class="led" id="led"></span></span></div>
   <div class="lcdBig" id="relogio">00:00:00</div>
   <div class="lcdSt" id="st">Aguardando entrada</div>
@@ -290,7 +308,7 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
  </div>
  <button class="big" style="height:52px" onclick="salvarCfg()">Salvar ajustes</button></div>
  <div class="box" id="fper"><b>👤 Meu perfil e foto</b><p class="bk">Aparece no cabeçalho do app e no relatório para a chefia.</p>
- <div style="display:flex;gap:12px;align-items:center;margin:8px 0"><img id="pFt" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;background:var(--c2)"><div class="acts" style="margin:0"><button class="ghost" onclick="$('pArq').click()">📷 Escolher foto</button><button class="ghost" onclick="tirarFoto()">Remover</button></div><input type="file" id="pArq" accept="image/*" class="h" onchange="fotoArquivo(this)"></div>
+ <div style="display:flex;gap:12px;align-items:center;margin:8px 0"><img id="pFt" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;background:var(--c2)"><div class="acts" style="margin:0"><button class="ghost" onclick="$('pArq').click()">📷 Escolher foto</button><button class="ghost" onclick="ajustarAtual()">✂ Ajustar</button><button class="ghost" onclick="tirarFoto()">Remover</button></div><input type="file" id="pArq" accept="image/*" class="h" onchange="fotoArquivo(this)"></div>
  <label>Nome completo<input type="text" id="pNome"></label><div class="g2"><label>Cargo<input type="text" id="pCargo"></label><label>Empresa<input type="text" id="pEmp"></label></div>
  <button class="ghost" onclick="salvarPerfil()">Salvar perfil</button></div>
 <div class="box" id="fcfg"><b>💰 Configuração salarial</b><p class="bk">Tudo editável. Os % são encadeados como na simulação da empresa (cada adicional diz sobre o que incide). "Valor anterior" mostra se houve aumento.</p>
@@ -304,13 +322,13 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
   <label>FGTS empresa (%, info)<input type="number" id="fFgtsP" step="0.01"></label></div>
  <p class="bk" id="fVHc"></p><div id="fItens"></div>
  <div class="acts"><button class="ghost" onclick="addItem('v')">+ Vencimento</button><button class="ghost" onclick="addItem('d')">+ Desconto</button><button class="ghost" onclick="addItem('i')">+ Informativo</button></div>
- <b style="display:block;margin:12px 0 4px">Impostos (tabelas 2026 — edite se mudarem)</b>
+ <details style="margin:12px 0"><summary style="cursor:pointer;font-weight:700;color:var(--mu)">⚙ Avançado — tabelas de impostos (INSS/IRRF)</summary><p class="bk">Entram no cálculo do líquido. Só altere se as tabelas oficiais mudarem.</p>
  <label>INSS faixas (limite:alíquota%, ...)<input type="text" id="fInss"></label>
  <div class="g2"><label>Dependentes p/ IR<input type="number" id="fDep"></label><label>Dedução por dependente (R$)<input type="number" id="fDepV" step="0.01"></label>
   <label>Desconto simplificado (R$)<input type="number" id="fSimp" step="0.01"></label><label>Isenção total até (R$, 0 = sem redutor)<input type="number" id="fR1" step="0.01"></label>
   <label>Redução máx. até a isenção (R$)<input type="number" id="fR1m" step="0.01"></label><label>Redutor parcial até (R$)<input type="number" id="fR2" step="0.01"></label>
   <label>Redutor: A (R$)<input type="number" id="fRA" step="0.01"></label><label>Redutor: B (× rendimento)<input type="number" id="fRB" step="0.000001"></label></div>
- <label>IRRF faixas (limite:alíquota%:deduzir, ...)<input type="text" id="fIrTab"></label>
+ <label>IRRF faixas (limite:alíquota%:deduzir, ...)<input type="text" id="fIrTab"></label></details>
  <button class="big" style="height:52px" onclick="salvarFolha()">Salvar configuração salarial</button></div>
  <div class="box"><b>🔔 Avisos de horário</b><p class="bk">Avisa com som, vibração e voz quando faltar o tempo de "Aviso antes" (padrão 20 min) e quando faltar 1 min para sair ao intervalo e para a saída de casa; e quando completar o tempo mínimo do intervalo. O app precisa estar aberto.</p>
  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="cAv" style="width:auto" onchange="C.avisosAtivos=this.checked;salvar();sinoUI();if(this.checked)pedirNotif()"> Ativar avisos</label>
@@ -354,6 +372,10 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
  <div class="box" id="ferPrev" style="margin-top:6px"></div>
  <div class="acts"><button class="big" style="height:50px;flex:1" onclick="ferMarcar()">Marcar férias</button><button class="ghost" onclick="$('fer').close()">Fechar</button></div>
  <b style="display:block;margin:8px 0 6px">Férias já marcadas</b><div id="ferLista"></div></dialog>
+<dialog id="fa"><h3>📷 Ajustar foto</h3><p class="bk">Arraste a foto para posicionar e use o zoom. O círculo mostra como ela vai aparecer.</p>
+ <div style="display:flex;justify-content:center"><canvas id="faC" width="280" height="280"></canvas></div>
+ <label>Zoom<input type="range" id="faZ" min="0" max="100" value="0" style="width:100%" oninput="zoomAj()"></label>
+ <div class="acts"><button class="big" style="height:50px;flex:1" onclick="salvarAj()">Salvar foto</button><button class="ghost" onclick="fecharAj()">Cancelar</button></div></dialog>
 <dialog id="fo"><h3>💰 Folha estimada</h3><div id="foB"></div><div class="acts" style="margin:14px 0 0"><button class="ghost" onclick="imprimirGanhos()">Imprimir</button><button class="ghost" onclick="$('fo').close()">Fechar</button></div></dialog>
 <dialog id="rl"><h3>📄 Relatório de fechamento</h3>
  <label>Período<select id="rlP"></select></label>
@@ -620,8 +642,23 @@ function salvarFolha(){lerEd();const n=i=>+$(i).value||0;
 /* perfil + foto */
 function pPerfil(){const u=usuarioAtual();$('pNome').value=u.nome||'';$('pCargo').value=u.cargo||'';$('pEmp').value=u.empresa||'';$('pFt').src=C.foto||'icon-192.png'}
 function salvarPerfil(){const u=USERS.find(x=>x.id===UID);if(!u)return;u.nome=$('pNome').value.trim()||u.nome;u.cargo=$('pCargo').value.trim();u.empresa=$('pEmp').value.trim();localStorage.setItem(UK,JSON.stringify(USERS));toast('Perfil salvo','ok');render()}
-function fotoArquivo(inp){const f=inp.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);img.onload=()=>{const sz=360,c=document.createElement('canvas');c.width=c.height=sz;const m=Math.min(img.width,img.height);
- c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,sz,sz);C.foto=c.toDataURL('image/jpeg',.82);URL.revokeObjectURL(u);salvar();pPerfil();pAv();toast('Foto salva','ok')};img.onerror=()=>toast('Não consegui ler essa imagem','bad');img.src=u;inp.value=''}
+function fotoArquivo(inp){const f=inp.files[0];if(!f)return;abrirAjuste(URL.createObjectURL(f));inp.value=''}
+function ajustarAtual(){if(!C.foto)return toast('Escolha uma foto primeiro','wa');abrirAjuste(C.foto)}
+let FA={S:280};
+function abrirAjuste(src){const img=new Image();img.onload=()=>{FA={S:280,img,src};FA.min=Math.max(280/img.width,280/img.height);FA.z=FA.min;FA.x=(280-img.width*FA.z)/2;FA.y=(280-img.height*FA.z)/2;$('faZ').value=0;pintaAj();$('fa').showModal()};img.onerror=()=>toast('Não consegui ler essa imagem','bad');img.src=src}
+function clampAj(){const w=FA.img.width*FA.z,h=FA.img.height*FA.z;FA.x=Math.min(0,Math.max(FA.S-w,FA.x));FA.y=Math.min(0,Math.max(FA.S-h,FA.y))}
+function pintaAj(){const g=$('faC').getContext('2d'),S=FA.S;g.fillStyle='#000';g.fillRect(0,0,S,S);g.drawImage(FA.img,FA.x,FA.y,FA.img.width*FA.z,FA.img.height*FA.z);
+ g.save();g.fillStyle='rgba(0,0,0,.55)';g.beginPath();g.rect(0,0,S,S);g.arc(S/2,S/2,S/2-1,0,Math.PI*2,true);g.fill('evenodd');g.restore();
+ g.strokeStyle='#ff7a1a';g.lineWidth=2;g.beginPath();g.arc(S/2,S/2,S/2-1,0,Math.PI*2);g.stroke()}
+function zoomAj(){const nz=FA.min*(1+$('faZ').value/100*3),cx=(FA.S/2-FA.x)/FA.z,cy=(FA.S/2-FA.y)/FA.z;FA.z=nz;FA.x=FA.S/2-cx*nz;FA.y=FA.S/2-cy*nz;clampAj();pintaAj()}
+function fecharAj(){$('fa').close();if(FA.src&&String(FA.src).startsWith('blob:'))URL.revokeObjectURL(FA.src)}
+function salvarAj(){const o=document.createElement('canvas'),S=360,k=S/FA.S;o.width=o.height=S;o.getContext('2d').drawImage(FA.img,FA.x*k,FA.y*k,FA.img.width*FA.z*k,FA.img.height*FA.z*k);
+ C.foto=o.toDataURL('image/jpeg',.85);fecharAj();salvar();pPerfil();pAv();toast('Foto salva','ok');if(C.githubAtivo)syncGithub(false)}
+(()=>{const c=$('faC');let dr=null;
+ c.addEventListener('pointerdown',e=>{dr={x:e.clientX,y:e.clientY,ox:FA.x,oy:FA.y};c.setPointerCapture(e.pointerId)});
+ c.addEventListener('pointermove',e=>{if(!dr||!FA.img)return;const k=c.width/c.getBoundingClientRect().width;FA.x=dr.ox+(e.clientX-dr.x)*k;FA.y=dr.oy+(e.clientY-dr.y)*k;clampAj();pintaAj()});
+ c.addEventListener('pointerup',()=>dr=null);c.addEventListener('pointercancel',()=>dr=null);
+ c.addEventListener('wheel',e=>{if(!FA.img)return;e.preventDefault();const z=$('faZ');z.value=Math.max(0,Math.min(100,+z.value-Math.sign(e.deltaY)*5));zoomAj()},{passive:false})})();
 function tirarFoto(){delete C.foto;salvar();pPerfil();pAv()}
 
 /* ===== RELATÓRIO DE FECHAMENTO (HTML independente, só visualização) ===== */
@@ -635,7 +672,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th{background:#ff6a00;c
 .ln{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f6d9c0}.ln.t{font-weight:800;border-top:2px solid #ff6a00;border-bottom:0;font-size:17px;margin-top:6px}.sig{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:36px 28px 10px}.sig div{border-top:1px solid #2a1d14;text-align:center;padding-top:6px;font-size:12px;color:#8a6f5c}
 .ft{background:#2a1d14;color:#cfe0f5;padding:18px 28px;text-align:center;font-size:12px;border-top:5px solid #ff7a1a}.ft b{color:#fff}.bt{display:block;margin:14px auto;padding:10px 20px;border:0;border-radius:10px;background:linear-gradient(135deg,#ff6a00,#ff9a3c);color:#fff;font-weight:700;cursor:pointer}
 @media print{body{background:#fff}.pg{box-shadow:none;max-width:none}.bt{display:none}tr,.kp div,.sec{break-inside:avoid}.hd,th,.ft{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-.bt2{background:#2a1d14!important;margin-top:0!important}
+.bt2{background:#2a1d14!important;margin-top:0!important}.vl{display:inline-block;margin:12px 28px 0;padding:8px 16px;border-radius:99px;background:#ffe3cc;color:#c24e00;font-weight:700;text-decoration:none;font-size:13px}.t80 .vl{display:none}@media print{.vl{display:none}}
 body.t80{background:#fff;color:#000;font:11px/1.35 'Courier New',ui-monospace,monospace;width:72mm;margin:0 auto}
 .t80 .pg{max-width:none;box-shadow:none;background:#fff}
 .t80 .hd{background:#fff!important;color:#000;border:0;border-bottom:2px dashed #000;padding:6px 0;display:block;text-align:center}
@@ -662,7 +699,7 @@ body.t80{background:#fff;color:#000;font:11px/1.35 'Courier New',ui-monospace,mo
 @media print{.bt2{display:none}}`;
 function semanasRel(R){const m=new Map();R.dias.forEach(({d,r,x})=>{const s=new Date(d);s.setDate(d.getDate()-((d.getDay()+6)%7));const k=K(s);if(!m.has(k))m.set(k,{i:d,f:d,t:0,s:0,n:0,g:0});const w=m.get(k);w.f=d;
  if(x.t>0){w.t+=x.t;w.n++;w.g+=ganhoDia(x.t,R.U)}if(!(fds(d)||(r&&r.tipo==='feriado'))||r)w.s+=x.s});return[...m.values()]}
-function relatorioHTML(ref,comV){const R=resumo(ref),u=usuarioAtual(),f=F(),fer=feriasNoPeriodo(R.p),mh=metaHoras(R.p)*60,ex=f.extraHoras*60,pc=mh?Math.min(100,R.T/mh*100):0,hoje=new Date(),aberto=hoje<=R.p.f,sg=n=>(n>=0?'+':'')+HM(n),
+function relatorioHTML(ref,comV){const APP=escI(location.href.split(/[?#]/)[0]),VT=`if(window.opener&&!window.opener.closed){window.opener.focus();window.close();return false}`,R=resumo(ref),u=usuarioAtual(),f=F(),fer=feriasNoPeriodo(R.p),mh=metaHoras(R.p)*60,ex=f.extraHoras*60,pc=mh?Math.min(100,R.T/mh*100):0,hoje=new Date(),aberto=hoje<=R.p.f,sg=n=>(n>=0?'+':'')+HM(n),
  ini=(u.nome||'?').split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase(),dl=d=>`${pad(d.getDate())}/${pad(d.getMonth()+1)}`,
  st=R.T>=mh?['ok','Meta de horas atingida']:aberto?['wa','Período em andamento']:['fa','Abaixo da meta'],now=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
  const wk=semanasRel(R),dias=R.dias.filter(z=>!z.w||z.r),obs=R.dias.filter(z=>z.r&&z.r.obs);
@@ -675,6 +712,7 @@ function relatorioHTML(ref,comV){const R=resumo(ref),u=usuarioAtual(),f=F(),fer=
   ${dt.atual?`<p class="rs" style="margin-top:12px"><b>Planos de saúde:</b> ${RS(dt.atual)} no mês${dif?` (${dif>0?'aumento':'redução'} de ${RS(Math.abs(dif))} sobre o valor anterior)`:' — sem variação'}.</p>`:''}
   <p style="font-size:11px;color:#5d7290;margin-top:8px">Valores estimados; o holerite oficial prevalece.</p></section>`}
  return`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Relatório de Ponto — ${escI(u.nome)} — ${BR(R.p.i)} a ${BR(R.p.f)}</title><style>${REL_CSS}</style></head><body><div class="pg">
+<a class="vl" href="${APP}" onclick="${VT}">← Voltar ao sistema</a>
 <header class="hd"><div class="brand"><span class="inf">∞</span><div><b>Infinity Ponto</b><small>Sistema de Controle de Ponto</small></div></div><div class="hr"><b>RELATÓRIO DE ${aberto?'ACOMPANHAMENTO':'FECHAMENTO'}</b><small>Período: ${BR(R.p.i)} a ${BR(R.p.f)}</small></div></header>
 <section class="id">${C.foto?`<img class="av" src="${C.foto}" alt="Foto de ${escI(u.nome)}">`:`<div class="av">${escI(ini)}</div>`}<div><h1>${escI(u.nome)}</h1><p><b>${escI(u.cargo||'')}</b></p><p>${escI(u.empresa||'')}</p></div><div class="st"><span class="bdg ${st[0]}">${st[1]}</span></div></section>
 <section class="sec"><h2>Resumo executivo</h2><p class="rs">No período de ${BR(R.p.i)} a ${BR(R.p.f)}${aberto?' (parcial até '+BR(hoje)+')':''}, foram registrados <b>${R.D} dia(s) trabalhado(s)</b>${fer.n?` e <b>${fer.n} dia(s) de férias</b>`:''}, totalizando <b>${HM(R.T)}</b> horas — ${pc.toFixed(0)}% da meta de ${HM(mh)}${ex?` (${HM(mh+ex)} com extras)`:''}. Saldo do período: <b>${sg(R.saldo)}</b>${R.A?`, com ${HM(R.A)} de atrasos`:''}${R.F?` e ${HM(R.F)} de faltas`:''}.</p></section>
@@ -684,7 +722,7 @@ function relatorioHTML(ref,comV){const R=resumo(ref),u=usuarioAtual(),f=F(),fer=
 <section class="sec"><h2>Registro diário</h2><div class="tw"><table class="rd"><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída int.</th><th>Volta</th><th>Saída</th><th class="n">Horas</th><th class="n">Saldo</th><th>Situação</th></tr>${dias.map(({d,r,x})=>`<tr class="${x.st==='fa'?'fa':x.st==='fe'?'fe':x.st==='fr'?'fr':''}"><td>${BR(d)}</td><td>${DS[d.getDay()]}</td><td>${r&&r.entrada||'--'}</td><td>${r&&r.saidaIntervalo||'--'}</td><td>${r&&r.voltaIntervalo||'--'}</td><td>${r&&r.saida||'--'}</td><td class="n">${x.t>0?HM(x.t):'--'}</td><td class="n">${x.st==='fe'||x.st==='fr'?'--':sg(x.s)}</td><td>${sit(r,x)}</td></tr>`).join('')}</table></div></section>
 ${obs.length?`<section class="sec"><h2>Observações</h2>${obs.map(({d,r})=>`<div class="ln"><span>${BR(d)}</span><span>${escI(r.obs)}</span></div>`).join('')}</section>`:''}${fin}
 <div class="sig"><div>${escI(u.nome)}<br>${escI(u.cargo||'Colaborador')}</div><div>Gestor responsável<br>Ciente em ___/___/______</div></div>
-<footer class="ft"><b>∞ Infinity Ponto</b> — Sistema de ponto desenvolvido por <b>Waldeci de Andrade Ramos</b><br>Analista de Serviços Internos${u.empresa?' • '+escI(u.empresa):''}<br><span style="opacity:.7">Documento gerado automaticamente em ${now} • somente visualização</span><button class="bt" onclick="window.print()">🖨 Imprimir A4 / salvar em PDF</button><button class="bt bt2" onclick="p80()">🧾 Imprimir térmica 80mm</button></footer></div><scr${''}ipt>function p80(){var b=document.body,st=document.createElement("style");st.textContent="@page{size:80mm auto;margin:0}";b.classList.add("t80");document.head.appendChild(st);var f=function(){b.classList.remove("t80");st.remove();window.removeEventListener("afterprint",f)};window.addEventListener("afterprint",f);window.print()}</scr${''}ipt></body></html>`}
+<footer class="ft"><b>∞ Infinity Ponto</b> — Sistema de ponto desenvolvido por <b>Waldeci de Andrade Ramos</b><br>Analista de Serviços Internos${u.empresa?' • '+escI(u.empresa):''}<br><span style="opacity:.7">Documento gerado automaticamente em ${now} • somente visualização</span><button class="bt" onclick="window.print()">🖨 Imprimir A4 / salvar em PDF</button><a class="bt bt2" href="${APP}" onclick="${VT}" style="text-decoration:none;text-align:center;max-width:260px">← Voltar ao sistema</a><button class="bt bt2" onclick="p80()">🧾 Imprimir térmica 80mm</button></footer></div><scr${''}ipt>function p80(){var b=document.body,st=document.createElement("style");st.textContent="@page{size:80mm auto;margin:0}";b.classList.add("t80");document.head.appendChild(st);var f=function(){b.classList.remove("t80");st.remove();window.removeEventListener("afterprint",f)};window.addEventListener("afterprint",f);window.print()}</scr${''}ipt></body></html>`}
 function abrirRel(){const p=per(),o=[p,per(new Date(p.i.getTime()-864e5))];o.push(per(new Date(o[1].i.getTime()-864e5)));
  $('rlP').innerHTML=o.map((x,i)=>`<option value="${K(x.i)}">${i?'':'Atual: '}${BR(x.i)} a ${BR(x.f)}</option>`).join('');$('rlL').style.display='none';$('rl').showModal()}
 const relRef=()=>new Date($('rlP').value+'T12:00:00'),relNome=()=>{const r=relRef(),k='infinity_rel_'+UID+'_'+$('rlP').value;let n=localStorage.getItem(k);if(!n){n=`${UID}_${K(per(r).f).slice(0,7)}_${Math.random().toString(36).slice(2,8)}.html`;localStorage.setItem(k,n)}return n};
