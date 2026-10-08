@@ -240,7 +240,14 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
 .cd3,.box,.tl,.rs div,.it{box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.14)}
 @media(prefers-reduced-motion:reduce){.ondas i{animation:none}}
 #faC{width:280px;max-width:100%;border-radius:18px;touch-action:none;background:#000;cursor:grab}
-</style></head><body>
+</style><style>
+.falta{font-style:normal;font-size:12px;font-weight:700;color:#ff6a00;margin-left:6px;white-space:nowrap}.falta.pausa{color:#8a8a8a}.falta.ok{color:var(--ok,#1f9d55)}
+.impChk{display:flex;gap:6px;align-items:center;font-size:13px;margin:6px 0}
+.impT{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}.impT th,.impT td{border-bottom:1px solid var(--bd,#ddd);padding:5px 6px;text-align:left;white-space:nowrap}.impT th{font-size:11px;opacity:.7}
+.impT tr.nv td{background:rgba(31,157,85,.08)}.impT tr.df td{background:rgba(255,106,0,.1)}.impT tr.ig td{opacity:.55}.impT tr.er td{background:rgba(220,38,38,.1)}
+.impBx{overflow:auto;max-height:46vh;border:1px solid var(--bd,#ddd);border-radius:10px}.impH{font-size:13px;margin:10px 0 2px}
+</style>
+</head><body>
 <header><div style="display:flex;align-items:center;gap:8px"><img id="avH" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--pu)"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><div class="hdr-dir"><button class="ghost" id="btTema" onclick="alternarTema()" aria-label="Alternar tema claro ou escuro">☀️ Claro</button><span id="per"></span></div></header>
 <main>
 <section id="v-hoje" class="vw">
@@ -267,7 +274,7 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
  <div id="tempo" class="tempoHoje">Trabalhado hoje: 00:00:00</div>
  <button id="sem" class="ghost sem h" onclick="bater('saida')">Encerrar sem intervalo</button>
  <div class="tl" id="tl"></div>
- <div class="cards"><div class="cd3"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><span class="tt">Saída prevista</span><b id="prev">--:--</b></div><span class="sub">Horário para fechar a jornada</span></div><div class="cd3"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><div><span class="tt">Saldo do dia</span><b id="sd">--:--</b></div><span class="sub">Horas a mais ou a menos</span></div><div class="cd3"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><div><span class="tt">Intervalo</span><b id="ivl">--:--</b></div><span class="sub">Tempo de pausa feito</span></div></div>
+ <div class="cards"><div class="cd3"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><span class="tt">Saída prevista</span><b id="prev">--:--</b> <em id="falta" class="falta"></em></div><span class="sub">Horário para fechar a jornada</span></div><div class="cd3"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><div><span class="tt">Saldo do dia</span><b id="sd">--:--</b></div><span class="sub">Horas a mais ou a menos</span></div><div class="cd3"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><div><span class="tt">Intervalo</span><b id="ivl">--:--</b></div><span class="sub">Tempo de pausa feito</span></div></div>
 </section>
 <section id="v-cal" class="vw h">
  <div class="nv"><button onclick="mm(-1)">‹</button><b id="mes" style="text-transform:capitalize"></b><button onclick="mm(1)">›</button></div>
@@ -280,7 +287,7 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
  <div class="box"><span class="lb" id="mt">--</span><div class="bar"><i id="mb" style="width:0"></i></div><span class="lb" id="mh">--</span></div>
  <div class="rs" id="rs"></div>
  <div class="box" id="fbox"></div>
- <div class="acts"><button class="ghost" onclick="abrirEd(null)">+ Dia extra</button><button class="ghost" onclick="fech()">Fechar mês</button><button class="ghost" onclick="csv()">CSV</button><button class="ghost" onclick="abrirRel()">📄 Relatório</button><button class="ghost" onclick="abrirFer()">🏖 Férias</button></div>
+ <div class="acts"><button class="ghost" onclick="abrirEd(null)">+ Dia extra</button><button class="ghost" onclick="fech()">Fechar mês</button><button class="ghost" onclick="csv()">CSV</button><button class="ghost" onclick="abrirRel()">📄 Relatório</button><button class="ghost" onclick="abrirFer()">🏖 Férias</button><button class="ghost" onclick="abrirImp()">📥 Importar espelho</button></div>
  <div id="ls"></div>
 </section>
 <section id="v-imp" class="vw h">
@@ -387,6 +394,13 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
   <div class="acts"><button class="ghost" onclick="relCopiar()">Copiar</button><button class="ghost" onclick="relZap()">WhatsApp</button><button class="ghost" onclick="relShare()">Compartilhar</button></div>
   <p class="bk">O GitHub leva cerca de 1 minuto para publicar; se der "não encontrado", espere e atualize.</p></div>
  <div class="acts" style="margin-top:8px"><button class="ghost" onclick="$('rl').close()">Fechar</button></div></dialog>
+<dialog id="imp" style="width:min(96vw,860px);max-height:92vh;overflow:auto"><h3>📥 Importar espelho de ponto (PDF)</h3>
+<p class="bk">Escolha o PDF do espelho já assinado (precisa ser o PDF com texto, não foto). Os dias e horários batidos são lidos e gravados no app. Nada que já existe é alterado, a menos que você marque “Substituir”.</p>
+<input type="file" id="impF" accept="application/pdf,.pdf" multiple style="margin:6px 0">
+<label class="impChk"><input type="checkbox" id="impOver" onchange="prevImp()"> Substituir dias que já têm registro diferente</label>
+<div id="impM"></div><div id="impL"></div>
+<div class="acts" style="margin:12px 0"><button class="ghost" id="impB" onclick="aplicarImp()" style="display:none">Importar selecionados</button><button class="ghost" onclick="$('imp').close()">Fechar</button></div>
+<h4 style="margin:14px 0 6px">Períodos no app — ano todo</h4><div id="impAno"></div></dialog>
 <dialog id="fc"><h3>Fechamento do mês</h3><div id="fcB"></div><div class="acts" style="margin:14px 0 0"><button class="ghost" onclick="$('fc').close();abrirRel()">📄 Relatório p/ chefia</button><button class="ghost" onclick="$('fc').close()">Fechar</button></div></dialog>
 <dialog id="lk"><h3>Configurar outro aparelho</h3>
  <p class="bk">Abra este link (ou escaneie o QR) no outro celular/PC: ele já fica configurado e puxa seus pontos. <b>O link contém o token — mande só pra você e apague depois.</b></p>
@@ -749,8 +763,8 @@ function calc(r,d=new Date()){const J=C.jornadaDiaria*60;
  const e=TM(r.entrada),a=TM(r.saidaIntervalo),b=TM(r.voltaIntervalo),f=TM(r.saida),hj=K(d)===K(new Date());
  const end=f!=null?f:!hj?(b??a??e):(a!=null&&b==null)?a:Math.max(NOW(),e);
  const iv=a!=null&&b!=null?b-a:0,ie=iv>0?Math.max(iv,C.intervaloMinimo):0,t=end-e-ie,s=t-J;
- return{t,s,iv,st:t<=0?'fa':s<-C.tolerancia?'pa':'ok',prev:e+J+(ie||C.intervaloMinimo)}}
-function per(ref=new Date()){const g=C.diaFechamento,d=ref.getDate(),m=ref.getMonth(),y=ref.getFullYear();return d>=g?{i:new Date(y,m,g),f:new Date(y,m+1,g-1)}:{i:new Date(y,m-1,g),f:new Date(y,m,g-1)}}
+ return{t,s,iv,st:t<=0?'fa':s<-C.tolerancia?'pa':'ok',prev:(a!=null&&b==null&&hj)?Math.max(a+C.intervaloMinimo,NOW())+J-(a-e):e+J+(ie||C.intervaloMinimo)}}
+function per(ref=window.REFP||new Date()){const g=C.diaFechamento,d=ref.getDate(),m=ref.getMonth(),y=ref.getFullYear();return d>=g?{i:new Date(y,m,g),f:new Date(y,m+1,g-1)}:{i:new Date(y,m-1,g),f:new Date(y,m,g-1)}}
 function resumo(ref){const p=per(ref),J=C.jornadaDiaria*60,lim=new Date();lim.setHours(23,59,59,999);let T=0,X=0,F=0,A=0,U=0,D=0,dias=[];
  for(let c=new Date(p.i);c<=p.f&&c<=lim;c.setDate(c.getDate()+1)){const d=new Date(c),r=E[K(d)],x=calc(r,d),fim=fds(d),w=fim||(r&&(r.tipo==='feriado'||r.tipo==='ferias'));if(!w)U++;
   if(!w||r){T+=Math.max(0,x.t);if(x.st==='fa'){if(!w)F+=J}else if(x.s>0)X+=x.s;else if(x.s<0)A-=x.s}
@@ -793,7 +807,7 @@ function rHoje(){const d=new Date(),r=E[K(d)],x=calc(r,d),[tx,c]=prox(r),u=usuar
  $('tempo').textContent='Trabalhado hoje: '+HMS(Math.max(0,x.t)*60);
  $('st').textContent=r&&r.tipo==='ferias'?'🏖 Em férias':!r||!r.entrada?(fds(d)?'Fim de semana':'Aguardando entrada'):r.saida?'Jornada concluída':r.saidaIntervalo&&!r.voltaIntervalo?'Em intervalo':'Em jornada';
  $('tl').innerHTML=[['Entrada','entrada'],['Intervalo','saidaIntervalo'],['Volta','voltaIntervalo'],['Saída','saida']].map(([n,k])=>`<div class="${r&&r[k]?'on':''}"><i></i><b>${r&&r[k]||'--:--'}</b>${n}</div>`).join('');
- const on=r&&r.entrada;$('prev').textContent=on?HM(x.prev):'--:--';$('sd').textContent=on?HM(x.s):'--:--';$('sd').style.color=on?(x.s>=0?'var(--ok)':'var(--bad)'):'';$('ivl').textContent=x.iv?HM(x.iv):'--:--';rContagem();sinoUI()}
+ const on=r&&r.entrada;$('prev').textContent=on?HM(x.prev):'--:--';$('sd').textContent=on?HM(x.s):'--:--';$('sd').style.color=on?(x.s>=0?'var(--ok)':'var(--bad)'):'';$('ivl').textContent=x.iv?HM(x.iv):'--:--';rContagem();sinoUI();rFalta(r,d)}
 function rCal(){const y=mc.getFullYear(),m=mc.getMonth(),g=$('gr'),h=new Date();g.innerHTML='';
  $('mes').textContent=mc.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
  for(let i=0;i<new Date(y,m,1).getDay();i++)g.innerHTML+='<div class="dc v"></div>';
@@ -988,4 +1002,92 @@ let WL=null;async function manterTela(){try{const q=C.telaLigada&&C.avisosAtivos
  let dia=K(new Date());setInterval(()=>{if(K(new Date())!==dia){dia=K(new Date());mc=new Date();render()}},60000);
  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
-</script></body></html>
+</script><script>
+/* ===== Falta para sair: conta só o trabalho, sem o intervalo ===== */
+function rFalta(r,d){const el=$('falta');if(!el)return;
+ if(!r||!r.entrada||r.tipo){el.textContent='';el.className='falta';return}
+ if(r.saida){el.textContent='✔ jornada concluída';el.className='falta ok';return}
+ const J=C.jornadaDiaria*3600,n=d.getHours()*3600+d.getMinutes()*60+d.getSeconds(),e=TM(r.entrada)*60,
+  a=r.saidaIntervalo?TM(r.saidaIntervalo)*60:null,b=r.voltaIntervalo?TM(r.voltaIntervalo)*60:null,
+  w=a==null?n-e:b==null?a-e:(a-e)+(n-b),rem=J-w;
+ if(rem<=0){el.textContent='✔ '+HM(C.jornadaDiaria*60)+' cumpridas';el.className='falta ok';return}
+ const pausa=a!=null&&b==null;
+ el.textContent='falta '+HMS(rem)+(pausa?' · parado no intervalo':'');el.className='falta'+(pausa?' pausa':'')}
+
+/* ===== Importar espelho de ponto (PDF) ===== */
+let IMP=[];
+const mi=t=>{const [h,m]=t.split(':');return +h*60+ +m},hh=t=>t.padStart(5,'0');
+function carregarPdfJs(){return window.pdfjsLib?Promise.resolve():new Promise((ok,er)=>{const s=document.createElement('script');
+ s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+ s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';ok()};
+ s.onerror=()=>er(new Error('Não consegui carregar o leitor de PDF (precisa de internet nesta etapa).'));document.head.appendChild(s)})}
+async function linhasPdf(file){await carregarPdfJs();
+ const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,L=[];
+ for(let p=1;p<=pdf.numPages;p++){const tc=await(await pdf.getPage(p)).getTextContent(),rows=[];
+  tc.items.forEach(it=>{const t=(it.str||'').trim();if(!t)return;const y=Math.round(it.transform[5]),x=it.transform[4];let g=rows.find(z=>Math.abs(z.y-y)<=3);if(!g)rows.push(g={y,it:[]});g.it.push({x,s:t})});
+  rows.sort((a,b)=>b.y-a.y).forEach(g=>L.push(g.it.sort((a,b)=>a.x-b.x).map(i=>i.s).join(' ')))}
+ return L}
+function tipoTexto(t,dow){if(/f[ée]rias/i.test(t))return'ferias';if(/falta/i.test(t))return'falta';
+ if(/^fer$/i.test(dow)||/feriado|independ|natal|tiradentes|p[áa]scoa|carnaval|corpus|finados|proclama|aparecida|consci|confraterniz|ano novo|dia do trabalho/i.test(t))return'feriado';
+ if(/atestado|abono|folga|compens|licen|dispens|banco/i.test(t))return'feriado';return t?'?':''}
+function lerEspelho(L){
+ const txt=L.join('\n'),pm=txt.match(/Per[ií]odo:\s*(\d{2})\/(\d{2})\/(\d{4})\s*a\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+ if(!pm)return{erro:'Não achei o “Período: dd/mm/aaaa a dd/mm/aaaa” neste PDF. Só leio o espelho com texto (PDF gerado pelo sistema); foto ou documento escaneado não dá.'};
+ const i=new Date(+pm[3],pm[2]-1,+pm[1]),f=new Date(+pm[6],pm[5]-1,+pm[4]),dias=[];
+ const nome=(txt.match(/Nome:\s*(.+)/i)||[,''])[1].trim(),total=(txt.match(/Horas Noturnas \+ Normais:\s*(\d+:\d{2})/i)||[,''])[1];
+ L.forEach(l=>{const m=l.match(/^\s*(\d{2})\/(\d{2})\s+(Seg|Ter|Qua|Qui|Sex|S[áa]b|Dom|Fer)\b\s*(.*)$/i);if(!m)return;
+  let d=new Date(i.getFullYear(),m[2]-1,+m[1]);if(d<i)d=new Date(i.getFullYear()+1,m[2]-1,+m[1]);if(d<i||d>f)return;
+  const rest=m[4].trim(),T=(rest.match(/\b\d{1,2}:\d{2}\b/g)||[]).map(hh),so=rest.replace(/\b\d{1,2}:\d{2}\b/g,'').trim(),o={k:K(d),d,dow:m[3],aviso:''};
+  if(!T.length){const t=tipoTexto(so,m[3]);if(!t&&!so){o.vazio=1}else{o.tipo=t;o.txt=so}dias.push(o);return}
+  let P=T.slice(),ht=null;
+  if(P.length>=3&&P.length%2===1){const u=P.pop(),sm=P.reduce((a,x,j)=>j%2?a+mi(x)-mi(P[j-1]):a,0);if(Math.abs(sm-mi(u))<=1)ht=u;else P.push(u)}
+  const n=P.length;o.n=n;
+  if(n===1){o.entrada=P[0]}
+  else if(n===2){o.entrada=P[0];o.saida=P[1]}
+  else if(n===3){o.entrada=P[0];o.saidaIntervalo=P[1];o.voltaIntervalo=P[2];o.aviso='3 marcações (sem saída)'}
+  else{o.entrada=P[0];o.saida=P[n-1];let bi=1,bg=-1;for(let j=1;j+1<n-1;j+=2){const g=mi(P[j+1])-mi(P[j]);if(g>bg){bg=g;bi=j}}
+   o.saidaIntervalo=P[bi];o.voltaIntervalo=P[bi+1];if(n>4)o.aviso=n+' marcações: usei a 1ª, a última e o maior intervalo'}
+  if(P.some((x,j)=>j&&mi(x)<mi(P[j-1])))o.aviso=(o.aviso?o.aviso+'; ':'')+'horários fora de ordem';
+  o.ht=ht;if(o.saida)o.t=calc({entrada:o.entrada,saidaIntervalo:o.saidaIntervalo||null,voltaIntervalo:o.voltaIntervalo||null,saida:o.saida},d).t;
+  dias.push(o)});
+ return{i,f,nome,total,dias}}
+const reg=o=>o.tipo&&o.tipo!=='?'?{tipo:o.tipo,obs:o.txt||''}:{entrada:o.entrada,saidaIntervalo:o.saidaIntervalo||null,voltaIntervalo:o.voltaIntervalo||null,saida:o.saida||null,obs:'Importado do espelho'+(o.aviso?' ('+o.aviso+')':'')};
+const igual=(a,b)=>a&&b&&(a.tipo||'')===(b.tipo||'')&&(a.entrada||'')===(b.entrada||'')&&(a.saidaIntervalo||'')===(b.saidaIntervalo||'')&&(a.voltaIntervalo||'')===(b.voltaIntervalo||'')&&(a.saida||'')===(b.saida||'');
+function abrirImp(){$('impAno').innerHTML=anoHTML();$('imp').showModal()}
+$('impF').onchange=async()=>{const fs=[...$('impF').files];IMP=[];$('impM').innerHTML='';$('impB').style.display='none';
+ for(const f of fs){try{const r=lerEspelho(await linhasPdf(f));if(r.erro){$('impM').innerHTML+=`<p class="bk" style="color:#dc2626"><b>${escI(f.name)}</b>: ${escI(r.erro)}</p>`;continue}r.arq=f.name;IMP.push(r)}catch(e){$('impM').innerHTML+=`<p class="bk" style="color:#dc2626"><b>${escI(f.name)}</b>: ${escI(e.message)}</p>`}}
+ $('impF').value='';prevImp()};
+function escImp(ai,di,v){const o=IMP[ai].dias[di];if(!o.orig)o.orig={vazio:o.vazio,tipo:o.tipo};o.man=1;if(v){o.tipo=v;o.vazio=0;o.txt=o.txt||''}else{o.vazio=o.orig.vazio;o.tipo=o.orig.tipo}prevImp()}
+const tl=t=>({ferias:'Férias',falta:'Falta',feriado:'Feriado / dispensado','?':'Texto não reconhecido'})[t]||'';
+function prevImp(){const over=$('impOver').checked;let h='';
+ IMP.forEach((r,ai)=>{let soma=0;r.dias.forEach(o=>{if(o.t>0)soma+=o.t});
+  const ok=r.total?Math.abs(soma-mi(r.total))<=1:null;
+  h+=`<div class="impH"><b>${escI(r.nome||r.arq)}</b> · ${BR(r.i)} a ${BR(r.f)} · total do PDF <b>${r.total||'—'}</b> · calculado <b>${HM(soma)}</b> ${ok===null?'':ok?'✔ confere':'⚠ diferente'}</div><div class="impBx"><table class="impT"><thead><tr><th></th><th>Data</th><th>Dia</th><th>Entrada</th><th>Interv.</th><th>Volta</th><th>Saída</th><th>HT PDF</th><th>App</th><th>Situação</th></tr></thead><tbody>`;
+  r.dias.forEach((o,di)=>{if(o.vazio&&/^(S[áa]b|Dom)$/i.test(o.dow))return;
+   const ex=E[o.k],tp=o.tipo&&o.tipo!=='?',dados=!o.vazio&&o.tipo!=='?';let cl='',st='',ck=0;
+   if(o.vazio){st='sem marcação — escolha se foi falta/abono, ou deixe ignorar'}
+   else if(o.tipo==='?'){cl='er';st='Texto “'+escI(o.txt)+'” — escolha o que é'}
+   else if(!ex){cl='nv';st=tp?tl(o.tipo)+(o.txt?': '+escI(o.txt):''):'novo';ck=1}
+   else if(igual(ex,reg(o))){cl='ig';st='já está igual no app'}
+   else{cl='df';st='já existe um registro diferente';ck=over?1:0}
+   if(o.aviso)st+=' · ⚠ '+escI(o.aviso);
+   const df=o.ht&&o.t!=null&&Math.abs(o.t-mi(o.ht))>1?' style="color:#dc2626;font-weight:700"':'';
+   const man=o.tipo==='?'||o.vazio||o.man,sel=man?`<select onchange="escImp(${ai},${di},this.value)">${[['','ignorar'],['falta','Falta'],['feriado','Feriado/dispensado'],['ferias','Férias']].map(([v,l])=>`<option value="${v}"${(o.tipo&&o.tipo!=='?'?o.tipo:'')===v?' selected':''}>${l}</option>`).join('')}</select>`:'';
+   h+=`<tr class="${cl}"><td>${dados?`<input type="checkbox" class="ick" data-a="${ai}" data-d="${di}"${ck?' checked':''}>`:''}</td><td>${BR(o.d)}</td><td>${o.dow}</td>`+
+    (o.tipo?`<td colspan="4">${o.tipo==='?'||o.man?sel:tl(o.tipo)+(o.txt?' — '+escI(o.txt):'')}</td><td></td><td></td>`:o.vazio?`<td colspan="6">${sel}</td>`:`<td>${o.entrada||''}</td><td>${o.saidaIntervalo||''}</td><td>${o.voltaIntervalo||''}</td><td>${o.saida||''}</td><td>${o.ht||''}</td><td${df}>${o.t!=null?HM(o.t):''}</td>`)+`<td>${st}</td></tr>`});
+  h+='</tbody></table></div>'});
+ $('impL').innerHTML=h;$('impB').style.display=IMP.length?'inline-block':'none'}
+function aplicarImp(){let n=0;document.querySelectorAll('#impL .ick:checked').forEach(c=>{const o=IMP[+c.dataset.a].dias[+c.dataset.d];if(!o||o.tipo==='?')return;E[o.k]=reg(o);n++});
+ if(!n){toast('Nenhum dia selecionado para importar','bad');return}
+ salvar();render();if(C.githubAtivo)syncGithub(false);toast(n+' dia(s) importado(s) ✔','ok',6000);
+ $('impAno').innerHTML=anoHTML();prevImp()}
+function anoHTML(){const ks=Object.keys(E).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort();if(!ks.length)return'<p class="bk">Ainda não há dias registrados.</p>';
+ const fim=per(new Date()).i;let c=per(new Date(ks[0]+'T12:00')).i,h='<div class="impBx"><table class="impT"><thead><tr><th>Período</th><th>Dias</th><th>Horas</th><th>Extras</th><th>Faltas</th><th></th></tr></thead><tbody>';
+ for(let g=0;c<=fim&&g<60;g++){const R=resumo(c),fer=feriasNoPeriodo(R.p).n;
+  if(R.D||fer)h+=`<tr><td>${BR(R.p.i)} a ${BR(R.p.f)}</td><td>${R.D}${fer?' + '+fer+' férias':''}</td><td><b>${HM(R.T)}</b></td><td>${HM(R.X)}</td><td>${HM(R.F)}</td><td><button class="ghost" onclick="perFn(${R.p.i.getTime()},'fech')">Fechar mês</button> <button class="ghost" onclick="perFn(${R.p.i.getTime()},'csv')">CSV</button> <button class="ghost" onclick="perFn(${R.p.i.getTime()},'folha')">Folha</button></td></tr>`;
+  c=new Date(R.p.f.getFullYear(),R.p.f.getMonth(),R.p.f.getDate()+1)}
+ return h+'</tbody></table></div>'}
+function perFn(ts,fn){window.REFP=new Date(+ts);try{({fech,csv,folha:abrirFolha})[fn]()}finally{window.REFP=null}}
+</script>
+
+</body></html>
