@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ff6a00"><link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7251d3"><link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <title>Infinity Ponto</title>
@@ -246,6 +246,181 @@ dialog::backdrop{background:rgba(40,16,0,.55)}
 .impT{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}.impT th,.impT td{border-bottom:1px solid var(--bd,#ddd);padding:5px 6px;text-align:left;white-space:nowrap}.impT th{font-size:11px;opacity:.7}
 .impT tr.nv td{background:rgba(31,157,85,.08)}.impT tr.df td{background:rgba(255,106,0,.1)}.impT tr.ig td{opacity:.55}.impT tr.er td{background:rgba(220,38,38,.1)}
 .impBx{overflow:auto;max-height:46vh;border:1px solid var(--bd,#ddd);border-radius:10px}.impH{font-size:13px;margin:10px 0 2px}
+</style>
+<style id="tema-glass">
+/* ===== Tema Glass Lilás (referência: janela de vidro roxa, cartões AA/AAA, paleta lavanda→índigo) ===== */
+:root{color-scheme:light;--bg:#cdc1f1;--cd:rgba(255,255,255,.34);--c2:rgba(255,255,255,.46);--tx:#1b1078;--mu:#4b3c9e;--ac:#331ea2;--pu:#5b3fd0;--bd:rgba(255,255,255,.62);--sh:0 14px 34px rgba(51,30,162,.22);
+ --glass:linear-gradient(145deg,rgba(255,255,255,.50),rgba(255,255,255,.18));--hi:inset 0 1px 0 rgba(255,255,255,.75),inset 0 -1px 0 rgba(255,255,255,.18);--indigo:linear-gradient(145deg,#5b3fd0,#331ea2 62%,#1b1078);--blur:blur(16px) saturate(1.5)}
+:root[data-tema=dark]{color-scheme:dark;--bg:#161461;--cd:rgba(255,255,255,.09);--c2:rgba(255,255,255,.15);--tx:#ebdef8;--mu:#b6a7e6;--ac:#a68ddb;--pu:#987fe0;--bd:rgba(255,255,255,.2);--sh:0 14px 34px rgba(8,5,60,.55);
+ --glass:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.05));--hi:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(255,255,255,.05)}
+
+body{background:radial-gradient(120% 70% at 85% -10%,rgba(255,255,255,.65) 0,transparent 60%),linear-gradient(160deg,#d9d2e8 0%,#b6a7e6 38%,#987fe0 78%,#7251d3 100%) fixed;color:var(--tx);font-family:'Inter',system-ui,'Segoe UI',sans-serif}
+:root[data-tema=dark] body{background:radial-gradient(110% 60% at 85% -10%,rgba(152,127,224,.38) 0,transparent 60%),linear-gradient(160deg,#331ea2 0%,#221a8c 35%,#161461 75%,#0f0c4a 100%) fixed}
+
+/* paleta de 6 tons da referência como fio sob o cabeçalho */
+header::after{content:"";flex:0 0 100%;height:6px;margin-top:8px;border-radius:4px;background:linear-gradient(90deg,#d9d2e8 0 16.66%,#b6a7e6 0 33.33%,#a68ddb 0 50%,#987fe0 0 66.66%,#7251d3 0 83.33%,#1b1078 0 100%);box-shadow:0 3px 10px rgba(51,30,162,.25)}
+header b{background:linear-gradient(90deg,#1b1078,#5b3fd0);-webkit-background-clip:text;background-clip:text;color:transparent}
+:root[data-tema=dark] header b{background:linear-gradient(90deg,#ebdef8,#987fe0);-webkit-background-clip:text;background-clip:text}
+header span{color:var(--mu)}
+
+/* superfícies de vidro */
+.box,.cd3,.tl,.rs div,.it,.st3 div,.modoImp,.tempoHoje,.fi,.ghost,.dc:not(.v):not(.ok):not(.pa):not(.fa):not(.fe):not(.sab):not(.dom):not(.fr):not(.w){background:var(--glass);border:1px solid var(--bd);box-shadow:var(--sh),var(--hi);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.box{border-radius:24px}.cd3{border-radius:22px}.tl{border-radius:24px}.it,.rs div{border-radius:18px}
+.ghost{border-radius:14px;color:var(--tx)}.ghost:hover{border-color:#fff}
+.dc{box-shadow:none}.dc.sab,.dc.dom,.dc.ok,.dc.fa,.dc.fe{box-shadow:0 4px 10px rgba(27,16,120,.25)}
+.dc.w{background:rgba(255,255,255,.22);color:var(--mu)}.dc.hj{outline-color:#331ea2}
+:root[data-tema=dark] .dc.hj{outline-color:#d9d2e8}
+.bk,.lb,.lg,.sm{color:var(--mu)}
+.sm span:first-child{color:#c2307a}.sm span:last-child{color:#3b4fd6}
+:root[data-tema=dark] .sm span:first-child{color:#f9a8d4}:root[data-tema=dark] .sm span:last-child{color:#93c5fd}
+.nv button{background:var(--glass);border:1px solid var(--bd);box-shadow:var(--hi);color:var(--ac)}
+:root:not([data-tema=dark]) .nv button{color:#331ea2}
+
+/* janela de vidro (REP) com 3 pontos, como a janela da referência */
+.rep{background:radial-gradient(circle at 22px 17px,rgba(255,255,255,.95) 0 4.5px,transparent 5px),radial-gradient(circle at 40px 17px,rgba(255,255,255,.85) 0 4.5px,transparent 5px),radial-gradient(circle at 58px 17px,rgba(255,255,255,.75) 0 4.5px,transparent 5px),linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,.45)) 0 34px/100% 1px no-repeat,var(--glass);
+ border:1px solid rgba(255,255,255,.7);border-radius:26px;padding:48px 18px 22px;color:var(--tx);box-shadow:0 22px 50px rgba(51,30,162,.32),var(--hi);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5)}
+:root[data-tema=dark] .rep{border-color:rgba(255,255,255,.28)}
+.rep::before{background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,0));border-radius:26px 26px 60% 60%/26px 26px 40px 40px}
+.repTop{margin-bottom:12px}
+.marca{color:var(--mu);letter-spacing:1.4px}.marca b{color:var(--tx)}
+.lcdSt,.sensorLabel{color:var(--mu)}
+.led{background:rgba(27,16,120,.35);box-shadow:inset 0 0 3px rgba(0,0,0,.4)}
+.led.on{background:#3ddc84;box-shadow:0 0 8px #3ddc84}.led.err{background:#ff5b5b;box-shadow:0 0 8px #ff5b5b}
+/* mostrador = cartão índigo da referência (4.8:1) */
+.lcdBig{background:var(--indigo);color:#fff;text-shadow:0 0 14px rgba(217,210,232,.7);border-radius:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -6px 14px rgba(0,0,0,.28),0 10px 22px rgba(51,30,162,.35)}
+.lc{background:var(--indigo);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -4px 10px rgba(0,0,0,.25);color:#ebdef8}
+.lc span{color:#d9d2e8}
+.lc.am{color:#ffd36b}.lc.vm{color:#ff8f86}
+/* sensor = botão de vidro com selo de verificação */
+.sensor{background:radial-gradient(circle at 35% 28%,#a68ddb,#5b3fd0 45%,#1b1078 100%);box-shadow:0 12px 26px rgba(27,16,120,.5),inset 0 2px 5px rgba(255,255,255,.55),inset 0 -5px 10px rgba(0,0,0,.35)}
+.sensor::before{border-color:rgba(255,255,255,.75)}
+.sensor svg{stroke:#ebdef8}.sensor.lendo svg{stroke:#fff;filter:drop-shadow(0 0 6px #fff)}.sensor.ok svg{stroke:#8af0b8}.sensor.err svg{stroke:#ff8f86}
+.scanline{background:#fff;box-shadow:0 0 10px #fff,0 0 18px #987fe0}
+.sensor.lendo::after{border-color:#d9d2e8}
+.ondas i:first-child{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 90'%3E%3Cpath d='M0 45 Q100 10 200 45 T400 45 V90 H0Z' fill='rgba(255,255,255,.26)'/%3E%3C/svg%3E")}
+.ondas i:last-child{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 90'%3E%3Cpath d='M0 55 Q100 85 200 55 T400 55 V90 H0Z' fill='rgba(114,81,211,.30)'/%3E%3C/svg%3E")}
+#fotoHoje{border:4px solid #fff;box-shadow:0 0 0 6px rgba(255,255,255,.35),0 12px 26px rgba(27,16,120,.45);background:#1b1078}
+
+/* cartões de indicadores e selo de check */
+.tempoHoje,#tempo.tempoHoje{color:var(--tx)}
+.ic{background:var(--indigo);box-shadow:inset 0 2px 5px rgba(255,255,255,.5),inset 0 -4px 8px rgba(0,0,0,.28),0 8px 16px rgba(51,30,162,.4);border:2px solid rgba(255,255,255,.7)}
+.falta{color:#5b3fd0}:root[data-tema=dark] .falta{color:#c9b8ff}
+.tl:before{background:rgba(255,255,255,.7)}
+.tl i{background:rgba(255,255,255,.75);border-color:#fff}
+.tl div.on i{background:#331ea2;border-color:#fff;box-shadow:0 0 0 4px rgba(91,63,208,.28)}
+:root[data-tema=dark] .tl div.on i{background:#a68ddb}
+.bar{background:rgba(255,255,255,.45);box-shadow:inset 0 1px 3px rgba(27,16,120,.2)}
+.bar i{background:linear-gradient(90deg,#987fe0,#5b3fd0 60%,#331ea2)}
+.rs b{color:var(--tx)}
+
+/* botões primários: retângulo índigo da referência */
+.big,.big[data-c=entrada]{background:var(--indigo);color:#fff;box-shadow:0 12px 26px rgba(51,30,162,.42),inset 0 1px 0 rgba(255,255,255,.4)}
+.big[data-c=saida]{background:linear-gradient(145deg,#e0554a,#b3261e);color:#fff;box-shadow:0 12px 26px rgba(179,38,30,.4)}
+.big::after,nav button.on::after{background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.03))}
+.seg{background:rgba(255,255,255,.35);border:1px solid var(--bd)}
+.segBtn.on{background:var(--indigo);color:#fff;box-shadow:0 5px 12px rgba(51,30,162,.4)}
+.segBtn{color:var(--mu)}
+
+/* navegação flutuante em vidro */
+nav{background:var(--glass);border:1px solid var(--bd);box-shadow:0 16px 36px rgba(51,30,162,.35),var(--hi);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6)}
+nav button{color:var(--mu)}
+nav button.on{background:var(--indigo);color:#fff;box-shadow:0 6px 14px rgba(51,30,162,.4)}
+
+/* campos */
+input[type=text],input[type=number],input[type=time],input[type=date],select,textarea{background:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.8);color:var(--tx);box-shadow:inset 0 1px 3px rgba(51,30,162,.12)}
+:root[data-tema=dark] input[type=text],:root[data-tema=dark] input[type=number],:root[data-tema=dark] input[type=time],:root[data-tema=dark] input[type=date],:root[data-tema=dark] select,:root[data-tema=dark] textarea{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25)}
+input:focus,select:focus,textarea:focus{border-color:#5b3fd0;box-shadow:0 0 0 4px rgba(91,63,208,.28)}
+:root[data-tema=dark] input:focus,:root[data-tema=dark] select:focus,:root[data-tema=dark] textarea:focus{border-color:#a68ddb}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23331ea2' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"),linear-gradient(135deg,rgba(255,255,255,.65),rgba(255,255,255,.35))}
+:root[data-tema=dark] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23d9d2e8' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"),linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.06))}
+option{background:#ebdef8;color:#1b1078}:root[data-tema=dark] option{background:#1b1078;color:#ebdef8}
+input[type=checkbox],input[type=radio]{accent-color:#5b3fd0}
+label{color:var(--mu)}
+.modoImp label:has(input:checked){background:rgba(255,255,255,.55);color:#331ea2}
+:root[data-tema=dark] .modoImp label:has(input:checked){background:rgba(255,255,255,.16);color:#ebdef8}
+
+/* diálogos */
+dialog{background:rgba(236,229,252,.9);color:#1b1078;border:1px solid rgba(255,255,255,.85);border-radius:28px;box-shadow:0 30px 70px rgba(27,16,120,.5),var(--hi);-webkit-backdrop-filter:blur(24px) saturate(1.5);backdrop-filter:blur(24px) saturate(1.5)}
+:root[data-tema=dark] dialog{background:rgba(30,22,125,.9);color:#ebdef8;border-color:rgba(255,255,255,.25)}
+dialog::backdrop{background:rgba(27,16,120,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+dialog .ghost,dialog .box{box-shadow:none}
+.fl{border-bottom-color:rgba(75,60,158,.25)}
+
+/* aviso */
+#toast{background:var(--indigo);color:#fff;box-shadow:0 14px 30px rgba(27,16,120,.45)}
+
+/* impressora */
+.maq{background:var(--glass);border:1px solid var(--bd);box-shadow:0 14px 30px rgba(51,30,162,.28),var(--hi)}
+.lcd{background:var(--indigo);color:#ebdef8;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -4px 10px rgba(0,0,0,.3)}
+.lcd.oc::after{background:#ebdef8}
+.btmaq{background:var(--glass);border:1px solid var(--bd);box-shadow:0 8px 18px rgba(51,30,162,.3),var(--hi)}
+.btmaq:active,.btmaq[disabled]{box-shadow:inset 0 4px 10px rgba(51,30,162,.3)}
+.btmaq i{background:#5b3fd0;box-shadow:0 0 12px #987fe0}
+
+/* tabelas de importação */
+.impT tr.df td{background:rgba(114,81,211,.16)}.impT th{opacity:.85}
+.impBx{border-color:rgba(255,255,255,.7)}
+a{color:#331ea2}
+::selection{background:#987fe0;color:#fff}
+:focus-visible{outline:3px solid #5b3fd0;outline-offset:2px}
+:root[data-tema=dark] :focus-visible{outline-color:#d9d2e8}
+@media(prefers-reduced-transparency:reduce){.box,.cd3,.tl,.rs div,.it,.rep,nav,dialog,.ghost{-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+:root[data-tema=dark] .rep::before{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,0))}
+:root[data-tema=dark] .lcdBig,:root[data-tema=dark] .lc{background:linear-gradient(145deg,#4a30c4,#2a1a98 55%,#14106a);border:1px solid rgba(255,255,255,.3)}
+:root[data-tema=dark] header::after{box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+body,:root[data-tema=dark] body{background-repeat:no-repeat;background-attachment:fixed;background-size:100% 100%;min-height:100vh}
+/* ===== v2: mais transparência, cantos menos redondos, cartões lado a lado como na referência ===== */
+:root{--glass:linear-gradient(145deg,rgba(255,255,255,.30),rgba(255,255,255,.07));--bd:rgba(255,255,255,.55);--blur:blur(22px) saturate(1.6);--r:14px}
+:root[data-tema=dark]{--glass:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.03));--bd:rgba(255,255,255,.2)}
+.box{border-radius:16px}.tl{border-radius:16px}.it,.rs div,.st3 div{border-radius:12px}
+.ghost,.nv button,.tempoHoje,.big,.segBtn,.seg{border-radius:10px}
+.nv button{width:38px;height:38px}
+.tempoHoje{border-radius:10px}
+.big{height:60px;font-size:17px}.big::after,nav button.on::after{border-radius:10px 10px 50% 50%/10px 10px 14px 14px}
+.seg{border-radius:12px}.segBtn{border-radius:9px}
+input[type=text],input[type=number],input[type=time],input[type=date],select,textarea{border-radius:10px;background:rgba(255,255,255,.28)}
+:root[data-tema=dark] input[type=text],:root[data-tema=dark] input[type=number],:root[data-tema=dark] input[type=time],:root[data-tema=dark] input[type=date],:root[data-tema=dark] select,:root[data-tema=dark] textarea{background:rgba(255,255,255,.07)}
+.modoImp{border-radius:14px}.modoImp label{border-radius:10px}
+dialog{border-radius:18px;background:rgba(236,229,252,.74)}
+:root[data-tema=dark] dialog{background:rgba(30,22,125,.74)}
+.maq{border-radius:16px}.btmaq{border-radius:14px}.lcd{border-radius:8px}
+.dc{border-radius:10px}
+
+/* janela */
+.rep{border-radius:18px;border-color:rgba(255,255,255,.6);box-shadow:0 18px 44px rgba(51,30,162,.28),var(--hi);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6)}
+.rep::before{border-radius:18px 18px 60% 60%/18px 18px 30px 30px;background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0))}
+:root[data-tema=dark] .rep::before{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0))}
+.lcdBig{border-radius:10px;background:linear-gradient(145deg,rgba(91,63,208,.92),rgba(27,16,120,.92))}
+.lc{border-radius:8px}
+.sensor{border-radius:24px;width:92px;height:92px;background:linear-gradient(145deg,rgba(166,141,219,.95),rgba(91,63,208,.95) 50%,rgba(27,16,120,.95))}
+.sensor::before{border-radius:30px;inset:-7px}
+.sensor.lendo::after{border-radius:24px}
+.scanline{left:18%;right:18%}
+
+/* foto: moldura de vidro, quadrada arredondada */
+.fotoWrap{margin:0 0 18px}
+#fotoHoje{width:132px;height:132px;border-radius:22px;border:1px solid rgba(255,255,255,.85);padding:5px;background:rgba(255,255,255,.28);box-shadow:0 14px 30px rgba(27,16,120,.4),inset 0 1px 0 rgba(255,255,255,.7);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+#avH{border-radius:9px!important;border:1px solid rgba(255,255,255,.8)!important}
+#pFt{border-radius:16px!important}
+
+/* indicadores: 3 cartões lado a lado, amostra índigo em cima (como os cartões 4.8:1 / 7.2:1) */
+.cards{flex-direction:row;gap:10px;align-items:stretch}
+.cd3{flex:1;min-width:0;flex-direction:column;gap:8px;padding:10px;border-radius:14px;text-align:center}
+.cd3 .sub{display:none}
+.cd3>div{width:100%}
+.ic{width:100%;height:48px;border-radius:9px;border:1px solid rgba(255,255,255,.55)}
+.ic svg{width:24px;height:24px}
+.cd3 b{font-size:19px;display:inline}
+.cd3 .tt{margin-bottom:3px}
+.falta{display:block;margin:2px 0 0;font-size:11px;white-space:normal}
+
+/* navegação */
+nav{border-radius:16px;padding:5px;background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6)}
+nav button{border-radius:11px}
+.tl i{border-radius:4px;width:14px;height:14px}
+.tl div.on i{border-radius:4px}
+.bar,.bar i{border-radius:4px}
 </style>
 </head><body>
 <header><div style="display:flex;align-items:center;gap:8px"><img id="avH" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--pu)"><b>∞ Infinity</b><button class="ghost" style="padding:3px 10px;font-size:11px" onclick="abrirUsr()">👤 Trocar</button></div><div class="hdr-dir"><button class="ghost" id="btTema" onclick="alternarTema()" aria-label="Alternar tema claro ou escuro">☀️ Claro</button><span id="per"></span></div></header>
@@ -663,7 +838,7 @@ function abrirAjuste(src){const img=new Image();img.onload=()=>{FA={S:280,img,sr
 function clampAj(){const w=FA.img.width*FA.z,h=FA.img.height*FA.z;FA.x=Math.min(0,Math.max(FA.S-w,FA.x));FA.y=Math.min(0,Math.max(FA.S-h,FA.y))}
 function pintaAj(){const g=$('faC').getContext('2d'),S=FA.S;g.fillStyle='#000';g.fillRect(0,0,S,S);g.drawImage(FA.img,FA.x,FA.y,FA.img.width*FA.z,FA.img.height*FA.z);
  g.save();g.fillStyle='rgba(0,0,0,.55)';g.beginPath();g.rect(0,0,S,S);g.arc(S/2,S/2,S/2-1,0,Math.PI*2,true);g.fill('evenodd');g.restore();
- g.strokeStyle='#ff7a1a';g.lineWidth=2;g.beginPath();g.arc(S/2,S/2,S/2-1,0,Math.PI*2);g.stroke()}
+ g.strokeStyle='#987fe0';g.lineWidth=2;g.beginPath();g.arc(S/2,S/2,S/2-1,0,Math.PI*2);g.stroke()}
 function zoomAj(){const nz=FA.min*(1+$('faZ').value/100*3),cx=(FA.S/2-FA.x)/FA.z,cy=(FA.S/2-FA.y)/FA.z;FA.z=nz;FA.x=FA.S/2-cx*nz;FA.y=FA.S/2-cy*nz;clampAj();pintaAj()}
 function fecharAj(){$('fa').close();if(FA.src&&String(FA.src).startsWith('blob:'))URL.revokeObjectURL(FA.src)}
 function salvarAj(){const o=document.createElement('canvas'),S=360,k=S/FA.S;o.width=o.height=S;o.getContext('2d').drawImage(FA.img,FA.x*k,FA.y*k,FA.img.width*FA.z*k,FA.img.height*FA.z*k);
@@ -924,7 +1099,7 @@ document.querySelectorAll('input[name=impModo]').forEach(r=>r.addEventListener('
 /* ===== Tema claro/escuro ===== */
 function aplicaTema(t){document.documentElement.dataset.tema=t;try{localStorage.setItem('infinity_tema',t)}catch{}
  const b=$('btTema');if(b)b.textContent=t==='dark'?'☀️ Claro':'🌙 Escuro';
- const m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#17100a':'#ff6a00'}
+ const m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#161461':'#7251d3'}
 function alternarTema(){aplicaTema(document.documentElement.dataset.tema==='dark'?'light':'dark')}
 
 /* ===== Férias ===== */
