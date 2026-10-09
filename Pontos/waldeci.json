@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "dataBackup": "2026-10-08T15:54:10.334Z",
+  "dataBackup": "2026-10-09T01:40:15.091Z",
   "config": {
     "jornadaDiaria": 5,
     "intervaloMinimo": 20,
@@ -505,6 +505,11 @@
       "saida": "12:33",
       "obs": "Importado do espelho",
       "_t": 1791439529315
+    },
+    "2026-10-12": {
+      "tipo": "feriado",
+      "obs": "",
+      "_t": 1791510014413
     }
   },
   "excluidos": {}
