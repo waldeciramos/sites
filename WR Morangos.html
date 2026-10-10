@@ -139,6 +139,10 @@ footer b{color:var(--muted); font-weight:700;}
   border:none; box-shadow:0 5px 12px rgba(0,0,0,.3), inset 0 1px 2px rgba(255,255,255,.6); cursor:pointer; font-size:1.1rem;
   transition:transform .15s;}
 .printer-btn:active{transform:scale(.88);}
+.ico-print{display:inline-block; width:13px; height:13px; vertical-align:-2px; margin-right:.3rem; background-color:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9V2h12v7'/%3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/%3E%3Crect x='6' y='14' width='12' height='8'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9V2h12v7'/%3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/%3E%3Crect x='6' y='14' width='12' height='8'/%3E%3C/svg%3E") center/contain no-repeat;}
+.printer-btn .ico-print{width:17px; height:17px; margin-right:0;}
 .barcode{height:28px; margin:.8rem 0 .2rem; background-image:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 4px,#111 4px 5px,transparent 5px 9px,#111 9px 12px,transparent 12px 13px);}
 .printer-slot{height:9px; background:#c6ccc9; border-radius:5px; box-shadow:inset 0 2px 5px rgba(0,0,0,.3); margin-bottom:0;}
 .paper-wrap{overflow:hidden; max-height:0; background:#fff; border-radius:0 0 16px 16px; transition:max-height 1.15s cubic-bezier(.65,0,.3,1);}
@@ -286,25 +290,25 @@ footer b{color:var(--muted); font-weight:700;}
             <td>09/10/2026</td><td><div class="prod-name">Waldeci Ramos</div><div class="prod-var">Sítio Boa Vista</div></td>
             <td><div class="prod-name">Morango In Natura</div><div class="prod-var">caixa 2,2 kg</div></td>
             <td class="num">100</td><td>cx</td><td class="num">R$ 50,00</td><td class="num">R$ 5.000,00</td>
-            <td><span class="chip pendente">Pendente · Pix 15d</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)">🖨 Recibo</button></td>
+            <td><span class="chip pendente">Pendente · Pix 15d</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)"><span class="ico-print"></span>Recibo</button></td>
           </tr>
           <tr data-produtor="Waldeci Ramos" data-produto="Morango Congelado" data-var="Caixa grande — a granel" data-qtd="100" data-unid="kg" data-preco="1,80" data-total="180,00" data-data="09/10/2026" data-venc="24/10/2026" data-nr="000125">
             <td>09/10/2026</td><td><div class="prod-name">Waldeci Ramos</div><div class="prod-var">Sítio Boa Vista</div></td>
             <td><div class="prod-name">Morango Congelado</div><div class="prod-var">caixa grande · kg</div></td>
             <td class="num">100</td><td>kg</td><td class="num">R$ 1,80</td><td class="num">R$ 180,00</td>
-            <td><span class="chip pendente">Pendente · Pix 15d</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)">🖨 Recibo</button></td>
+            <td><span class="chip pendente">Pendente · Pix 15d</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)"><span class="ico-print"></span>Recibo</button></td>
           </tr>
           <tr data-produtor="José Carlos Silva" data-produto="Morango In Natura" data-var="Caixa de 2,2 kg" data-qtd="60" data-unid="caixas" data-preco="50,00" data-total="3.000,00" data-data="08/10/2026" data-venc="23/10/2026" data-nr="000121">
             <td>08/10/2026</td><td><div class="prod-name">José Carlos Silva</div><div class="prod-var">Chácara Primavera</div></td>
             <td><div class="prod-name">Morango In Natura</div><div class="prod-var">caixa 2,2 kg</div></td>
             <td class="num">60</td><td>cx</td><td class="num">R$ 50,00</td><td class="num">R$ 3.000,00</td>
-            <td><span class="chip pago">Pago</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)">🖨 Recibo</button></td>
+            <td><span class="chip pago">Pago</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)"><span class="ico-print"></span>Recibo</button></td>
           </tr>
           <tr data-produtor="Maria Aparecida Souza" data-produto="Morango In Natura" data-var="Caixa de 2,2 kg" data-qtd="35" data-unid="caixas" data-preco="48,00" data-total="1.680,00" data-data="08/10/2026" data-venc="23/10/2026" data-nr="000122">
             <td>08/10/2026</td><td><div class="prod-name">Maria Aparecida Souza</div><div class="prod-var">Sítio Três Irmãs</div></td>
             <td><div class="prod-name">Morango In Natura</div><div class="prod-var">caixa 2,2 kg</div></td>
             <td class="num">35</td><td>cx</td><td class="num">R$ 48,00</td><td class="num">R$ 1.680,00</td>
-            <td><span class="chip pago">Pago</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)">🖨 Recibo</button></td>
+            <td><span class="chip pago">Pago</span></td><td><button class="btn-recibo" onclick="abrirRecibo(this)"><span class="ico-print"></span>Recibo</button></td>
           </tr>
         </tbody>
       </table>
@@ -415,7 +419,7 @@ footer b{color:var(--muted); font-weight:700;}
         <div class="printer-shell" style="width:100%; max-width:320px; margin:0 auto;">
           <div class="printer-top">
             <span><span class="led" id="rlLed"></span><span id="rlStatus">Pronto</span></span>
-            <button class="printer-btn" onclick="montarCupomInline()">🖨</button>
+            <button class="printer-btn" onclick="montarCupomInline()"><span class="ico-print"></span></button>
           </div>
           <div class="printer-slot"></div>
           <div class="paper-wrap" id="rlPaperWrap">
@@ -448,7 +452,7 @@ footer b{color:var(--muted); font-weight:700;}
         </div>
         <div class="ticket-actions" id="rlPostActions" style="display:none; max-width:320px; margin:.9rem auto 0;">
           <button class="btn-cancel" onclick="limparImpressaoInline()">Limpar</button>
-          <button class="btn-print" onclick="enviarParaImpressaoInline()">🖨 Enviar para impressão</button>
+          <button class="btn-print" onclick="enviarParaImpressaoInline()"><span class="ico-print"></span>Enviar para impressão</button>
         </div>
       </div>
 
@@ -479,7 +483,7 @@ footer b{color:var(--muted); font-weight:700;}
     <button class="close-x" onclick="fecharRecibo()">✕</button>
     <div class="printer-top">
       <span><span class="led"></span><span id="printerStatus">Pronto</span></span>
-      <button class="printer-btn" onclick="imprimirTicket()">🖨</button>
+      <button class="printer-btn" onclick="imprimirTicket()"><span class="ico-print"></span></button>
     </div>
     <div class="printer-slot"></div>
     <div class="paper-wrap" id="paperWrap">
@@ -563,10 +567,12 @@ function abrirReciboMultiplo(trs){
 
   const qrBox = document.getElementById('rQr');
   qrBox.innerHTML = '';
-  new QRCode(qrBox, {
-    text: `WR MORANGOS\nProdutor: ${d0.produtor}\nRecibo(s) Nº: ${nrConsolidado}\nValor: R$ ${fmt(total)}`,
-    width: 96, height: 96, colorDark: '#111', colorLight: '#ffffff'
-  });
+  try{
+    new QRCode(qrBox, {
+      text: `WR MORANGOS\nProdutor: ${d0.produtor}\nRecibo(s) Nº: ${nrConsolidado}\nValor: R$ ${fmt(total)}`,
+      width: 96, height: 96, colorDark: '#111', colorLight: '#ffffff'
+    });
+  }catch(e){ console.warn('QR indisponível', e); }
 
   // reseta a impressora e já dispara a impressão sozinha
   document.getElementById('paperWrap').classList.remove('printing');
@@ -612,7 +618,7 @@ function filtrarRelatorio(){
     const linha = document.createElement('tr');
     linha.innerHTML = `<td>${d.data}</td><td>${d.produto}</td><td class="num">${d.qtd}</td><td>${d.unid}</td>
       <td class="num">R$ ${d.total}</td><td>${chip.outerHTML}</td>
-      <td><button class="btn-recibo" data-nr="${d.nr}" onclick="abrirReciboDoRelatorio(this)">🖨</button></td>`;
+      <td><button class="btn-recibo" data-nr="${d.nr}" onclick="abrirReciboDoRelatorio(this)"><span class="ico-print"></span></button></td>`;
     body.appendChild(linha);
   });
   const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -662,10 +668,12 @@ function montarCupomInline(){
 
   const qrBox = document.getElementById('rlQr');
   qrBox.innerHTML = '';
-  new QRCode(qrBox, {
-    text: `WR MORANGOS\nProdutor: ${d0.produtor}\nRecibo(s) Nº: ${nrConsolidado}\nValor: R$ ${fmt(total)}`,
-    width: 96, height: 96, colorDark: '#111', colorLight: '#ffffff'
-  });
+  try{
+    new QRCode(qrBox, {
+      text: `WR MORANGOS\nProdutor: ${d0.produtor}\nRecibo(s) Nº: ${nrConsolidado}\nValor: R$ ${fmt(total)}`,
+      width: 96, height: 96, colorDark: '#111', colorLight: '#ffffff'
+    });
+  }catch(e){ console.warn('QR indisponível', e); }
 
   const paper = document.getElementById('rlPaperWrap');
   const status = document.getElementById('rlStatus');
