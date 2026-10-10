@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WR Morangos · Bem-vindo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f0; --card:#eef1f0; --shadow-d:#c7cdcb; --shadow-l:#ffffff;
+  --green:#22c178; --green-2:#39e39a; --blue:#4fa8e8; --text:#1f2b26; --muted:#7c8b85;
+  --font:'Space Grotesk',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font);
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:2rem 1.2rem; position:relative; overflow:hidden;
+  padding-top:env(safe-area-inset-top,2rem); padding-bottom:env(safe-area-inset-bottom,2rem);
+}
+
+/* SOFT DECORATIVE CIRCLES (como na referência) */
+.deco{position:absolute; border-radius:50%; background:var(--card);
+  box-shadow: 18px 18px 36px var(--shadow-d), -18px -18px 36px var(--shadow-l); z-index:0;}
+.deco.d1{width:260px; height:260px; top:-90px; left:-90px;}
+.deco.d2{width:180px; height:180px; bottom:-60px; right:-50px;}
+.deco.d3{width:120px; height:120px; top:18%; right:-40px;}
+.deco.d4{width:90px; height:90px; bottom:12%; left:-30px;}
+
+/* CARD */
+.card{
+  position:relative; z-index:2; width:100%; max-width:360px;
+  background:var(--card); border-radius:32px; padding:2.6rem 2rem 2.2rem; text-align:center;
+  box-shadow: 22px 22px 46px var(--shadow-d), -22px -22px 46px var(--shadow-l);
+}
+
+/* STRAWBERRY ICON — 3D, transparente, contorno azul, detalhes verdes */
+.icon-wrap{position:relative; width:132px; height:132px; margin:0 auto 1.1rem;}
+.icon-wrap svg{width:100%; height:100%;
+  filter:drop-shadow(0 16px 20px rgba(34,193,120,.28)) drop-shadow(0 0 16px rgba(79,168,232,.22));
+  animation:floatIcon 4.5s ease-in-out infinite;}
+@keyframes floatIcon{0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-9px) rotate(-2deg);}}
+.icon-ring{position:absolute; inset:-14px; border-radius:50%; border:1.5px dashed rgba(79,168,232,.35);
+  animation:spin 20s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+h1{font-size:1.35rem; font-weight:700; letter-spacing:-.01em;}
+.sub{font-size:.8rem; color:var(--muted); margin-top:.35rem; margin-bottom:2rem;}
+
+.btn-login{
+  width:100%; border:none; border-radius:16px; padding:1rem; font-family:var(--font); font-weight:700; font-size:.95rem;
+  color:#fff; background:linear-gradient(135deg, var(--green-2), var(--green));
+  cursor:pointer; letter-spacing:.01em;
+  box-shadow:0 16px 30px -10px rgba(34,193,120,.55), 6px 6px 16px var(--shadow-d), -6px -6px 16px var(--shadow-l);
+  transition:transform .18s, box-shadow .18s; animation:pulseGlow 3.4s ease-in-out infinite;
+}
+.btn-login:hover{transform:translateY(-4px); box-shadow:0 22px 38px -10px rgba(34,193,120,.7), 6px 6px 16px var(--shadow-d), -6px -6px 16px var(--shadow-l);}
+@keyframes pulseGlow{0%,100%{box-shadow:0 16px 30px -10px rgba(34,193,120,.45), 6px 6px 16px var(--shadow-d), -6px -6px 16px var(--shadow-l);}
+  50%{box-shadow:0 16px 36px -8px rgba(34,193,120,.7), 6px 6px 16px var(--shadow-d), -6px -6px 16px var(--shadow-l);}}
+
+.foot{margin-top:1.4rem; font-size:.74rem; color:var(--muted);}
+.brandline{margin-top:1.8rem; font-size:.6rem; color:#a9b4af; letter-spacing:.04em;}
+</style>
+</head>
+<body>
+
+<div class="deco d1"></div>
+<div class="deco d2"></div>
+<div class="deco d3"></div>
+<div class="deco d4"></div>
+
+<div class="card">
+  <div class="icon-wrap">
+    <div class="icon-ring"></div>
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="berryFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/>
+          <stop offset="100%" stop-color="#cfe9ff" stop-opacity=".35"/>
+        </linearGradient>
+        <linearGradient id="leafFill" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#39e39a"/>
+          <stop offset="100%" stop-color="#1ea86e"/>
+        </linearGradient>
+      </defs>
+      <path d="M100 70c-35 0-62 26-62 66 0 36 34 54 62 54s62-18 62-54c0-40-27-66-62-66z"
+        fill="url(#berryFill)" stroke="#4fa8e8" stroke-width="2.6"/>
+      <g fill="#4fa8e8" fill-opacity=".45">
+        <ellipse cx="78" cy="108" rx="4.5" ry="7" transform="rotate(-15 78 108)"/>
+        <ellipse cx="102" cy="100" rx="4.5" ry="7" transform="rotate(-5 102 100)"/>
+        <ellipse cx="126" cy="108" rx="4.5" ry="7" transform="rotate(15 126 108)"/>
+        <ellipse cx="68" cy="135" rx="4.5" ry="7" transform="rotate(-20 68 135)"/>
+        <ellipse cx="92" cy="128" rx="4.5" ry="7" transform="rotate(-5 92 128)"/>
+        <ellipse cx="114" cy="128" rx="4.5" ry="7" transform="rotate(5 114 128)"/>
+        <ellipse cx="136" cy="135" rx="4.5" ry="7" transform="rotate(20 136 135)"/>
+        <ellipse cx="82" cy="160" rx="4.5" ry="7" transform="rotate(-10 82 160)"/>
+        <ellipse cx="106" cy="156" rx="4.5" ry="7"/>
+        <ellipse cx="128" cy="160" rx="4.5" ry="7" transform="rotate(10 128 160)"/>
+        <ellipse cx="100" cy="182" rx="4.5" ry="7"/>
+      </g>
+      <g stroke="url(#leafFill)" stroke-width="7" stroke-linecap="round" fill="none"
+         filter="drop-shadow(0 0 5px rgba(34,193,120,.5))">
+        <path d="M100 72 L100 40"/>
+        <path d="M100 72 L72 46"/>
+        <path d="M100 72 L128 46"/>
+        <path d="M100 72 L56 62"/>
+        <path d="M100 72 L144 62"/>
+      </g>
+    </svg>
+  </div>
+
+  <h1>Bem-vindo</h1>
+  <div class="sub">Entre para continuar suas entregas</div>
+
+  <button class="btn-login" onclick="entrar()">Entrar</button>
+
+  <div class="foot">WR Morangos · Barracão de Recebimento</div>
+  <div class="brandline">WALDECI RAMOS · SISTEMA PILOTO DE DADOS</div>
+</div>
+
+<script>
+function entrar(){
+  const btn = document.querySelector('.btn-login');
+  btn.textContent = 'Entrando...';
+  btn.style.opacity = '.75';
+  setTimeout(()=>{
+    window.location.href = 'https://claude.ai/artifact/WaHd2LykoXsWPkZ6cBtQH7';
+  }, 650);
+}
+</script>
+</body>
+</html>
