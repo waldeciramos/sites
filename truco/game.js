@@ -39,6 +39,8 @@ const NOMES=['Você','Dona Mercedes','Tio Chico','Sô Tião'];
 const LAB=['Você','Adversário 1','Parceiro','Adversário 2'];
 const pick=a=>a[Math.random()*a.length|0];
 const VOZ={truco:['Truco, sô!','Pede truco, uai!','Bora ver quem aguenta, trem bão!','Truco nesse trem!'],mais:['Seis, sô!','Aumenta aí, uai!','Cê aguenta mais, home?'],corri:['Corri, uai! Tô fora!','Cê me pegou, sô!','Essa eu deixo pra você!'],aceito:['Vem, sô!','Quero ver, uai!','Aceito, trem bão!'],medo:['Tá com medo, seu patinho?','Correu, uai! Cê é fraquinho!','Arregou, sô! Vai pra casa!']};
+const FT=[(a,t)=>`${a}, ${t}!`,a=>`${a}, marreco!`,(a,t)=>`${a} nesse trem, ${t}!`,(a,t)=>`Bora, ${t}! ${a}!`];
+const FM=[t=>`Tá com medo, ${t}?`,()=>'Vai, corre, marreco!',t=>`Correu, ${t}! Cê é fraquinho!`,t=>`Arregou, ${t}! Vai pra casa!`];
 let VZ=JSON.parse(localStorage.getItem('tw-voz')||'{"v":"","r":1,"p":1}');
 let G=null,rec=null;
 
@@ -114,12 +116,12 @@ async function callTruco(seat){
   if(G.noTruco||G.stake>=12||G.lastRaise===ct)return;
   while(true){
     const nx=G.stake+(G.stake===1?2:3),nome={3:'Truco',6:'Seis',9:'Nove',12:'Doze'}[nx];
-    await say(cs,nome+'!');
+    const rt0=1-ct,hs0=G.hum.find(x=>team(x)===rt0),alvo=G.names[hs0??1];await say(cs,pick(FT)(nome,alvo));
     const rt=1-ct,hs=G.hum.find(x=>team(x)===rt),rs=hs??1;let r;
     if(hs!==undefined)r=await ask(`${G.names[cs]} pediu ${nome}! O que você faz?`,['Aceitar','Correr'].concat(nx<12?['Pedir '+(nx+3)]:[]),hs);
-    else{const a=avg(rt),x=a+Math.random()*.5;r=nx<12&&a>1.15&&Math.random()<.3?2:(x>.55+nx/30?0:1);
+    else{const a=avg(rt)+bonus(rt),x=a+Math.random()*.5;r=nx<12&&a>1.15&&Math.random()<.3?2:(x>.55+nx/30?0:1);
       await say(rs,pick([VOZ.aceito,VOZ.corri,VOZ.mais][r]))}
-    if(r===1){if(hs!==undefined&&!G.hum.includes(cs))await say(cs,pick(VOZ.medo));throw{end:[ct,G.stake,'o outro correu do '+nome]}}
+    if(r===1){await say(cs,pick(FM)(G.names[rs]));throw{end:[ct,G.stake,'o outro correu do '+nome]}}
     G.stake=nx;render();
     if(r===0){G.lastRaise=ct;return}
     ct=rt;cs=rs;
@@ -148,7 +150,7 @@ async function turno(s){
   G.cur=s;render();
   if(G.hum.includes(s)){while(true){const a=await esperaHumano(s);if(a.run){G.wait=false;throw{end:[1-team(s),G.stake,G.names[s]+' correu da mão']}}if(a.truco){G.wait=false;await callTruco(s);continue}jogar(s,a.card,!!a.hide&&G.vz>0);break}}
   else{toast('Vez de '+G.names[s]);await sleep(800);
-    if(!G.noTruco&&G.lastRaise!==team(s)&&avg(team(s))>1&&Math.random()<.3){await say(s,pick(VOZ.truco));await callTruco(s)}
+    {const a=avg(team(s))+bonus(team(s));if(!G.noTruco&&G.lastRaise!==team(s)&&((a>1.1&&Math.random()<.45)||Math.random()<.05))await callTruco(s)}
     const bi=botCard(s);jogar(s,bi,G.vz>0&&pw(G.hands[s][bi])<4&&Math.random()<.25)}
 }
 function decide(r){const[a,b,c]=r;
@@ -193,7 +195,7 @@ async function mao(){
     if(a&&b){G.ferro=true;G.noTruco=true;render();toast('Mão de ferro: ninguém vê as cartas e ninguém truca.');await sleep(1800)}
     else if(a||b){const t=a?0:1;G.noTruco=true;G.show11=t;render();
       if(!await onze(t))throw{end:[1-t,1,'correu da mão de onze']};G.stake=3;render()}
-    const r=[];let lead=(G.dealer+1)%n;
+    const r=G.res=[];let lead=(G.dealer+1)%n;
     for(let v=0;v<3;v++){
       G.table=[];render();
       G.vz=v;for(let k=0;k<n;k++)await turno((lead+k)%n);G.cur=-1;
@@ -229,10 +231,16 @@ $('#bRe').onclick=()=>{if(confirm('Voltar ao início? A partida atual será perd
 /* ---------- voz natural, narração, tela final, menu ---------- */
 let NARRA=localStorage.getItem('tw-narra')!=='0';
 function melhorVoz(){const l=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));return l.find(v=>v.name===VZ.v)||l.find(v=>/premium|enhanced|natural|neural|online/i.test(v.name))||l.find(v=>/google|luciana|felipe|joana/i.test(v.name))||l[0]}
+const bonus=t=>G.res?(G.res.filter(x=>x===t).length-G.res.filter(x=>x===1-t).length)*.35:0;
+let AUD=new Set();fetch('audio/lista.json').then(r=>r.json()).then(l=>AUD=new Set(l)).catch(()=>{});
 function falar(t){
-  let ok=0;const slug=t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  const tts=()=>{if(ok++||!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const v=melhorVoz();if(v)u.voice=v;u.rate=VZ.r;u.pitch=VZ.p;speechSynthesis.cancel();speechSynthesis.speak(u)};
-  const a=new Audio('audio/'+slug+'.mp3');a.onerror=tts;a.play().catch(tts)}
+  const slug=t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  if(AUD.has(slug)){new Audio('audio/'+slug+'.mp3').play().catch(()=>{});return}
+  if(!('speechSynthesis'in window))return;
+  const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const v=melhorVoz();if(v)u.voice=v;u.rate=VZ.r;u.pitch=VZ.p;
+  const go=()=>{speechSynthesis.resume();speechSynthesis.speak(u)};
+  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(go,80)}else go()}
+document.addEventListener('pointerdown',()=>{if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}},{once:true});
 function telaFim(t,tudo){
   $('#fimT').textContent=(tudo?'Vitória na disputa! ':'Partida ganha! ')+tname(t);
   $('#fimP').textContent=`Partidas: ${G.games[0]} x ${G.games[1]}`;

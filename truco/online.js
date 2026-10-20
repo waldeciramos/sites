@@ -28,8 +28,8 @@ function draw(v){
     else if(v.pa&&k===2)cs=v.pa.map(c=>cardH(c)).join('');
     else cs=Array(v.cnt[s]).fill('<div class="card back"></div>').join('');
     if(v.cur===s)d.classList.add('turn');if(v.table.some(x=>x.s===s))d.classList.add('done');const tg=s===v.dealer?'<em class="tg">PÉ</em>':n===4&&s===(v.dealer+n-1)%n?'<em class="tg c">CONTRAPÉ</em>':'';d.innerHTML=`<div class="nm">${v.names[s]}${tg}</div><div class="av">${avatar(v.av[s])}</div><div class="hand ${s===me?'':'sm'}">${cs}</div>`;T.append(d)}
-  $('#center').innerHTML=v.table.map(x=>`<div>${x.h?'':cardH(x.c)}<small>${v.names[x.s]}${x.h?'<br>escondeu a carta':''}</small></div>`).join('');
-  $('#deck').innerHTML=v.vira?cardH(v.vira):'';score()}
+  $('#center').innerHTML=v.table.map(x=>{const k=(x.s-me+n)%n,p=n===2?(k?2:0):k;return `<div class="pc p${p}">${x.h?'':cardH(x.c)}<small>${v.names[x.s]}${x.h?'<br>escondeu a carta':''}</small></div>`}).join('');
+  $('#deck').innerHTML=v.vira?'<div class="vira">'+cardH(v.vira)+'</div><div class="stk"><div class="card back"></div><div class="card back"></div></div>':'';score()}
 
 /* jogador remoto: recebe mensagens do anfitrião */
 function onMsg(m){

@@ -1,5 +1,5 @@
 Voz mais natural: grave cada frase abaixo em MP3 (com sotaque mineiro) e salve nesta pasta com o nome indicado.
-Se o arquivo não existir, o jogo usa a voz do aparelho.
+Depois de colocar os MP3, escreva os nomes (sem .mp3) em audio/lista.json, assim: ["truco","seis"]. Se o arquivo não estiver na lista, o jogo usa a voz do aparelho.
 
 truco-so.mp3  =  Truco, sô!
 pede-truco-uai.mp3  =  Pede truco, uai!
