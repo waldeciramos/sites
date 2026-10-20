@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Truco Waldeci</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h1>Truco Waldeci</h1><small>Ideia original de Waldeci</small></header>
+
+<main>
+<section id="setup" class="panel">
+  <h2>Nova partida</h2>
+  <div class="row"><label for="n">Jogadores</label>
+    <select id="n"><option value="4">4 (duas duplas)</option><option value="2">2 (um contra um)</option></select></div>
+  <div class="row"><label for="mode">Modo de manilha</label>
+    <select id="mode"><option value="velha">Manilha velha (fixa, mineiro)</option><option value="novo">Ponto acima (vira a carta)</option></select></div>
+  <div id="players"></div>
+  <div class="bar"><button id="go">Jogar contra bots</button><button id="goOn">Criar sala online</button></div>
+  <p style="font-size:.85rem;opacity:.8">Você é o jogador 1. No modo de 4, seu parceiro é o jogador 3.</p>
+  <h2>Entrar numa sala</h2>
+  <div class="row"><label for="code">Código recebido (5 caracteres)</label><input id="code" maxlength="5" autocapitalize="characters"><button id="join">Entrar</button></div>
+  <p style="font-size:.85rem;opacity:.8">Para entrar, preencha seu nome e avatar acima (campo "Você").</p>
+</section>
+
+<section id="lobby" class="panel hide">
+  <h2>Sala online</h2>
+  <div id="lobTxt"></div>
+  <button id="startOn">Começar o jogo</button>
+</section>
+
+<section id="game" class="hide">
+  <div id="score"></div>
+  <div id="table"><div id="deck"></div><div id="center"></div></div>
+  <div id="toast"></div>
+  <div id="actions"></div>
+</section>
+</main>
+
+<p class="cred">Ideia original: <b>Truco Waldeci</b>. Todos os direitos da ideia a Waldeci.</p>
+
+<nav id="nav"><button id="bMan"><i>📖</i>Manual</button><button id="bHist"><i>🕘</i>Histórico</button><button id="bVoz"><i>🎤</i>Voz off</button><button id="bTema"><i>🌗</i>Tema</button></nav>
+<dialog id="dMan">
+  <div class="tabs"><button id="tV">Manilha velha</button><button class="sec" id="tN">Ponto acima</button><button class="sec" id="xMan">Fechar</button></div>
+  <div id="mV">
+    <h2>Manilha velha (truco mineiro)</h2>
+    <p>Baralho de 40 cartas (sem 8, 9 e 10). Cada jogador recebe 3 cartas.</p>
+    <p><b>Manilhas fixas, da maior para a menor:</b> Zap (4 de paus), 7 de copas, Espadilha (Ás de espadas) e 7 de ouros.</p>
+    <p><b>Depois das manilhas:</b> 3, 2, Ás, Rei, Valete, Dama, 7, 6, 5 e 4.</p>
+    <p>Vence a mão quem ganhar 2 de 3 vazas. Se empatar (embuchar) a primeira vaza, a segunda decide. Se a primeira foi ganha e a segunda empata, vale a primeira.</p>
+  </div>
+  <div id="mN" class="hide">
+    <h2>Ponto acima</h2>
+    <p>Baralho de 40 cartas (sem 8, 9 e 10). Depois de distribuir, vira-se uma carta. A manilha é a carta do valor seguinte.</p>
+    <p><b>Ordem dos valores:</b> 4, 5, 6, 7, Dama, Valete, Rei, Ás, 2, 3. Se virar o Ás, as manilhas são os 2. Se virar o 3, são os 4.</p>
+    <p><b>Entre as manilhas:</b> paus, copas, espadas e ouros, do maior para o menor. As demais cartas seguem a ordem dos valores, do 3 (maior) ao 4 (menor).</p>
+  </div>
+  <h2>Regras comuns</h2>
+  <p><b>Tentos:</b> a mão vale 1 tento. O jogo vai até 12.</p>
+  <p><b>Truco:</b> na sua vez, peça Truco (3), depois Seis, Nove e Doze. O adversário aceita, corre (você ganha o valor anterior) ou pede o próximo valor. Quem pediu não pode aumentar de novo antes de o outro aumentar.</p>
+  <p><b>Mão de onze:</b> a dupla com 11 tentos vê as cartas do parceiro e escolhe jogar (vale 3) ou correr (o adversário ganha 1). Ninguém pode trucar nessa mão.</p>
+  <p><b>Mão de ferro:</b> se as duas duplas têm 11, ninguém vê as cartas, nada de truco, e a mão vale 1.</p>
+  <p><b>Partidas:</b> a dupla que ganhar 2 partidas de 3 vence tudo. Depois recomeça.</p>
+  <p><b>Voz:</b> ligue o botão Voz e diga "truco" na sua vez (Chrome ou Android).</p>
+</dialog>
+
+<dialog id="dHist">
+  <h2>Histórico</h2><div id="hist"></div>
+  <div class="bar"><button id="bExp">Exportar</button><button class="sec" id="bClr">Apagar</button><button class="sec" id="xHist">Fechar</button></div>
+</dialog>
+<p class="cred"><a href="implantacao.html" style="color:var(--ac2)">Guia de implantação e como jogar online</a></p>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="game.js"></script>
+<script src="online.js"></script>
+</body>
+</html>
