@@ -257,3 +257,5 @@ $('#menuBtn').onclick=()=>$('#nav').classList.toggle('open');
 $('#nav').addEventListener('click',()=>$('#nav').classList.remove('open'));
 $('#vn').onchange=()=>{NARRA=$('#vn').checked;localStorage.setItem('tw-narra',NARRA?'1':'0')};
 const _som=$('#bSom').onclick;$('#bSom').onclick=()=>{$('#vn').checked=NARRA;_som()};
+
+document.querySelectorAll('.seg').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));const s=$('#'+g.dataset.for);s.value=b.dataset.v;s.dispatchEvent(new Event('change'))});

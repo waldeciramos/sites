@@ -4,25 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Truco Waldeci</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-<header><h1>Truco Waldeci</h1><small>Ideia original de Waldeci</small></header>
+<header>Truco Waldeci · ideia original de Waldeci</header>
 
 <main>
-<section id="setup" class="panel">
-  <h2>Truco Waldeci</h2><p style="margin:0 0 .6rem;font-size:.85rem">Ideia original de Waldeci</p>
-  <div class="row"><label for="n">Jogadores</label>
-    <select id="n"><option value="4">4 (duas duplas)</option><option value="2">2 (um contra um)</option></select></div>
-  <div class="row"><label for="mode">Modo de manilha</label>
-    <select id="mode"><option value="velha">Manilha velha (fixa, mineiro)</option><option value="novo">Ponto acima (vira a carta)</option></select></div>
-  <div id="players"></div>
-  <div class="bar"><button id="go">Jogar contra bots</button><button id="goOn">Criar sala online</button></div>
-  <p style="font-size:.85rem;opacity:.8">Você é o jogador 1. No modo de 4, seu parceiro é o jogador 3.</p>
-  <h2>Entrar numa sala</h2>
-  <div class="row"><label for="code">Código recebido (5 caracteres)</label><input id="code" maxlength="5" autocapitalize="characters"><button id="join">Entrar</button></div>
-  <p style="font-size:.85rem;opacity:.8">Para entrar, preencha seu nome e avatar acima (campo "Você"). Toque no avatar para trocar.</p>
-  <p style="font-size:.85rem"><a href="implantacao.html" style="color:var(--ac)">Guia de implantação e como jogar online</a></p>
+<section id="setup">
+  <div class="logo"><div class="mark">♠</div><h1>Truco Waldeci</h1><p>Truco mineiro para jogar com a galera</p></div>
+  <div class="card-n">
+    <h3>Jogadores</h3>
+    <div class="seg" data-for="n"><button type="button" data-v="4" class="on">4 jogadores<small>duas duplas</small></button><button type="button" data-v="2">2 jogadores<small>um contra um</small></button></div>
+    <h3>Manilha</h3>
+    <div class="seg" data-for="mode"><button type="button" data-v="velha" class="on">Manilha velha<small>Zap, Copas, Espadilha, Ouros</small></button><button type="button" data-v="novo">Ponto acima<small>vira a carta</small></button></div>
+    <select id="n" class="hide"><option value="4">4</option><option value="2">2</option></select>
+    <select id="mode" class="hide"><option value="velha">velha</option><option value="novo">novo</option></select>
+    <h3>Quem joga</h3>
+    <div id="players"></div>
+    <button id="go" class="big">Jogar contra bots</button>
+    <button id="goOn" class="big sec">Criar sala online</button>
+  </div>
+  <div class="card-n">
+    <h3>Entrar numa sala</h3>
+    <div class="row"><input id="code" maxlength="5" placeholder="Código de 5 letras" autocapitalize="characters" aria-label="Código da sala"><button id="join" class="round" aria-label="Entrar">→</button></div>
+    <p class="foot" style="margin-top:10px">Use o nome e o avatar escolhidos acima. Toque no avatar para trocar.</p>
+  </div>
+  <p class="foot">Ideia original de Waldeci · <a href="implantacao.html">Guia de implantação</a></p>
 </section>
 
 <section id="lobby" class="panel hide">
@@ -37,8 +44,6 @@
   <div id="actions"></div>
 </section>
 </main>
-
-<p class="cred">Ideia original: <b>Truco Waldeci</b>. Todos os direitos da ideia a Waldeci.</p>
 
 <button id="menuBtn" aria-label="Abrir menu">☰</button>
 <nav id="nav"><button id="bMan"><i>📖</i>Manual</button><button id="bHist"><i>🕘</i>Histórico</button><button id="bSom"><i>🔊</i>Som</button><button id="bVoz"><i>🎤</i>Voz off</button><button id="bTema"><i>🌗</i>Tema</button><button id="bRe"><i>↩</i>Início</button></nav>
@@ -83,9 +88,8 @@
   <h2>Histórico</h2><div id="hist"></div>
   <div class="bar"><button id="bExp">Exportar</button><button class="sec" id="bClr">Apagar</button><button class="sec" id="xHist">Fechar</button></div>
 </dialog>
-<p class="cred"><a href="implantacao.html" style="color:var(--ac2)">Guia de implantação e como jogar online</a></p>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script src="game.js"></script>
-<script src="online.js"></script>
+<script src="game.js?v=3"></script>
+<script src="online.js?v=3"></script>
 </body>
 </html>
