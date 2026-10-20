@@ -21,7 +21,8 @@
   <p style="font-size:.85rem;opacity:.8">Você é o jogador 1. No modo de 4, seu parceiro é o jogador 3.</p>
   <h2>Entrar numa sala</h2>
   <div class="row"><label for="code">Código recebido (5 caracteres)</label><input id="code" maxlength="5" autocapitalize="characters"><button id="join">Entrar</button></div>
-  <p style="font-size:.85rem;opacity:.8">Para entrar, preencha seu nome e avatar acima (campo "Você").</p>
+  <p style="font-size:.85rem;opacity:.8">Para entrar, preencha seu nome e avatar acima (campo "Você"). Toque no avatar para trocar.</p>
+  <p style="font-size:.85rem"><a href="implantacao.html" style="color:var(--ac)">Guia de implantação e como jogar online</a></p>
 </section>
 
 <section id="lobby" class="panel hide">
@@ -31,8 +32,7 @@
 </section>
 
 <section id="game" class="hide">
-  <div id="score"></div>
-  <div id="table"><div id="deck"></div><div id="center"></div></div>
+  <div id="table"><div id="score"></div><div id="deck"></div><div id="center"></div></div>
   <div id="toast"></div>
   <div id="actions"></div>
 </section>
@@ -40,13 +40,13 @@
 
 <p class="cred">Ideia original: <b>Truco Waldeci</b>. Todos os direitos da ideia a Waldeci.</p>
 
-<nav id="nav"><button id="bMan"><i>📖</i>Manual</button><button id="bHist"><i>🕘</i>Histórico</button><button id="bVoz"><i>🎤</i>Voz off</button><button id="bTema"><i>🌗</i>Tema</button></nav>
+<nav id="nav"><button id="bMan"><i>📖</i>Manual</button><button id="bHist"><i>🕘</i>Histórico</button><button id="bSom"><i>🔊</i>Som</button><button id="bVoz"><i>🎤</i>Voz off</button><button id="bTema"><i>🌗</i>Tema</button><button id="bRe"><i>↩</i>Início</button></nav>
 <dialog id="dMan">
   <div class="tabs"><button id="tV">Manilha velha</button><button class="sec" id="tN">Ponto acima</button><button class="sec" id="xMan">Fechar</button></div>
   <div id="mV">
     <h2>Manilha velha (truco mineiro)</h2>
     <p>Baralho de 40 cartas (sem 8, 9 e 10). Cada jogador recebe 3 cartas.</p>
-    <p><b>Manilhas fixas, da maior para a menor:</b> Zap (4 de paus), 7 de copas, Espadilha (Ás de espadas) e 7 de ouros.</p>
+    <p><b>As 4 manilhas fixas, da maior para a menor:</b></p><div id="zaps" style="display:flex;gap:10px;flex-wrap:wrap"></div>
     <p><b>Depois das manilhas:</b> 3, 2, Ás, Rei, Valete, Dama, 7, 6, 5 e 4.</p>
     <p>Vence a mão quem ganhar 2 de 3 vazas. Se empatar (embuchar) a primeira vaza, a segunda decide. Se a primeira foi ganha e a segunda empata, vale a primeira.</p>
   </div>
@@ -65,6 +65,14 @@
   <p><b>Voz:</b> ligue o botão Voz e diga "truco" na sua vez (Chrome ou Android).</p>
 </dialog>
 
+<dialog id="dVoz">
+  <h2>Voz dos personagens</h2>
+  <div class="row"><label for="vsel">Voz</label><select id="vsel"></select></div>
+  <div class="row"><label for="vr">Velocidade</label><input id="vr" type="range" min=".7" max="1.4" step=".05"></div>
+  <div class="row"><label for="vp">Tom (grave ou agudo)</label><input id="vp" type="range" min=".5" max="1.5" step=".05"></div>
+  <p style="font-size:.85rem">O navegador só oferece as vozes do seu aparelho. Escolha a mais natural e ajuste o tom. As falas já vêm escritas em mineirês.</p>
+  <div class="bar"><button id="vt">Testar</button><button class="sec" id="vx">Fechar</button></div>
+</dialog>
 <dialog id="dHist">
   <h2>Histórico</h2><div id="hist"></div>
   <div class="bar"><button id="bExp">Exportar</button><button class="sec" id="bClr">Apagar</button><button class="sec" id="xHist">Fechar</button></div>

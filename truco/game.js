@@ -1,16 +1,52 @@
 const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const R=['4','5','6','7','Q','J','K','A','2','3'],S=['♣','♥','♠','♦'];
-const AV=['🤠','🧙','🐵','🐸','🦊','🐼','🤖','👽','🐷','🧛','🐔','🦄'];
+const AVC=[
+{n:'Careca barbudo',bg:'#8fd3ff',sh:'#2e7d32',sk:'#f1c19b',h:'bald',hc:'#777',b:'full',g:1},
+{n:'Jovem de boné',bg:'#ffd166',sh:'#e53935',sk:'#e0a97c',h:'cap',hc:'#222',hat:'#1565c0'},
+{n:'Criança',bg:'#c3f0ca',sh:'#ff8f00',sk:'#f5cba7',h:'short',hc:'#7b4a1e',kid:1},
+{n:'Vovó',bg:'#f8bbd0',sh:'#6a1b9a',sk:'#f1c19b',h:'bun',hc:'#ddd',g:1},
+{n:'Black power',bg:'#b39ddb',sh:'#00897b',sk:'#8d5a3b',h:'afro',hc:'#1b1b1b'},
+{n:'Moicano',bg:'#ffab91',sh:'#3949ab',sk:'#c68642',h:'mohawk',hc:'#d81b60',b:'stache'},
+{n:'Mineiro de chapéu',bg:'#a5d6a7',sh:'#795548',sk:'#d9a066',h:'hat',hc:'#6d4c41',b:'stache'},
+{n:'Ruivo de óculos',bg:'#90caf9',sh:'#546e7a',sk:'#f5cba7',h:'short',hc:'#d84315',g:1},
+{n:'Garota de tranças',bg:'#fff59d',sh:'#d81b60',sk:'#a9714b',h:'pig',hc:'#212121',kid:1},
+{n:'Vovô bigodudo',bg:'#ce93d8',sh:'#37474f',sk:'#f1c19b',h:'bald',hc:'#ccc',b:'stache',g:1},
+{n:'Palhaço',bg:'#80deea',sh:'#fdd835',sk:'#fff3e0',h:'afro',hc:'#e53935',x:'clown'},
+{n:'Loira',bg:'#ffcc80',sh:'#26a69a',sk:'#f5cba7',h:'long',hc:'#f9d71c'},
+{n:'Barbudo ruivo',bg:'#bcaaa4',sh:'#c62828',sk:'#e8b48a',h:'short',hc:'#bf360c',b:'full'},
+{n:'Morena de coque',bg:'#b2dfdb',sh:'#ad1457',sk:'#b5784a',h:'bun',hc:'#1b1b1b'},
+{n:'Roqueiro',bg:'#9fa8da',sh:'#212121',sk:'#e0a97c',h:'long',hc:'#3e2723',b:'goat'},
+{n:'Super-herói',bg:'#ffe082',sh:'#1565c0',sk:'#e0a97c',h:'short',hc:'#222',x:'mask'},
+{n:'Pirata',bg:'#81d4fa',sh:'#5d4037',sk:'#d9a066',h:'bald',hc:'#222',b:'full',x:'patch'},
+{n:'Robô',bg:'#cfd8dc',sh:'#607d8b',sk:'#b0bec5',h:'none',hc:'#000',x:'robot'},
+{n:'Alienígena',bg:'#212b5a',sh:'#7e57c2',sk:'#9ccc65',h:'none',hc:'#000',x:'alien'}];
+function avatar(i){
+ const c=AVC[+i%AVC.length],H=c.hc,r=c.kid?18:15;
+ const back={afro:`<circle cx="32" cy="22" r="20" fill="${H}"/>`,long:`<rect x="12" y="14" width="40" height="38" rx="14" fill="${H}"/>`,pig:`<circle cx="12" cy="36" r="6" fill="${H}"/><circle cx="52" cy="36" r="6" fill="${H}"/>`,bun:`<circle cx="32" cy="8" r="7" fill="${H}"/>`}[c.h]||'';
+ const top=`<path d="M16 28c0-14 8-17 16-17s16 3 16 17c-3-7-8-9-16-9s-13 2-16 9z" fill="${H}"/>`;
+ const front={short:top,long:top,pig:top,bun:top,afro:`<path d="M17 24c2-8 8-9 15-9s13 1 15 9c-5-3-10-4-15-4s-10 1-15 4z" fill="${H}"/>`,mohawk:`<path d="M27 6h10l2 16H25z" fill="${H}"/>`,bald:`<circle cx="17" cy="27" r="4" fill="${H}"/><circle cx="47" cy="27" r="4" fill="${H}"/>`,cap:`<path d="M15 26c0-14 8-16 17-16s17 2 17 16z" fill="${c.hat}"/><rect x="14" y="24" width="30" height="4" rx="2" fill="${c.hat}"/>`,hat:`<ellipse cx="32" cy="17" rx="24" ry="4" fill="${H}"/><path d="M20 17c0-10 5-12 12-12s12 2 12 12z" fill="${H}"/>`}[c.h]||'';
+ const head=c.x==='robot'?`<rect x="15" y="14" width="34" height="32" rx="5" fill="${c.sk}"/><path d="M32 14V7" stroke="#555" stroke-width="2"/><circle cx="32" cy="6" r="2.5" fill="#e53935"/>`:`<ellipse cx="32" cy="30" rx="${r}" ry="${r+3}" fill="${c.sk}"/><circle cx="${32-r}" cy="31" r="3.5" fill="${c.sk}"/><circle cx="${32+r}" cy="31" r="3.5" fill="${c.sk}"/>`;
+ const bd={full:`<path d="M17 36c0 14 6 18 15 18s15-4 15-18c-3 6-7 8-15 8s-12-2-15-8z" fill="${H}"/>`,goat:`<path d="M27 42c0 8 3 10 5 10s5-2 5-10z" fill="${H}"/>`,stache:`<path d="M22 38q5-3 10 0q5-3 10 0q-5 4-10 2q-5 2-10-2z" fill="${H}"/>`}[c.b]||'';
+ const eyes=c.x==='alien'?`<ellipse cx="24" cy="29" rx="5" ry="7" fill="#111"/><ellipse cx="40" cy="29" rx="5" ry="7" fill="#111"/>`:`<circle cx="25" cy="29" r="3" fill="#fff"/><circle cx="39" cy="29" r="3" fill="#fff"/><circle cx="25.5" cy="29.5" r="1.6" fill="#222"/><circle cx="39.5" cy="29.5" r="1.6" fill="#222"/>`;
+ const ex=(c.x==='mask'?`<path d="M15 26h34v7H15z" fill="#111"/>`:'')+(c.x==='patch'?`<path d="M15 22c0-10 8-12 17-12s17 2 17 12z" fill="#d32f2f"/>`:'');
+ const ex2=c.x==='patch'?`<circle cx="25" cy="29" r="4" fill="#111"/>`:'';
+ const gl=c.g?`<g fill="none" stroke="#222" stroke-width="1.5"><circle cx="25" cy="29" r="5.5"/><circle cx="39" cy="29" r="5.5"/><path d="M30.5 29h3"/></g>`:'';
+ const nose=c.x==='clown'?`<circle cx="32" cy="35" r="4" fill="#e53935"/>`:`<ellipse cx="32" cy="35" rx="2.2" ry="2.8" fill="#0003"/>`;
+ const mouth=`<path d="M23 40q9 9 18 0z" fill="#7a1f1f"/><path d="M24.5 40h15q-7.5 3-15 0z" fill="#fff"/>`;
+ return `<svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><rect width="64" height="64" fill="${c.bg}"/><path d="M6 64c2-13 14-17 26-17s24 4 26 17z" fill="${c.sh}"/>${back}${head}${front}${ex}${bd}${mouth}${nose}${eyes}${ex2}${gl}</svg>`;
+}
 const NOMES=['Você','Dona Mercedes','Tio Chico','Sô Tião'];
 const LAB=['Você','Adversário 1','Parceiro','Adversário 2'];
-const FALAS=['Pede seis, sô!','Tá com medo, uai?','Bora ver!','Num tem jeito não!'];
+const pick=a=>a[Math.random()*a.length|0];
+const VOZ={truco:['Truco, sô!','Pede truco, uai!','Bora ver quem aguenta, trem bão!','Truco nesse trem!'],mais:['Seis, sô!','Aumenta aí, uai!','Cê aguenta mais, home?'],corri:['Corri, uai! Tô fora!','Cê me pegou, sô!','Essa eu deixo pra você!'],aceito:['Vem, sô!','Quero ver, uai!','Aceito, trem bão!'],medo:['Tá com medo, seu patinho?','Correu, uai! Cê é fraquinho!','Arregou, sô! Vai pra casa!']};
+let VZ=JSON.parse(localStorage.getItem('tw-voz')||'{"v":"","r":1.05,"p":0.9}');
 let G=null,rec=null;
 
 /* ---------- tema, manual, histórico ---------- */
 const setTema=t=>{document.documentElement.dataset.theme=t;localStorage.setItem('tw-tema',t)};
 setTema(localStorage.getItem('tw-tema')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
 $('#bTema').onclick=()=>setTema(document.documentElement.dataset.theme==='dark'?'light':'dark');
-$('#bMan').onclick=()=>$('#dMan').showModal();$('#xMan').onclick=()=>$('#dMan').close();
+$('#bMan').onclick=()=>{$('#zaps').innerHTML=[[0,0,'Zap','4 de paus, a mais forte'],[3,1,'Sete de copas','a segunda'],[7,2,'Espadilha','Ás de espadas, a terceira'],[3,3,'Pica-fumo','7 de ouros, a quarta']].map(([r,s,n,d])=>`<div style="text-align:center;font-size:.75rem;max-width:90px">${cardH({r,s})}<br><b>${n}</b><br>${d}</div>`).join('');$('#dMan').showModal()};$('#xMan').onclick=()=>$('#dMan').close();
 $('#tV').onclick=()=>{$('#mV').classList.remove('hide');$('#mN').classList.add('hide');$('#tV').className='';$('#tN').className='sec'};
 $('#tN').onclick=()=>{$('#mN').classList.remove('hide');$('#mV').classList.add('hide');$('#tN').className='';$('#tV').className='sec'};
 const lerH=()=>{try{return JSON.parse(localStorage.getItem('tw-hist')||'[]')}catch(e){return[]}};
@@ -21,7 +57,8 @@ $('#bClr').onclick=()=>{if(confirm('Apagar todo o histórico deste aparelho?')){
 $('#bExp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(lerH(),null,2)],{type:'application/json'}));a.download='truco-waldeci-historico.json';a.click()};
 
 /* ---------- configuração ---------- */
-$('#players').innerHTML=[0,1,2,3].map(i=>`<div class="row" id="pr${i}"><label for="nm${i}">${LAB[i]}</label><input id="nm${i}" value="${NOMES[i]}" maxlength="16"><select id="av${i}" aria-label="Avatar de ${LAB[i]}">${AV.map((a,j)=>`<option ${j===[0,4,2,6][i]?'selected':''}>${a}</option>`).join('')}</select></div>`).join('');
+$('#players').innerHTML=[0,1,2,3].map(i=>`<div class="row" id="pr${i}"><label for="nm${i}">${LAB[i]}</label><input id="nm${i}" value="${NOMES[i]}" maxlength="16"><button type="button" class="avb" id="av${i}" value="${[0,4,2,6][i]}" aria-label="Trocar avatar de ${LAB[i]}">${avatar([0,4,2,6][i])}</button></div>`).join('');
+document.querySelectorAll('.avb').forEach(b=>b.onclick=()=>{b.value=(+b.value+1)%AVC.length;b.innerHTML=avatar(b.value)});
 const verN=()=>{const n=+$('#n').value;[2,3].forEach(i=>$('#pr'+i).classList.toggle('hide',n===2));$('#pr1 label').textContent=n===2?'Adversário':'Adversário 1'};
 $('#n').onchange=verN;verN();
 $('#go').onclick=()=>{
@@ -66,7 +103,7 @@ function ask(msg,opts){toast(msg);const a=$('#actions');a.innerHTML=opts.map((o,
   return new Promise(r=>a.onclick=e=>{const b=e.target.closest('button');if(b){a.innerHTML='';a.onclick=null;r(+b.dataset.i)}})}
 async function say(s,t){
   const d=$('#seat'+s);if(d){const b=document.createElement('div');b.className='bubble';b.textContent=t;d.append(b);setTimeout(()=>b.remove(),1300)}
-  if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';speechSynthesis.speak(u)}await sleep(1300)}
+  if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const vs=speechSynthesis.getVoices().find(v=>v.name===VZ.v);if(vs)u.voice=vs;u.rate=VZ.r;u.pitch=VZ.p;speechSynthesis.cancel();speechSynthesis.speak(u)}await sleep(1300)}
 async function embaralhar(){
   const dk=$('#deck');dk.innerHTML=Array.from({length:8},()=>'<div class="card back"></div>').join('');dk.classList.add('shuf');
   toast('Embaralhando...');await sleep(1700);dk.classList.remove('shuf');dk.innerHTML=G.vira?cardH(G.vira):'<div class="card back"></div>'}
@@ -81,8 +118,8 @@ async function callTruco(seat){
     const rt=1-ct,hs=G.hum.find(x=>team(x)===rt),rs=hs??1;let r;
     if(hs!==undefined)r=await ask(`${G.names[cs]} pediu ${nome}! O que você faz?`,['Aceitar','Correr'].concat(nx<12?['Pedir '+(nx+3)]:[]),hs);
     else{const a=avg(rt),x=a+Math.random()*.5;r=nx<12&&a>1.15&&Math.random()<.3?2:(x>.55+nx/30?0:1);
-      await say(rs,['Vem!','Corri!','Pede mais, sô!'][r])}
-    if(r===1)throw{end:[ct,G.stake,'o outro correu do '+nome]};
+      await say(rs,pick([VOZ.aceito,VOZ.corri,VOZ.mais][r]))}
+    if(r===1){if(hs!==undefined&&!G.hum.includes(cs))await say(cs,pick(VOZ.medo));throw{end:[ct,G.stake,'o outro correu do '+nome]}}
     G.stake=nx;render();
     if(r===0){G.lastRaise=ct;return}
     ct=rt;cs=rs;
@@ -104,14 +141,14 @@ function esperaHumano(s=0){
   const ok=!G.noTruco&&G.stake<12&&G.lastRaise!==0;
   $('#actions').innerHTML=ok?`<button id="bT">${{1:'Truco!',3:'Seis!',6:'Nove!',9:'Doze!'}[G.stake]}</button>`:'';
   if(ok)$('#bT').onclick=()=>G.pick&&G.pick({truco:1});
-  if(G.vz>0)hideBtn();
+  if(G.vz>0)hideBtn();runBtn();
   toast('Sua vez: toque numa carta');
   return new Promise(r=>G.pick=a=>{G.pick=null;G.wait=false;$('#actions').innerHTML='';r(a)})}
 async function turno(s){
   G.cur=s;render();
-  if(G.hum.includes(s)){while(true){const a=await esperaHumano(s);if(a.truco){G.wait=false;await callTruco(s);continue}jogar(s,a.card,!!a.hide&&G.vz>0);break}}
+  if(G.hum.includes(s)){while(true){const a=await esperaHumano(s);if(a.run){G.wait=false;throw{end:[1-team(s),G.stake,G.names[s]+' correu da mão']}}if(a.truco){G.wait=false;await callTruco(s);continue}jogar(s,a.card,!!a.hide&&G.vz>0);break}}
   else{toast('Vez de '+G.names[s]);await sleep(800);
-    if(!G.noTruco&&G.lastRaise!==team(s)&&avg(team(s))>1&&Math.random()<.3){await say(s,FALAS[Math.random()*4|0]);await callTruco(s)}
+    if(!G.noTruco&&G.lastRaise!==team(s)&&avg(team(s))>1&&Math.random()<.3){await say(s,pick(VOZ.truco));await callTruco(s)}
     const bi=botCard(s);jogar(s,bi,G.vz>0&&pw(G.hands[s][bi])<4&&Math.random()<.25)}
 }
 function decide(r){const[a,b,c]=r;
@@ -133,9 +170,22 @@ async function fim(w,p,msg){
     G.pts=[0,0];if(tudo)G.games=[0,0];
   }
 }
+async function cortar(d){
+  const n=G.n;if(G.pts[0]===11||G.pts[1]===11)return;
+  let c=(G.dealer+1)%n;
+  for(let t=0;t<(n===4?2:1);t++){
+    let k;
+    if(G.hum.includes(c)){
+      const o=['Cortar 1','Cortar 2','Cortar 3','Não cortar'].concat(t===0&&n===4?['Passar ao parceiro']:[]);
+      const r=await ask(G.names[c]+', corte o baralho (o pé é '+G.names[G.dealer]+')',o,c);
+      if(r===4){c=(c+2)%n;continue}k=r<3?r+1:0}
+    else{k=Math.random()*4|0;if(t===0&&n===4&&Math.random()<.2){await say(c,'Passo pro parceiro!');c=(c+2)%n;continue}}
+    if(k){for(let i=0;i<k;i++)d.push(d.shift());await say(c,'Cortei '+k+'!')}
+    return}
+}
 async function mao(){
-  const n=G.n,d=baralho();G.hands=Array.from({length:n},()=>d.splice(0,3));
-  G.vira=null;if(G.mode==='novo'){G.vira=d.pop();G.man=(G.vira.r+1)%10}
+  const n=G.n,d=baralho();await cortar(d);G.hands=Array.from({length:n},()=>d.splice(0,3));
+  G.vira=null;if(G.mode==='novo'){G.vira=d.pop();if(G.vira.r===G.lastR){d.unshift(G.vira);G.vira=d.pop()}G.lastR=G.vira.r;G.man=(G.vira.r+1)%10}
   Object.assign(G,{stake:1,lastRaise:-1,ferro:false,noTruco:false,show11:null,table:[],wait:false});
   G.hands.forEach((_,i)=>G.hands[i]);const guarda=G.hands;G.hands=Array.from({length:n},()=>[]);render();
   await embaralhar();G.hands=guarda;render();
@@ -166,3 +216,13 @@ $('#bVoz').onclick=()=>{
   rec=new SR();rec.lang='pt-BR';rec.continuous=true;
   rec.onresult=e=>{const t=e.results[e.results.length-1][0].transcript.toLowerCase();if(/truco|seis|nove|doze/.test(t)&&G&&G.pick&&G.wait)G.pick({truco:1})};
   rec.onend=()=>{if(rec)try{rec.start()}catch(e){}};rec.start();$('#bVoz').textContent='Voz on'};
+
+/* ---------- voz dos personagens e reinício ---------- */
+function vozes(){const l=speechSynthesis.getVoices().filter(v=>/pt/i.test(v.lang));$('#vsel').innerHTML=l.length?l.map(v=>`<option ${v.name===VZ.v?'selected':''}>${v.name}</option>`).join(''):'<option value="">Voz padrão do aparelho</option>'}
+if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=vozes;
+const gv=()=>{VZ={v:$('#vsel').value,r:+$('#vr').value,p:+$('#vp').value};localStorage.setItem('tw-voz',JSON.stringify(VZ))};
+$('#bSom').onclick=()=>{if('speechSynthesis'in window)vozes();$('#vr').value=VZ.r;$('#vp').value=VZ.p;$('#dVoz').showModal()};
+$('#vx').onclick=()=>$('#dVoz').close();
+['vsel','vr','vp'].forEach(i=>$('#'+i).onchange=gv);
+$('#vt').onclick=()=>{gv();say(0,'Uai, sô! Bora jogar um truquinho?')};
+$('#bRe').onclick=()=>{if(confirm('Voltar ao início? A partida atual será perdida.'))location.reload()};

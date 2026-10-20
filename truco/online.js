@@ -1,6 +1,7 @@
 /* Online: o anfitrião (jogador 1) roda o jogo e envia a cada pessoa só a visão dela. */
 let HS=false,peer,conn,isH=false,conns={},P={},W={},J={};
 function hideBtn(){HS=false;const b=document.createElement('button');b.className='sec';b.id='bH';b.textContent='Esconder carta: não';b.onclick=()=>{HS=!HS;b.textContent='Esconder carta: '+(HS?'sim':'não')};$('#actions').append(b)}
+function runBtn(){const b=document.createElement('button');b.className='sec';b.textContent='Correr';b.onclick=()=>{if(confirm('Correr desta mão? O adversário ganha '+(G.stake||1)+' tento(s).'))G.pick&&G.pick({run:1})};$('#actions').append(b)}
 const bc=m=>Object.values(conns).forEach(c=>c.open&&c.send(m));
 const act=a=>{conn.send({t:'a',a});$('#actions').innerHTML=''};
 const view=me=>({n:G.n,me,names:G.names,av:G.av,pts:G.pts,games:G.games,mode:G.mode,vira:G.vira,man:G.man,stake:G.stake,ferro:G.ferro,table:G.table,
@@ -26,7 +27,7 @@ function draw(v){
     if(s===me)cs=v.hand.map((c,i)=>v.ferro?`<div class="card back ${v.wait?'ok':''}" data-i="${i}"></div>`:cardH(c,v.wait?'ok':'',i)).join('');
     else if(v.pa&&k===2)cs=v.pa.map(c=>cardH(c)).join('');
     else cs=Array(v.cnt[s]).fill('<div class="card back"></div>').join('');
-    if(v.cur===s)d.classList.add('turn');const tg=s===v.dealer?'<em class="tg">PÉ</em>':s===(v.dealer+n-1)%n?'<em class="tg c">CONTRAPÉ</em>':'';d.innerHTML=`<div class="av">${v.av[s]}</div>${v.names[s]}${tg}<div class="hand ${s===me?'':'sm'}">${cs}</div>`;T.append(d)}
+    if(v.cur===s)d.classList.add('turn');if(v.table.some(x=>x.s===s))d.classList.add('done');const tg=s===v.dealer?'<em class="tg">PÉ</em>':n===4&&s===(v.dealer+n-1)%n?'<em class="tg c">CONTRAPÉ</em>':'';d.innerHTML=`<div class="av">${avatar(v.av[s])}</div>${v.names[s]}${tg}<div class="hand ${s===me?'':'sm'}">${cs}</div>`;T.append(d)}
   $('#center').innerHTML=v.table.map(x=>`<div>${x.h?'':cardH(x.c)}<small>${v.names[x.s]}${x.h?'<br>escondeu a carta':''}</small></div>`).join('');
   $('#deck').innerHTML=v.vira?cardH(v.vira):'';score()}
 
@@ -37,7 +38,7 @@ function onMsg(m){
   if(m.t==='view'){$('#lobby').classList.add('hide');$('#game').classList.remove('hide');G=m.v;G.pick=G.wait?act:null;draw(G)}
   if(m.t==='toast')toast(m.x);
   if(m.t==='say')say(m.s,m.x);
-  if(m.t==='turn'){if(m.ok){$('#actions').innerHTML=`<button id="bT">${m.l}</button>`;$('#bT').onclick=()=>act({truco:1})}if(m.vz>0)hideBtn();toast('Sua vez: toque numa carta')}
+  if(m.t==='turn'){if(m.ok){$('#actions').innerHTML=`<button id="bT">${m.l}</button>`;$('#bT').onclick=()=>act({truco:1})}if(m.vz>0)hideBtn();runBtn();toast('Sua vez: toque numa carta')}
   if(m.t==='ask')ask(m.m,m.o).then(i=>conn.send({t:'a',a:i}));
 }
 $('#join').onclick=()=>{
@@ -50,7 +51,7 @@ $('#join').onclick=()=>{
   $('#setup').classList.add('hide');$('#lobby').classList.remove('hide');$('#startOn').classList.add('hide');$('#lobTxt').textContent='Conectando...'};
 
 /* anfitrião: cria a sala */
-function lista(n){return [0,1,2,3].slice(0,n).map(i=>`${J[i]?J[i].av+' '+J[i].name:'(vaga livre: um bot joga)'}`).join('<br>')}
+function lista(n){return [0,1,2,3].slice(0,n).map(i=>`${J[i]?'<span class="avs">'+avatar(J[i].av)+'</span> '+J[i].name:'(vaga livre: um bot joga)'}`).join('<br>')}
 $('#goOn').onclick=()=>{
   isH=true;const n=+$('#n').value,al='ABCDEFGHJKMNPQRSTUVWXYZ23456789',room=Array.from({length:4},()=>al[Math.random()*31|0]).join('');
   J[0]={name:$('#nm0').value||'Você',av:$('#av0').value};
@@ -70,5 +71,5 @@ $('#goOn').onclick=()=>{
       c.on('close',()=>{const s=c.seat;delete conns[s];if(G){G.hum=G.hum.filter(x=>x!==s);W[s]=0;P[s]&&P[s]({card:0})}})});
     $('#startOn').onclick=()=>{
       const ids=[0,1,2,3].slice(0,n);
-      G={n,mode:$('#mode').value,names:ids.map(i=>J[i]?J[i].name:NOMES[i]),av:ids.map(i=>J[i]?J[i].av:AV[[0,4,2,6][i]]),pts:[0,0],games:[0,0],dealer:n-1,hands:[],table:[],hum:[0,...Object.keys(conns).map(Number)]};
+      G={n,mode:$('#mode').value,names:ids.map(i=>J[i]?J[i].name:NOMES[i]),av:ids.map(i=>J[i]?J[i].av:[0,4,2,6][i]),pts:[0,0],games:[0,0],dealer:n-1,hands:[],table:[],hum:[0,...Object.keys(conns).map(Number)]};
       $('#lobby').classList.add('hide');$('#game').classList.remove('hide');run()}})};

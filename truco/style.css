@@ -45,3 +45,32 @@ input,select{background:var(--gl);border:1px solid var(--gb);border-radius:12px;
 dialog{background:var(--bg2);color:var(--fg);border:1px solid var(--gb);border-radius:24px;max-width:560px;width:92%;max-height:80vh}dialog::backdrop{background:#000a}.tabs{display:flex;gap:.4rem;flex-wrap:wrap}
 @media(max-width:520px){.card{width:58px;height:84px}#table{height:68vh}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+
+.seat .hand{margin-top:-16px;position:relative}.seat .av{width:44px;height:44px;font-size:1.6rem}
+.seat.done{opacity:.45}.s3 .av{transform:scaleX(-1)}#zaps .card{animation:none}
+#nav button{font-size:.64rem}#nav i{font-size:1.2rem}
+.hand .card.ok{box-shadow:0 0 0 2px var(--ac),0 4px 10px #0008}
+
+/* ===== layout que cabe na tela ===== */
+html,body{height:100%;overflow:hidden}body{padding-bottom:0}body>.cred{display:none}
+header{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:center;gap:.6rem;padding:0 .6rem;z-index:6}
+header h1{font-size:1.05rem;margin:0}header small{font-size:.7rem}
+main{position:fixed;top:46px;bottom:78px;left:0;right:0;overflow:auto}
+#game:not(.hide){display:flex;flex-direction:column;height:100%;background:repeating-linear-gradient(90deg,#c59a62 0 36px,#b98f58 36px 72px)}
+#table{flex:1;height:auto;min-height:0;margin:6px;max-width:none;border:8px solid #5b5f66;border-radius:14px;box-shadow:inset 0 0 0 3px #d8c58a,inset 0 0 60px #000a,0 6px 14px #0006}
+#toast{flex:none;min-height:1.4rem;padding:2px 8px;font-size:.85rem;color:#2a1a05;text-shadow:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#actions{flex:none;min-height:2.6rem;padding:2px 6px 6px}#actions button{padding:.5em .9em;font-size:.9rem}
+#score{position:absolute;top:6px;left:6px;z-index:3;display:flex;flex-direction:column;gap:4px;padding:0;justify-content:flex-start}
+#score .team{min-width:0;padding:3px 9px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.25)}
+#score .tn{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.74rem}#score .tn small{display:none}
+#score .digi{font-size:1.3rem;letter-spacing:.06em;margin-left:auto}#score .dots{display:none}
+#score .team:last-child{display:block;font-size:.68rem;line-height:1.25}
+@media(min-width:700px){#score .dots{display:flex}#score .tn{max-width:170px}}
+.av{width:clamp(40px,10vw,56px);height:clamp(40px,10vw,56px);border-radius:14px;overflow:hidden;font-size:0;padding:0;border:2px solid #fff}
+.avb{width:52px;height:52px;padding:0;overflow:hidden;border-radius:14px}.avs{display:inline-block;width:24px;height:24px;vertical-align:middle;border-radius:6px;overflow:hidden}
+.seat{font-size:.72rem}.seat .hand{margin-top:-14px}
+.card{--cw:clamp(46px,13vw,70px);width:var(--cw);height:calc(var(--cw)*1.42);font-size:calc(var(--cw)*.2)}
+.hand.sm .card{--cw:clamp(26px,7vw,38px);width:var(--cw);height:calc(var(--cw)*1.42);font-size:calc(var(--cw)*.22)}
+#center .card{--cw:clamp(38px,10vw,58px);width:var(--cw);height:calc(var(--cw)*1.42)}
+#deck .card{--cw:46px;width:var(--cw);height:calc(var(--cw)*1.42)}
+#center{inset:22% 12%}
