@@ -1,0 +1,27 @@
+Voz mais natural: grave cada frase abaixo em MP3 (com sotaque mineiro) e salve nesta pasta com o nome indicado.
+Se o arquivo não existir, o jogo usa a voz do aparelho.
+
+truco-so.mp3  =  Truco, sô!
+pede-truco-uai.mp3  =  Pede truco, uai!
+bora-ver-quem-aguenta-trem-bao.mp3  =  Bora ver quem aguenta, trem bão!
+truco-nesse-trem.mp3  =  Truco nesse trem!
+seis-so.mp3  =  Seis, sô!
+aumenta-ai-uai.mp3  =  Aumenta aí, uai!
+ce-aguenta-mais-home.mp3  =  Cê aguenta mais, home?
+corri-uai-to-fora.mp3  =  Corri, uai! Tô fora!
+ce-me-pegou-so.mp3  =  Cê me pegou, sô!
+essa-eu-deixo-pra-voce.mp3  =  Essa eu deixo pra você!
+vem-so.mp3  =  Vem, sô!
+quero-ver-uai.mp3  =  Quero ver, uai!
+aceito-trem-bao.mp3  =  Aceito, trem bão!
+ta-com-medo-seu-patinho.mp3  =  Tá com medo, seu patinho?
+correu-uai-ce-e-fraquinho.mp3  =  Correu, uai! Cê é fraquinho!
+arregou-so-vai-pra-casa.mp3  =  Arregou, sô! Vai pra casa!
+truco.mp3  =  Truco!
+seis.mp3  =  Seis!
+nove.mp3  =  Nove!
+doze.mp3  =  Doze!
+passo-pro-parceiro.mp3  =  Passo pro parceiro!
+cortei.mp3  =  Cortei!
+vou-jogar.mp3  =  Vou jogar!
+eu-corro.mp3  =  Eu corro!

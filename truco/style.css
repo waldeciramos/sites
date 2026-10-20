@@ -74,3 +74,32 @@ main{position:fixed;top:46px;bottom:78px;left:0;right:0;overflow:auto}
 #center .card{--cw:clamp(38px,10vw,58px);width:var(--cw);height:calc(var(--cw)*1.42)}
 #deck .card{--cw:46px;width:var(--cw);height:calc(var(--cw)*1.42)}
 #center{inset:22% 12%}
+
+/* ===== v3: neumórfico, mesa maior, cartas nítidas ===== */
+:root{--nb:#262a45;--ns1:#30355a;--ns2:#181b30;--nt:#d9dcf5}
+[data-theme=light]{--nb:#e9eef3;--ns1:#fff;--ns2:#c3cad3;--nt:#5b6470}
+body{background:var(--nb);color:var(--nt)}
+header{top:auto;bottom:2px;height:auto;padding:0;pointer-events:none;gap:.4rem;opacity:.8}
+header h1{font-size:.62rem;font-weight:600;color:var(--nt)}header small{font-size:.58rem;color:var(--nt)}
+main{top:env(safe-area-inset-top,0);bottom:16px}#setup,#lobby{margin-bottom:80px}
+.panel{background:var(--nb);border:0;border-radius:32px;box-shadow:10px 10px 22px var(--ns2),-10px -10px 22px var(--ns1);color:var(--nt)}
+h2,.row label,.cred{color:var(--nt)}
+button{background:var(--nb);color:var(--nt);border:0;border-radius:22px;padding:.8em 1.3em;font-weight:600;box-shadow:6px 6px 12px var(--ns2),-6px -6px 12px var(--ns1)}
+button.sec{background:var(--nb);color:var(--nt);box-shadow:4px 4px 8px var(--ns2),-4px -4px 8px var(--ns1)}
+button:active{box-shadow:inset 4px 4px 8px var(--ns2),inset -4px -4px 8px var(--ns1);transform:none}
+#bT,#go,#goOn,#join,#startOn,#fimSh,#vt{background:#6e6e73;color:#fff}
+input,select{background:var(--nb);color:var(--nt);border:0;border-radius:999px;padding:.75em 1.1em;box-shadow:inset 4px 4px 8px var(--ns2),inset -4px -4px 8px var(--ns1)}
+input[type=range]{padding:.5em}input[type=checkbox]{width:1.5rem;height:1.5rem;border-radius:8px}
+.avb{border-radius:18px}
+dialog{background:var(--nb);color:var(--nt);border:0;box-shadow:12px 12px 24px #0006,-6px -6px 18px var(--ns1)}
+#game:not(.hide){background:var(--nb)}
+#table{border:10px solid #a97c4a;box-shadow:inset 0 0 0 4px #5b5f66,inset 0 0 60px #000a}
+#toast{color:var(--nt);text-shadow:none}
+#menuBtn{position:fixed;right:10px;bottom:22px;width:48px;height:48px;border-radius:50%;padding:0;font-size:1.3rem;z-index:8}
+#nav{display:none;left:8px;right:8px;bottom:78px;background:var(--nb);border:0;box-shadow:8px 8px 18px var(--ns2),-8px -8px 18px var(--ns1)}#nav.open{display:flex}
+#nav button{color:var(--nt);box-shadow:none}
+.card{box-shadow:none;border:1px solid #b8b8b8}
+.hand .card.ok{box-shadow:none;transform:translateY(-6px)}.hand .card.ok:hover{transform:translateY(-12px)}
+.s0 .hand .card{--cw:clamp(64px,21vw,98px);width:var(--cw);height:calc(var(--cw)*1.42);font-size:calc(var(--cw)*.2)}
+.seat .hand{margin-top:3px}.nm{font-weight:600;white-space:nowrap;margin-bottom:2px}
+#score{max-width:118px}#score .tn{max-width:62px}

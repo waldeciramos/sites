@@ -1,7 +1,7 @@
 /* Online: o anfitrião (jogador 1) roda o jogo e envia a cada pessoa só a visão dela. */
 let HS=false,peer,conn,isH=false,conns={},P={},W={},J={};
 function hideBtn(){HS=false;const b=document.createElement('button');b.className='sec';b.id='bH';b.textContent='Esconder carta: não';b.onclick=()=>{HS=!HS;b.textContent='Esconder carta: '+(HS?'sim':'não')};$('#actions').append(b)}
-function runBtn(){const b=document.createElement('button');b.className='sec';b.textContent='Correr';b.onclick=()=>{if(confirm('Correr desta mão? O adversário ganha '+(G.stake||1)+' tento(s).'))G.pick&&G.pick({run:1})};$('#actions').append(b)}
+function runBtn(){const b=document.createElement('button');b.className='sec';b.textContent='Correr';b.onclick=()=>{G.pick&&G.pick({run:1})};$('#actions').append(b)}
 const bc=m=>Object.values(conns).forEach(c=>c.open&&c.send(m));
 const act=a=>{conn.send({t:'a',a});$('#actions').innerHTML=''};
 const view=me=>({n:G.n,me,names:G.names,av:G.av,pts:G.pts,games:G.games,mode:G.mode,vira:G.vira,man:G.man,stake:G.stake,ferro:G.ferro,table:G.table,
@@ -27,7 +27,7 @@ function draw(v){
     if(s===me)cs=v.hand.map((c,i)=>v.ferro?`<div class="card back ${v.wait?'ok':''}" data-i="${i}"></div>`:cardH(c,v.wait?'ok':'',i)).join('');
     else if(v.pa&&k===2)cs=v.pa.map(c=>cardH(c)).join('');
     else cs=Array(v.cnt[s]).fill('<div class="card back"></div>').join('');
-    if(v.cur===s)d.classList.add('turn');if(v.table.some(x=>x.s===s))d.classList.add('done');const tg=s===v.dealer?'<em class="tg">PÉ</em>':n===4&&s===(v.dealer+n-1)%n?'<em class="tg c">CONTRAPÉ</em>':'';d.innerHTML=`<div class="av">${avatar(v.av[s])}</div>${v.names[s]}${tg}<div class="hand ${s===me?'':'sm'}">${cs}</div>`;T.append(d)}
+    if(v.cur===s)d.classList.add('turn');if(v.table.some(x=>x.s===s))d.classList.add('done');const tg=s===v.dealer?'<em class="tg">PÉ</em>':n===4&&s===(v.dealer+n-1)%n?'<em class="tg c">CONTRAPÉ</em>':'';d.innerHTML=`<div class="nm">${v.names[s]}${tg}</div><div class="av">${avatar(v.av[s])}</div><div class="hand ${s===me?'':'sm'}">${cs}</div>`;T.append(d)}
   $('#center').innerHTML=v.table.map(x=>`<div>${x.h?'':cardH(x.c)}<small>${v.names[x.s]}${x.h?'<br>escondeu a carta':''}</small></div>`).join('');
   $('#deck').innerHTML=v.vira?cardH(v.vira):'';score()}
 

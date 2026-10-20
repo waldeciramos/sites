@@ -39,7 +39,7 @@ const NOMES=['Você','Dona Mercedes','Tio Chico','Sô Tião'];
 const LAB=['Você','Adversário 1','Parceiro','Adversário 2'];
 const pick=a=>a[Math.random()*a.length|0];
 const VOZ={truco:['Truco, sô!','Pede truco, uai!','Bora ver quem aguenta, trem bão!','Truco nesse trem!'],mais:['Seis, sô!','Aumenta aí, uai!','Cê aguenta mais, home?'],corri:['Corri, uai! Tô fora!','Cê me pegou, sô!','Essa eu deixo pra você!'],aceito:['Vem, sô!','Quero ver, uai!','Aceito, trem bão!'],medo:['Tá com medo, seu patinho?','Correu, uai! Cê é fraquinho!','Arregou, sô! Vai pra casa!']};
-let VZ=JSON.parse(localStorage.getItem('tw-voz')||'{"v":"","r":1.05,"p":0.9}');
+let VZ=JSON.parse(localStorage.getItem('tw-voz')||'{"v":"","r":1,"p":1}');
 let G=null,rec=null;
 
 /* ---------- tema, manual, histórico ---------- */
@@ -103,7 +103,7 @@ function ask(msg,opts){toast(msg);const a=$('#actions');a.innerHTML=opts.map((o,
   return new Promise(r=>a.onclick=e=>{const b=e.target.closest('button');if(b){a.innerHTML='';a.onclick=null;r(+b.dataset.i)}})}
 async function say(s,t){
   const d=$('#seat'+s);if(d){const b=document.createElement('div');b.className='bubble';b.textContent=t;d.append(b);setTimeout(()=>b.remove(),1300)}
-  if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const vs=speechSynthesis.getVoices().find(v=>v.name===VZ.v);if(vs)u.voice=vs;u.rate=VZ.r;u.pitch=VZ.p;speechSynthesis.cancel();speechSynthesis.speak(u)}await sleep(1300)}
+  falar(t);await sleep(1300)}
 async function embaralhar(){
   const dk=$('#deck');dk.innerHTML=Array.from({length:8},()=>'<div class="card back"></div>').join('');dk.classList.add('shuf');
   toast('Embaralhando...');await sleep(1700);dk.classList.remove('shuf');dk.innerHTML=G.vira?cardH(G.vira):'<div class="card back"></div>'}
@@ -162,11 +162,11 @@ async function onze(t){
 async function fim(w,p,msg){
   if(w<0)toast('Mão empatada: ninguém marca.');
   else{G.pts[w]=Math.min(12,G.pts[w]+p);toast(`${tname(w)} marcou ${p} (${msg||'ganhou a mão'})`)}
-  score();await sleep(1800);
+  G.log=G.log||[];G.log.push({m:G.log.length+1,w,p,msg:msg||'ganhou a mão',a:G.pts[0],b:G.pts[1]});score();if(NARRA)await say(-1,`Nós ${G.pts[0]}, eles ${G.pts[1]}`);else await sleep(1200);
   if(G.pts[0]>=12||G.pts[1]>=12){
     const t=G.pts[0]>=12?0:1;G.games[t]++;const tudo=G.games[t]===2;
     salvar({data:new Date().toLocaleString('pt-BR'),modo:G.mode==='velha'?'manilha velha':'ponto acima',times:[tname(0),tname(1)],partidas:[...G.games]});
-    await ask(`${tname(t)} ganhou ${tudo?'a disputa':'a partida'}! (${G.games[0]} x ${G.games[1]})`,[tudo?'Nova disputa':'Próxima partida']);
+    await telaFim(t,tudo);G.log=[];
     G.pts=[0,0];if(tudo)G.games=[0,0];
   }
 }
@@ -174,21 +174,20 @@ async function cortar(d){
   const n=G.n;if(G.pts[0]===11||G.pts[1]===11)return;
   let c=(G.dealer+1)%n;
   for(let t=0;t<(n===4?2:1);t++){
-    let k;
+    let k=0;
     if(G.hum.includes(c)){
-      const o=['Cortar 1','Cortar 2','Cortar 3','Não cortar'].concat(t===0&&n===4?['Passar ao parceiro']:[]);
-      const r=await ask(G.names[c]+', corte o baralho (o pé é '+G.names[G.dealer]+')',o,c);
-      if(r===4){c=(c+2)%n;continue}k=r<3?r+1:0}
-    else{k=Math.random()*4|0;if(t===0&&n===4&&Math.random()<.2){await say(c,'Passo pro parceiro!');c=(c+2)%n;continue}}
-    if(k){for(let i=0;i<k;i++)d.push(d.shift());await say(c,'Cortei '+k+'!')}
+      const r=await ask(G.names[c]+', quer cortar o baralho?',['Cortar','Não cortar'].concat(t===0&&n===4?['Passar ao parceiro']:[]),c);
+      if(r===2){c=(c+2)%n;continue}k=r===0?1:0}
+    else{k=Math.random()<.5?1:0;if(t===0&&n===4&&Math.random()<.2){await say(c,'Passo pro parceiro!');c=(c+2)%n;continue}}
+    if(k){d.push(d.shift());await say(c,'Cortei!')}
     return}
 }
 async function mao(){
-  const n=G.n,d=baralho();await cortar(d);G.hands=Array.from({length:n},()=>d.splice(0,3));
-  G.vira=null;if(G.mode==='novo'){G.vira=d.pop();if(G.vira.r===G.lastR){d.unshift(G.vira);G.vira=d.pop()}G.lastR=G.vira.r;G.man=(G.vira.r+1)%10}
+  const n=G.n,d=baralho();G.hands=Array.from({length:n},()=>d.splice(0,3));
+  G.vira=null;
   Object.assign(G,{stake:1,lastRaise:-1,ferro:false,noTruco:false,show11:null,table:[],wait:false});
   G.hands.forEach((_,i)=>G.hands[i]);const guarda=G.hands;G.hands=Array.from({length:n},()=>[]);render();
-  await embaralhar();G.hands=guarda;render();
+  await embaralhar();G.hands=guarda;render();await cortar(d);if(G.mode==='novo'){G.vira=d.pop();if(G.vira.r===G.lastR){d.unshift(G.vira);G.vira=d.pop()}G.lastR=G.vira.r;G.man=(G.vira.r+1)%10;render()}
   try{
     const a=G.pts[0]===11,b=G.pts[1]===11;
     if(a&&b){G.ferro=true;G.noTruco=true;render();toast('Mão de ferro: ninguém vê as cartas e ninguém truca.');await sleep(1800)}
@@ -226,3 +225,35 @@ $('#vx').onclick=()=>$('#dVoz').close();
 ['vsel','vr','vp'].forEach(i=>$('#'+i).onchange=gv);
 $('#vt').onclick=()=>{gv();say(0,'Uai, sô! Bora jogar um truquinho?')};
 $('#bRe').onclick=()=>{if(confirm('Voltar ao início? A partida atual será perdida.'))location.reload()};
+
+/* ---------- voz natural, narração, tela final, menu ---------- */
+let NARRA=localStorage.getItem('tw-narra')!=='0';
+function melhorVoz(){const l=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));return l.find(v=>v.name===VZ.v)||l.find(v=>/premium|enhanced|natural|neural|online/i.test(v.name))||l.find(v=>/google|luciana|felipe|joana/i.test(v.name))||l[0]}
+function falar(t){
+  let ok=0;const slug=t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const tts=()=>{if(ok++||!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const v=melhorVoz();if(v)u.voice=v;u.rate=VZ.r;u.pitch=VZ.p;speechSynthesis.cancel();speechSynthesis.speak(u)};
+  const a=new Audio('audio/'+slug+'.mp3');a.onerror=tts;a.play().catch(tts)}
+function telaFim(t,tudo){
+  $('#fimT').textContent=(tudo?'Vitória na disputa! ':'Partida ganha! ')+tname(t);
+  $('#fimP').textContent=`Partidas: ${G.games[0]} x ${G.games[1]}`;
+  $('#fimL').innerHTML=(G.log||[]).map(r=>`<p>Mão ${r.m}: ${r.w<0?'empate':tname(r.w)+' +'+r.p} (${r.msg}) · ${r.a} x ${r.b}</p>`).join('');
+  $('#dFim').showModal();
+  return new Promise(r=>$('#fimOk').onclick=()=>{$('#dFim').close();r()})}
+async function compartilhar(){
+  const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,1350);g.addColorStop(0,'#3a2bd8');g.addColorStop(1,'#12104f');x.fillStyle=g;x.fillRect(0,0,1080,1350);
+  x.textAlign='center';x.fillStyle='#fff';x.font='bold 80px system-ui,sans-serif';x.fillText('Truco Waldeci',540,120);
+  x.font='44px system-ui,sans-serif';x.fillText($('#fimT').textContent,540,200);
+  x.fillStyle='#ffcf4a';x.font='bold 230px ui-monospace,Menlo,monospace';x.fillText(String(G.pts[0]).padStart(2,'0')+' x '+String(G.pts[1]).padStart(2,'0'),540,470);
+  x.fillStyle='#fff';x.font='52px system-ui,sans-serif';x.fillText(tname(0)+'  x  '+tname(1),540,560);
+  x.font='40px system-ui,sans-serif';x.fillText($('#fimP').textContent,540,640);
+  x.font='34px system-ui,sans-serif';(G.log||[]).slice(-9).forEach((r,i)=>x.fillText(`Mão ${r.m}: ${r.w<0?'empate':tname(r.w)+' +'+r.p} · ${r.a} x ${r.b}`,540,720+i*58));
+  x.fillStyle='#b9b6f5';x.font='30px system-ui,sans-serif';x.fillText('Ideia original de Waldeci',540,1300);
+  c.toBlob(async b=>{const f=new File([b],'truco-waldeci.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],text:'Resultado do Truco Waldeci'});return}catch(e){}}
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='truco-waldeci.png';a.click();alert('Imagem salva. Envie pelo WhatsApp.')},'image/png')}
+$('#dFim').oncancel=e=>e.preventDefault();$('#fimSh').onclick=compartilhar;
+$('#menuBtn').onclick=()=>$('#nav').classList.toggle('open');
+$('#nav').addEventListener('click',()=>$('#nav').classList.remove('open'));
+$('#vn').onchange=()=>{NARRA=$('#vn').checked;localStorage.setItem('tw-narra',NARRA?'1':'0')};
+const _som=$('#bSom').onclick;$('#bSom').onclick=()=>{$('#vn').checked=NARRA;_som()};

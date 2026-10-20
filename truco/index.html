@@ -11,7 +11,7 @@
 
 <main>
 <section id="setup" class="panel">
-  <h2>Nova partida</h2>
+  <h2>Truco Waldeci</h2><p style="margin:0 0 .6rem;font-size:.85rem">Ideia original de Waldeci</p>
   <div class="row"><label for="n">Jogadores</label>
     <select id="n"><option value="4">4 (duas duplas)</option><option value="2">2 (um contra um)</option></select></div>
   <div class="row"><label for="mode">Modo de manilha</label>
@@ -40,6 +40,7 @@
 
 <p class="cred">Ideia original: <b>Truco Waldeci</b>. Todos os direitos da ideia a Waldeci.</p>
 
+<button id="menuBtn" aria-label="Abrir menu">☰</button>
 <nav id="nav"><button id="bMan"><i>📖</i>Manual</button><button id="bHist"><i>🕘</i>Histórico</button><button id="bSom"><i>🔊</i>Som</button><button id="bVoz"><i>🎤</i>Voz off</button><button id="bTema"><i>🌗</i>Tema</button><button id="bRe"><i>↩</i>Início</button></nav>
 <dialog id="dMan">
   <div class="tabs"><button id="tV">Manilha velha</button><button class="sec" id="tN">Ponto acima</button><button class="sec" id="xMan">Fechar</button></div>
@@ -70,8 +71,13 @@
   <div class="row"><label for="vsel">Voz</label><select id="vsel"></select></div>
   <div class="row"><label for="vr">Velocidade</label><input id="vr" type="range" min=".7" max="1.4" step=".05"></div>
   <div class="row"><label for="vp">Tom (grave ou agudo)</label><input id="vp" type="range" min=".5" max="1.5" step=".05"></div>
-  <p style="font-size:.85rem">O navegador só oferece as vozes do seu aparelho. Escolha a mais natural e ajuste o tom. As falas já vêm escritas em mineirês.</p>
+  <div class="row"><label for="vn">Narrar o placar a cada ponto</label><input id="vn" type="checkbox"></div>
+  <p style="font-size:.85rem">O navegador só oferece as vozes do seu aparelho. Para voz mais natural, grave as falas e coloque os MP3 na pasta audio (veja audio/LEIAME.txt).</p>
   <div class="bar"><button id="vt">Testar</button><button class="sec" id="vx">Fechar</button></div>
+</dialog>
+<dialog id="dFim">
+  <h2 id="fimT"></h2><p id="fimP"></p><div id="fimL" style="max-height:40vh;overflow:auto;font-size:.85rem"></div>
+  <div class="bar"><button id="fimSh">Compartilhar imagem</button><button class="sec" id="fimOk">Continuar</button></div>
 </dialog>
 <dialog id="dHist">
   <h2>Histórico</h2><div id="hist"></div>
