@@ -27,7 +27,7 @@ function draw(v){
     if(s===me)cs=v.hand.map((c,i)=>v.ferro?`<div class="card back ${v.wait?'ok':''}" data-i="${i}"></div>`:cardH(c,v.wait?'ok':'',i)).join('');
     else if(v.pa&&k===2)cs=v.pa.map(c=>cardH(c)).join('');
     else cs=Array(v.cnt[s]).fill('<div class="card back"></div>').join('');
-    if(v.cur===s)d.classList.add('turn');if(v.table.some(x=>x.s===s))d.classList.add('done');const tg=s===v.dealer?'<em class="tg">PÉ</em>':n===4&&s===(v.dealer+n-1)%n?'<em class="tg c">CONTRAPÉ</em>':'';d.innerHTML=`<div class="nm">${v.names[s]}${tg}</div><div class="av">${avatar(v.av[s])}</div><div class="hand ${s===me?'':'sm'}">${cs}</div>`;T.append(d)}
+    if(v.cur===s)d.classList.add('turn');if(v.table.some(x=>x.s===s))d.classList.add('done');const tg=n===4&&s===v.dealer?'<em class="tg">PÉ</em>':n===4&&s===(v.dealer+n-1)%n?'<em class="tg c">CONTRAPÉ</em>':'';d.innerHTML=`<div class="nm">${v.names[s]}${tg}</div><div class="av">${avatar(v.av[s])}</div><div class="hand ${s===me?'':'sm'}">${cs}</div>`;T.append(d)}
   $('#center').innerHTML=v.table.map(x=>{const k=(x.s-me+n)%n,p=n===2?(k?2:0):k;return `<div class="pc p${p}">${x.h?'':cardH(x.c)}<small>${v.names[x.s]}${x.h?'<br>escondeu a carta':''}</small></div>`}).join('');
   $('#deck').innerHTML=v.vira?'<div class="vira">'+cardH(v.vira)+'</div><div class="stk"><div class="card back"></div><div class="card back"></div></div>':'';score()}
 
@@ -59,7 +59,8 @@ $('#goOn').onclick=()=>{
   peer.on('error',e=>alert('Erro de conexão ('+e.type+'). Recarregue a página e tente de novo.'));
   peer.on('open',()=>{
     $('#setup').classList.add('hide');$('#lobby').classList.remove('hide');
-    const up=()=>$('#lobTxt').innerHTML=(n===4?`<p>Código do seu <b>parceiro</b>: <b>${room}P</b></p><p>Código dos <b>adversários</b> (2 pessoas): <b>${room}X</b></p>`:`<p>Código do adversário: <b>${room}X</b></p>`)+'<p>'+lista(n)+'</p>';
+    const cod=(l,c)=>`<div class="cod"><span>${l}</span><b>${c}</b><button class="sec cp" data-c="${c}">Copiar</button><button class="sec wa" data-c="${c}">WhatsApp</button></div>`;
+    const up=()=>$('#lobTxt').innerHTML=(n===4?cod('Código do seu parceiro',room+'P')+cod('Código dos adversários (2 pessoas)',room+'X'):cod('Código do adversário',room+'X'))+'<p>'+lista(n)+'</p>';
     up();
     peer.on('connection',c=>{
       c.on('data',m=>{
@@ -73,3 +74,8 @@ $('#goOn').onclick=()=>{
       const ids=[0,1,2,3].slice(0,n);
       G={n,mode:$('#mode').value,names:ids.map(i=>J[i]?J[i].name:NOMES[i]),av:ids.map(i=>J[i]?J[i].av:[0,4,2,6][i]),pts:[0,0],games:[0,0],dealer:n-1,hands:[],table:[],hum:[0,...Object.keys(conns).map(Number)]};
       $('#lobby').classList.add('hide');$('#game').classList.remove('hide');run()}})};
+
+const conv=c=>`Vem jogar Truco Waldeci! Abra ${location.href.split('?')[0].replace(/index\.html$/,'')} e digite o código: ${c}`;
+$('#lobTxt').addEventListener('click',async e=>{const b=e.target.closest('.cp'),a=e.target.closest('.wa');
+  if(b){try{await navigator.clipboard.writeText(conv(b.dataset.c));b.textContent='Copiado!'}catch(x){prompt('Copie o convite:',conv(b.dataset.c))}setTimeout(()=>b.textContent='Copiar',1500)}
+  if(a)window.open('https://wa.me/?text='+encodeURIComponent(conv(a.dataset.c)),'_blank')});

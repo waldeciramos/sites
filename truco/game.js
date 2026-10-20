@@ -40,8 +40,8 @@ const LAB=['Você','Adversário 1','Parceiro','Adversário 2'];
 const pick=a=>a[Math.random()*a.length|0];
 const VOZ={truco:['Truco, sô!','Pede truco, uai!','Bora ver quem aguenta, trem bão!','Truco nesse trem!'],mais:['Seis, sô!','Aumenta aí, uai!','Cê aguenta mais, home?'],corri:['Corri, uai! Tô fora!','Cê me pegou, sô!','Essa eu deixo pra você!'],aceito:['Vem, sô!','Quero ver, uai!','Aceito, trem bão!'],medo:['Tá com medo, seu patinho?','Correu, uai! Cê é fraquinho!','Arregou, sô! Vai pra casa!']};
 const FT=[(a,t)=>`${a}, ${t}!`,a=>`${a}, marreco!`,(a,t)=>`${a} nesse trem, ${t}!`,(a,t)=>`Bora, ${t}! ${a}!`];
-const FM=[t=>`Tá com medo, ${t}?`,()=>'Vai, corre, marreco!',t=>`Correu, ${t}! Cê é fraquinho!`,t=>`Arregou, ${t}! Vai pra casa!`];
-let VZ=JSON.parse(localStorage.getItem('tw-voz')||'{"v":"","r":1,"p":1}');
+const FM=[t=>`Tá com medo, ${t}?`,()=>'Vai, corre, marreco!',t=>`Correu, ${t}! Cê é fraquinho!`,t=>`Arregou, ${t}! Vai pra casa!`,()=>'Vai correr, medroso!',t=>`Correu, ${t}? Medroso!`];
+let VZ=JSON.parse(localStorage.getItem('tw-voz2')||'{"v":"","r":0.85,"p":1}');
 let G=null,rec=null;
 
 /* ---------- tema, manual, histórico ---------- */
@@ -162,6 +162,7 @@ async function onze(t){
   toast('O adversário está com 11 e vai decidir...');await sleep(1500);
   const j=avg(1)+Math.random()*.4>.8;await say(1,j?'Vou jogar!':'Eu corro!');return j}
 async function fim(w,p,msg){
+  if(G.n===2&&w>=0)G.nextLead=w;
   if(w<0)toast('Mão empatada: ninguém marca.');
   else{G.pts[w]=Math.min(12,G.pts[w]+p);toast(`${tname(w)} marcou ${p} (${msg||'ganhou a mão'})`)}
   G.log=G.log||[];G.log.push({m:G.log.length+1,w,p,msg:msg||'ganhou a mão',a:G.pts[0],b:G.pts[1]});score();if(NARRA)await say(-1,`Nós ${G.pts[0]}, eles ${G.pts[1]}`);else await sleep(1200);
@@ -195,7 +196,7 @@ async function mao(){
     if(a&&b){G.ferro=true;G.noTruco=true;render();toast('Mão de ferro: ninguém vê as cartas e ninguém truca.');await sleep(1800)}
     else if(a||b){const t=a?0:1;G.noTruco=true;G.show11=t;render();
       if(!await onze(t))throw{end:[1-t,1,'correu da mão de onze']};G.stake=3;render()}
-    const r=G.res=[];let lead=(G.dealer+1)%n;
+    const r=G.res=[];let lead=(G.n===2&&G.nextLead!==undefined)?G.nextLead:(G.dealer+1)%n;
     for(let v=0;v<3;v++){
       G.table=[];render();
       G.vz=v;for(let k=0;k<n;k++)await turno((lead+k)%n);G.cur=-1;
@@ -221,7 +222,7 @@ $('#bVoz').onclick=()=>{
 /* ---------- voz dos personagens e reinício ---------- */
 function vozes(){const l=speechSynthesis.getVoices().filter(v=>/pt/i.test(v.lang));$('#vsel').innerHTML=l.length?l.map(v=>`<option ${v.name===VZ.v?'selected':''}>${v.name}</option>`).join(''):'<option value="">Voz padrão do aparelho</option>'}
 if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=vozes;
-const gv=()=>{VZ={v:$('#vsel').value,r:+$('#vr').value,p:+$('#vp').value};localStorage.setItem('tw-voz',JSON.stringify(VZ))};
+const gv=()=>{VZ={v:$('#vsel').value,r:+$('#vr').value,p:+$('#vp').value};localStorage.setItem('tw-voz2',JSON.stringify(VZ))};
 $('#bSom').onclick=()=>{if('speechSynthesis'in window)vozes();$('#vr').value=VZ.r;$('#vp').value=VZ.p;$('#dVoz').showModal()};
 $('#vx').onclick=()=>$('#dVoz').close();
 ['vsel','vr','vp'].forEach(i=>$('#'+i).onchange=gv);
@@ -233,11 +234,12 @@ let NARRA=localStorage.getItem('tw-narra')!=='0';
 function melhorVoz(){const l=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));return l.find(v=>v.name===VZ.v)||l.find(v=>/premium|enhanced|natural|neural|online/i.test(v.name))||l.find(v=>/google|luciana|felipe|joana/i.test(v.name))||l[0]}
 const bonus=t=>G.res?(G.res.filter(x=>x===t).length-G.res.filter(x=>x===1-t).length)*.35:0;
 let AUD=new Set();fetch('audio/lista.json').then(r=>r.json()).then(l=>AUD=new Set(l)).catch(()=>{});
+const pron=t=>t.replace(/marreco/gi,'marréco').replace(/medroso/gi,'medrôso').replace(/patinho/gi,'patínho').replace(/arregou/gi,'arrêgou').replace(/\buai\b/gi,'uái');
 function falar(t){
   const slug=t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   if(AUD.has(slug)){new Audio('audio/'+slug+'.mp3').play().catch(()=>{});return}
   if(!('speechSynthesis'in window))return;
-  const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const v=melhorVoz();if(v)u.voice=v;u.rate=VZ.r;u.pitch=VZ.p;
+  const u=new SpeechSynthesisUtterance(pron(t));u.lang='pt-BR';const v=melhorVoz();if(v)u.voice=v;u.rate=VZ.r;u.pitch=VZ.p;
   const go=()=>{speechSynthesis.resume();speechSynthesis.speak(u)};
   if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(go,80)}else go()}
 document.addEventListener('pointerdown',()=>{if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}},{once:true});
