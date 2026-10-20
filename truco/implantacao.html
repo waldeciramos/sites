@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Truco Waldeci: implantação</title>
+<link rel="stylesheet" href="style.css">
+<style>.guia{max-width:680px;margin:0 auto;padding:1rem}.guia li{margin:.4rem 0}.guia code{background:var(--pn);border:1px solid var(--bd);border-radius:6px;padding:0 .3em}</style>
+</head>
+<body>
+<div class="guia">
+<h1>Truco Waldeci</h1>
+<p>Ideia original: Truco Waldeci. Este guia mostra como colocar o jogo no ar e como jogar online com 4 pessoas.</p>
+
+<h2>1. Publicar no GitHub</h2>
+<ol>
+<li>Crie uma conta gratuita em <code>github.com</code>.</li>
+<li>Clique em <b>New repository</b>, dê o nome <code>truco-waldeci</code> e marque <b>Public</b>.</li>
+<li>Extraia o arquivo ZIP e, no repositório, use <b>Add file &gt; Upload files</b> para enviar os arquivos: <code>index.html</code>, <code>style.css</code>, <code>game.js</code>, <code>online.js</code>, <code>implantacao.html</code> e <code>README.md</code>. Clique em <b>Commit changes</b>.</li>
+<li>Vá em <b>Settings &gt; Pages</b>. Em <b>Branch</b>, escolha <code>main</code> e a pasta <code>/ (root)</code>. Clique em <b>Save</b>.</li>
+<li>Espere 1 a 2 minutos. O GitHub mostra o endereço, parecido com <code>seu-usuario.github.io/truco-waldeci</code>. Esse é o link do jogo.</li>
+</ol>
+
+<h2>2. Jogar online com 4 pessoas</h2>
+<ol>
+<li>O <b>anfitrião</b> (jogador 1) abre o link, escolhe 4 jogadores e o modo de manilha, preenche nome e avatar e toca em <b>Criar sala online</b>.</li>
+<li>O jogo mostra dois códigos de 5 caracteres. O que termina em <b>P</b> é do parceiro dele. O que termina em <b>X</b> é para os dois adversários.</li>
+<li>O anfitrião manda os códigos pelo WhatsApp. Cada um abre o mesmo link, preenche nome e avatar, digita o código em <b>Entrar numa sala</b> e toca em <b>Entrar</b>.</li>
+<li>Quem digita o código P vira parceiro do anfitrião. Os dois que digitam o código X formam a dupla adversária.</li>
+<li>Quando todos aparecerem na lista, o anfitrião toca em <b>Começar o jogo</b>. Vaga que ficar livre é ocupada por um bot.</li>
+</ol>
+<p>Para 2 jogadores, vale só um código (terminado em X) para o adversário.</p>
+
+<h2>3. Como a conexão funciona</h2>
+<p>O celular do anfitrião roda o jogo. Ele embaralha e manda para cada pessoa só as cartas dela. Na mão de onze, o parceiro também recebe as cartas do colega. A conexão é direta entre os aparelhos, por WebRTC com PeerJS, e funciona entre cidades e países.</p>
+
+<h2>4. Cuidados e problemas comuns</h2>
+<ul>
+<li>Se o anfitrião fechar a página, a partida acaba. Peça para ele manter a tela ligada.</li>
+<li>Se alguém cair da conexão, um bot assume o lugar dele.</li>
+<li>Se alguém não conseguir entrar, confira o código (letras maiúsculas) e tente trocar de wi-fi para 4G. Algumas redes bloqueiam a conexão direta.</li>
+<li>O reconhecimento de voz funciona melhor no Chrome. O botão de truco sempre funciona.</li>
+<li>O histórico fica salvo só no aparelho de cada pessoa. Use <b>Histórico &gt; Exportar</b> para guardar.</li>
+</ul>
+
+<h2>5. Atualizar o jogo</h2>
+<p>Para mudar algo, substitua o arquivo no repositório (<b>Add file &gt; Upload files</b>) e confirme. A página atualiza em alguns minutos. Se o navegador mostrar a versão antiga, recarregue a página.</p>
+<p><a href="index.html" style="color:var(--ac2)">Voltar ao jogo</a></p>
+</div>
+<script>document.documentElement.dataset.theme=localStorage.getItem('tw-tema')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')</script>
+</body>
+</html>
