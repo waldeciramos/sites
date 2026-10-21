@@ -90,3 +90,14 @@ dialog::backdrop{background:#000a}.tabs{display:flex;gap:.5rem;flex-wrap:wrap;ma
 /* convite da sala */
 .cod{display:grid;grid-template-columns:1fr auto auto;gap:6px 10px;align-items:center;margin:12px 0}.cod span{grid-column:1/-1;font-size:.8rem;color:var(--mut)}
 .cod b{font:700 1.5rem ui-monospace,Menlo,monospace;letter-spacing:.12em}.cod button{padding:.55em .9em;font-size:.85rem}
+
+/* nomes e placar no mesmo estilo dos botões (rebaixado) */
+.seat{text-shadow:none}
+.nm{display:inline-block;background:var(--nb);color:var(--nt);border-radius:999px;padding:2px 12px;box-shadow:inset 3px 3px 6px var(--s2),inset -3px -3px 6px var(--s1)}
+.seat.turn .nm{color:var(--ac)}
+#score .team{background:var(--nb);color:var(--nt);border:0;border-radius:18px;box-shadow:5px 5px 10px rgba(0,0,0,.45),-3px -3px 8px rgba(255,255,255,.12)}
+#score .digi{background:var(--nb);color:var(--nt);border-radius:10px;padding:0 8px;text-shadow:none;box-shadow:inset 3px 3px 6px var(--s2),inset -3px -3px 6px var(--s1)}
+#score .team:last-child{color:var(--mut);box-shadow:inset 3px 3px 6px var(--s2),inset -3px -3px 6px var(--s1)}
+.dots i{border-color:var(--s2);box-shadow:inset 1px 1px 2px var(--s2)}.dots i.on{border-color:#c98a00;box-shadow:none}
+#score .tn{max-width:34px}#score .digi{padding:0 5px;font-size:1rem}
+.stk .card{left:calc(var(--vw)*-1.12)}.stk .card+.card{left:calc(var(--vw)*-1.04)}

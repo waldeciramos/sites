@@ -38,9 +38,9 @@ function avatar(i){
 const NOMES=['Você','Dona Mercedes','Tio Chico','Sô Tião'];
 const LAB=['Você','Adversário 1','Parceiro','Adversário 2'];
 const pick=a=>a[Math.random()*a.length|0];
-const VOZ={truco:['Truco, sô!','Pede truco, uai!','Bora ver quem aguenta, trem bão!','Truco nesse trem!'],mais:['Seis, sô!','Aumenta aí, uai!','Cê aguenta mais, home?'],corri:['Corri, uai! Tô fora!','Cê me pegou, sô!','Essa eu deixo pra você!'],aceito:['Vem, sô!','Quero ver, uai!','Aceito, trem bão!'],medo:['Tá com medo, seu patinho?','Correu, uai! Cê é fraquinho!','Arregou, sô! Vai pra casa!']};
-const FT=[(a,t)=>`${a}, ${t}!`,a=>`${a}, marreco!`,(a,t)=>`${a} nesse trem, ${t}!`,(a,t)=>`Bora, ${t}! ${a}!`];
-const FM=[t=>`Tá com medo, ${t}?`,()=>'Vai, corre, marreco!',t=>`Correu, ${t}! Cê é fraquinho!`,t=>`Arregou, ${t}! Vai pra casa!`,()=>'Vai correr, medroso!',t=>`Correu, ${t}? Medroso!`];
+const VOZ={truco:['Truco, sô!','Pede truco, uai!'],mais:['Seis, sô!','Aumenta aí!'],corri:['Corri, uai!','Cê me pegou, sô!'],aceito:['Vem, sô!','Aceito, uai!'],medo:['Tá com medo?']};
+const FT=[(a,t)=>`${a}, ${t}!`,a=>`${a}, marreco!`,(a,t)=>`Bora, ${t}! ${a}!`];
+const FM=[t=>`Tá com medo, ${t}?`,()=>'Vai, corre, marreco!',()=>'Vai correr, medroso!',t=>`Arregou, ${t}!`];
 let VZ=JSON.parse(localStorage.getItem('tw-voz3')||'{"v":"","r":0.92,"p":1}');
 let G=null,rec=null;
 
@@ -104,8 +104,9 @@ $('#table').onclick=e=>{const c=e.target.closest('.card.ok');if(c&&G.pick){G.pic
 function ask(msg,opts){toast(msg);const a=$('#actions');a.innerHTML=opts.map((o,i)=>`<button data-i="${i}">${o}</button>`).join('');
   return new Promise(r=>a.onclick=e=>{const b=e.target.closest('button');if(b){a.innerHTML='';a.onclick=null;r(+b.dataset.i)}})}
 async function say(s,t){
-  const d=$('#seat'+s);if(d){const b=document.createElement('div');b.className='bubble';b.textContent=t;d.append(b);setTimeout(()=>b.remove(),1300)}
-  falar(t);await sleep(1300)}
+  const d=$('#seat'+s);let bb=null;
+  if(d){bb=document.createElement('div');bb.className='bubble';bb.textContent=t;d.append(bb)}
+  await Promise.all([falar(t),sleep(900)]);if(bb)bb.remove()}
 async function embaralhar(){
   const dk=$('#deck');dk.innerHTML=Array.from({length:8},()=>'<div class="card back"></div>').join('');dk.classList.add('shuf');
   toast('Embaralhando...');await sleep(1700);dk.classList.remove('shuf');dk.innerHTML=G.vira?cardH(G.vira):'<div class="card back"></div>'}
@@ -235,13 +236,14 @@ function melhorVoz(){const l=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.t
 const bonus=t=>G.res?(G.res.filter(x=>x===t).length-G.res.filter(x=>x===1-t).length)*.35:0;
 let AUD=new Set();fetch('audio/lista.json').then(r=>r.json()).then(l=>AUD=new Set(l)).catch(()=>{});
 const pron=t=>t.replace(/marreco/gi,'marréco').replace(/medroso/gi,'medrôso').replace(/patinho/gi,'patínho').replace(/arregou/gi,'arrêgou').replace(/\buai\b/gi,'uái');
-function falar(t){
+function falar(t){return new Promise(res=>{
   const slug=t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  if(AUD.has(slug)){new Audio('audio/'+slug+'.mp3').play().catch(()=>{});return}
-  if(!('speechSynthesis'in window))return;
+  const lim=Math.min(7000,900+t.length*110);
+  if(AUD.has(slug)){const au=new Audio('audio/'+slug+'.mp3');au.onended=au.onerror=()=>res();au.play().catch(()=>res());setTimeout(res,lim+2000);return}
+  if(!('speechSynthesis'in window)){setTimeout(res,900);return}
   const u=new SpeechSynthesisUtterance(pron(t));u.lang='pt-BR';const v=melhorVoz();if(v)u.voice=v;u.rate=VZ.r;u.pitch=VZ.p;
-  const go=()=>{speechSynthesis.resume();speechSynthesis.speak(u)};
-  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(go,80)}else go()}
+  u.onend=u.onerror=()=>res();setTimeout(res,lim);
+  speechSynthesis.resume();speechSynthesis.speak(u)})}
 document.addEventListener('pointerdown',()=>{if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}},{once:true});
 function telaFim(t,tudo){
   $('#fimT').textContent=(tudo?'Vitória na disputa! ':'Partida ganha! ')+tname(t);
