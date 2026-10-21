@@ -41,7 +41,7 @@ const pick=a=>a[Math.random()*a.length|0];
 const VOZ={truco:['Truco, sô!','Pede truco, uai!','Bora ver quem aguenta, trem bão!','Truco nesse trem!'],mais:['Seis, sô!','Aumenta aí, uai!','Cê aguenta mais, home?'],corri:['Corri, uai! Tô fora!','Cê me pegou, sô!','Essa eu deixo pra você!'],aceito:['Vem, sô!','Quero ver, uai!','Aceito, trem bão!'],medo:['Tá com medo, seu patinho?','Correu, uai! Cê é fraquinho!','Arregou, sô! Vai pra casa!']};
 const FT=[(a,t)=>`${a}, ${t}!`,a=>`${a}, marreco!`,(a,t)=>`${a} nesse trem, ${t}!`,(a,t)=>`Bora, ${t}! ${a}!`];
 const FM=[t=>`Tá com medo, ${t}?`,()=>'Vai, corre, marreco!',t=>`Correu, ${t}! Cê é fraquinho!`,t=>`Arregou, ${t}! Vai pra casa!`,()=>'Vai correr, medroso!',t=>`Correu, ${t}? Medroso!`];
-let VZ=JSON.parse(localStorage.getItem('tw-voz2')||'{"v":"","r":0.85,"p":1}');
+let VZ=JSON.parse(localStorage.getItem('tw-voz3')||'{"v":"","r":0.92,"p":1}');
 let G=null,rec=null;
 
 /* ---------- tema, manual, histórico ---------- */
@@ -165,7 +165,7 @@ async function fim(w,p,msg){
   if(G.n===2&&w>=0)G.nextLead=w;
   if(w<0)toast('Mão empatada: ninguém marca.');
   else{G.pts[w]=Math.min(12,G.pts[w]+p);toast(`${tname(w)} marcou ${p} (${msg||'ganhou a mão'})`)}
-  G.log=G.log||[];G.log.push({m:G.log.length+1,w,p,msg:msg||'ganhou a mão',a:G.pts[0],b:G.pts[1]});score();if(NARRA)await say(-1,`Nós ${G.pts[0]}, eles ${G.pts[1]}`);else await sleep(1200);
+  G.log=G.log||[];G.log.push({m:G.log.length+1,w,p,msg:msg||'ganhou a mão',a:G.pts[0],b:G.pts[1]});score();if(NARRA){const a=w<0?0:w,b=1-a;await say(-1,`${tname(a)} ${G.pts[a]}, ${tname(b)} ${G.pts[b]}`)}else await sleep(1200);
   if(G.pts[0]>=12||G.pts[1]>=12){
     const t=G.pts[0]>=12?0:1;G.games[t]++;const tudo=G.games[t]===2;
     salvar({data:new Date().toLocaleString('pt-BR'),modo:G.mode==='velha'?'manilha velha':'ponto acima',times:[tname(0),tname(1)],partidas:[...G.games]});
@@ -181,8 +181,8 @@ async function cortar(d){
     if(G.hum.includes(c)){
       const r=await ask(G.names[c]+', quer cortar o baralho?',['Cortar','Não cortar'].concat(t===0&&n===4?['Passar ao parceiro']:[]),c);
       if(r===2){c=(c+2)%n;continue}k=r===0?1:0}
-    else{k=Math.random()<.5?1:0;if(t===0&&n===4&&Math.random()<.2){await say(c,'Passo pro parceiro!');c=(c+2)%n;continue}}
-    if(k){d.push(d.shift());await say(c,'Cortei!')}
+    else{k=Math.random()<.5?1:0;if(t===0&&n===4&&Math.random()<.2){c=(c+2)%n;continue}}
+    if(k)d.push(d.shift());
     return}
 }
 async function mao(){
@@ -222,7 +222,7 @@ $('#bVoz').onclick=()=>{
 /* ---------- voz dos personagens e reinício ---------- */
 function vozes(){const l=speechSynthesis.getVoices().filter(v=>/pt/i.test(v.lang));$('#vsel').innerHTML=l.length?l.map(v=>`<option ${v.name===VZ.v?'selected':''}>${v.name}</option>`).join(''):'<option value="">Voz padrão do aparelho</option>'}
 if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=vozes;
-const gv=()=>{VZ={v:$('#vsel').value,r:+$('#vr').value,p:+$('#vp').value};localStorage.setItem('tw-voz2',JSON.stringify(VZ))};
+const gv=()=>{VZ={v:$('#vsel').value,r:+$('#vr').value,p:+$('#vp').value};localStorage.setItem('tw-voz3',JSON.stringify(VZ))};
 $('#bSom').onclick=()=>{if('speechSynthesis'in window)vozes();$('#vr').value=VZ.r;$('#vp').value=VZ.p;$('#dVoz').showModal()};
 $('#vx').onclick=()=>$('#dVoz').close();
 ['vsel','vr','vp'].forEach(i=>$('#'+i).onchange=gv);
@@ -231,7 +231,7 @@ $('#bRe').onclick=()=>{if(confirm('Voltar ao início? A partida atual será perd
 
 /* ---------- voz natural, narração, tela final, menu ---------- */
 let NARRA=localStorage.getItem('tw-narra')!=='0';
-function melhorVoz(){const l=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));return l.find(v=>v.name===VZ.v)||l.find(v=>/premium|enhanced|natural|neural|online/i.test(v.name))||l.find(v=>/google|luciana|felipe|joana/i.test(v.name))||l[0]}
+function melhorVoz(){const l=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));return l.find(v=>v.name===VZ.v)||l.find(v=>/premium|aprimorada|enhanced|natural|neural|online|siri/i.test(v.name))||l.find(v=>/google|luciana|felipe|joana/i.test(v.name))||l[0]}
 const bonus=t=>G.res?(G.res.filter(x=>x===t).length-G.res.filter(x=>x===1-t).length)*.35:0;
 let AUD=new Set();fetch('audio/lista.json').then(r=>r.json()).then(l=>AUD=new Set(l)).catch(()=>{});
 const pron=t=>t.replace(/marreco/gi,'marréco').replace(/medroso/gi,'medrôso').replace(/patinho/gi,'patínho').replace(/arregou/gi,'arrêgou').replace(/\buai\b/gi,'uái');
