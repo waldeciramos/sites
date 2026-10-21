@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clínica TV · Admin</title>
+<link rel="stylesheet" href="assets/fx.css"><link rel="icon" href="logo.svg">
+<style>
+  :root { --bg:#e6eaf1; --sh1:#ffffff; --sh2:#c5ccd9; --txt:#3b4556; --mut:#7d889b; --acc:#1fb6a6; --danger:#d9534f; --fd:'Comfortaa'; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Montserrat', system-ui, sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  .neo { background: var(--bg); box-shadow: 8px 8px 18px var(--sh2), -8px -8px 18px var(--sh1); border-radius: 26px; }
+  .neo-in { background: var(--bg); box-shadow: inset 4px 4px 9px var(--sh2), inset -4px -4px 9px var(--sh1); border-radius: 999px; border: 0; padding: 12px 18px; width: 100%; outline: none; }
+  textarea.neo-in { border-radius: 16px; resize: vertical; }
+  select.neo-in { appearance: none; background-image: linear-gradient(45deg, transparent 50%, #7d889b 50%), linear-gradient(135deg, #7d889b 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 36px; }
+  .btn { border: 0; cursor: pointer; border-radius: 999px; padding: 11px 20px; font-weight: 700; background: var(--bg); box-shadow: 5px 5px 11px var(--sh2), -5px -5px 11px var(--sh1); transition: .15s; font-size: 14px; }
+  .btn:active { box-shadow: inset 3px 3px 7px var(--sh2), inset -3px -3px 7px var(--sh1); }
+  .btn.pri { background: #6b7280; color: #fff; } .btn.ok { background: var(--acc); color: #fff; } .btn.del { color: var(--danger); } .btn.sm { padding: 6px 12px; font-size: 13px; }
+  input:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+
+  /* ---- Login (neumorfismo) ---- */
+  #login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  #login .box { width: 100%; max-width: 400px; padding: 38px 32px; }
+  #login h1 { font-family: var(--fd); font-size: 28px; text-align: center; font-weight: 700; }
+  #login .sub { text-align: center; color: var(--mut); font-size: 13px; margin: 4px 0 26px; }
+  #login label { display: block; font-size: 14px; color: var(--mut); margin: 16px 0 8px 6px; }
+  #login .btn { width: 100%; margin-top: 26px; padding: 15px; font-size: 16px; }
+  #loginErr { color: var(--danger); text-align: center; font-size: 13px; margin-top: 14px; min-height: 18px; }
+  .foot { text-align: center; color: var(--mut); font-size: 12px; margin-top: 18px; }
+
+  /* ---- Painel ---- */
+  #panel { display: none; max-width: 1760px; margin: 0 auto; padding: 20px 18px 60px; }
+  header.top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  header.top h1 { font-family: var(--fd); font-size: 24px; font-weight: 700; flex: 1; min-width: 220px; }
+  header.top h1 small { display: block; font-family: 'Montserrat', sans-serif; font-size: 12px; color: var(--mut); font-weight: 500; }
+  .layout { display: grid; grid-template-columns: 210px minmax(0, 1fr) 420px; gap: 24px; align-items: start; }
+  nav.tabs { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 10px; }
+  nav.tabs .btn { text-align: left; width: 100%; }
+  nav.tabs .btn.on { background: var(--acc); color: #fff; }
+  section.tab { display: none; padding: 26px; } section.tab.on { display: block; }
+  h2 { font-size: 19px; margin-bottom: 4px; } h3 { font-size: 15px; margin: 22px 0 10px; }
+  p.hint { color: var(--mut); font-size: 13px; margin-bottom: 18px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+  .f label { display: block; font-size: 11px; font-weight: 700; color: var(--mut); margin: 0 0 6px 8px; text-transform: uppercase; letter-spacing: .5px; }
+  .f.chk label { display: flex; align-items: center; gap: 8px; text-transform: none; font-size: 14px; color: var(--txt); margin-top: 26px; font-weight: 600; }
+  input[type=color] { width: 100%; height: 44px; border: 0; border-radius: 14px; background: none; padding: 0; cursor: pointer; }
+  input[type=range] { width: 100%; accent-color: var(--acc); }
+  .item { padding: 16px; margin-bottom: 16px; border-radius: 20px; background: var(--bg); box-shadow: 4px 4px 10px var(--sh2), -4px -4px 10px var(--sh1); }
+  .item .head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .item .head b { flex: 1; min-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  details.item > summary { list-style: none; cursor: pointer; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  details.item > summary::-webkit-details-marker { display: none; }
+  details.item > summary b { flex: 1; min-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  details.item > .body { margin-top: 16px; }
+  details.fxbox { margin-top: 16px; border-top: 1px dashed var(--sh2); padding-top: 12px; }
+  details.fxbox > summary { cursor: pointer; font-weight: 700; font-size: 14px; color: var(--acc); }
+  .pvtext { background: linear-gradient(135deg, #0f766e, #134e4a); border-radius: 14px; min-height: 96px; display: flex; align-items: center; justify-content: center; padding: 14px; text-align: center; margin: 12px 0; overflow: hidden; }
+  .row2 { display: grid; grid-template-columns: 110px 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .row3 { display: grid; grid-template-columns: 64px 1fr 80px auto; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .thumb { width: 100%; max-height: 140px; object-fit: contain; border-radius: 12px; margin-top: 10px; background: #0001; }
+  .days { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; } .days .btn.on { background: var(--acc); color: #fff; }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: #1f2937; color: #fff; padding: 11px 20px; border-radius: 999px; font-size: 14px; opacity: 0; transition: .3s; pointer-events: none; z-index: 99; }
+  .toast.on { opacity: 1; }
+  .warn { background: #fff3cd; color: #7a5c00; padding: 10px 14px; border-radius: 14px; font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
+  .info { background: #dff5f2; color: #0b5c53; padding: 10px 14px; border-radius: 14px; font-size: 13px; margin: 12px 0; line-height: 1.5; }
+  .radio { display: flex; gap: 14px; flex-wrap: wrap; margin: 8px 0 14px; } .radio label { display: flex; gap: 8px; align-items: center; cursor: pointer; font-size: 14px; }
+  ol.steps { padding-left: 20px; font-size: 14px; line-height: 1.7; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .chip { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; }
+
+  /* ---- Pré-visualização ao vivo ---- */
+  aside.pv { position: sticky; top: 16px; padding: 14px; }
+  aside.pv .bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  aside.pv .bar b { flex: 1; font-size: 13px; }
+  .pvbox { position: relative; width: 100%; background: #000; overflow: hidden; border-radius: 12px; }
+  .pvbox iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; pointer-events: none; }
+
+  @media (max-width: 1280px) { .layout { grid-template-columns: 190px minmax(0, 1fr); } aside.pv { position: static; grid-column: 1 / -1; order: 3; } }
+  @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } nav.tabs { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 8px; } nav.tabs .btn { width: auto; white-space: nowrap; } .row2, .row3 { grid-template-columns: 1fr; } section.tab { padding: 18px; } }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <form class="box neo" id="loginForm" autocomplete="off">
+    <h1>InfoTV</h1><div class="sub">Painel administrativo</div>
+    <label for="lUser">Usuário</label><input class="neo-in" id="lUser" value="admin" autocomplete="username">
+    <label for="lPass">Senha</label><input class="neo-in" id="lPass" type="password" placeholder="Digite a senha" autocomplete="current-password">
+    <button class="btn pri" type="submit">Entrar</button>
+    <div id="loginErr"></div>
+    <div class="foot">Sistema idealizado por Waldeci Ramos</div>
+  </form>
+</div>
+
+<div id="panel">
+  <header class="top">
+    <h1>⚙ Clínica TV · Administração<small id="clinicName"></small></h1>
+    <a class="btn ok" href="index.html" target="_blank" style="text-decoration:none">▶ Abrir TV</a>
+    <button class="btn" id="btnLogout">Sair</button>
+  </header>
+  <div class="layout">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="content">
+
+      <section class="tab neo" data-tab="🎨 Identidade">
+        <h2>Identidade visual</h2><p class="hint">Nome, logo (fica em um cartão claro para qualquer logo aparecer bem), cores, fontes e orientação da TV.</p>
+        <div class="grid" id="gGeneral"></div>
+        <h3>Logo da clínica</h3>
+        <div class="f"><input type="file" accept="image/*" id="logoFile" class="neo-in" aria-label="Enviar logo">
+          <img id="logoPrev" class="thumb" style="max-height:80px;display:none" alt=""></div>
+        <div class="actions"><button class="btn sm del" id="logoDel">Remover logo</button></div>
+        <h3>Fontes</h3>
+        <div class="grid" id="gFonts"></div>
+        <div class="info">Para usar a fonte <b>Qurova</b> (ou qualquer outra): coloque o arquivo <code>.woff2 / .ttf / .otf</code> na pasta <code>midia/</code> e informe o caminho abaixo, ou envie o arquivo aqui. Ela passa a valer em todos os títulos, relógio e rodapé.</div>
+        <div class="grid">
+          <div class="f"><label for="fontPath">Caminho do arquivo da fonte</label><input class="neo-in" id="fontPath" placeholder="midia/Qurova.otf"></div>
+          <div class="f"><label for="fontFile">Ou enviar o arquivo da fonte</label><input type="file" class="neo-in" id="fontFile" accept=".woff,.woff2,.ttf,.otf"></div>
+        </div>
+        <div class="actions"><button class="btn sm del" id="fontDel">Voltar para a fonte da lista</button></div>
+        <h3>Efeito no relógio</h3>
+        <div id="clockFx"></div>
+      </section>
+
+      <section class="tab neo" data-tab="🌦 Clima e Local">
+        <h2>Clima em tempo real</h2><p class="hint">O clima é buscado pela latitude e longitude e atualiza sozinho a cada 10 minutos. Já vem configurado para Estiva-MG.</p>
+        <div class="grid" id="gWeather"></div>
+        <div class="actions">
+          <button class="btn ok" id="geoFind">🔎 Buscar coordenadas pela cidade</button>
+          <button class="btn" id="geoHere">📍 Usar minha localização atual</button>
+          <button class="btn" id="geoTest">🌡 Testar agora</button>
+        </div>
+        <div class="info" id="geoOut">Clique em "Testar agora" para ver o clima atual deste ponto.</div>
+      </section>
+
+      <section class="tab neo" data-tab="🖥 Tela e Layout">
+        <h2>Tela: monitor, TV e celular</h2><p class="hint">Tudo aqui vale para todas as TVs. O tema claro é o visual limpo de clínica. A orientação "Automática" acompanha o aparelho: horizontal na TV e no monitor, vertical em totem e celular (no celular a tela fica enxuta). Se a TV corta as bordas, aumente a margem de segurança.</p>
+        <div class="grid" id="gScreen"></div>
+        <h3>O que aparece na tela</h3><div class="grid" id="gShow"></div>
+        <div class="info">Atalhos na TV: <b>F</b> tela cheia · <b>R</b> girar a tela (só neste aparelho) · <b>M</b> liga/pausa a rádio · <b>N</b> próxima rádio. Endereços úteis: <code>?o=v</code> força vertical, <code>?m=1</code> força o modo celular.</div>
+      </section>
+
+      <section class="tab neo" data-tab="🩺 Serviços">
+        <h2>Faixa de serviços</h2><p class="hint">Fica embaixo da tela central. Os serviços ganham destaque um de cada vez.</p>
+        <div id="svcList"></div><div class="actions"><button class="btn ok" id="addSvc">+ Novo serviço</button></div>
+      </section>
+
+      <section class="tab neo" data-tab="📺 Propagandas">
+        <h2>Publicações e recados (tela central)</h2><p class="hint">Adicione quantas quiser, cada uma com seu tempo, datas, entrada e efeitos. Tipos: imagem, vídeo MP4, YouTube ou slide de texto (ótimo para recados). Modelos prontos para foto: aniversariante e campanha/dica. Todo texto aceita fonte, cor, efeitos e animação. Use as setas para mudar a ordem.</p>
+        <div id="slidesList"></div>
+        <div class="actions"><button class="btn ok" id="addSlide">+ Nova propaganda</button></div>
+      </section>
+
+      <section class="tab neo" data-tab="🗓 Programação">
+        <h2>Programação do dia</h2><p class="hint">Aparece na coluna da esquerda. O horário atual fica destacado automaticamente.</p>
+        <div class="days" id="days"></div><div id="schedRows"></div>
+        <div class="actions"><button class="btn ok" id="addRow">+ Adicionar horário</button><button class="btn" id="copyAll">Copiar este dia para todos</button></div>
+      </section>
+
+      <section class="tab neo" data-tab="✝ Frases de Deus">
+        <h2>Frases de Deus</h2><p class="hint">Giram na coluna esquerda, abaixo da programação.</p>
+        <div id="versesList"></div><div class="actions"><button class="btn ok" id="addVerse">+ Nova frase</button></div>
+      </section>
+
+      <section class="tab neo" data-tab="📰 Rodapé (notícias)">
+        <h2>Rodapé estilo telejornal</h2><p class="hint">Uma manchete por vez no destaque (com a etiqueta da categoria) e todas correndo na faixa de baixo. Crie as categorias que quiser: trânsito, locais, eventos, promoções…</p>
+        <div class="grid" id="gTicker"></div>
+        <h3>Categorias</h3><div id="catList"></div>
+        <div class="actions"><button class="btn ok" id="addCat">+ Nova categoria</button></div>
+        <h3>Informações</h3><div id="tickerList"></div>
+        <div class="actions"><button class="btn ok" id="addTicker">+ Nova informação</button></div>
+      </section>
+
+      <section class="tab neo" data-tab="📻 Rádio">
+        <h2>Rádio ambiente</h2><p class="hint">Toca música na TV por um link de transmissão (stream). Se a primeira estação falhar, tenta a próxima automaticamente.</p>
+        <div class="grid" id="gRadio"></div>
+        <h3>Estações</h3><div id="stList"></div>
+        <div class="actions"><button class="btn ok" id="addStation">+ Nova estação</button></div>
+        <div class="warn">⚠ O link precisa ser <b>https://</b> (o GitHub Pages bloqueia link http). Navegadores bloqueiam som automático: na TV, abra o Chrome com <code>--autoplay-policy=no-user-gesture-required</code> ou toque uma vez na tela. Teclas na TV: <b>M</b> liga/pausa, <b>N</b> próxima estação.</div>
+      </section>
+
+      <section class="tab neo" data-tab="💾 Publicar e Backup">
+        <h2>Publicar, backup e segurança</h2>
+        <div class="info" id="srvNote" style="display:none">✔ <b>Modo servidor Debian:</b> tudo que você altera é salvo no servidor e as TVs atualizam sozinhas em segundos. A senha do painel é a definida na instalação (arquivo /etc/war.env). Use o backup abaixo para guardar uma cópia.</div>
+        <div class="warn" id="warnPass">⚠ A senha padrão é <b>admin123</b>. Troque abaixo. A proteção é feita no navegador (serve para esconder o painel, não é segurança de servidor).</div>
+        <div id="modeBox"><h3>Como a TV lê os dados (GitHub Pages)</h3>
+        <div class="radio" id="modeRadio">
+          <label><input type="radio" name="mode" value="local"> Neste navegador (admin e TV no mesmo computador)</label>
+          <label><input type="radio" name="mode" value="repo"> Do arquivo config.json do GitHub (TV em outro aparelho)</label>
+        </div>
+        <ol class="steps"><li>Faça as alterações aqui no admin.</li><li>Clique em <b>Baixar config.json</b>.</li><li>No GitHub, substitua o <code>config.json</code> do repositório.</li><li>Nas TVs, deixe "Do arquivo config.json". Elas atualizam em até 2 minutos.</li></ol></div>
+        <div class="actions">
+          <button class="btn ok" id="btnExport">⬇ Baixar config.json</button>
+          <label class="btn" style="cursor:pointer">⬆ Importar config.json<input type="file" id="importFile" accept=".json" hidden></label>
+          <button class="btn del" id="btnReset">Restaurar padrão</button>
+        </div>
+        <div id="passBox"><h3>Usuário e senha do admin</h3>
+        <div class="grid">
+          <div class="f"><label for="newUser">Usuário</label><input class="neo-in" id="newUser"></div>
+          <div class="f"><label for="newPass">Nova senha</label><input class="neo-in" id="newPass" type="password"></div>
+        </div>
+        <div class="actions"><button class="btn pri" id="btnPass">Salvar acesso</button></div></div>
+        <div class="foot" style="margin-top:30px">Clínica TV · Sistema idealizado por Waldeci Ramos</div>
+      </section>
+    </div>
+
+    <aside class="pv neo">
+      <div class="bar"><b>Pré-visualização ao vivo</b>
+        <button class="btn sm" id="pvH">Horizontal</button><button class="btn sm" id="pvV">Vertical</button></div>
+      <div class="pvbox" id="pvbox"><iframe id="pvf" title="Pré-visualização da TV"></iframe></div>
+      <p class="hint" style="margin:10px 0 0">Mostra exatamente o que a TV exibe. Atualiza a cada alteração.</p>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="assets/core.js"></script>
+<script>
+(function () {
+  'use strict';
+  const TV = 'index.html';
+  const $ = (id) => document.getElementById(id);
+  let cfg = null, curDay = new Date().getDay();
+  const SESSION = 'infotv_admin_ok', openIds = new Set();
+
+  function el(tag, props, kids) {
+    const e = document.createElement(tag);
+    Object.entries(props || {}).forEach(([k, v]) => { if (k === 'class') e.className = v; else if (k.startsWith('on')) e[k] = v; else e.setAttribute(k, v); });
+    (kids || []).forEach((c) => e.append(c));
+    return e;
+  }
+  let tt; function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 1700); }
+  function persist() {
+    Promise.resolve().then(() => InfoTV.save(cfg)).then(() => toast('Salvo ✓'), (e) => alert('Não foi possível salvar: ' + (e && e.message ? e.message : e) + '. Se estiver no servidor, confira a senha e a conexão; no navegador, use arquivos menores.'));
+  }
+  let dt; const persistSoon = () => { clearTimeout(dt); dt = setTimeout(persist, 350); };
+  const move = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; };
+
+  /* ---------- campo ligado a um objeto ---------- */
+  let uid = 0;
+  function field(label, obj, key, o) {
+    o = o || {}; const id = 'f' + (++uid); const wrap = el('div', { class: 'f' + (o.type === 'checkbox' ? ' chk' : '') });
+    let inp, immediate = false;
+    if (o.options) { inp = el('select', { class: 'neo-in', id }); o.options.forEach((p) => { const a = Array.isArray(p) ? p : [p, p]; inp.append(el('option', { value: a[0] }, [a[1]])); }); inp.value = obj[key]; immediate = true; }
+    else if (o.type === 'checkbox') { inp = el('input', { type: 'checkbox', id }); inp.checked = !!obj[key]; immediate = true; }
+    else if (o.type === 'textarea') { inp = el('textarea', { class: 'neo-in', rows: 3, id }); inp.value = obj[key] || ''; }
+    else if (o.type === 'range') { inp = el('input', { type: 'range', id, min: o.min, max: o.max, step: o.step }); inp.value = obj[key]; }
+    else { inp = el('input', { type: o.type || 'text', class: o.type === 'color' ? '' : 'neo-in', id }); inp.value = obj[key] == null ? '' : obj[key]; if (o.ph) inp.placeholder = o.ph; if (o.step) inp.step = o.step; }
+    const run = () => {
+      let v = o.type === 'checkbox' ? inp.checked : inp.value; if (o.type === 'number' || o.type === 'range') v = +v;
+      obj[key] = v; (immediate ? persist : persistSoon)(); if (o.after) o.after(v);
+    };
+    inp.addEventListener(immediate ? 'change' : 'input', run);
+    if (o.type === 'checkbox') wrap.append(el('label', { for: id }, [inp, document.createTextNode(label)])); else wrap.append(el('label', { for: id }, [label]), inp);
+    return wrap;
+  }
+  const fileToDataURL = (file, max, type) => new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => { if (!max) return res(fr.result); const im = new Image(); im.onload = () => { const k = Math.min(1, max / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL(type, 0.82)); }; im.onerror = rej; im.src = fr.result; };
+    fr.onerror = rej; fr.readAsDataURL(file);
+  });
+
+  const fileToURL = async (file, max, type) => (await InfoTV.isServer()) ? InfoTV.upload(file) : fileToDataURL(file, max, type);
+
+  /* ---------- Editor de texto com efeitos ---------- */
+  function fxEditor(st, title, base, bg) {
+    const d = el('details', { class: 'fxbox' }); d.append(el('summary', {}, ['✨ ' + title + ' — texto, fonte e efeitos']));
+    const pv = el('div', { class: 'pvtext' }); if (bg) pv.style.background = bg; const span = el('span');
+    const render = () => InfoFX.text(span, st.text || 'Texto de exemplo', st, base * 0.34);
+    pv.append(span); render();
+    const rer = () => render();
+    const g = el('div', { class: 'grid' });
+    g.append(
+      field('Fonte', st, 'font', { options: [['', 'Padrão (fonte dos títulos)']].concat(InfoTV.FONTS.map((f) => [f, f])), after: rer }),
+      field('Tamanho (' + Math.round(st.size * 100) + '%)', st, 'size', { type: 'range', min: 0.4, max: 2.6, step: 0.05, after: rer }),
+      field('Cor do texto', st, 'color', { type: 'color', after: rer }),
+      field('Efeito', st, 'effect', { options: InfoTV.EFFECTS, after: rer }),
+      field('Cor do brilho / sombra', st, 'glow', { type: 'color', after: rer }),
+      field('Gradiente: cor 1', st, 'g1', { type: 'color', after: rer }),
+      field('Gradiente: cor 2', st, 'g2', { type: 'color', after: rer }),
+      field('Animação', st, 'anim', { options: InfoTV.ANIMS, after: rer })
+    );
+    d.append(el('div', { class: 'f', style: 'margin-top:12px' }, [(() => { const l = el('label', {}, ['Texto']); return l; })(), (() => { const t = el('textarea', { class: 'neo-in', rows: 2 }); t.value = st.text || ''; t.addEventListener('input', () => { st.text = t.value; persistSoon(); rer(); }); return t; })()]), pv, el('button', { class: 'btn sm', style: 'margin-bottom:16px', onclick: rer }, ['▶ Repetir animação']), g);
+    return d;
+  }
+
+  /* ---------- Identidade ---------- */
+  function renderGeneral() {
+    const g = cfg.general, box = $('gGeneral'); box.innerHTML = '';
+    box.append(
+      field('Nome da clínica', g, 'name'), field('Subtítulo', g, 'subtitle'),
+      field('Orientação padrão da TV', g, 'orientation', { options: [['auto', 'Automática (TV, monitor ou celular)'], ['h', 'Horizontal'], ['v', 'Vertical (monitor já girado)'], ['v90', 'Vertical, girando via software ↻'], ['v270', 'Vertical, girando via software ↺']] }),
+      field('Cor principal', g, 'primary', { type: 'color' }), field('Cor de destaque (dourado)', g, 'secondary', { type: 'color' }),
+      field('Fundo do cartão da logo', g, 'brandBg', { type: 'color' }), field('Texto do cartão da logo', g, 'brandFg', { type: 'color' }),
+      field('Tempo padrão de cada propaganda (s)', g, 'slideSeconds', { type: 'number' }),
+      field('Tempo de cada frase de Deus (s)', g, 'verseSeconds', { type: 'number' }),
+      field('Mostrar segundos no relógio', g, 'showSeconds', { type: 'checkbox' })
+    );
+    const p = $('logoPrev'); if (g.logo) { p.src = g.logo; p.style.display = 'block'; } else p.style.display = 'none';
+    const f = $('gFonts'); f.innerHTML = '';
+    f.append(field('Fonte dos títulos e relógio', g, 'fontDisplay', { options: InfoTV.FONTS }), field('Fonte dos textos', g, 'fontBody', { options: InfoTV.FONTS }));
+    $('fontPath').value = (g.fontCustomSrc || '').startsWith('data:') ? '(arquivo enviado)' : (g.fontCustomSrc || '');
+    const c = $('clockFx'); c.innerHTML = ''; const cg = el('div', { class: 'grid' });
+    cg.append(field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }));
+    c.append(cg);
+  }
+  $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; cfg.general.logo = await fileToURL(f, 500, 'image/png'); persist(); renderGeneral(); };
+  $('logoDel').onclick = () => { cfg.general.logo = ''; persist(); renderGeneral(); };
+  $('fontPath').onchange = (e) => { if (e.target.value !== '(arquivo enviado)') { cfg.general.fontCustomSrc = e.target.value.trim(); persist(); } };
+  $('fontFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; cfg.general.fontCustomSrc = await fileToURL(f, 0); persist(); renderGeneral(); };
+  $('fontDel').onclick = () => { cfg.general.fontCustomSrc = ''; persist(); renderGeneral(); };
+
+  /* ---------- Clima ---------- */
+  function renderWeather() {
+    const g = cfg.general, b = $('gWeather'); b.innerHTML = '';
+    b.append(field('Cidade (nome exibido)', g, 'city', { ph: 'Estiva, MG' }), field('Latitude', g, 'lat', { type: 'number', step: 'any' }), field('Longitude', g, 'lon', { type: 'number', step: 'any' }));
+  }
+  const WN = { 0: 'Céu limpo', 1: 'Quase limpo', 2: 'Parcialmente nublado', 3: 'Nublado', 45: 'Neblina', 51: 'Garoa', 61: 'Chuva fraca', 63: 'Chuva', 65: 'Chuva forte', 80: 'Pancadas de chuva', 95: 'Tempestade' };
+  $('geoFind').onclick = async () => {
+    const name = (cfg.general.city || '').split(',')[0].trim(); if (!name) return toast('Informe a cidade');
+    try {
+      const j = await (await fetch('https://geocoding-api.open-meteo.com/v1/search?count=5&language=pt&countryCode=BR&name=' + encodeURIComponent(name))).json();
+      if (!j.results || !j.results.length) return toast('Cidade não encontrada');
+      const st = (cfg.general.city.split(',')[1] || '').trim().toLowerCase();
+      const r = j.results.find((x) => st && (x.admin1 || '').toLowerCase().includes(st)) || j.results.find((x) => /minas/i.test(x.admin1 || '')) || j.results[0];
+      cfg.general.lat = +r.latitude.toFixed(4); cfg.general.lon = +r.longitude.toFixed(4); persist(); renderWeather();
+      $('geoOut').textContent = 'Encontrado: ' + r.name + (r.admin1 ? ' – ' + r.admin1 : '') + ' (' + cfg.general.lat + ', ' + cfg.general.lon + ')';
+    } catch (e) { toast('Sem conexão com o serviço de localização'); }
+  };
+  $('geoHere').onclick = () => navigator.geolocation ? navigator.geolocation.getCurrentPosition((p) => { cfg.general.lat = +p.coords.latitude.toFixed(4); cfg.general.lon = +p.coords.longitude.toFixed(4); persist(); renderWeather(); toast('Localização aplicada'); }, () => toast('Não foi possível obter a localização')) : toast('Navegador sem GPS');
+  $('geoTest').onclick = async () => {
+    try {
+      const g = cfg.general, j = await (await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + g.lat + '&longitude=' + g.lon + '&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto')).json();
+      $('geoOut').textContent = 'Agora em ' + g.city + ': ' + Math.round(j.current.temperature_2m) + '°C, ' + (WN[j.current.weather_code] || 'tempo variável') + ', umidade ' + j.current.relative_humidity_2m + '%, vento ' + Math.round(j.current.wind_speed_10m) + ' km/h.';
+    } catch (e) { $('geoOut').textContent = 'Não foi possível consultar o clima agora.'; }
+  };
+
+  /* ---------- Propagandas ---------- */
+  const TYPES = [['image', '🖼 Imagem'], ['video', '🎬 Vídeo MP4'], ['youtube', '▶ YouTube'], ['text', '📝 Slide de texto']];
+  const tLabel = (s) => (TYPES.find((t) => t[0] === s.type) || [])[1];
+  function renderSlides() {
+    const box = $('slidesList'); box.innerHTML = '';
+    cfg.slides.forEach((s, i) => {
+      const d = el('details', { class: 'item' }); if (openIds.has(s.id)) d.open = true; d.ontoggle = () => { d.open ? openIds.add(s.id) : openIds.delete(s.id); };
+      const sum = el('summary', {}, [el('b', {}, ['#' + (i + 1) + ' · ' + (s.t1.text || tLabel(s)) + (s.active ? '' : '  (desligada)')])]);
+      const btn = (t, fn, cls) => el('button', { class: 'btn sm ' + (cls || ''), onclick: (e) => { e.preventDefault(); e.stopPropagation(); fn(); } }, [t]);
+      sum.append(btn('↑', () => { move(cfg.slides, i, -1); persist(); renderSlides(); }), btn('↓', () => { move(cfg.slides, i, 1); persist(); renderSlides(); }),
+        btn('⧉', () => { const c = InfoTV.clone(s); c.id = InfoTV.rid(); cfg.slides.splice(i + 1, 0, c); persist(); renderSlides(); }),
+        btn('🗑', () => { if (sum.dataset.arm) { cfg.slides.splice(i, 1); persist(); renderSlides(); } else { sum.dataset.arm = 1; toast('Clique de novo para excluir'); setTimeout(() => delete sum.dataset.arm, 2500); } }, 'del'));
+      const body = el('div', { class: 'body' }); const g = el('div', { class: 'grid' });
+      g.append(field('Tipo', s, 'type', { options: TYPES, after: renderSlides }), field('Ativa', s, 'active', { type: 'checkbox' }),
+        field('Duração (s)' + (s.type === 'video' ? ' · 0 = até o fim' : ''), s, 'seconds', { type: 'number' }),
+        field('Exibir a partir de', s, 'start', { type: 'date' }), field('Exibir até', s, 'end', { type: 'date' }));
+      if (s.type === 'image') g.append(field('Ajuste da imagem', s, 'fit', { options: [['cover', 'Preencher (corta bordas)'], ['contain', 'Mostrar inteira']] }));
+      if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }));
+      if (s.type === 'youtube') g.append(field('Link do YouTube', s, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx' }));
+      if (s.type === 'text') g.append(field('Ícone / emoji', s, 'icon'), field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
+      else g.append(field('Posição do texto sobre a mídia', s, 'pos', { options: [['bottom', 'Embaixo'], ['center', 'Centro'], ['top', 'Em cima']] }));
+      if (s.type !== 'text') g.append(field('Modelo da publicação', s, 'tpl', { options: [['cheia', 'Tela cheia (como enviada)'], ['aniversario', 'Aniversariante (foto + parabéns)'], ['dica', 'Campanha / dica (foto + texto ao lado)']], after: renderSlides }));
+      if (s.type === 'image') g.append(field('Movimento da imagem', s, 'kb', { options: [['', 'Parada'], ['in', 'Zoom aproximando'], ['out', 'Zoom afastando'], ['pan', 'Deslizando de lado']] }));
+      g.append(field('Entrada na tela', s, 'trans', { options: [['', 'Padrão da TV'], ['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Desfocar'], ['wipe', 'Cortina']] }));
+      if (s.type === 'text' || (s.type !== 'text' && s.tpl !== 'cheia')) g.append(field('Efeito animado de fundo', s, 'bgfx', { options: [['', s.tpl === 'aniversario' ? 'Confete (padrão)' : 'Nenhum'], ['aurora', 'Aurora'], ['bolhas', 'Bolhas'], ['ondas', 'Ondas'], ['confete', 'Confete'], ['brilhos', 'Brilhos']] }));
+      if (s.type !== 'text' && s.tpl !== 'cheia') g.append(field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
+      body.append(g);
+      if (s.type !== 'text' && s.tpl === 'aniversario') body.append(el('div', { class: 'info' }, ['Aniversariante: escreva só o nome da pessoa no texto principal (a TV mostra "Parabéns, Nome!") e a mensagem no texto secundário.']));
+      if (s.type === 'video') {
+        const vu = el('input', { type: 'file', accept: 'video/*', class: 'neo-in' });
+        vu.onchange = async () => { if (!vu.files[0]) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho acima.'); toast('Enviando vídeo…'); try { s.src = await InfoTV.upload(vu.files[0]); persist(); renderSlides(); } catch (e) { alert('Falha no envio: ' + e.message); } };
+        body.append(el('div', { class: 'f', style: 'margin-top:14px' }, [el('label', {}, ['Enviar vídeo do computador (servidor Debian)']), vu]));
+      }
+      if (s.type === 'image') {
+        const up = el('input', { type: 'file', accept: 'image/*', class: 'neo-in', id: 'up' + s.id });
+        up.onchange = async () => { if (!up.files[0]) return; s.src = await fileToURL(up.files[0], 1920, 'image/jpeg'); persist(); renderSlides(); };
+        const url = el('input', { class: 'neo-in', placeholder: 'midia/banner.jpg  ou  https://…' }); url.value = (s.src || '').startsWith('data:') ? '' : (s.src || '');
+        url.onchange = () => { s.src = url.value; persist(); renderSlides(); };
+        body.append(el('div', { class: 'grid', style: 'margin-top:14px' }, [el('div', { class: 'f' }, [el('label', { for: up.id }, ['Enviar imagem do computador']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço da imagem']), url])]));
+        if (s.src) body.append(el('img', { class: 'thumb', src: s.src, alt: '' }));
+      }
+      const bgc = s.type === 'text' ? 'linear-gradient(135deg,' + s.bg1 + ',' + s.bg2 + ')' : '#16202c';
+      body.append(fxEditor(s.t1, s.type === 'text' ? 'Título' : 'Texto principal (opcional)', 4.6, bgc), fxEditor(s.t2, s.type === 'text' ? 'Descrição' : 'Texto secundário (opcional)', 2.3, bgc));
+      d.append(sum, body); box.append(d);
+    });
+    if (!cfg.slides.length) box.append(el('p', { class: 'hint' }, ['Nenhuma propaganda cadastrada.']));
+  }
+  $('addSlide').onclick = () => { const s = InfoTV.normSlide({ type: 'image', t1: { text: '' }, t2: { text: '', effect: 'none', anim: 'fade' } }); cfg.slides.push(s); openIds.add(s.id); persist(); renderSlides(); };
+
+  /* ---------- Programação ---------- */
+  const DN = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  function renderSched() {
+    const d = $('days'); d.innerHTML = '';
+    DN.forEach((n, i) => d.append(el('button', { class: 'btn sm' + (i === curDay ? ' on' : ''), onclick: () => { curDay = i; renderSched(); } }, [n])));
+    const rows = cfg.schedule[curDay] = cfg.schedule[curDay] || []; const box = $('schedRows'); box.innerHTML = '';
+    rows.forEach((r, i) => {
+      const t = el('input', { type: 'time', class: 'neo-in', 'aria-label': 'Horário' }); t.value = r.time || ''; t.oninput = () => { r.time = t.value; persistSoon(); };
+      const x = el('input', { class: 'neo-in', placeholder: 'Atividade', 'aria-label': 'Atividade' }); x.value = r.text || ''; x.oninput = () => { r.text = x.value; persistSoon(); };
+      box.append(el('div', { class: 'row2' }, [t, x, el('button', { class: 'btn sm del', onclick: () => { rows.splice(i, 1); persist(); renderSched(); } }, ['🗑'])]));
+    });
+    if (!rows.length) box.append(el('p', { class: 'hint' }, ['Sem programação neste dia.']));
+  }
+  $('addRow').onclick = () => { (cfg.schedule[curDay] = cfg.schedule[curDay] || []).push({ time: '', text: '' }); persist(); renderSched(); };
+  $('copyAll').onclick = () => { for (let i = 0; i < 7; i++) cfg.schedule[i] = InfoTV.clone(cfg.schedule[curDay]); persist(); toast('Copiado para todos os dias'); };
+
+  /* ---------- listas simples ---------- */
+  function simpleList(boxId, arr, mk, addId, blank) {
+    const box = $(boxId);
+    const draw = () => {
+      box.innerHTML = '';
+      arr().forEach((it, i) => {
+        const head = el('div', { class: 'head' }, [el('b', {}, ['#' + (i + 1)])]);
+        [['↑', -1], ['↓', 1]].forEach(([t, dd]) => head.append(el('button', { class: 'btn sm', onclick: () => { move(arr(), i, dd); persist(); draw(); } }, [t])));
+        head.append(el('button', { class: 'btn sm del', onclick: () => { arr().splice(i, 1); persist(); draw(); afterList(); } }, ['🗑']));
+        box.append(el('div', { class: 'item' }, [head, el('div', { style: 'height:12px' }), ...mk(it)]));
+      });
+    };
+    $(addId).onclick = () => { arr().push(InfoTV.clone(blank())); persist(); draw(); afterList(); };
+    return draw;
+  }
+  function afterList() { drawTicker(); }
+  const drawVerses = simpleList('versesList', () => cfg.verses, (v) => [field('Texto', v, 'text', { type: 'textarea' }), el('div', { style: 'height:10px' }), field('Referência', v, 'ref', { ph: 'Salmos 23:1' })], 'addVerse', () => ({ text: '', ref: '' }));
+
+  /* ---------- Rodapé + categorias ---------- */
+  function renderTickerCfg() { const b = $('gTicker'); b.innerHTML = ''; b.append(field('Segundos de cada manchete', cfg.general, 'headlineSeconds', { type: 'number' }), field('Velocidade da faixa (maior = mais rápida)', cfg.general, 'tickerSpeed', { type: 'number' })); }
+  const drawCats = simpleList('catList', () => cfg.categories, (c) => [el('div', { class: 'grid' }, [field('Emoji', c, 'icon'), field('Nome da etiqueta', c, 'label'), field('Cor', c, 'color', { type: 'color' }), field('Identificador', c, 'id', { after: () => {} })])], 'addCat', () => ({ id: 'cat' + InfoTV.rid(), label: 'Nova categoria', icon: '⭐', color: '#6366f1' }));
+  const drawTicker = simpleList('tickerList', () => cfg.ticker, (t) => [el('div', { class: 'grid' }, [field('Categoria', t, 'cat', { options: cfg.categories.map((c) => [c.id, (c.icon || '') + ' ' + c.label]) }), field('Ativa', t, 'active', { type: 'checkbox' })]), el('div', { style: 'height:10px' }), field('Texto', t, 'text', { type: 'textarea' }), el('div', { style: 'height:10px' }), el('div', { class: 'grid' }, [field('Detalhe (linha menor, opcional)', t, 'detail'), field('Segundos no destaque (0 = padrão)', t, 'seconds', { type: 'number' }), field('Exibir a partir de', t, 'start', { type: 'date' }), field('Exibir até', t, 'end', { type: 'date' }), field('Entrada do texto', t, 'anim', { options: [['up', 'Subir'], ['fade', 'Aparecer'], ['zoom', 'Zoom'], ['blur', 'Desfocar'], ['letras', 'Letras uma a uma'], ['digitar', 'Máquina de escrever']] })])], 'addTicker', () => ({ cat: cfg.categories[0].id, text: '', active: true, detail: '', seconds: 0, start: '', end: '', anim: 'up' }));
+
+  /* ---------- Tela e serviços ---------- */
+  function renderScreen() {
+    const g = cfg.general, b = $('gScreen'); b.innerHTML = '';
+    const tr = [['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Desfocar'], ['wipe', 'Cortina']];
+    b.append(field('Tema', g, 'theme', { options: [['claro', 'Claro e limpo (clínica)'], ['escuro', 'Escuro']] }), field('Moldura da tela central', g, 'frame', { options: [['moldura', 'Com moldura'], ['cheia', 'Tela cheia, sem borda']] }),
+      field('Coluna lateral', g, 'sidebar', { options: [['estreita', 'Estreita'], ['normal', 'Normal'], ['larga', 'Larga'], ['oculta', 'Oculta']] }), field('Entrada padrão dos slides', g, 'transition', { options: tr }),
+      field('Zoom geral (' + g.zoom + '%)', g, 'zoom', { type: 'range', min: 60, max: 160, step: 5 }), field('Margem de segurança (' + g.margin + '%)', g, 'margin', { type: 'range', min: 0, max: 8, step: 0.5 }));
+    const sh = $('gShow'); sh.innerHTML = '';
+    [['brand', 'Logo e nome'], ['weather', 'Clima'], ['schedule', 'Programação do dia'], ['verse', 'Frases de Deus'], ['services', 'Faixa de serviços'], ['ticker', 'Barra de notícias']].forEach(([k, l]) => sh.append(field(l, g.show, k, { type: 'checkbox' })));
+  }
+  const drawSvc = simpleList('svcList', () => cfg.services, (v) => [el('div', { class: 'grid' }, [field('Ícone / emoji', v, 'icon'), field('Nome do serviço', v, 'label'), field('Ativo', v, 'active', { type: 'checkbox' })])], 'addSvc', () => ({ icon: '✚', label: '', active: true }));
+
+  /* ---------- Rádio ---------- */
+  let testAudio = null;
+  function renderRadio() {
+    const r = cfg.radio, b = $('gRadio'); b.innerHTML = '';
+    b.append(field('Ativar rádio na TV', r, 'enabled', { type: 'checkbox' }), field('Tocar ao abrir a TV', r, 'autoplay', { type: 'checkbox' }),
+      field('Volume (' + Math.round(r.volume * 100) + '%)', r, 'volume', { type: 'range', min: 0, max: 1, step: 0.05 }),
+      field('Now playing (opcional, AzuraCast)', r, 'nowPlayingUrl', { ph: 'https://radio.exemplo.com/api/nowplaying/1' }));
+    drawStations();
+  }
+  const drawStations = simpleList('stList', () => cfg.radio.stations, (s) => [el('div', { class: 'grid' }, [field('Nome da rádio', s, 'name'), field('Link do stream (https://)', s, 'url', { ph: 'https://…/stream.mp3' })]),
+    el('div', { class: 'actions' }, [el('button', { class: 'btn sm', onclick: () => { if (testAudio) testAudio.pause(); testAudio = new Audio(s.url); testAudio.play().then(() => toast('Tocando teste…')).catch(() => toast('Não foi possível tocar este link')); } }, ['▶ Testar']), el('button', { class: 'btn sm', onclick: () => testAudio && testAudio.pause() }, ['■ Parar'])])], 'addStation', () => ({ name: '', url: '' }));
+
+  /* ---------- Backup / segurança ---------- */
+  function renderBackup() {
+    document.querySelectorAll('input[name=mode]').forEach((r) => { r.checked = r.value === InfoTV.getMode(); r.onchange = () => { InfoTV.setMode(r.value); toast('Modo: ' + (r.value === 'repo' ? 'config.json do GitHub' : 'este navegador')); }; });
+    $('newUser').value = cfg.admin.user;
+    InfoTV.isServer().then((sv) => { ['modeBox', 'passBox', 'warnPass'].forEach((id) => { $(id).style.display = sv ? 'none' : ''; }); $('srvNote').style.display = sv ? '' : 'none'; });
+  }
+  $('btnExport').onclick = () => { const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' })), download: 'config.json' }); a.click(); };
+  $('importFile').onchange = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { cfg = InfoTV.build(JSON.parse(r.result)); persist(); renderAll(); toast('Configuração importada'); } catch (x) { toast('Arquivo inválido'); } }; r.readAsText(f); };
+  let armReset = 0; $('btnReset').onclick = () => { if (Date.now() - armReset < 3000) { cfg = InfoTV.build({}); persist(); renderAll(); } else { armReset = Date.now(); toast('Clique de novo para restaurar o padrão'); } };
+  $('btnPass').onclick = async () => {
+    const u = $('newUser').value.trim(), p = $('newPass').value; if (!u) return toast('Informe o usuário');
+    cfg.admin.user = u; if (p) { if (p.length < 4) return toast('Senha muito curta'); cfg.admin.hash = await InfoTV.sha256(p); }
+    persist(); $('newPass').value = ''; toast('Acesso atualizado ✓');
+  };
+
+  /* ---------- Pré-visualização ---------- */
+  let pvO = 'h';
+  function pvFit() {
+    const b = $('pvbox'), v = pvO !== 'h', w = v ? 1080 : 1920, h = v ? 1920 : 1080, f = $('pvf');
+    b.style.aspectRatio = w + '/' + h; if (v) { b.style.maxWidth = '240px'; b.style.margin = '0 auto'; } else { b.style.maxWidth = ''; b.style.margin = ''; }
+    f.width = w; f.height = h; f.style.transform = 'scale(' + (b.clientWidth / w) + ')';
+  }
+  function pvLoad() { $('pvf').src = TV + '?preview=1&o=' + pvO; pvFit(); }
+  $('pvH').onclick = () => { pvO = 'h'; pvLoad(); }; $('pvV').onclick = () => { pvO = 'v'; pvLoad(); };
+  addEventListener('resize', pvFit);
+
+  /* ---------- Abas / login ---------- */
+  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderScreen(); drawSvc(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawTicker(); renderRadio(); renderBackup(); }
+  function buildTabs() {
+    const secs = [...document.querySelectorAll('section.tab')], nav = $('tabs'); nav.innerHTML = '';
+    const show = (n) => { secs.forEach((s) => s.classList.toggle('on', s.dataset.tab === n)); [...nav.children].forEach((b) => b.classList.toggle('on', b.textContent === n)); };
+    secs.forEach((s) => nav.append(el('button', { class: 'btn', onclick: () => show(s.dataset.tab) }, [s.dataset.tab]))); show(secs[0].dataset.tab);
+  }
+  async function enter() {
+    cfg = await InfoTV.load(); const sv = await InfoTV.isServer(); if (!sv && InfoTV.getMode() === 'repo') { const l = InfoTV.loadLocal(); if (l) cfg = l; }
+    $('login').style.display = 'none'; $('panel').style.display = 'block'; buildTabs(); renderAll(); pvLoad();
+    sessionStorage.setItem(SESSION, '1');
+  }
+  $('loginForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const c = await InfoTV.load(), hash = c.admin.hash, u = $('lUser').value.trim(), p = $('lPass').value;
+    const ok = u === c.admin.user && (hash ? (await InfoTV.sha256(p)) === hash : p === 'admin123');
+    if (ok) enter(); else $('loginErr').textContent = 'Usuário ou senha incorretos.';
+  };
+  $('btnLogout').onclick = () => { sessionStorage.removeItem(SESSION); location.reload(); };
+  InfoTV.isServer().then((sv) => { if (sv || sessionStorage.getItem(SESSION)) enter(); });
+})();
+</script>
+</body>
+</html>
