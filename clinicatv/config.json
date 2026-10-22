@@ -40,7 +40,8 @@
       "glow": "#1fb6a6",
       "g1": "#0f766e",
       "g2": "#1fb6a6"
-    }
+    },
+    "sourcesUrl": ""
   },
   "radio": {
     "enabled": false,
@@ -483,5 +484,15 @@
   "admin": {
     "user": "admin",
     "hash": ""
-  }
+  },
+  "sources": [
+    {
+      "id": "br381",
+      "name": "BR-381 Fernão Dias",
+      "url": "https://rodovias.motiva.com.br/minas-sp/",
+      "kind": "motiva",
+      "max": 2,
+      "active": true
+    }
+  ]
 }
