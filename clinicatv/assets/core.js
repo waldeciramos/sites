@@ -66,11 +66,10 @@
       theme: 'claro', orientation: 'auto', sidebar: 'normal', frame: 'moldura', zoom: 100, margin: 0, transition: 'fade',
       show: { brand: true, weather: true, schedule: true, verse: true, services: true, ticker: true },
       slideSeconds: 12, verseSeconds: 25, headlineSeconds: 9, tickerSpeed: 90, showSeconds: true,
-      fontDisplay: 'Qurova', fontBody: 'Agency', fontCustomSrc: '', sourcesUrl: '',
+      fontDisplay: 'Qurova', fontBody: 'Agency', fontCustomSrc: '',
       clock: { effect: 'brilho', color: '#0f766e', glow: '#1fb6a6', g1: '#0f766e', g2: '#1fb6a6' }
     },
     radio: { enabled: false, autoplay: true, volume: 0.6, nowPlayingUrl: '', stations: [] },
-    sources: [],
     slides: [
       { type: 'text', icon: '💙', seconds: 10, bgfx: 'aurora', bg1: '#0f766e', bg2: '#134e4a', t1: { text: 'Bem-vindo(a)!', effect: 'brilho', anim: 'zoom' }, t2: { text: 'Aqui o seu bem-estar é a nossa prioridade.', effect: 'sombra', anim: 'fade' } },
       { type: 'text', icon: '🦴', seconds: 12, bgfx: 'ondas', trans: 'slide', bg1: '#1d4ed8', bg2: '#1e3a8a', t1: { text: 'Fisioterapia Ortopédica', effect: 'neon', glow: '#38bdf8', anim: 'up' }, t2: { text: 'Reabilitação de lesões, dores articulares e pós-cirúrgico.', effect: 'none', anim: 'fade' } },
@@ -122,7 +121,6 @@
     cfg.ticker = (cfg.ticker || []).map((t) => ({ cat: t.cat || t.type || 'aviso', text: t.text || '', active: t.active !== false, detail: t.detail || '', seconds: +t.seconds || 0, start: t.start || '', end: t.end || '', anim: t.anim || 'up' }));
     cfg.services = (cfg.services || []).map((v) => ({ icon: v.icon || '', label: v.label || '', active: v.active !== false }));
     if (!Array.isArray(cfg.radio.stations)) cfg.radio.stations = [];
-    cfg.sources = (cfg.sources || []).map((v) => ({ id: v.id || rid(), name: v.name || '', url: v.url || '', kind: v.kind || 'auto', max: +v.max || 5, active: v.active !== false }));
     return cfg;
   }
   const build = (raw) => normalize(merge(DEFAULT, raw));

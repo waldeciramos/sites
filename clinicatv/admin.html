@@ -171,19 +171,10 @@
         <div class="actions"><button class="btn ok" id="addTicker">+ Nova informação</button></div>
       </section>
 
-      <section class="tab neo" data-tab="🌐 Fontes (sites)">
-        <h2>Fontes de informação (sites)</h2><p class="hint">Cole o link de um site e o robô do GitHub busca as manchetes sozinho (a cada ~10 min) e coloca no rodapé da TV; quando o site trocar a notícia, a nova aparece. Para rodovia Motiva use o link da rodovia (ex.: https://rodovias.motiva.com.br/minas-sp/): ele lê o trânsito nos dois sentidos (BH e SP) e a etiqueta fica verde (normal), laranja ou vermelha (problema/parado).</p>
-        <div class="grid" id="gSrc"></div>
-        <div id="srcList"></div>
-        <div class="actions"><button class="btn ok" id="addSrc">+ Nova fonte</button></div>
-        <h3>Situação da última busca</h3><div class="hint" id="srcStatus"></div>
-        <div class="info">Depois de editar, baixe o <b>config.json</b> (aba Publicar e Backup) e substitua no GitHub: o robô lê as fontes desse arquivo. Para rodar na hora: GitHub → Actions → "Atualizar fontes" → Run workflow.</div>
-      </section>
-
       <section class="tab neo" data-tab="📻 Rádio">
-        <h2>Rádio ambiente</h2><p class="hint">Cadastre até <b>5 rádios</b> (link de transmissão/stream). Se a primeira estação falhar, tenta a próxima automaticamente.</p>
+        <h2>Rádio ambiente</h2><p class="hint">Toca música na TV por um link de transmissão (stream). Se a primeira estação falhar, tenta a próxima automaticamente.</p>
         <div class="grid" id="gRadio"></div>
-        <h3>Estações (até 5)</h3><div id="stList"></div>
+        <h3>Estações</h3><div id="stList"></div>
         <div class="actions"><button class="btn ok" id="addStation">+ Nova estação</button></div>
         <div class="warn">⚠ O link precisa ser <b>https://</b> (o GitHub Pages bloqueia link http). Navegadores bloqueiam som automático: na TV, abra o Chrome com <code>--autoplay-policy=no-user-gesture-required</code> ou toque uma vez na tela. Teclas na TV: <b>M</b> liga/pausa, <b>N</b> próxima estação.</div>
       </section>
@@ -456,24 +447,11 @@
   const drawStations = simpleList('stList', () => cfg.radio.stations, (s) => [el('div', { class: 'grid' }, [field('Nome da rádio', s, 'name'), field('Link do stream (https://)', s, 'url', { ph: 'https://…/stream.mp3' })]),
     el('div', { class: 'actions' }, [el('button', { class: 'btn sm', onclick: () => { if (testAudio) testAudio.pause(); testAudio = new Audio(s.url); testAudio.play().then(() => toast('Tocando teste…')).catch(() => toast('Não foi possível tocar este link')); } }, ['▶ Testar']), el('button', { class: 'btn sm', onclick: () => testAudio && testAudio.pause() }, ['■ Parar'])])], 'addStation', () => ({ name: '', url: '' }));
 
-  { const add = $('addStation'), base = add.onclick; add.onclick = () => { if (cfg.radio.stations.length >= 5) return toast('Máximo de 5 rádios'); base(); }; }
-
-  /* ---------- Fontes (sites) ---------- */
-  const drawSrc = simpleList('srcList', () => cfg.sources, (s) => [el('div', { class: 'grid' }, [field('Nome (etiqueta no rodapé)', s, 'name', { ph: 'BR-381 Fernão Dias' }), field('Link do site', s, 'url', { ph: 'https://…' }), field('Tipo', s, 'kind', { options: [['auto', 'Manchetes do site (automático)'], ['motiva', 'Rodovia Motiva (trânsito)']] }), field('Quantas manchetes', s, 'max', { type: 'number' }), field('Ativo', s, 'active', { type: 'checkbox' })])], 'addSrc', () => ({ id: InfoTV.rid(), name: '', url: '', kind: 'auto', max: 5, active: true }));
-  async function srcStatus() {
-    const box = $('srcStatus');
-    try { const u = cfg.general.sourcesUrl || 'data/fontes.json', j = await (await fetch(u + '?t=' + Date.now(), { cache: 'no-store' })).json();
-      box.textContent = 'Última mudança: ' + (j.updated ? new Date(j.updated).toLocaleString('pt-BR') : '—') + ' · ' + (j.sources || []).map((x) => x.name + ': ' + (x.ok ? x.items.length + ' item(ns)' : 'erro (' + (x.error || '?') + ')')).join(' · ');
-    } catch (e) { box.textContent = 'Ainda não há dados: o robô do GitHub ainda não rodou.'; }
-  }
-  function renderSources() { const b = $('gSrc'); b.innerHTML = ''; b.append(field('Arquivo de dados (opcional)', cfg.general, 'sourcesUrl', { ph: 'data/fontes.json' })); drawSrc(); srcStatus(); }
-
   /* ---------- Backup / segurança ---------- */
   function renderBackup() {
     document.querySelectorAll('input[name=mode]').forEach((r) => { r.checked = r.value === InfoTV.getMode(); r.onchange = () => { InfoTV.setMode(r.value); toast('Modo: ' + (r.value === 'repo' ? 'config.json do GitHub' : 'este navegador')); }; });
     $('newUser').value = cfg.admin.user;
-    InfoTV.isServer().then((sv) => { ['modeBox', 'passBox', 'warnPass'].forEach((id) => { $(id).style.display = sv ? 'none' : ''; });
-      if (!sv) fetch('acesso.json', { cache: 'no-store' }).then((r) => { if (r.ok) { $('passBox').style.display = 'none'; $('warnPass').innerHTML = '🔑 O login do admin fica no arquivo <b>acesso.json</b> (usuario e senha). Para trocar, edite esse arquivo e envie ao GitHub. No GitHub Pages esse arquivo é público: serve só para esconder o painel, não é segurança de verdade.'; } }).catch(() => {}); $('srvNote').style.display = sv ? '' : 'none'; });
+    InfoTV.isServer().then((sv) => { ['modeBox', 'passBox', 'warnPass'].forEach((id) => { $(id).style.display = sv ? 'none' : ''; }); $('srvNote').style.display = sv ? '' : 'none'; });
   }
   $('btnExport').onclick = () => { const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' })), download: 'config.json' }); a.click(); };
   $('importFile').onchange = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { cfg = InfoTV.build(JSON.parse(r.result)); persist(); renderAll(); toast('Configuração importada'); } catch (x) { toast('Arquivo inválido'); } }; r.readAsText(f); };
@@ -496,7 +474,7 @@
   addEventListener('resize', pvFit);
 
   /* ---------- Abas / login ---------- */
-  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderScreen(); drawSvc(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawTicker(); renderSources(); renderRadio(); renderBackup(); }
+  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderScreen(); drawSvc(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawTicker(); renderRadio(); renderBackup(); }
   function buildTabs() {
     const secs = [...document.querySelectorAll('section.tab')], nav = $('tabs'); nav.innerHTML = '';
     const show = (n) => { secs.forEach((s) => s.classList.toggle('on', s.dataset.tab === n)); [...nav.children].forEach((b) => b.classList.toggle('on', b.textContent === n)); };
@@ -510,8 +488,7 @@
   $('loginForm').onsubmit = async (e) => {
     e.preventDefault();
     const c = await InfoTV.load(), hash = c.admin.hash, u = $('lUser').value.trim(), p = $('lPass').value;
-    let acc = null; try { const r = await fetch('acesso.json?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) acc = await r.json(); } catch (e) {}
-    const ok = acc ? (u === String(acc.usuario) && p === String(acc.senha)) : (u === c.admin.user && (hash ? (await InfoTV.sha256(p)) === hash : p === 'admin123'));
+    const ok = u === c.admin.user && (hash ? (await InfoTV.sha256(p)) === hash : p === 'admin123');
     if (ok) enter(); else $('loginErr').textContent = 'Usuário ou senha incorretos.';
   };
   $('btnLogout').onclick = () => { sessionStorage.removeItem(SESSION); location.reload(); };

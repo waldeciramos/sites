@@ -14,9 +14,9 @@
   body.show-ui { cursor: default; }
   body { font-family: var(--fb), 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--txt); font-size: 1rem; }
 
-  #app { position: fixed; left: var(--mx); top: var(--my); width: calc(100vw - 2 * var(--mx)); height: calc(var(--H, 100vh) - 2 * var(--my) - var(--dock, 0px)); background: var(--bg); display: grid; overflow: hidden; }
-  #app.rot90  { left: 0; top: 0; width: calc(var(--H, 100vh) - 2 * var(--my)); height: calc(100vw - 2 * var(--mx)); transform-origin: 0 0; transform: translate(calc(100vw - var(--mx)), var(--my)) rotate(90deg); }
-  #app.rot270 { left: 0; top: 0; width: calc(var(--H, 100vh) - 2 * var(--my)); height: calc(100vw - 2 * var(--mx)); transform-origin: 0 0; transform: translate(var(--mx), calc(var(--H, 100vh) - var(--my))) rotate(-90deg); }
+  #app { position: fixed; left: var(--mx); top: var(--my); width: calc(100vw - 2 * var(--mx)); height: calc(100vh - 2 * var(--my)); background: var(--bg); display: grid; overflow: hidden; }
+  #app.rot90  { left: 0; top: 0; width: calc(100vh - 2 * var(--my)); height: calc(100vw - 2 * var(--mx)); transform-origin: 0 0; transform: translate(calc(100vw - var(--mx)), var(--my)) rotate(90deg); }
+  #app.rot270 { left: 0; top: 0; width: calc(100vh - 2 * var(--my)); height: calc(100vw - 2 * var(--mx)); transform-origin: 0 0; transform: translate(var(--mx), calc(100vh - var(--my))) rotate(-90deg); }
 
   /* ===== Horizontal ===== */
   #app.h { grid-template-columns: var(--sw) 1fr; grid-template-rows: 1fr auto auto; grid-template-areas: "side stage" "side svc" "side lt"; }
@@ -143,11 +143,6 @@
   body.show-ui #bar { opacity: 1; pointer-events: auto; } body.preview #bar { display: none; }
   #bar button, #bar a { font: 600 14px system-ui, sans-serif; background: rgba(0,0,0,.8); color: #fff; border: 1px solid rgba(255,255,255,.3); padding: 10px 14px; border-radius: 10px; cursor: pointer; text-decoration: none; }
   #bar button:hover, #bar a:hover { background: var(--p); }
-  /* Celular: barra de controles sempre visível embaixo (rádio, próxima, tela cheia, admin) */
-  body.compact:not(.preview) #bar { left: 0; right: 0; bottom: 0; opacity: 1; pointer-events: auto; gap: 6px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)); background: #06111d; border-top: 1px solid rgba(255,255,255,.15); }
-  body.compact:not(.preview) #bar button, body.compact:not(.preview) #bar a { flex: 1; min-height: 42px; padding: 0 4px; font-size: 13px; display: flex; align-items: center; justify-content: center; }
-  body.compact:not(.preview) #bar #bNext { flex: 0 0 48px; }
-  body.compact #radio { top: 1rem; right: 1rem; }
 </style>
 </head>
 <body>
@@ -178,7 +173,7 @@
     <div class="lt-crawl"><div id="tScroll"></div></div>
   </footer>
 </div>
-<div id="bar"><button id="bMute">📻 Rádio</button><button id="bNext" title="Próxima rádio">⏭</button><button id="bFull">⛶ Tela cheia</button><button id="bRot">⟳ Girar</button><a href="admin.html">⚙ Admin</a></div>
+<div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
 <script src="assets/core.js"></script>
 <script>
@@ -190,7 +185,6 @@
   const PREVIEW = Q.has('preview');
   if (PREVIEW) document.body.classList.add('preview');
   let cfg = null;
-  const clean = (c) => { c.radio.stations = c.radio.stations.filter((x) => x && x.url && x.url.trim()).slice(0, 5); return c; };
   const WD = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
   /* ================= Orientação, escala e ajuste de tela ================= */
@@ -201,14 +195,11 @@
   }
   function layout() {
     const g = cfg ? cfg.general : {}, o = orient(), portrait = o !== 'h', rot = o === 'v90' || o === 'v270', cp = compact();
-    document.body.classList.toggle('compact', cp);
-    const dock = cp && !PREVIEW ? Math.max(58, $('bar').offsetHeight) : 0, IH = innerHeight - dock;
-    document.documentElement.style.setProperty('--H', innerHeight + 'px'); document.documentElement.style.setProperty('--dock', dock + 'px');
     const m = Math.min(10, Math.max(0, +g.margin || 0)), R = document.documentElement;
     R.style.setProperty('--mx', m + 'vw'); R.style.setProperty('--my', m + 'vh');
     app.className = (portrait ? 'v' : 'h') + (o === 'v90' ? ' rot90' : o === 'v270' ? ' rot270' : '') + (g.frame === 'cheia' ? ' fullbleed' : '');
     const mxp = innerWidth * m / 100, myp = innerHeight * m / 100;
-    const W = rot ? IH - 2 * myp : innerWidth - 2 * mxp, H = rot ? innerWidth - 2 * mxp : IH - 2 * myp;
+    const W = rot ? innerHeight - 2 * myp : innerWidth - 2 * mxp, H = rot ? innerWidth - 2 * mxp : innerHeight - 2 * myp;
     const base = cp ? [45, 80] : portrait ? [67.5, 120] : [120, 67.5];
     R.style.fontSize = Math.max(5, Math.min(W / base[0], H / base[1]) * ((+g.zoom || 100) / 100)) + 'px';
     R.style.setProperty('--sw', { estreita: '24rem', normal: '30rem', larga: '36rem' }[g.sidebar] || '30rem');
@@ -289,21 +280,7 @@
 
   /* ================= Barra de notícias (data e hora + manchete + faixa) e serviços ================= */
   const catOf = (id) => cfg.categories.find((c) => c.id === id) || { label: 'Informação', icon: 'ℹ️', color: '#1fb6a6' };
-  const items = () => { const t = new Date().toISOString().slice(0, 10); return (cfg.ticker || []).filter((x) => x.active !== false && x.text && (!x.start || x.start <= t) && (!x.end || x.end >= t)).concat(feedItems); };
-  /* Fontes de sites (data/fontes.json, gerado pelo robô do GitHub): entram junto com as manchetes manuais */
-  let feedItems = [], feedSig = '';
-  const LV = { ok: '#16a34a', atencao: '#e08a00', alerta: '#d93a3a' };
-  async function loadFeeds() {
-    try {
-      const u = cfg.general.sourcesUrl || 'data/fontes.json', r = await fetch(u + (u.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw 0;
-      const j = await r.json(), out = [];
-      (cfg.sources || []).filter((s) => s.active !== false).forEach((s) => {
-        const d = (j.sources || []).find((x) => x.id === s.id); if (!d || !d.items) return;
-        d.items.slice(0, +s.max || 5).forEach((i) => out.push({ cat: 'src', _c: { label: s.name || 'Notícias', icon: s.kind === 'motiva' ? '🚧' : '📰', color: LV[i.status] || '#5b5bd6' }, text: i.text, detail: i.detail || '', anim: 'up', active: true }));
-      });
-      const sig = JSON.stringify(out); if (sig !== feedSig) { feedSig = sig; feedItems = out; if (cfg) lowerThird(); }
-    } catch (e) {}
-  }
+  const items = () => { const t = new Date().toISOString().slice(0, 10); return (cfg.ticker || []).filter((x) => x.active !== false && x.text && (!x.start || x.start <= t) && (!x.end || x.end >= t)); };
   let hTimer = null, hIdx = -1, tRaf = null, svT = null;
   function lowerThird() {
     clearTimeout(hTimer); cancelAnimationFrame(tRaf);
@@ -311,7 +288,7 @@
     if (!list.length) { lt.style.display = 'none'; return; }
     lt.style.display = ''; hIdx = -1;
     const show = () => {
-      hIdx = (hIdx + 1) % list.length; const it = list[hIdx], c = it._c || catOf(it.cat);
+      hIdx = (hIdx + 1) % list.length; const it = list[hIdx], c = catOf(it.cat);
       $('ltBadge').style.background = c.color; $('ltBadge').textContent = (c.icon || '') + ' ' + c.label;
       const box = $('ltText'); box.innerHTML = ''; const sp = document.createElement('span');
       InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)' }, 0); box.appendChild(sp);
@@ -321,7 +298,7 @@
     show();
     const dark = document.body.classList.contains('dark'), el = $('tScroll'); el.innerHTML = '';
     list.forEach((it) => {
-      const c = it._c || catOf(it.cat), e = document.createElement('em'); e.textContent = (c.icon || '') + ' ' + c.label.toUpperCase() + ':'; e.style.color = dark ? lighten(c.color) : c.color;
+      const c = catOf(it.cat), e = document.createElement('em'); e.textContent = (c.icon || '') + ' ' + c.label.toUpperCase() + ':'; e.style.color = dark ? lighten(c.color) : c.color;
       const s = document.createElement('span'); s.textContent = it.text; const sep = document.createElement('i'); sep.textContent = '●';
       el.append(e, s, sep);
     });
@@ -428,12 +405,12 @@
   function rUI() {
     const r = cfg.radio, st = r.stations[rIdx]; const box = $('radio');
     box.classList.toggle('on', !audio.paused);
-    $('rBtn').textContent = audio.paused ? '▶' : '❚❚'; $('bMute').textContent = (audio.paused ? '▶' : '⏸') + ' Rádio';
+    $('rBtn').textContent = audio.paused ? '▶' : '❚❚';
     $('rName').textContent = st ? '📻 ' + st.name : 'Rádio';
   }
   function rSet(i) {
     const st = cfg.radio.stations[i]; if (!st) return;
-    rIdx = i; audio.src = location.protocol === 'https:' ? st.url.replace(/^http:/i, 'https:') : st.url; audio.volume = Math.min(1, Math.max(0, +cfg.radio.volume || 0.6)); $('rTitle').textContent = ''; rUI();
+    rIdx = i; audio.src = st.url; audio.volume = Math.min(1, Math.max(0, +cfg.radio.volume || 0.6)); $('rTitle').textContent = ''; rUI();
   }
   function rPlay() {
     rWant = true; audio.play().then(() => { $('radio').classList.remove('hint'); rUI(); rNowPlaying(); })
@@ -458,7 +435,6 @@
   }
   function radioApply() {
     const r = cfg.radio, box = $('radio');
-    $('bMute').style.display = $('bNext').style.display = (r.enabled && r.stations.length && !PREVIEW) ? '' : 'none';
     if (PREVIEW || !r.enabled || !r.stations.length) { box.hidden = true; rWant = false; audio.pause(); rSig = ''; return; }
     box.hidden = false; audio.volume = Math.min(1, Math.max(0, +r.volume || 0.6));
     const sig = JSON.stringify(r.stations);
@@ -479,10 +455,9 @@
     if (Q.get('o')) { const u = new URL(location.href); u.searchParams.set('o', nx); location.href = u; return; }
     layout(); lowerThird(); renderSchedule();
   }
-  $('bNext').onclick = () => { const n = cfg.radio.stations.length; if (n > 1) rSet((rIdx + 1) % n); rPlay(); };
   $('bFull').onclick = fullscreen; $('bRot').onclick = rotate; $('bMute').onclick = rToggle;
   addEventListener('keydown', (e) => { const k = e.key.toLowerCase(); if (k === 'f') fullscreen(); if (k === 'r') rotate(); if (k === 'm') rToggle(); if (k === 'n' && cfg.radio.stations.length > 1) { rSet((rIdx + 1) % cfg.radio.stations.length); rPlay(); } });
-  let uiT; ['mousemove', 'touchstart'].forEach((ev) => addEventListener(ev, () => { document.body.classList.add('show-ui'); clearTimeout(uiT); uiT = setTimeout(() => document.body.classList.remove('show-ui'), 3000); }, { passive: true }));
+  let uiT; addEventListener('mousemove', () => { document.body.classList.add('show-ui'); clearTimeout(uiT); uiT = setTimeout(() => document.body.classList.remove('show-ui'), 3000); });
   async function wake() { try { if (!PREVIEW && 'wakeLock' in navigator) await navigator.wakeLock.request('screen'); } catch (e) {} }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
 
@@ -502,20 +477,19 @@
     const ck = Object.assign({}, InfoTV.DEFAULT.general.clock, g.clock); ck.anim = 'none';
     if (g.theme === 'escuro' && ck.color === '#0f766e') { ck.color = '#a8f0e7'; ck.g1 = '#ffffff'; }
     InfoFX.style($('time'), ck, 0); $('time').className += ' time'; $('time').style.fontSize = '';
-    layout(); renderSchedule(); nextVerse(); weather(); lowerThird(); services(); radioApply(); loadFeeds();
+    layout(); renderSchedule(); nextVerse(); weather(); lowerThird(); services(); radioApply();
     sIdx = -1; nextSlide();
   }
 
   async function init() {
-    cfg = clean(await InfoTV.load());
+    cfg = await InfoTV.load();
     apply(); tick(); setInterval(tick, 1000); wake();
-    let ct; InfoTV.onChange(() => { clearTimeout(ct); ct = setTimeout(async () => { cfg = clean(await InfoTV.load()); apply(); }, 1200); });
+    let ct; InfoTV.onChange(() => { clearTimeout(ct); ct = setTimeout(async () => { cfg = await InfoTV.load(); apply(); }, 1200); });
     setInterval(async () => {   // modo GitHub: confere config.json a cada 2 minutos
       if (InfoTV.getMode() !== 'repo' || await InfoTV.isServer()) return;
-      const n = await InfoTV.loadRepo(); if (n) clean(n);
+      const n = await InfoTV.loadRepo();
       if (n && JSON.stringify(n) !== JSON.stringify(cfg)) { cfg = n; apply(); }
     }, 120000);
-    setInterval(loadFeeds, 120000);
     if (!PREVIEW) setTimeout(() => location.reload(), 24 * 3600 * 1000);   // recarrega 1x por dia
   }
   init();
