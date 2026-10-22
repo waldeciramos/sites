@@ -159,6 +159,9 @@
         <h2>Tela: monitor, TV e celular</h2><p class="hint">Tudo aqui vale para todas as TVs. O tema claro é o visual limpo de clínica. A orientação "Automática" acompanha o aparelho: horizontal na TV e no monitor, vertical em totem e celular (no celular a tela fica enxuta). Se a TV corta as bordas, aumente a margem de segurança.</p>
         <div class="grid" id="gScreen"></div>
         <h3>O que aparece na tela</h3><div class="grid" id="gShow"></div>
+        <h3>🎬 Vídeo de transição entre as publicações</h3>
+        <div class="info">Escolha um vídeo curto (MP4, até uns 5 segundos, sem som) que passa por cima da tela na troca de uma publicação para outra. Depois, em <b>Entrada padrão dos slides</b> (ou em cada propaganda) escolha <b>Vídeo de transição</b>. Sem vídeo, a troca usa o efeito comum. Vídeo leve e curto deixa a TV mais fluida.</div>
+        <div class="grid" id="gTrans"></div>
         <div class="info">Atalhos na TV: <b>F</b> tela cheia · <b>R</b> girar a tela (só neste aparelho) · <b>M</b> liga/pausa a rádio · <b>N</b> próxima rádio. Endereços úteis: <code>?o=v</code> força vertical, <code>?m=1</code> força o modo celular.</div>
       </section>
 
@@ -242,7 +245,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="assets/core.js"></script>
+<script src="assets/core.js?v=5"></script>
 <script>
 (function () {
   'use strict';
@@ -386,11 +389,18 @@
       else g.append(field('Posição do texto sobre a mídia', s, 'pos', { options: [['bottom', 'Embaixo'], ['center', 'Centro'], ['top', 'Em cima']] }));
       if (s.type !== 'text') g.append(field('Modelo da publicação', s, 'tpl', { options: [['cheia', 'Tela cheia (como enviada)'], ['aniversario', 'Aniversariante (foto + parabéns)'], ['dica', 'Campanha / dica (foto + texto ao lado)']], after: renderSlides }));
       if (s.type === 'image') g.append(field('Movimento da imagem', s, 'kb', { options: [['', 'Parada'], ['in', 'Zoom aproximando'], ['out', 'Zoom afastando'], ['pan', 'Deslizando de lado']] }));
-      g.append(field('Entrada na tela', s, 'trans', { options: [['', 'Padrão da TV'], ['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Desfocar'], ['wipe', 'Cortina']] }));
+      g.append(field('Entrada na tela', s, 'trans', { options: [['', 'Padrão da TV'], ['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Suave com zoom'], ['wipe', 'Cortina'], ['video', 'Vídeo de transição (Tela e Layout)']] }));
       if (s.type === 'text' || (s.type !== 'text' && s.tpl !== 'cheia')) g.append(field('Efeito animado de fundo', s, 'bgfx', { options: [['', s.tpl === 'aniversario' ? 'Confete (padrão)' : 'Nenhum'], ['aurora', 'Aurora'], ['bolhas', 'Bolhas'], ['ondas', 'Ondas'], ['confete', 'Confete'], ['brilhos', 'Brilhos']] }));
       if (s.type !== 'text' && s.tpl !== 'cheia') g.append(field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
       body.append(g);
       if (s.type !== 'text' && s.tpl === 'aniversario') body.append(el('div', { class: 'info' }, ['Aniversariante: escreva só o nome da pessoa no texto principal (a TV mostra "Parabéns, Nome!") e a mensagem no texto secundário.']));
+      if (s.type === 'text') {
+        const bu = el('input', { type: 'file', accept: 'video/*', class: 'neo-in', 'aria-label': 'Enviar vídeo de fundo' });
+        bu.onchange = async () => { const f = bu.files[0]; if (!f) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho ao lado.'); toast('Enviando vídeo…'); try { s.bgvid = await InfoTV.upload(f); persist(); renderSlides(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); } };
+        const bp = el('input', { class: 'neo-in', placeholder: 'midia/fundo.mp4' }); bp.value = s.bgvid || ''; bp.onchange = () => { s.bgvid = bp.value.trim(); persist(); renderSlides(); };
+        body.append(el('div', { class: 'grid', style: 'margin-top:14px' }, [el('div', { class: 'f' }, [el('label', {}, ['Vídeo de fundo no lugar da cor (opcional)']), bu]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho do vídeo']), bp])]));
+        if (s.bgvid) body.append(el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { s.bgvid = ''; persist(); renderSlides(); } }, ['Remover vídeo de fundo'])]));
+      }
       if (s.type === 'video') {
         const vu = el('input', { type: 'file', accept: 'video/*', class: 'neo-in' });
         vu.onchange = async () => { if (!vu.files[0]) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho acima.'); toast('Enviando vídeo…'); try { s.src = await InfoTV.upload(vu.files[0]); persist(); renderSlides(); } catch (e) { alert('Falha no envio: ' + e.message); } };
@@ -482,10 +492,17 @@
   /* ---------- Tela e serviços ---------- */
   function renderScreen() {
     const g = cfg.general, b = $('gScreen'); b.innerHTML = '';
-    const tr = [['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Desfocar'], ['wipe', 'Cortina']];
+    const tr = [['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Suave com zoom'], ['wipe', 'Cortina'], ['video', 'Vídeo de transição (definido abaixo)']];
     b.append(field('Tema', g, 'theme', { options: [['claro', 'Claro e limpo (clínica)'], ['escuro', 'Escuro']] }), field('Moldura da tela central', g, 'frame', { options: [['moldura', 'Com moldura'], ['cheia', 'Tela cheia, sem borda']] }),
       field('Coluna lateral', g, 'sidebar', { options: [['estreita', 'Estreita'], ['normal', 'Normal'], ['larga', 'Larga'], ['oculta', 'Oculta']] }), field('Cor da coluna lateral', g, 'sidebarStyle', { options: [['escura', 'Escura (relevo suave, como o admin)'], ['clara', 'Clara']] }), field('Entrar em tela cheia no 1º toque/tecla', g, 'autoFullscreen', { type: 'checkbox' }), field('Entrada padrão dos slides', g, 'transition', { options: tr }),
       field('Zoom geral (' + g.zoom + '%)', g, 'zoom', { type: 'range', min: 60, max: 160, step: 5 }), field('Margem de segurança (' + g.margin + '%)', g, 'margin', { type: 'range', min: 0, max: 8, step: 0.5 }));
+    const tb = $('gTrans'); tb.innerHTML = '';
+    const tup = el('input', { type: 'file', accept: 'video/*', class: 'neo-in', 'aria-label': 'Enviar vídeo de transição' });
+    tup.onchange = async () => { const f = tup.files[0]; if (!f) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho ao lado.'); toast('Enviando vídeo…'); try { g.transVideo = await InfoTV.upload(f); persist(); renderScreen(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); } };
+    const tpath = el('input', { class: 'neo-in', placeholder: 'midia/transicao.mp4' }); tpath.value = (g.transVideo || '').startsWith('data:') ? '' : (g.transVideo || '');
+    tpath.onchange = () => { g.transVideo = tpath.value.trim(); persist(); renderScreen(); };
+    tb.append(el('div', { class: 'f' }, [el('label', {}, ['Enviar vídeo do computador (servidor Debian)']), tup]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho do vídeo']), tpath]));
+    if (g.transVideo) tb.append(el('div', { class: 'f' }, [el('video', { class: 'thumb', src: g.transVideo, muted: '', controls: '', playsinline: '' }), el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { g.transVideo = ''; persist(); renderScreen(); } }, ['Remover vídeo'])])]));
     const sh = $('gShow'); sh.innerHTML = '';
     [['brand', 'Logo e nome'], ['weather', 'Clima'], ['schedule', 'Programação do dia'], ['verse', 'Frases de Deus'], ['services', 'Faixa de serviços'], ['ticker', 'Barra de notícias']].forEach(([k, l]) => sh.append(field(l, g.show, k, { type: 'checkbox' })));
   }
@@ -526,7 +543,7 @@
     const r = cfg.radio, b = $('gRadio'); b.innerHTML = '';
     const cur = field('📻 Rádio que toca na TV', r, 'current', { options: stOpts(), num: true, after: () => drawStations() }); cur.querySelector('select').id = 'curStation';
     b.append(field('Ativar rádio na TV', r, 'enabled', { type: 'checkbox' }), field('Tocar ao abrir a TV', r, 'autoplay', { type: 'checkbox' }), cur,
-      field('Gráfico de som (no fim da programação)', r, 'viz', { options: [['barras', 'Barras'], ['espelho', 'Barras espelhadas'], ['onda', 'Onda'], ['off', 'Sem gráfico']] }),
+      field('Gráfico de som (no cartão da rádio)', r, 'viz', { options: [['barras', 'Barras'], ['espelho', 'Barras espelhadas'], ['onda', 'Onda'], ['off', 'Sem gráfico']] }),
       field('Volume (' + Math.round(r.volume * 100) + '%)', r, 'volume', { type: 'range', min: 0, max: 1, step: 0.05 }),
       field('Now playing (opcional, AzuraCast)', r, 'nowPlayingUrl', { ph: 'https://radio.exemplo.com/api/nowplaying/1' }));
     drawStations();

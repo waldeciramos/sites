@@ -59,7 +59,7 @@
   const tdef = (o) => Object.assign({ text: '', font: '', size: 1, color: '#ffffff', effect: 'sombra', glow: '#00e5ff', g1: '#ffffff', g2: '#ffd54f', anim: 'up' }, o || {});
 
   function normSlide(s) {
-    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '' }, s || {});
+    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '' }, s || {});
     s.id = s.id || rid();
     s.t1 = tdef(s.t1 || { text: s.title || '' });
     s.t2 = tdef(s.t2 || { text: s.body || '', effect: 'none', anim: 'fade' });
@@ -76,20 +76,20 @@
   ];
   const CLOCK_OLD = '#0f766e';
   const DEFAULT = {
-    version: 4,
+    version: 5,
     general: {
       name: 'Clínica TV', subtitle: 'Fisio Clínica Estiva', logo: 'logo.svg',
       brandBg: '#ffffff', brandFg: '#0b1d2e',
       city: 'Estiva, MG', lat: -22.4553, lon: -46.0214,
       primary: '#1fb6a6', secondary: '#d4a93c',
-      theme: 'claro', sidebarStyle: 'escura', autoFullscreen: true, orientation: 'auto', sidebar: 'normal', frame: 'cheia', zoom: 100, margin: 0, transition: 'fade',
+      theme: 'claro', sidebarStyle: 'clara', autoFullscreen: true, transVideo: '', orientation: 'auto', sidebar: 'normal', frame: 'cheia', zoom: 100, margin: 0, transition: 'fade',
       show: { brand: true, weather: true, schedule: true, verse: true, services: false, ticker: true },
       slideSeconds: 12, verseSeconds: 25, headlineSeconds: 9, tickerSpeed: 90, showSeconds: true,
       fontDisplay: 'Qurova', fontBody: 'Agency', fontCustomSrc: '',
       tickerFont: '', tickerSize: 100,
       svcMode: 'passando', svcSpeed: 60, svcFont: '', svcSize: 100,
       newsProxy: '',
-      clock: { font: 'Rajdhani', size: 115, effect: 'neon', color: '#eaf6ff', glow: '#38bdf8', g1: '#9bd5ff', g2: '#38bdf8' }
+      clock: { font: 'Rajdhani', size: 115, effect: 'gradiente', color: '#0a58ca', glow: '#38bdf8', g1: '#0646b8', g2: '#1e9bff' }
     },
     radio: { enabled: true, autoplay: true, volume: 0.6, nowPlayingUrl: '', current: 0, viz: 'barras', stations: DEFAULT_STATIONS() },
     newsSources: [],
@@ -158,15 +158,15 @@
       cfg.services.forEach((v) => { if (v.icon === '🦴') v.icon = ''; }); cfg.slides.forEach((s) => { if (s.icon === '🦴') s.icon = ''; });
       cfg.ticker = cfg.ticker.filter((t) => !/^Exemplo:/.test(t.text));
     }
-    // v4: tela cheia sem borda, lateral escura com efeito neomórfico (como o admin), sem a faixa de serviços e relógio neon.
+    // v4: tela cheia sem borda e sem a faixa de serviços. v5: lateral clara com o layout em relevo das janelas do admin e relógio azul.
     // Só roda uma vez em configurações salvas antes; depois disso o que você escolher no admin é respeitado.
-    if (wasVersion < 4) {
-      const g = cfg.general;
-      g.frame = 'cheia'; g.sidebarStyle = 'escura'; g.autoFullscreen = true; g.show = Object.assign({}, g.show, { services: false });
-      const c = g.clock || {};
-      if (!c.color || c.color === '#0a58ca' || c.color === CLOCK_OLD) g.clock = clone(DEFAULT.general.clock);
+    if (wasVersion < 4) { const g = cfg.general; g.frame = 'cheia'; g.autoFullscreen = true; g.show = Object.assign({}, g.show, { services: false }); }
+    if (wasVersion < 5) {
+      const g = cfg.general, c = g.clock || {};
+      g.sidebarStyle = 'clara';
+      if (!c.color || c.color === '#0a58ca' || c.color === '#eaf6ff' || c.color === CLOCK_OLD) g.clock = clone(DEFAULT.general.clock);
     }
-    cfg.version = 4;
+    cfg.version = 5;
     r.current = Math.min(Math.max(0, +r.current || 0), Math.max(0, r.stations.length - 1));
     if (!['barras', 'espelho', 'onda', 'off'].includes(r.viz)) r.viz = 'barras';
     if (!['escura', 'clara'].includes(cfg.general.sidebarStyle)) cfg.general.sidebarStyle = 'escura';
