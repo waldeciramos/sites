@@ -14,8 +14,21 @@
   const srvP = (async () => { try { const r = await fetch('api/ping', { cache: 'no-store' }); const j = await r.json(); SRV = !!(j && j.clinicatv); } catch (e) { SRV = false; } return SRV; })();
 
   /* ---------- Fontes (Google Fonts) ---------- */
-  const FONTS = ['Qurova', 'Agency', 'Comfortaa', 'Quicksand', 'Fredoka', 'Righteous', 'Montserrat', 'Poppins', 'Rubik', 'Baloo 2', 'Oswald', 'Bebas Neue', 'Anton', 'Archivo Black', 'Russo One', 'Orbitron', 'Playfair Display', 'Pacifico', 'Lobster', 'Dancing Script', 'Permanent Marker', 'Bangers'];
-  const FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@500;700&family=Fredoka:wght@400;600&family=Righteous&family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;600;700;800&family=Rubik:wght@500;800&family=Baloo+2:wght@600;800&family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Anton&family=Archivo+Black&family=Russo+One&family=Orbitron:wght@500;800&family=Playfair+Display:wght@600;800&family=Pacifico&family=Lobster&family=Dancing+Script:wght@600;700&family=Permanent+Marker&family=Bangers&display=swap';
+  const FONTS = ['Qurova', 'Agency', 'Rajdhani', 'Exo 2', 'Audiowide', 'Teko', 'Comfortaa', 'Quicksand', 'Fredoka', 'Righteous', 'Montserrat', 'Poppins', 'Rubik', 'Baloo 2', 'Oswald', 'Bebas Neue', 'Anton', 'Archivo Black', 'Russo One', 'Orbitron', 'Playfair Display', 'Pacifico', 'Lobster', 'Dancing Script', 'Permanent Marker', 'Bangers'];
+  const FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@500;700&family=Fredoka:wght@400;600&family=Righteous&family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;600;700;800&family=Rubik:wght@500;800&family=Baloo+2:wght@600;800&family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Anton&family=Archivo+Black&family=Russo+One&family=Orbitron:wght@500;800&family=Exo+2:wght@600;800&family=Audiowide&family=Teko:wght@500;700&family=Playfair+Display:wght@600;800&family=Pacifico&family=Lobster&family=Dancing+Script:wght@600;700&family=Permanent+Marker&family=Bangers&display=swap';
+
+  /* ---------- Rádios: endereços oficiais de áudio (SRG SSR). Aceita também o link da página do player ---------- */
+  const SWISS = {
+    pop: 'https://stream.srg-ssr.ch/srgssr/rsp/mp3/128',
+    jazz: 'https://stream.srg-ssr.ch/srgssr/rsj/mp3/128',
+    classic: 'https://stream.srg-ssr.ch/srgssr/rsc_de/mp3/128'
+  };
+  function resolveStream(u) {
+    u = String(u || '').trim();
+    const m = /radioswiss(pop|jazz|classic)\.ch/i.exec(u);
+    if (m && /webplayer|\.ch\/?$|\.ch\/(en|de|fr|it)\/?$/i.test(u)) return SWISS[m[1].toLowerCase()];
+    return u;
+  }
 
   /* ---------- Efeitos de texto ---------- */
   const EFFECTS = [['none', 'Nenhum'], ['sombra', 'Sombra'], ['neon', 'Neon'], ['neonpulse', 'Neon piscando'], ['contorno', 'Contorno vazado'], ['gradiente', 'Gradiente de cores'], ['brilho', 'Brilho passando'], ['3d', '3D'], ['retro', 'Retrô'], ['fogo', 'Fogo'], ['glitch', 'Glitch (TV)']];
@@ -56,8 +69,14 @@
 
   const day = (end) => [{ time: '07:30', text: 'Abertura da clínica' }, { time: '08:00', text: 'Atendimentos da manhã' }, { time: '12:00', text: 'Pausa para o almoço' }, { time: '13:30', text: 'Atendimentos da tarde' }, { time: end, text: 'Encerramento' }];
 
+  const DEFAULT_STATIONS = () => [
+    { name: 'Radio Swiss Pop', url: SWISS.pop },
+    { name: 'Radio Swiss Jazz', url: SWISS.jazz },
+    { name: 'Radio Swiss Classic', url: SWISS.classic }
+  ];
+  const CLOCK_OLD = '#0f766e';
   const DEFAULT = {
-    version: 2,
+    version: 3,
     general: {
       name: 'Clínica TV', subtitle: 'Fisio Clínica Estiva', logo: 'logo.svg',
       brandBg: '#ffffff', brandFg: '#0b1d2e',
@@ -67,12 +86,16 @@
       show: { brand: true, weather: true, schedule: true, verse: true, services: true, ticker: true },
       slideSeconds: 12, verseSeconds: 25, headlineSeconds: 9, tickerSpeed: 90, showSeconds: true,
       fontDisplay: 'Qurova', fontBody: 'Agency', fontCustomSrc: '',
-      clock: { effect: 'brilho', color: '#0f766e', glow: '#1fb6a6', g1: '#0f766e', g2: '#1fb6a6' }
+      tickerFont: '', tickerSize: 100,
+      svcMode: 'passando', svcSpeed: 60, svcFont: '', svcSize: 100,
+      newsProxy: '',
+      clock: { font: 'Rajdhani', size: 115, effect: 'gradiente', color: '#0a58ca', glow: '#38bdf8', g1: '#0646b8', g2: '#1e9bff' }
     },
-    radio: { enabled: false, autoplay: true, volume: 0.6, nowPlayingUrl: '', stations: [] },
+    radio: { enabled: true, autoplay: true, volume: 0.6, nowPlayingUrl: '', current: 0, viz: 'barras', stations: DEFAULT_STATIONS() },
+    newsSources: [],
     slides: [
       { type: 'text', icon: '💙', seconds: 10, bgfx: 'aurora', bg1: '#0f766e', bg2: '#134e4a', t1: { text: 'Bem-vindo(a)!', effect: 'brilho', anim: 'zoom' }, t2: { text: 'Aqui o seu bem-estar é a nossa prioridade.', effect: 'sombra', anim: 'fade' } },
-      { type: 'text', icon: '🦴', seconds: 12, bgfx: 'ondas', trans: 'slide', bg1: '#1d4ed8', bg2: '#1e3a8a', t1: { text: 'Fisioterapia Ortopédica', effect: 'neon', glow: '#38bdf8', anim: 'up' }, t2: { text: 'Reabilitação de lesões, dores articulares e pós-cirúrgico.', effect: 'none', anim: 'fade' } },
+      { type: 'text', icon: '', seconds: 12, bgfx: 'ondas', trans: 'slide', bg1: '#1d4ed8', bg2: '#1e3a8a', t1: { text: 'Fisioterapia Ortopédica', effect: 'neon', glow: '#38bdf8', anim: 'up' }, t2: { text: 'Reabilitação de lesões, dores articulares e pós-cirúrgico.', effect: 'none', anim: 'fade' } },
       { type: 'text', icon: '🧘', seconds: 12, bgfx: 'brilhos', trans: 'zoom', bg1: '#7c3aed', bg2: '#4c1d95', t1: { text: 'Pilates e RPG', effect: 'gradiente', g1: '#ffffff', g2: '#fde68a', anim: 'letras' }, t2: { text: 'Postura, flexibilidade e força com acompanhamento profissional.', effect: 'none', anim: 'fade' } },
       { type: 'text', icon: '💧', seconds: 10, bgfx: 'bolhas', trans: 'wipe', bg1: '#0369a1', bg2: '#0c4a6e', t1: { text: 'Hidrate-se!', effect: '3d', glow: '#0c4a6e', anim: 'zoom' }, t2: { text: 'Beber água ao longo do dia ajuda músculos, articulações e a disposição.', effect: 'none', anim: 'fade' } }
     ].map(normSlide),
@@ -94,13 +117,11 @@
     ticker: [
       { cat: 'saude', text: 'Beba pelo menos 2 litros de água por dia.', active: true },
       { cat: 'saude', text: 'Levante e alongue-se a cada hora se você trabalha sentado.', active: true },
-      { cat: 'transito', text: 'Exemplo: informe aqui as condições do trânsito da região.', active: true },
       { cat: 'aviso', text: 'Chegue com 10 minutos de antecedência e avise a recepção em caso de falta.', active: true },
-      { cat: 'local', text: 'Exemplo: adicione aqui avisos e novidades de locais da cidade.', active: true },
       { cat: 'saude', text: 'Caminhar 30 minutos por dia faz bem ao coração e às articulações.', active: true }
     ],
     services: [
-      { icon: '🦴', label: 'Fisioterapia ortopédica', active: true }, { icon: '🧘', label: 'Pilates', active: true }, { icon: '🏃', label: 'RPG', active: true },
+      { icon: '', label: 'Fisioterapia ortopédica', active: true }, { icon: '🧘', label: 'Pilates', active: true }, { icon: '🏃', label: 'RPG', active: true },
       { icon: '🧠', label: 'Neurofuncional', active: true }, { icon: '💆', label: 'Drenagem linfática', active: true }, { icon: '💧', label: 'Reabilitação pós-cirúrgica', active: true }
     ],
     admin: { user: 'admin', hash: '' }   // hash vazio = senha padrão "admin123"
@@ -115,15 +136,34 @@
     return out;
   }
 
-  function normalize(cfg) {
+  const MODES = ['manchetes', 'trecho', 'pagina'];
+  function normSource(s) {
+    s = s || {};
+    return { id: s.id || rid(), url: String(s.url || '').trim(), label: s.label || '', cat: s.cat || 'transito', mode: MODES.includes(s.mode) ? s.mode : 'manchetes',
+      max: Math.min(20, Math.max(1, +s.max || 5)), minutes: Math.max(5, +s.minutes || 15), filter: s.filter || '', exclude: s.exclude || '', selector: s.selector || '', js: !!s.js, active: s.active !== false };
+  }
+
+  function normalize(cfg, wasVersion) {
     cfg.slides = (cfg.slides || []).map(normSlide);
     if (!Array.isArray(cfg.categories) || !cfg.categories.length) cfg.categories = clone(DEFAULT.categories);
     cfg.ticker = (cfg.ticker || []).map((t) => ({ cat: t.cat || t.type || 'aviso', text: t.text || '', active: t.active !== false, detail: t.detail || '', seconds: +t.seconds || 0, start: t.start || '', end: t.end || '', anim: t.anim || 'up' }));
-    cfg.services = (cfg.services || []).map((v) => ({ icon: v.icon || '', label: v.label || '', active: v.active !== false }));
-    if (!Array.isArray(cfg.radio.stations)) cfg.radio.stations = [];
+    cfg.services = (cfg.services || []).map((v) => ({ icon: v.icon || '', label: v.label || '', active: v.active !== false, type: v.type === 'image' || v.type === 'video' ? v.type : '', src: v.src || '', stage: v.stage !== false, seconds: (v.seconds === 0 || v.seconds === '0') ? 0 : (+v.seconds || 8) }));
+    cfg.newsSources = (Array.isArray(cfg.newsSources) ? cfg.newsSources : []).map(normSource);
+    const r = cfg.radio;
+    r.stations = (Array.isArray(r.stations) ? r.stations : []).map((s) => ({ name: s.name || '', url: s.url || '' }));
+    // configurações antigas (v2): entram as 3 rádios, relógio azul novo e sem o osso 🦴
+    if (wasVersion < 3) {
+      if (!r.stations.length) { r.stations = DEFAULT_STATIONS(); r.enabled = true; }
+      const c = cfg.general.clock; if (c && (c.color === CLOCK_OLD || c.effect === 'brilho')) cfg.general.clock = clone(DEFAULT.general.clock);
+      cfg.services.forEach((v) => { if (v.icon === '🦴') v.icon = ''; }); cfg.slides.forEach((s) => { if (s.icon === '🦴') s.icon = ''; });
+      cfg.ticker = cfg.ticker.filter((t) => !/^Exemplo:/.test(t.text));
+    }
+    cfg.version = 3;
+    r.current = Math.min(Math.max(0, +r.current || 0), Math.max(0, r.stations.length - 1));
+    if (!['barras', 'espelho', 'onda', 'off'].includes(r.viz)) r.viz = 'barras';
     return cfg;
   }
-  const build = (raw) => normalize(merge(DEFAULT, raw));
+  const build = (raw) => normalize(merge(DEFAULT, raw), (raw && +raw.version) || 2);
 
   function getMode() { try { return localStorage.getItem(MODE_KEY) || 'local'; } catch (e) { return 'local'; } }
   function setMode(m) { try { localStorage.setItem(MODE_KEY, m); } catch (e) {} }
@@ -167,7 +207,94 @@
     let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return 'x' + h;
   }
 
-  window.InfoTV = { DEFAULT, clone, merge, build, normSlide, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, getMode, setMode, getOrient, setOrient, sha256 };
+  /* ---------- Acesso do admin: arquivo acesso.json { "usuario": "...", "senha": "..." } (ou "hash") ---------- */
+  async function loadAccess() {
+    try { const r = await fetch('acesso.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; const j = await r.json(); return j && (j.usuario || j.user) ? { user: String(j.usuario || j.user), pass: j.senha != null ? String(j.senha) : (j.pass != null ? String(j.pass) : ''), hash: j.hash || j.senha_hash || '' } : null; } catch (e) { return null; }
+  }
+
+  /* ---------- Notícias a partir de endereços (RSS ou página): manchetes, trechos ou resumo ---------- */
+  const InfoNews = (function () {
+    const clean = (s) => String(s == null ? '' : s).replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+    const norm = (s) => clean(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const NOISE = /dd\/mm|\[[^\]]*\]|^slide \d|^sucesso|cookie|newsletter|pol[ií]tica de privacidade|termos de uso|todos os direitos|^menu$|^buscar|fale conosco|^saiba mais|^clique|^voltar|^ver mais|^leia mais|^acess(ar|e)\b|^compartilh|^pular para|^skip to|^login|^entrar$|^cadastr/i;
+    const cut = (s, n) => { s = clean(s); if (s.length <= n) return s; const c = s.slice(0, n), i = Math.max(c.lastIndexOf('. '), c.lastIndexOf('; ')); return i > n * 0.5 ? c.slice(0, i + 1) : c.replace(/\s+\S*$/, '') + '…'; };
+    const htmlText = (h) => { try { return clean(new DOMParser().parseFromString('<body>' + h + '</body>', 'text/html').body.textContent); } catch (e) { return clean(String(h).replace(/<[^>]+>/g, ' ')); } };
+    const mdClean = (s) => clean(String(s).replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`>]+/g, '').replace(/^[-+•]\s+/, ''));
+    const okTitle = (t) => t.length >= 8 && t.length <= 200 && !NOISE.test(t);
+
+    function fromFeed(doc) {
+      return [...doc.querySelectorAll('item, entry')].map((it) => {
+        const g = (q) => { const e = it.querySelector(q); return e ? clean(e.textContent) : ''; };
+        return { title: g('title'), snippet: htmlText(g('description') || g('summary') || g('content') || g('content\\:encoded')) };
+      }).filter((x) => x.title);
+    }
+    function nextSnippet(h) {
+      let e = h.nextElementSibling, n = 0;
+      while (e && n++ < 3) { const t = clean(e.textContent); if (t.length >= 20 && !/^h[1-6]$/i.test(e.tagName)) return t; if (/^h[1-6]$/i.test(e.tagName)) break; e = e.nextElementSibling; }
+      return '';
+    }
+    function fromHtml(doc, src) {
+      doc.querySelectorAll('script,style,noscript,svg,nav,footer,form,iframe').forEach((n) => n.remove());
+      const out = [], seen = new Set(), add = (title, snippet) => { title = clean(title); if (!title || seen.has(norm(title))) return; seen.add(norm(title)); out.push({ title, snippet: clean(snippet) }); };
+      if (src.selector) { try { doc.querySelectorAll(src.selector).forEach((n) => add(n.textContent, '')); } catch (e) {} return out; }
+      doc.querySelectorAll('h1,h2,h3,h4,[class*="headline" i],[class*="manchete" i]').forEach((h) => { const t = clean(h.textContent); if (okTitle(t) || (t.length >= 3 && nextSnippet(h))) add(t, nextSnippet(h)); });
+      if (out.length < 3) doc.querySelectorAll('a[href]').forEach((a) => { const t = clean(a.textContent); if (t.length >= 35 && t.length <= 180 && t.split(' ').length >= 5 && okTitle(t)) add(t, ''); });
+      return out;
+    }
+    function pageSummary(doc) {
+      const m = (q) => { const e = doc.querySelector(q); return e ? clean(e.getAttribute('content')) : ''; };
+      return m('meta[name="description"]') || m('meta[property="og:description"]') || '';
+    }
+    function fromMarkdown(md) {
+      const lines = String(md).split(/\r?\n/).map((l) => l.trim()), out = [], seen = new Set();
+      const add = (title, snippet) => { title = mdClean(title); if (!title || seen.has(norm(title))) return; seen.add(norm(title)); out.push({ title, snippet: mdClean(snippet || '') }); };
+      lines.forEach((l, i) => {
+        const m = /^#{1,4}\s+(.+)/.exec(l); if (!m) return;
+        let sn = ''; for (let k = i + 1; k < Math.min(lines.length, i + 6); k++) { const x = lines[k]; if (!x) continue; if (/^#/.test(x)) break; const t = mdClean(x); if (t.length >= 8 && !/^\[?!\[/.test(x)) { sn = t; break; } }
+        add(m[1], sn);
+      });
+      if (out.length < 3) lines.forEach((l) => { const m = /^[-*+]?\s*\[([^\]]{35,180})\]\([^)]*\)\s*$/.exec(l); if (m) add(m[1], ''); });
+      return out;
+    }
+    function build(raw, src, kind) {
+      const head = raw.slice(0, 600);
+      let list, summary = '';
+      if (/<rss|<feed|<channel|<item[ >]/i.test(head)) { list = fromFeed(new DOMParser().parseFromString(raw, 'text/xml')); }
+      else if (kind === 'md' && !/<html|<!doctype|<body/i.test(head)) {
+        list = fromMarkdown(raw); const d = /^Description:\s*(.+)$/im.exec(raw); summary = d ? clean(d[1]) : ''; const t = /^Title:\s*(.+)$/im.exec(raw); if (!summary && t) summary = clean(t[1]);
+      } else { const doc = new DOMParser().parseFromString(raw, 'text/html'); summary = pageSummary(doc); list = fromHtml(doc, src); }
+      const filt = norm(src.filter).split(',').map((x) => x.trim()).filter(Boolean), excl = norm(src.exclude).split(',').map((x) => x.trim()).filter(Boolean);
+      const keep = (x) => { const t = norm(src.mode === 'manchetes' ? x.title : x.title + ' ' + x.snippet); return (!filt.length || filt.some((f) => t.includes(f))) && !excl.some((f) => t.includes(f)); };
+      list = list.filter((x) => !NOISE.test(x.title) && !(x.snippet && NOISE.test(x.snippet)) ).filter(keep);
+      const mode = src.mode || 'manchetes', max = Math.min(20, Math.max(1, +src.max || 5)), host = (() => { try { return new URL(src.url).hostname.replace(/^www\./, ''); } catch (e) { return ''; } })();
+      let items;
+      if (mode === 'pagina') { const s = summary && keep({ title: summary, snippet: '' }) ? [{ text: cut(summary, 220), detail: src.label || host }] : []; items = s.length ? s : list.slice(0, 1).map((x) => ({ text: cut(x.snippet || x.title, 220), detail: src.label || host })); }
+      else if (mode === 'trecho') items = list.map((x) => x.snippet ? { text: cut(x.snippet, 220), detail: cut(x.title, 90) } : { text: cut(x.title, 220), detail: src.label || host });
+      else items = list.map((x) => ({ text: cut(x.title, 200), detail: src.label || host }));
+      return items.slice(0, max);
+    }
+    async function grab(u, ms) {
+      const ac = new AbortController(), to = setTimeout(() => ac.abort(), ms || 15000);
+      try { const r = await fetch(u, { signal: ac.signal, cache: 'no-store' }); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.text(); } finally { clearTimeout(to); }
+    }
+    // tenta: leitor próprio → direto → proxies públicos → leitor com JavaScript (r.jina.ai)
+    async function fetchSource(src, proxy) {
+      const url = String(src.url || '').trim(); if (!/^https?:\/\//i.test(url)) return { items: [], via: '', error: 'Endereço inválido (use http:// ou https://)' };
+      const enc = encodeURIComponent(url), T = [];
+      if (proxy) T.push(['seu proxy', proxy.includes('{url}') ? proxy.replace('{url}', enc) : proxy + enc, 'html']);
+      const direto = ['direto', url, 'html'], ao = ['allorigins', 'https://api.allorigins.win/raw?url=' + enc, 'html'], cp = ['corsproxy', 'https://corsproxy.io/?url=' + enc, 'html'], jina = ['leitor com JavaScript', 'https://r.jina.ai/' + url, 'md'];
+      (src.js ? [jina, ao, cp, direto] : [direto, ao, cp, jina]).forEach((t) => T.push(t));
+      let err = 'Nenhum texto encontrado nesta página';
+      for (const [via, u, kind] of T) {
+        try { const raw = await grab(u); const items = build(raw, src, kind); if (items.length) return { items, via, error: '' }; } catch (e) { err = 'Não foi possível abrir a página (' + (e && e.message ? e.message : e) + ')'; }
+      }
+      return { items: [], via: '', error: err };
+    }
+    return { fetchSource, build };
+  })();
+
+  window.InfoTV = { DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess };
+  window.InfoNews = InfoNews;
   window.InfoFX = { style: fxStyle, text: fxText };
   try { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONTS_CSS; document.head.appendChild(l); } catch (e) {}
 })();

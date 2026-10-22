@@ -27,8 +27,8 @@
   .brand .t1 { font-family: var(--fd); font-size: 1.6rem; font-weight: 700; line-height: 1.05; }
   .brand .t2 { font-size: 1.05rem; opacity: .7; margin-top: .2rem; }
   .clock { text-align: center; }
-  .clock .time { font-family: var(--fd); font-size: 6.6rem; font-weight: 700; letter-spacing: -.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
-  .clock .sec { font-family: var(--fd); font-size: 2rem; font-weight: 700; color: var(--p); margin-left: .3rem; vertical-align: top; }
+  .clock .time { font-family: var(--fd); font-size: calc(6.6rem * var(--cs, 1)); font-weight: 700; letter-spacing: .02rem; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .clock .sec { font-family: var(--fd); font-size: calc(2rem * var(--cs, 1)); font-weight: 700; color: var(--clk2, var(--p)); margin-left: .3rem; vertical-align: top; }
   .clock .date { font-size: 1.2rem; color: var(--mut); margin-top: .3rem; }
   .card { background: var(--card); border: .08rem solid var(--line); border-radius: 1.1rem; padding: .8rem 1rem; }
   .weather .wtop { display: flex; align-items: center; gap: .9rem; }
@@ -98,20 +98,22 @@
   .bgfx-ondas svg:nth-child(1) { bottom: 0; height: 34%; } .bgfx-ondas svg:nth-child(2) { bottom: 0; height: 26%; animation-duration: 22s; animation-direction: reverse; } @keyframes wave { to { transform: translateX(-50%); } }
 
   /* Rádio */
-  #radio { position: absolute; top: 2.4rem; right: 2.6rem; z-index: 30; display: flex; align-items: center; gap: .8rem; padding: .55rem 1.1rem .55rem .7rem; max-width: 34rem; background: rgba(6,17,29,.82); color: #eaf2f8; border: .08rem solid rgba(255,255,255,.2); border-radius: 99rem; backdrop-filter: blur(.4rem); cursor: pointer; }
+  #radio { position: absolute; top: 2.4rem; right: 2.6rem; z-index: 30; display: flex; align-items: center; gap: .9rem; padding: .5rem 1.3rem .5rem 1rem; max-width: 46rem; background: rgba(6,17,29,.86); color: #eaf2f8; border: .08rem solid rgba(255,255,255,.2); border-radius: 99rem; backdrop-filter: blur(.4rem); cursor: pointer; box-shadow: 0 .4rem 1.4rem rgba(0,0,0,.35); }
   #radio[hidden] { display: none; }
+  #radio #viz { width: 11rem; height: 2.8rem; flex: none; display: block; }
   #radio .rb { width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--p); display: grid; place-items: center; font-size: 1.15rem; color: #fff; flex: none; }
-  #radio .rn { font-size: .78rem; font-weight: 700; letter-spacing: .06rem; text-transform: uppercase; color: var(--p); }
-  #radio .rt { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 24rem; }
-  #radio .eq { display: flex; gap: .15rem; align-items: flex-end; height: 1.3rem; } #radio .eq i { width: .22rem; background: var(--p); height: 30%; border-radius: .1rem; }
-  #radio.on .eq i { animation: eq 1s ease-in-out infinite; } #radio.on .eq i:nth-child(2) { animation-delay: .2s; } #radio.on .eq i:nth-child(3) { animation-delay: .4s; } #radio.on .eq i:nth-child(4) { animation-delay: .1s; }
+  #radio .rn { font-size: .8rem; font-weight: 700; letter-spacing: .06rem; text-transform: uppercase; color: var(--p); white-space: nowrap; }
+  #radio .rt { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 20rem; }
   #radio.hint { animation: hint 1.4s ease-in-out infinite; }
-  @keyframes eq { 50% { height: 100%; } } @keyframes hint { 50% { box-shadow: 0 0 0 .6rem color-mix(in srgb, var(--p) 40%, transparent); } }
+  @keyframes hint { 50% { box-shadow: 0 0 0 .6rem color-mix(in srgb, var(--p) 40%, transparent); } }
 
   /* ===== Faixa de serviços ===== */
   #svc { grid-area: svc; display: flex; gap: .8rem; padding: .3rem 1.4rem .7rem; overflow: hidden; }
-  #svc .sc { display: flex; align-items: center; gap: .55rem; padding: .5rem 1.1rem; border-radius: 99rem; background: var(--panel); border: .08rem solid var(--line); font-size: 1.15rem; font-weight: 600; white-space: nowrap; transition: .5s; }
-  #svc .sc span { font-size: 1.3rem; } #svc .sc.hl { background: var(--p); color: #fff; border-color: var(--p); transform: translateY(-.12rem); box-shadow: 0 .3rem .9rem color-mix(in srgb, var(--p) 45%, transparent); }
+  #svc .sc { display: flex; align-items: center; gap: .55rem; padding: .5rem 1.1rem; border-radius: 99rem; background: var(--panel); border: .08rem solid var(--line); font-family: var(--sf, inherit); font-size: calc(1.15rem * var(--ss, 1)); font-weight: 600; white-space: nowrap; transition: .5s; flex: none; }
+  #svc .sc span { font-size: calc(1.3rem * var(--ss, 1)); } #svc .sc .th { width: calc(2.3rem * var(--ss, 1)); height: calc(2.3rem * var(--ss, 1)); border-radius: 50%; object-fit: cover; flex: none; margin-left: -.5rem; background: #0002; }
+  #svc .sc.hl { background: var(--p); color: #fff; border-color: var(--p); transform: translateY(-.12rem); box-shadow: 0 .3rem .9rem color-mix(in srgb, var(--p) 45%, transparent); }
+  #svc.pass { display: block; padding: .3rem 0 .7rem; position: relative; -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
+  #svc .svtrack { display: flex; width: max-content; will-change: transform; padding: .2rem 0; } #svc.pass .sc { margin-right: .8rem; }
 
   /* ===== Barra de notícias com data e hora ===== */
   #lt { grid-area: lt; margin: .1rem 1.4rem 1.2rem; background: var(--lt); border-radius: 1.2rem; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0; }
@@ -122,14 +124,14 @@
   .lt-badge { align-self: flex-start; padding: .12rem 1rem; color: #fff; font-weight: 700; font-size: 1rem; letter-spacing: .06rem; text-transform: uppercase; border-radius: .3rem; white-space: nowrap; }
   .lt-text { font-family: var(--fd); font-size: 2rem; font-weight: 700; line-height: 1.15; color: var(--ltTxt); max-height: 2.35em; overflow: hidden; }
   .lt-detail { font-size: 1.2rem; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lt-crawl { position: relative; height: 2.9rem; overflow: hidden; display: flex; align-items: center; background: var(--crawl); color: var(--crawlTxt); }
-  #tScroll { position: absolute; left: 0; white-space: nowrap; font-size: 1.3rem; font-weight: 500; will-change: transform; } #tScroll em { font-style: normal; font-weight: 800; margin-right: .4rem; } #tScroll i { font-style: normal; color: var(--s); margin: 0 1.6rem; }
+  .lt-crawl { position: relative; height: calc(2.9rem * max(1, var(--ts, 1))); overflow: hidden; display: flex; align-items: center; background: var(--crawl); color: var(--crawlTxt); }
+  #tScroll { position: absolute; left: 0; white-space: nowrap; font-size: calc(1.3rem * var(--ts, 1)); font-weight: 500; will-change: transform; } #tScroll em { font-style: normal; font-weight: 800; margin-right: .4rem; } #tScroll i { font-style: normal; color: var(--s); margin: 0 1.6rem; }
 
   /* ===== Vertical (monitor girado, totem ou celular) ===== */
   #app.v { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto auto auto; grid-template-areas: "brand brand" "clock weather" "stage stage" "sched verse" "svc svc" "lt lt"; }
   #app.v #side { display: contents; }
   #app.v .brand { grid-area: brand; border-radius: 0; border: 0; border-bottom: .08rem solid var(--line); padding: 1rem 1.8rem; }
-  #app.v .clock { grid-area: clock; background: var(--panel); padding: 1rem; display: flex; flex-direction: column; justify-content: center; } #app.v .clock .time { font-size: 5.4rem; }
+  #app.v .clock { grid-area: clock; background: var(--panel); padding: 1rem; display: flex; flex-direction: column; justify-content: center; } #app.v .clock .time { font-size: calc(5.4rem * var(--cs, 1)); }
   #app.v .weather { grid-area: weather; border-radius: 0; background: var(--panel); border: 0; border-left: .08rem solid var(--line); }
   #app.v .sched { grid-area: sched; border-radius: 0; max-height: 24rem; background: var(--panel); border: 0; border-top: .08rem solid var(--line); }
   #app.v .verse { grid-area: verse; border-radius: 0; min-height: 0; border: 0; } #app.v .credit { display: none; }
@@ -162,7 +164,7 @@
   </aside>
   <main id="stage">
     <div id="frame"></div>
-    <div id="radio" hidden><div class="rb" id="rBtn">▶</div><div style="min-width:0"><div class="rn" id="rName">Rádio</div><div class="rt" id="rTitle"></div></div><div class="eq"><i></i><i></i><i></i><i></i></div></div>
+    <div id="radio" hidden><canvas id="viz" width="352" height="90"></canvas><div class="rb" id="rBtn">▶</div><div style="min-width:0"><div class="rn" id="rName">Rádio</div><div class="rt" id="rTitle"></div></div></div>
   </main>
   <div id="svc"></div>
   <footer id="lt">
@@ -206,8 +208,21 @@
     const B = document.body.classList;
     B.toggle('dark', g.theme === 'escuro'); B.toggle('compact', cp); B.toggle('no-side', g.sidebar === 'oculta');
     ['brand', 'weather', 'schedule', 'verse', 'services', 'ticker'].forEach((k) => B.toggle('no-' + k, !!g.show && g.show[k] === false));
+    R.style.setProperty('--ts', Math.min(2, Math.max(0.5, (+g.tickerSize || 100) / 100)));
+    fitClock();
   }
-  addEventListener('resize', layout);
+  let rzT; addEventListener('resize', () => { layout(); clearTimeout(rzT); rzT = setTimeout(services, 300); });
+
+  /* relógio: encolhe sozinho se a fonte/tamanho escolhidos não couberem na coluna */
+  function fitClock() {
+    if (!cfg) return;
+    const c = document.querySelector('.clock'), t = $('time'), s = $('sec'), R = document.documentElement.style;
+    const base = Math.min(2, Math.max(0.5, (+(cfg.general.clock || {}).size || 100) / 100));
+    R.setProperty('--cs', base);
+    const avail = c.clientWidth; if (!avail) return;
+    const w = t.offsetWidth + s.offsetWidth + 10;
+    if (w > avail) R.setProperty('--cs', (base * avail / w * 0.96).toFixed(3));
+  }
 
   /* ================= Relógio ================= */
   function tick() {
@@ -280,10 +295,37 @@
 
   /* ================= Barra de notícias (data e hora + manchete + faixa) e serviços ================= */
   const catOf = (id) => cfg.categories.find((c) => c.id === id) || { label: 'Informação', icon: 'ℹ️', color: '#1fb6a6' };
-  const items = () => { const t = new Date().toISOString().slice(0, 10); return (cfg.ticker || []).filter((x) => x.active !== false && x.text && (!x.start || x.start <= t) && (!x.end || x.end >= t)); };
-  let hTimer = null, hIdx = -1, tRaf = null, svT = null;
+  /* ----- notícias automáticas (endereços cadastrados no admin) ----- */
+  const NCACHE = 'infotv_news_cache'; let newsMap = {}, newsT = [], newsSig = '';
+  function newsLoad() { try { newsMap = JSON.parse(localStorage.getItem(NCACHE) || '{}') || {}; } catch (e) { newsMap = {}; } }
+  function newsItems() {
+    const out = [], now = Date.now();
+    (cfg.newsSources || []).filter((s) => s.active !== false && s.url).forEach((s) => {
+      const e = newsMap[s.id]; if (!e || now - e.t > 3 * 3600 * 1000) return;   // dado com mais de 3 h não é mostrado
+      e.items.forEach((it) => out.push({ cat: s.cat, text: it.text, detail: it.detail || '', seconds: 0, anim: 'up', active: true }));
+    });
+    return out;
+  }
+  async function newsRefresh(s) {
+    const r = await InfoNews.fetchSource(s, cfg.general.newsProxy);
+    if (r.items.length) { newsMap[s.id] = { t: Date.now(), items: r.items }; try { localStorage.setItem(NCACHE, JSON.stringify(newsMap)); } catch (e) {} }
+    const sig = JSON.stringify(newsItems()); if (sig !== newsSig) { newsSig = sig; lowerThird(); }
+  }
+  function newsSetup() {
+    newsT.forEach(clearInterval); newsT = []; newsLoad(); newsSig = JSON.stringify(newsItems());
+    (cfg.newsSources || []).filter((s) => s.active !== false && s.url).forEach((s) => {
+      const e = newsMap[s.id], run = () => newsRefresh(s);
+      if (!e || Date.now() - e.t > s.minutes * 60000) run();
+      newsT.push(setInterval(run, Math.max(5, s.minutes) * 60000));
+    });
+  }
+
+  const items = () => { const t = new Date().toISOString().slice(0, 10); return (cfg.ticker || []).filter((x) => x.active !== false && x.text && (!x.start || x.start <= t) && (!x.end || x.end >= t)).concat(newsItems()); };
+  let hTimer = null, hIdx = -1, tRaf = null, svT = null, svRaf = null;
   function lowerThird() {
     clearTimeout(hTimer); cancelAnimationFrame(tRaf);
+    const tf = cfg.general.tickerFont ? "'" + cfg.general.tickerFont + "', var(--fd), sans-serif" : '';
+    $('tScroll').style.fontFamily = tf;
     const list = items(), lt = $('lt');
     if (!list.length) { lt.style.display = 'none'; return; }
     lt.style.display = ''; hIdx = -1;
@@ -291,7 +333,7 @@
       hIdx = (hIdx + 1) % list.length; const it = list[hIdx], c = catOf(it.cat);
       $('ltBadge').style.background = c.color; $('ltBadge').textContent = (c.icon || '') + ' ' + c.label;
       const box = $('ltText'); box.innerHTML = ''; const sp = document.createElement('span');
-      InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)' }, 0); box.appendChild(sp);
+      InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)', font: cfg.general.tickerFont || '' }, 0); box.appendChild(sp);
       $('ltDetail').textContent = it.detail || ''; $('ltDetail').style.display = it.detail ? '' : 'none';
       hTimer = setTimeout(show, Math.max(4, +it.seconds || +cfg.general.headlineSeconds || 9) * 1000);
     };
@@ -315,19 +357,51 @@
     const f = (h) => Math.round(parseInt(h, 16) + (255 - parseInt(h, 16)) * 0.45);
     return 'rgb(' + f(m[1]) + ',' + f(m[2]) + ',' + f(m[3]) + ')';
   }
+  /* Faixa de serviços: "passando" (letreiro contínuo) ou "parada" (destaque um de cada vez).
+     Cada serviço pode ter foto/vídeo (miniatura redonda no cartão) e ainda entrar na tela central. */
+  function svcChip(s) {
+    const c = document.createElement('div'); c.className = 'sc';
+    if (s.src && s.type === 'image') { const i = document.createElement('img'); i.className = 'th'; i.src = s.src; i.alt = ''; c.appendChild(i); }
+    else if (s.src && s.type === 'video') { const v = document.createElement('video'); v.className = 'th'; v.src = s.src; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true; c.appendChild(v); v.play && v.play().catch(() => {}); }
+    else if (s.icon) { const ic = document.createElement('span'); ic.textContent = s.icon; c.appendChild(ic); }
+    const b = document.createElement('b'); b.textContent = s.label; c.appendChild(b); return c;
+  }
   function services() {
-    clearInterval(svT);
-    const b = $('svc'), l = (cfg.services || []).filter((s) => s.active !== false && s.label); b.innerHTML = ''; b.style.display = l.length ? '' : 'none';
-    l.forEach((s) => { const c = document.createElement('div'); c.className = 'sc'; c.innerHTML = '<span></span><b></b>'; c.children[0].textContent = s.icon || '✚'; c.children[1].textContent = s.label; b.appendChild(c); });
-    const ch = [...b.children]; if (!ch.length) return; let i = 0; ch[0].classList.add('hl');
-    svT = setInterval(() => { ch.forEach((c) => c.classList.remove('hl')); ch[++i % ch.length].classList.add('hl'); }, 2600);
+    clearInterval(svT); cancelAnimationFrame(svRaf);
+    const g = cfg.general, b = $('svc'), l = (cfg.services || []).filter((s) => s.active !== false && s.label);
+    b.innerHTML = ''; b.className = ''; b.style.display = l.length ? '' : 'none';
+    b.style.setProperty('--ss', Math.min(2, Math.max(0.6, (+g.svcSize || 100) / 100)));
+    b.style.setProperty('--sf', g.svcFont ? "'" + g.svcFont + "', var(--fb), sans-serif" : 'inherit');
+    if (!l.length) return;
+    if (g.svcMode === 'parada') {
+      l.forEach((s) => b.appendChild(svcChip(s)));
+      const ch = [...b.children]; let i = 0; ch[0].classList.add('hl');
+      svT = setInterval(() => { ch.forEach((c) => c.classList.remove('hl')); ch[++i % ch.length].classList.add('hl'); }, 2600); return;
+    }
+    b.classList.add('pass');
+    const track = document.createElement('div'); track.className = 'svtrack'; b.appendChild(track);
+    const fill = (n) => { track.innerHTML = ''; for (let k = 0; k < n; k++) l.forEach((s) => track.appendChild(svcChip(s))); return track.scrollWidth; };
+    const one = fill(1), reps = one > 0 ? Math.max(1, Math.ceil(b.clientWidth / one)) : 1;
+    const unit = fill(reps); for (let k = 0; k < reps; k++) l.forEach((s) => track.appendChild(svcChip(s)));   // 2 blocos iguais = laço sem emendas
+    if (!(unit > 0)) return;
+    let x = 0, last = performance.now();
+    (function step(now) {
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
+      x -= (now - last) / 1000 * (+g.svcSpeed || 60) * rem; last = now; if (x <= -unit) x += unit;
+      track.style.transform = 'translateX(' + x + 'px)'; svRaf = requestAnimationFrame(step);
+    })(last);
+  }
+  function svcSlides() {
+    return (cfg.services || []).filter((s) => s.active !== false && s.stage !== false && s.src && (s.type === 'image' || s.type === 'video')).map((s) => InfoTV.normSlide({
+      id: 'svc-' + s.label, type: s.type, seconds: s.type === 'video' ? s.seconds : (s.seconds || 8), src: s.src, fit: 'cover', tpl: 'cheia', pos: 'bottom', icon: '',
+      t1: { text: s.label, effect: 'sombra', anim: 'up' }, t2: { text: '', effect: 'none', anim: 'fade' } }));
   }
 
   /* ================= Publicações (slides): modelos, entradas e efeitos ================= */
   let sIdx = -1, sTimer = null, curEl = null;
   function validSlides() {
     const today = new Date().toISOString().slice(0, 10);
-    return (cfg.slides || []).filter((s) => s.active !== false && (!s.start || s.start <= today) && (!s.end || s.end >= today));
+    return (cfg.slides || []).filter((s) => s.active !== false && (!s.start || s.start <= today) && (!s.end || s.end >= today)).concat(svcSlides());
   }
   function ytId(u) { const m = String(u).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); }
   function textBlock(cls, st, base) { const w = document.createElement('div'); w.className = cls; if (st && st.text) { const s = document.createElement('span'); InfoFX.text(s, st.text, st, base); w.appendChild(s); } return w; }
@@ -410,7 +484,7 @@
   }
   function rSet(i) {
     const st = cfg.radio.stations[i]; if (!st) return;
-    rIdx = i; audio.src = st.url; audio.volume = Math.min(1, Math.max(0, +cfg.radio.volume || 0.6)); $('rTitle').textContent = ''; rUI();
+    rIdx = i; audio.src = InfoTV.resolveStream(st.url); audio.volume = Math.min(1, Math.max(0, +cfg.radio.volume || 0.6)); $('rTitle').textContent = ''; rUI();
   }
   function rPlay() {
     rWant = true; audio.play().then(() => { $('radio').classList.remove('hint'); rUI(); rNowPlaying(); })
@@ -437,9 +511,41 @@
     const r = cfg.radio, box = $('radio');
     if (PREVIEW || !r.enabled || !r.stations.length) { box.hidden = true; rWant = false; audio.pause(); rSig = ''; return; }
     box.hidden = false; audio.volume = Math.min(1, Math.max(0, +r.volume || 0.6));
-    const sig = JSON.stringify(r.stations);
-    if (sig !== rSig) { rSig = sig; rSet(0); if (r.autoplay) rPlay(); } else rUI();
+    // trocou a rádio escolhida (ou algum endereço) no admin → muda na hora; só mexer em volume/outros ajustes não reinicia o som
+    const cur = Math.min(Math.max(0, +r.current || 0), r.stations.length - 1), sig = JSON.stringify(r.stations.map((s) => s.url)) + '|' + cur;
+    if (sig !== rSig) { const was = !audio.paused; rSig = sig; rSet(cur); if (r.autoplay || was) rPlay(); } else rUI();
   }
+
+  /* Gráfico de som ao lado esquerdo da rádio (animação do ritmo — o áudio vem de outro site e o navegador não deixa "ouvir" o sinal) */
+  const viz = $('viz'), vctx = viz.getContext('2d'), VN = 34;
+  const vPh = Array.from({ length: VN }, () => Math.random() * 6.28), vSp = Array.from({ length: VN }, () => 1.5 + Math.random() * 3.4);
+  let vE = 0, vLast = 0;
+  function vizLoop(t) {
+    requestAnimationFrame(vizLoop);
+    if (!cfg || $('radio').hidden) return;
+    const mode = cfg.radio.viz; viz.style.display = mode === 'off' ? 'none' : '';
+    if (mode === 'off' || t - vLast < 32) return; vLast = t;
+    const dpr = Math.min(2, window.devicePixelRatio || 1), w = Math.round(viz.clientWidth * dpr), h = Math.round(viz.clientHeight * dpr);
+    if (!w || !h) return; if (viz.width !== w || viz.height !== h) { viz.width = w; viz.height = h; }
+    vE += ((!audio.paused && !audio.ended ? 1 : 0.07) - vE) * 0.07;
+    const s = t / 1000, g = cfg.general, c1 = g.primary || '#1fb6a6', c2 = g.secondary || '#d4a93c';
+    const lv = []; for (let i = 0; i < VN; i++) { const env = Math.pow(Math.abs(Math.sin(s * vSp[i] + vPh[i])), 1.25) * (0.55 + 0.45 * Math.sin(s * 0.9 + i * 0.35)) * (1 - i / VN * 0.3); lv.push(Math.max(0.04, vE * (0.14 + 0.86 * env))); }
+    vctx.clearRect(0, 0, w, h);
+    const gr = vctx.createLinearGradient(0, h, 0, 0); gr.addColorStop(0, c1); gr.addColorStop(1, c2);
+    vctx.fillStyle = gr; vctx.strokeStyle = gr;
+    if (mode === 'onda') {
+      const pts = lv.map((v, i) => [i / (VN - 1) * w, h / 2 - (v * h * 0.46) * (i % 2 ? 1 : -1)]);
+      vctx.lineWidth = Math.max(2, h * 0.07); vctx.lineCap = 'round'; vctx.beginPath(); vctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length - 1; i++) { const mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2; vctx.quadraticCurveTo(pts[i][0], pts[i][1], mx, my); }
+      vctx.stroke(); vctx.globalAlpha = 0.25; vctx.lineTo(w, h / 2); vctx.lineTo(0, h / 2); vctx.fill(); vctx.globalAlpha = 1; return;
+    }
+    const step = w / VN, bw = step * 0.62;
+    for (let i = 0; i < VN; i++) {
+      const bh = Math.max(bw, lv[i] * h), x = i * step + (step - bw) / 2, y = mode === 'espelho' ? (h - bh) / 2 : h - bh;
+      vctx.beginPath(); vctx.roundRect ? vctx.roundRect(x, y, bw, bh, bw / 2) : vctx.rect(x, y, bw, bh); vctx.fill();
+    }
+  }
+  requestAnimationFrame(vizLoop);
   $('radio').addEventListener('click', (e) => { e.stopPropagation(); rToggle(); });
   // 1º toque/tecla libera o áudio quando o navegador bloqueia o autoplay
   ['click', 'keydown', 'touchstart'].forEach((ev) => addEventListener(ev, () => { if (cfg && cfg.radio.enabled && cfg.radio.autoplay && rWant && audio.paused) rPlay(); }, { passive: true }));
@@ -475,15 +581,17 @@
     document.title = 'Clínica TV · ' + g.name;
     const lg = $('logo'); if (g.logo) { lg.src = g.logo; lg.hidden = false; } else lg.hidden = true;
     const ck = Object.assign({}, InfoTV.DEFAULT.general.clock, g.clock); ck.anim = 'none';
-    if (g.theme === 'escuro' && ck.color === '#0f766e') { ck.color = '#a8f0e7'; ck.g1 = '#ffffff'; }
+    if (g.theme === 'escuro' && ck.color === InfoTV.DEFAULT.general.clock.color) { ck.color = '#7cc4ff'; ck.g1 = '#9bd5ff'; ck.g2 = '#38bdf8'; }
     InfoFX.style($('time'), ck, 0); $('time').className += ' time'; $('time').style.fontSize = '';
-    layout(); renderSchedule(); nextVerse(); weather(); lowerThird(); services(); radioApply();
+    $('sec').style.fontFamily = $('time').style.fontFamily; root.setProperty('--clk2', ck.g2 || ck.glow || g.primary);
+    layout(); renderSchedule(); nextVerse(); weather(); newsSetup(); lowerThird(); services(); radioApply();
     sIdx = -1; nextSlide();
   }
 
   async function init() {
     cfg = await InfoTV.load();
     apply(); tick(); setInterval(tick, 1000); wake();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitClock(); services(); });
     let ct; InfoTV.onChange(() => { clearTimeout(ct); ct = setTimeout(async () => { cfg = await InfoTV.load(); apply(); }, 1200); });
     setInterval(async () => {   // modo GitHub: confere config.json a cada 2 minutos
       if (InfoTV.getMode() !== 'repo' || await InfoTV.isServer()) return;

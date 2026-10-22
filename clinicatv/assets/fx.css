@@ -1,5 +1,8 @@
 @font-face{font-family:'Qurova';src:url('../fontes/Qurova.woff2'),url('../fontes/Qurova.otf'),url('../fontes/Qurova.ttf');font-display:swap}
 @font-face{font-family:'Agency';src:url('../fontes/Agency.woff2'),url('../fontes/Agency.otf'),url('../fontes/Agency.ttf');font-display:swap}
+/* Rajdhani (licença OFL) — fonte do relógio, embutida para funcionar mesmo sem internet na TV */
+@font-face{font-family:'Rajdhani';font-weight:600;src:url('../fontes/Rajdhani-600.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'Rajdhani';font-weight:700;src:url('../fontes/Rajdhani-700.woff2') format('woff2');font-display:swap}
 /* InfoTV — efeitos de texto (compartilhado entre TV e admin) */
 .fx { display: inline-block; max-width: 100%; line-height: 1.12; font-family: var(--fd, 'Comfortaa', sans-serif); color: var(--c, #fff);
       overflow-wrap: anywhere; animation: var(--a1, none), var(--a2, none); position: relative; }

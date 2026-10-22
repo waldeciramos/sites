@@ -141,7 +141,9 @@
       </section>
 
       <section class="tab neo" data-tab="🩺 Serviços">
-        <h2>Faixa de serviços</h2><p class="hint">Fica embaixo da tela central. Os serviços ganham destaque um de cada vez.</p>
+        <h2>Faixa de serviços</h2><p class="hint">Fica embaixo da tela central. No modo "Passando" os serviços correm de lado sem parar; no modo "Parada" ganham destaque um de cada vez. Cada serviço pode ter uma foto ou vídeo: aparece como miniatura redonda no cartão e, se marcar, também passa na tela central junto com as propagandas.</p>
+        <div class="grid" id="gSvc"></div>
+        <h3>Serviços</h3>
         <div id="svcList"></div><div class="actions"><button class="btn ok" id="addSvc">+ Novo serviço</button></div>
       </section>
 
@@ -167,12 +169,16 @@
         <div class="grid" id="gTicker"></div>
         <h3>Categorias</h3><div id="catList"></div>
         <div class="actions"><button class="btn ok" id="addCat">+ Nova categoria</button></div>
-        <h3>Informações</h3><div id="tickerList"></div>
+        <h3>🔗 Notícias automáticas (cole o endereço do site)</h3>
+        <p class="hint">Em vez de digitar, cole o endereço de uma página (ou feed RSS) e a TV busca sozinha as manchetes ou um trecho do texto e atualiza no intervalo que você escolher. Use "Buscar agora" para ver o que vem. Se a página mostrar o conteúdo só depois de carregar (JavaScript), marque o leitor avançado. Use "Só com estas palavras" para ficar só com o que interessa (ex.: acidente, interdição, lentidão).</p>
+        <div id="srcList"></div>
+        <div class="actions"><button class="btn ok" id="addSrc">+ Nova fonte (endereço)</button></div>
+        <h3>Informações digitadas</h3><div id="tickerList"></div>
         <div class="actions"><button class="btn ok" id="addTicker">+ Nova informação</button></div>
       </section>
 
       <section class="tab neo" data-tab="📻 Rádio">
-        <h2>Rádio ambiente</h2><p class="hint">Toca música na TV por um link de transmissão (stream). Se a primeira estação falhar, tenta a próxima automaticamente.</p>
+        <h2>Rádio ambiente</h2><p class="hint">Escolha em "Rádio que toca na TV" qual estação toca; a TV troca na hora. Dá para mudar o nome e o endereço de cada rádio ou cadastrar novas. Pode colar o endereço da página do player (Radio Swiss Pop, Jazz ou Classic) que o sistema converte para o áudio. Se a rádio falhar, tenta a próxima automaticamente.</p>
         <div class="grid" id="gRadio"></div>
         <h3>Estações</h3><div id="stList"></div>
         <div class="actions"><button class="btn ok" id="addStation">+ Nova estação</button></div>
@@ -182,7 +188,7 @@
       <section class="tab neo" data-tab="💾 Publicar e Backup">
         <h2>Publicar, backup e segurança</h2>
         <div class="info" id="srvNote" style="display:none">✔ <b>Modo servidor Debian:</b> tudo que você altera é salvo no servidor e as TVs atualizam sozinhas em segundos. A senha do painel é a definida na instalação (arquivo /etc/war.env). Use o backup abaixo para guardar uma cópia.</div>
-        <div class="warn" id="warnPass">⚠ A senha padrão é <b>admin123</b>. Troque abaixo. A proteção é feita no navegador (serve para esconder o painel, não é segurança de servidor).</div>
+        <div class="warn" id="warnPass">🔐 O usuário e a senha iniciais vêm do arquivo <b>acesso.json</b> (na pasta do site). A proteção é feita no navegador: serve para esconder o painel, não é segurança de servidor. Se o repositório for público, quem souber o endereço consegue ler esse arquivo; para evitar, defina abaixo uma senha criptografada, que passa a valer no lugar da do arquivo.</div>
         <div id="modeBox"><h3>Como a TV lê os dados (GitHub Pages)</h3>
         <div class="radio" id="modeRadio">
           <label><input type="radio" name="mode" value="local"> Neste navegador (admin e TV no mesmo computador)</label>
@@ -247,7 +253,7 @@
     else if (o.type === 'range') { inp = el('input', { type: 'range', id, min: o.min, max: o.max, step: o.step }); inp.value = obj[key]; }
     else { inp = el('input', { type: o.type || 'text', class: o.type === 'color' ? '' : 'neo-in', id }); inp.value = obj[key] == null ? '' : obj[key]; if (o.ph) inp.placeholder = o.ph; if (o.step) inp.step = o.step; }
     const run = () => {
-      let v = o.type === 'checkbox' ? inp.checked : inp.value; if (o.type === 'number' || o.type === 'range') v = +v;
+      let v = o.type === 'checkbox' ? inp.checked : inp.value; if (o.type === 'number' || o.type === 'range' || o.num) v = +v;
       obj[key] = v; (immediate ? persist : persistSoon)(); if (o.after) o.after(v);
     };
     inp.addEventListener(immediate ? 'change' : 'input', run);
@@ -301,7 +307,7 @@
     f.append(field('Fonte dos títulos e relógio', g, 'fontDisplay', { options: InfoTV.FONTS }), field('Fonte dos textos', g, 'fontBody', { options: InfoTV.FONTS }));
     $('fontPath').value = (g.fontCustomSrc || '').startsWith('data:') ? '(arquivo enviado)' : (g.fontCustomSrc || '');
     const c = $('clockFx'); c.innerHTML = ''; const cg = el('div', { class: 'grid' });
-    cg.append(field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }));
+    cg.append(field('Fonte do relógio', g.clock, 'font', { options: [['', 'Mesma dos títulos']].concat(InfoTV.FONTS) }), field('Tamanho do relógio (' + (g.clock.size || 100) + '%)', g.clock, 'size', { type: 'range', min: 60, max: 160, step: 5 }), field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }));
     c.append(cg);
   }
   $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; cfg.general.logo = await fileToURL(f, 500, 'image/png'); persist(); renderGeneral(); };
@@ -401,27 +407,55 @@
   $('copyAll').onclick = () => { for (let i = 0; i < 7; i++) cfg.schedule[i] = InfoTV.clone(cfg.schedule[curDay]); persist(); toast('Copiado para todos os dias'); };
 
   /* ---------- listas simples ---------- */
-  function simpleList(boxId, arr, mk, addId, blank) {
+  function simpleList(boxId, arr, mk, addId, blank, onChange) {
     const box = $(boxId);
     const draw = () => {
       box.innerHTML = '';
       arr().forEach((it, i) => {
         const head = el('div', { class: 'head' }, [el('b', {}, ['#' + (i + 1)])]);
-        [['↑', -1], ['↓', 1]].forEach(([t, dd]) => head.append(el('button', { class: 'btn sm', onclick: () => { move(arr(), i, dd); persist(); draw(); } }, [t])));
-        head.append(el('button', { class: 'btn sm del', onclick: () => { arr().splice(i, 1); persist(); draw(); afterList(); } }, ['🗑']));
+        [['↑', -1], ['↓', 1]].forEach(([t, dd]) => head.append(el('button', { class: 'btn sm', onclick: () => { move(arr(), i, dd); onChange && onChange('move', i, dd); persist(); draw(); } }, [t])));
+        head.append(el('button', { class: 'btn sm del', onclick: () => { arr().splice(i, 1); onChange && onChange('del', i); persist(); draw(); afterList(); } }, ['🗑']));
         box.append(el('div', { class: 'item' }, [head, el('div', { style: 'height:12px' }), ...mk(it)]));
       });
     };
-    $(addId).onclick = () => { arr().push(InfoTV.clone(blank())); persist(); draw(); afterList(); };
+    $(addId).onclick = () => { arr().push(InfoTV.clone(blank())); onChange && onChange('add'); persist(); draw(); afterList(); };
     return draw;
   }
-  function afterList() { drawTicker(); }
+  function afterList() { drawTicker(); if (typeof drawSources === 'function') drawSources(); }
   const drawVerses = simpleList('versesList', () => cfg.verses, (v) => [field('Texto', v, 'text', { type: 'textarea' }), el('div', { style: 'height:10px' }), field('Referência', v, 'ref', { ph: 'Salmos 23:1' })], 'addVerse', () => ({ text: '', ref: '' }));
 
   /* ---------- Rodapé + categorias ---------- */
-  function renderTickerCfg() { const b = $('gTicker'); b.innerHTML = ''; b.append(field('Segundos de cada manchete', cfg.general, 'headlineSeconds', { type: 'number' }), field('Velocidade da faixa (maior = mais rápida)', cfg.general, 'tickerSpeed', { type: 'number' })); }
+  function renderTickerCfg() { const b = $('gTicker'); b.innerHTML = ''; b.append(field('Segundos de cada manchete', cfg.general, 'headlineSeconds', { type: 'number' }), field('Velocidade da faixa (maior = mais rápida)', cfg.general, 'tickerSpeed', { type: 'number' }),
+    field('Fonte da barra', cfg.general, 'tickerFont', { options: [['', 'Padrão']].concat(InfoTV.FONTS) }), field('Tamanho do texto da faixa (' + (cfg.general.tickerSize || 100) + '%)', cfg.general, 'tickerSize', { type: 'range', min: 60, max: 200, step: 5 }),
+    field('Proxy próprio para buscar sites (opcional)', cfg.general, 'newsProxy', { ph: 'https://meuproxy.com/?url={url}' })); }
   const drawCats = simpleList('catList', () => cfg.categories, (c) => [el('div', { class: 'grid' }, [field('Emoji', c, 'icon'), field('Nome da etiqueta', c, 'label'), field('Cor', c, 'color', { type: 'color' }), field('Identificador', c, 'id', { after: () => {} })])], 'addCat', () => ({ id: 'cat' + InfoTV.rid(), label: 'Nova categoria', icon: '⭐', color: '#6366f1' }));
   const drawTicker = simpleList('tickerList', () => cfg.ticker, (t) => [el('div', { class: 'grid' }, [field('Categoria', t, 'cat', { options: cfg.categories.map((c) => [c.id, (c.icon || '') + ' ' + c.label]) }), field('Ativa', t, 'active', { type: 'checkbox' })]), el('div', { style: 'height:10px' }), field('Texto', t, 'text', { type: 'textarea' }), el('div', { style: 'height:10px' }), el('div', { class: 'grid' }, [field('Detalhe (linha menor, opcional)', t, 'detail'), field('Segundos no destaque (0 = padrão)', t, 'seconds', { type: 'number' }), field('Exibir a partir de', t, 'start', { type: 'date' }), field('Exibir até', t, 'end', { type: 'date' }), field('Entrada do texto', t, 'anim', { options: [['up', 'Subir'], ['fade', 'Aparecer'], ['zoom', 'Zoom'], ['blur', 'Desfocar'], ['letras', 'Letras uma a uma'], ['digitar', 'Máquina de escrever']] })])], 'addTicker', () => ({ cat: cfg.categories[0].id, text: '', active: true, detail: '', seconds: 0, start: '', end: '', anim: 'up' }));
+
+  /* ---------- Notícias automáticas (endereços) ---------- */
+  const catOpts = () => cfg.categories.map((c) => [c.id, (c.icon || '') + ' ' + c.label]);
+  const drawSources = simpleList('srcList', () => cfg.newsSources, (s) => {
+    const out = el('div', { class: 'info', style: 'display:none' });
+    const test = el('button', { class: 'btn sm ok', onclick: async () => {
+      out.style.display = ''; out.textContent = 'Buscando… (pode levar até 1 minuto)';
+      const r = await InfoNews.fetchSource(s, cfg.general.newsProxy); out.textContent = '';
+      if (!r.items.length) { out.textContent = '⚠ ' + r.error + '. Tente marcar "Página carrega com JavaScript", tirar o filtro de palavras ou usar o endereço do feed RSS do site.'; return; }
+      out.append(el('b', {}, ['✔ Encontrado (' + r.via + '):']));
+      r.items.forEach((it) => out.append(el('div', { style: 'margin-top:6px' }, ['• ' + it.text + (it.detail ? '  — ' + it.detail : '')])));
+    } }, ['🔎 Buscar agora']);
+    return [el('div', { class: 'grid' }, [
+      field('Endereço do site ou feed RSS', s, 'url', { ph: 'https://rodovias.motiva.com.br/minas-sp/' }),
+      field('Categoria (etiqueta)', s, 'cat', { options: catOpts() }),
+      field('O que pegar', s, 'mode', { options: [['manchetes', 'Manchetes (títulos)'], ['trecho', 'Trecho da mensagem (texto abaixo do título)'], ['pagina', 'Resumo da página (descrição)']] }),
+      field('Quantidade de itens', s, 'max', { type: 'number' }),
+      field('Atualizar a cada (minutos)', s, 'minutes', { type: 'number' }),
+      field('Nome na linha pequena (opcional)', s, 'label'),
+      field('Só com estas palavras (vírgula)', s, 'filter', { ph: 'acidente, interdição, lentidão' }),
+      field('Ignorar se tiver (vírgula)', s, 'exclude', { ph: 'publicidade' }),
+      field('Ativa', s, 'active', { type: 'checkbox' }),
+      field('Página carrega com JavaScript (leitor avançado)', s, 'js', { type: 'checkbox' })]),
+    el('details', { class: 'fxbox' }, [el('summary', {}, ['Avançado: pegar só uma parte da página (seletor CSS)']), field('Seletor CSS', s, 'selector', { ph: '.noticia h3' })]),
+    el('div', { class: 'actions' }, [test]), out];
+  }, 'addSrc', () => InfoTV.normSource({ cat: cfg.categories[0] ? cfg.categories[0].id : 'aviso' }));
 
   /* ---------- Tela e serviços ---------- */
   function renderScreen() {
@@ -433,19 +467,61 @@
     const sh = $('gShow'); sh.innerHTML = '';
     [['brand', 'Logo e nome'], ['weather', 'Clima'], ['schedule', 'Programação do dia'], ['verse', 'Frases de Deus'], ['services', 'Faixa de serviços'], ['ticker', 'Barra de notícias']].forEach(([k, l]) => sh.append(field(l, g.show, k, { type: 'checkbox' })));
   }
-  const drawSvc = simpleList('svcList', () => cfg.services, (v) => [el('div', { class: 'grid' }, [field('Ícone / emoji', v, 'icon'), field('Nome do serviço', v, 'label'), field('Ativo', v, 'active', { type: 'checkbox' })])], 'addSvc', () => ({ icon: '✚', label: '', active: true }));
+  function renderSvcCfg() {
+    const g = cfg.general, b = $('gSvc'); b.innerHTML = '';
+    b.append(field('Modo da faixa', g, 'svcMode', { options: [['passando', 'Passando (letreiro contínuo)'], ['parada', 'Parada (destaca um de cada vez)']] }),
+      field('Velocidade (maior = mais rápido)', g, 'svcSpeed', { type: 'number' }),
+      field('Fonte da faixa', g, 'svcFont', { options: [['', 'Padrão']].concat(InfoTV.FONTS) }),
+      field('Tamanho do texto (' + (g.svcSize || 100) + '%)', g, 'svcSize', { type: 'range', min: 60, max: 200, step: 5 }));
+  }
+  const isVid = (u) => /\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(u || '') || /^data:video/.test(u || '');
+  const drawSvc = simpleList('svcList', () => cfg.services, (v) => {
+    const up = el('input', { type: 'file', accept: 'image/*,video/*', class: 'neo-in', 'aria-label': 'Enviar foto ou vídeo do serviço' });
+    up.onchange = async () => {
+      const f = up.files[0]; if (!f) return;
+      try {
+        if (f.type.startsWith('video/')) { if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho ao lado.'); toast('Enviando vídeo…'); v.src = await InfoTV.upload(f); v.type = 'video'; }
+        else { v.src = await fileToURL(f, 1600, 'image/jpeg'); v.type = 'image'; }
+        persist(); drawSvc();
+      } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); }
+    };
+    const path = el('input', { class: 'neo-in', placeholder: 'midia/fisio.jpg  ou  midia/fisio.mp4' }); path.value = (v.src || '').startsWith('data:') ? '' : (v.src || '');
+    path.onchange = () => { v.src = path.value.trim(); v.type = v.src ? (isVid(v.src) ? 'video' : 'image') : ''; persist(); drawSvc(); };
+    const prev = !v.src ? null : v.type === 'video' ? el('video', { class: 'thumb', src: v.src, muted: '', controls: '', playsinline: '' }) : el('img', { class: 'thumb', src: v.src, alt: '' });
+    const box = el('details', { class: 'fxbox' }); if (v.src) box.open = true;
+    box.append(el('summary', {}, ['🖼 Foto ou vídeo deste serviço']),
+      el('div', { class: 'grid', style: 'margin-top:12px' }, [field('Mostrar também na tela central', v, 'stage', { type: 'checkbox' }), field('Segundos na tela central' + (v.type === 'video' ? ' (0 = até o fim)' : ''), v, 'seconds', { type: 'number' })]),
+      el('div', { class: 'grid', style: 'margin-top:12px' }, [el('div', { class: 'f' }, [el('label', {}, ['Enviar foto ou vídeo do computador']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço do arquivo']), path])]));
+    if (prev) { box.append(prev); box.append(el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { v.src = ''; v.type = ''; persist(); drawSvc(); } }, ['Remover foto/vídeo'])])); }
+    return [el('div', { class: 'grid' }, [field('Ícone / emoji (deixe vazio para não mostrar)', v, 'icon'), field('Nome do serviço', v, 'label'), field('Ativo', v, 'active', { type: 'checkbox' })]), box];
+  }, 'addSvc', () => ({ icon: '', label: '', active: true, type: '', src: '', stage: true, seconds: 8 }));
 
   /* ---------- Rádio ---------- */
   let testAudio = null;
+  const stOpts = () => { const l = cfg.radio.stations.map((s, i) => [String(i), s.name || ('Rádio ' + (i + 1))]); return l.length ? l : [['0', '(nenhuma cadastrada)']]; };
+  function refreshCurSel() { const sel = $('curStation'); if (!sel) return; sel.innerHTML = ''; stOpts().forEach(([v, t]) => sel.append(el('option', { value: v }, [t]))); sel.value = String(cfg.radio.current || 0); }
   function renderRadio() {
     const r = cfg.radio, b = $('gRadio'); b.innerHTML = '';
-    b.append(field('Ativar rádio na TV', r, 'enabled', { type: 'checkbox' }), field('Tocar ao abrir a TV', r, 'autoplay', { type: 'checkbox' }),
+    const cur = field('📻 Rádio que toca na TV', r, 'current', { options: stOpts(), num: true, after: () => drawStations() }); cur.querySelector('select').id = 'curStation';
+    b.append(field('Ativar rádio na TV', r, 'enabled', { type: 'checkbox' }), field('Tocar ao abrir a TV', r, 'autoplay', { type: 'checkbox' }), cur,
+      field('Gráfico de som (ao lado da rádio)', r, 'viz', { options: [['barras', 'Barras'], ['espelho', 'Barras espelhadas'], ['onda', 'Onda'], ['off', 'Sem gráfico']] }),
       field('Volume (' + Math.round(r.volume * 100) + '%)', r, 'volume', { type: 'range', min: 0, max: 1, step: 0.05 }),
       field('Now playing (opcional, AzuraCast)', r, 'nowPlayingUrl', { ph: 'https://radio.exemplo.com/api/nowplaying/1' }));
     drawStations();
   }
-  const drawStations = simpleList('stList', () => cfg.radio.stations, (s) => [el('div', { class: 'grid' }, [field('Nome da rádio', s, 'name'), field('Link do stream (https://)', s, 'url', { ph: 'https://…/stream.mp3' })]),
-    el('div', { class: 'actions' }, [el('button', { class: 'btn sm', onclick: () => { if (testAudio) testAudio.pause(); testAudio = new Audio(s.url); testAudio.play().then(() => toast('Tocando teste…')).catch(() => toast('Não foi possível tocar este link')); } }, ['▶ Testar']), el('button', { class: 'btn sm', onclick: () => testAudio && testAudio.pause() }, ['■ Parar'])])], 'addStation', () => ({ name: '', url: '' }));
+  const drawStations = simpleList('stList', () => cfg.radio.stations, (s) => {
+    const idx = cfg.radio.stations.indexOf(s), on = idx === (+cfg.radio.current || 0);
+    return [el('div', { class: 'grid' }, [field('Nome da rádio', s, 'name', { after: refreshCurSel }), field('Endereço (stream de áudio ou página do player)', s, 'url', { ph: 'https://…/stream.mp3' })]),
+      el('div', { class: 'actions' }, [
+        el('button', { class: 'btn sm ' + (on ? 'ok' : ''), onclick: () => { cfg.radio.current = idx; persist(); renderRadio(); toast('Esta rádio vai tocar na TV'); } }, [on ? '✔ Tocando na TV' : '◉ Tocar esta na TV']),
+        el('button', { class: 'btn sm', onclick: () => { if (testAudio) testAudio.pause(); testAudio = new Audio(InfoTV.resolveStream(s.url)); testAudio.play().then(() => toast('Tocando teste…')).catch(() => toast('Não foi possível tocar este link')); } }, ['▶ Testar aqui']),
+        el('button', { class: 'btn sm', onclick: () => testAudio && testAudio.pause() }, ['■ Parar teste'])])];
+  }, 'addStation', () => ({ name: '', url: '' }), (kind, i, dd) => {
+    const r = cfg.radio, n = r.stations.length;
+    if (kind === 'move') { if (r.current === i) r.current = i + dd; else if (r.current === i + dd) r.current = i; }
+    else if (kind === 'del') { if (i < r.current) r.current--; r.current = Math.max(0, Math.min(r.current, n - 1)); }
+    refreshCurSel();
+  });
 
   /* ---------- Backup / segurança ---------- */
   function renderBackup() {
@@ -474,7 +550,7 @@
   addEventListener('resize', pvFit);
 
   /* ---------- Abas / login ---------- */
-  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderScreen(); drawSvc(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawTicker(); renderRadio(); renderBackup(); }
+  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderScreen(); renderSvcCfg(); drawSvc(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawSources(); drawTicker(); renderRadio(); renderBackup(); }
   function buildTabs() {
     const secs = [...document.querySelectorAll('section.tab')], nav = $('tabs'); nav.innerHTML = '';
     const show = (n) => { secs.forEach((s) => s.classList.toggle('on', s.dataset.tab === n)); [...nav.children].forEach((b) => b.classList.toggle('on', b.textContent === n)); };
@@ -487,8 +563,11 @@
   }
   $('loginForm').onsubmit = async (e) => {
     e.preventDefault();
-    const c = await InfoTV.load(), hash = c.admin.hash, u = $('lUser').value.trim(), p = $('lPass').value;
-    const ok = u === c.admin.user && (hash ? (await InfoTV.sha256(p)) === hash : p === 'admin123');
+    const c = await InfoTV.load(), u = $('lUser').value.trim(), p = $('lPass').value; let ok = false;
+    if (c.admin.hash) ok = u === c.admin.user && (await InfoTV.sha256(p)) === c.admin.hash;       // senha trocada no painel tem prioridade
+    else { const a = await InfoTV.loadAccess();                                                   // senão vale o arquivo acesso.json
+      if (a) ok = u === a.user && (a.hash ? (await InfoTV.sha256(p)) === a.hash : (a.pass !== '' && p === a.pass));
+      else ok = u === c.admin.user && p === 'admin123'; }
     if (ok) enter(); else $('loginErr').textContent = 'Usuário ou senha incorretos.';
   };
   $('btnLogout').onclick = () => { sessionStorage.removeItem(SESSION); location.reload(); };
