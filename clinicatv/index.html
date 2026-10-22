@@ -22,8 +22,8 @@
   #app.h { grid-template-columns: var(--sw) 1fr; grid-template-rows: 1fr auto auto; grid-template-areas: "side stage" "side svc" "side lt"; }
   body.no-side #app.h { grid-template-columns: 0 1fr; } body.no-side #side { display: none; }
   /* Lateral: escura com relevo suave (mesmo efeito do painel admin). Vale também no modo vertical (#side vira display:contents). */
-  #side { --panel:#e6eaf1; --card:#e6eaf1; --line:rgba(15,42,51,.08); --nsh1:#fff; --nsh2:#c5ccd9; }
-  body.side-dark #side { --panel:#0b1c2c; --card:#0e2336; --txt:#eaf2f8; --mut:#9db3c6; --line:rgba(255,255,255,.07); --nsh1: rgba(120,170,210,.07); --nsh2: rgba(0,0,0,.55); --vizbg: rgba(0,0,0,.28); }
+  #side { --panel:#e6eaf1; --card:#e6eaf1; --line:rgba(15,42,51,.08); --nsh1:#fff; --nsh2:#c5ccd9; --eh:#fff; --es:rgba(15,42,51,.3); }
+  body.side-dark #side { --panel:#0b1c2c; --card:#0e2336; --txt:#eaf2f8; --mut:#9db3c6; --line:rgba(255,255,255,.07); --nsh1: rgba(120,170,210,.07); --nsh2: rgba(0,0,0,.55); --vizbg: rgba(0,0,0,.28); --eh: rgba(140,190,230,.25); --es: rgba(0,0,0,.7); }
   #side { --vizbg:#e6eaf1; color: var(--txt); }
   #side { grid-area: side; display: flex; flex-direction: column; gap: .85rem; padding: 1.2rem 1.2rem .8rem; background: var(--panel); border-right: 0; box-shadow: .3rem 0 1.2rem rgba(15,42,51,.14); min-height: 0; z-index: 3; }
   .brand { display: flex; align-items: center; gap: 1rem; min-height: 5rem; padding: .7rem 1rem; border-radius: 1.1rem; background: var(--brandBg); color: var(--brandFg); border: 0; box-shadow: .4rem .4rem .9rem var(--nsh2), -.3rem -.3rem .8rem var(--nsh1); }
@@ -37,7 +37,7 @@
   .card { background: var(--card); border: 0; border-radius: 1.2rem; padding: .9rem 1.1rem; box-shadow: .45rem .45rem 1rem var(--nsh2), -.35rem -.35rem .9rem var(--nsh1); }
   .weather .wtop { display: flex; align-items: center; gap: .9rem; }
   .weather .ico { font-size: 3.2rem; line-height: 1; }
-  .weather .temp { font-family: var(--fd); font-size: 2.7rem; font-weight: 700; line-height: 1; }
+  .weather .temp { font-family: var(--tf, var(--fd)); font-size: 3.2rem; font-weight: 700; line-height: 1; color: var(--tempc, #1fa35c); text-shadow: -.035em -.035em .02em var(--eh), .04em .05em .05em var(--es); letter-spacing: .02rem; }
   .weather .desc { font-size: 1rem; color: var(--mut); margin-top: .2rem; }
   .weather .minmax { margin-left: auto; text-align: right; font-size: 1rem; color: var(--mut); line-height: 1.5; }
   .weather .city { font-size: .8rem; text-transform: uppercase; letter-spacing: .08rem; color: var(--p); font-weight: 700; }
@@ -191,7 +191,7 @@
 </div>
 <div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
-<script src="assets/core.js?v=5"></script>
+<script src="assets/core.js?v=6"></script>
 <script>
 (function () {
   'use strict';
@@ -624,9 +624,9 @@
     const lg = $('logo'); if (g.logo) { lg.src = g.logo; lg.hidden = false; } else lg.hidden = true;
     const ck = Object.assign({}, InfoTV.DEFAULT.general.clock, g.clock); ck.anim = 'none';
     // relógio padrão é claro com neon (lateral escura); se a lateral for clara, volta ao azul forte para ter contraste
-    if ((g.theme === 'escuro' || g.sidebarStyle === 'escura') && ck.color === InfoTV.DEFAULT.general.clock.color) Object.assign(ck, { effect: 'neon', color: '#eaf6ff', g1: '#9bd5ff', g2: '#38bdf8' });
+    if ((g.theme === 'escuro' || g.sidebarStyle === 'escura') && ck.color === InfoTV.DEFAULT.general.clock.color) Object.assign(ck, { color: '#6fb8ff', g1: '#9bd5ff', g2: '#38bdf8' });
     InfoFX.style($('time'), ck, 0); $('time').className += ' time'; $('time').style.fontSize = '';
-    $('sec').style.fontFamily = $('time').style.fontFamily; root.setProperty('--clk2', ck.g2 || ck.glow || g.primary);
+    $('sec').style.fontFamily = $('time').style.fontFamily; root.setProperty('--tf', ck.font ? "'" + ck.font + "', var(--fd)" : 'var(--fd)'); root.setProperty('--tempc', g.tempColor || '#1fa35c'); root.setProperty('--clk2', ck.g2 || ck.glow || g.primary);
     layout(); renderSchedule(); nextVerse(); weather(); newsSetup(); lowerThird(); services(); radioApply();
     sIdx = -1; nextSlide();
   }

@@ -8,6 +8,9 @@
       overflow-wrap: anywhere; animation: var(--a1, none), var(--a2, none); position: relative; }
 
 /* ---- Efeitos ---- */
+/* baixo relevo = letra gravada na superfície; alto relevo = letra saindo da superfície (cores de luz/sombra vêm de --eh / --es) */
+.fx-baixo { text-shadow: .035em .04em .025em var(--eh, #fff), -.025em -.03em .03em var(--es, rgba(15,42,51,.4)); }
+.fx-alto { text-shadow: -.035em -.035em .02em var(--eh, #fff), .04em .05em .05em var(--es, rgba(15,42,51,.4)); }
 .fx-sombra { text-shadow: 0 .06em .12em rgba(0,0,0,.55), 0 .02em .02em rgba(0,0,0,.4); }
 .fx-neon, .fx-neonpulse { text-shadow: 0 0 .05em #fff, 0 0 .15em var(--glow), 0 0 .35em var(--glow), 0 0 .7em var(--glow); }
 .fx-neonpulse { --a2: neonp 2.4s infinite; }

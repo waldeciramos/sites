@@ -31,7 +31,7 @@
   }
 
   /* ---------- Efeitos de texto ---------- */
-  const EFFECTS = [['none', 'Nenhum'], ['sombra', 'Sombra'], ['neon', 'Neon'], ['neonpulse', 'Neon piscando'], ['contorno', 'Contorno vazado'], ['gradiente', 'Gradiente de cores'], ['brilho', 'Brilho passando'], ['3d', '3D'], ['retro', 'Retrô'], ['fogo', 'Fogo'], ['glitch', 'Glitch (TV)']];
+  const EFFECTS = [['none', 'Nenhum'], ['sombra', 'Sombra'], ['neon', 'Neon'], ['neonpulse', 'Neon piscando'], ['contorno', 'Contorno vazado'], ['gradiente', 'Gradiente de cores'], ['brilho', 'Brilho passando'], ['3d', '3D'], ['retro', 'Retrô'], ['fogo', 'Fogo'], ['glitch', 'Glitch (TV)'], ['baixo', 'Baixo relevo (gravado)'], ['alto', 'Alto relevo']];
   const ANIMS = [['none', 'Sem animação'], ['fade', 'Aparecer'], ['up', 'Subir'], ['zoom', 'Zoom'], ['blur', 'Desfocar'], ['letras', 'Letras uma a uma'], ['digitar', 'Máquina de escrever'], ['pulse', 'Pulsar (contínuo)'], ['float', 'Flutuar (contínuo)']];
 
   function fxStyle(el, st, baseRem) {
@@ -76,20 +76,20 @@
   ];
   const CLOCK_OLD = '#0f766e';
   const DEFAULT = {
-    version: 5,
+    version: 6,
     general: {
       name: 'Clínica TV', subtitle: 'Fisio Clínica Estiva', logo: 'logo.svg',
       brandBg: '#ffffff', brandFg: '#0b1d2e',
       city: 'Estiva, MG', lat: -22.4553, lon: -46.0214,
       primary: '#1fb6a6', secondary: '#d4a93c',
-      theme: 'claro', sidebarStyle: 'clara', autoFullscreen: true, transVideo: '', orientation: 'auto', sidebar: 'normal', frame: 'cheia', zoom: 100, margin: 0, transition: 'fade',
+      theme: 'claro', sidebarStyle: 'clara', autoFullscreen: true, transVideo: '', tempColor: '#1fa35c', orientation: 'auto', sidebar: 'normal', frame: 'cheia', zoom: 100, margin: 0, transition: 'fade',
       show: { brand: true, weather: true, schedule: true, verse: true, services: false, ticker: true },
       slideSeconds: 12, verseSeconds: 25, headlineSeconds: 9, tickerSpeed: 90, showSeconds: true,
       fontDisplay: 'Qurova', fontBody: 'Agency', fontCustomSrc: '',
       tickerFont: '', tickerSize: 100,
       svcMode: 'passando', svcSpeed: 60, svcFont: '', svcSize: 100,
       newsProxy: '',
-      clock: { font: 'Rajdhani', size: 115, effect: 'gradiente', color: '#0a58ca', glow: '#38bdf8', g1: '#0646b8', g2: '#1e9bff' }
+      clock: { font: 'Rajdhani', size: 115, effect: 'baixo', color: '#1565d8', glow: '#38bdf8', g1: '#0646b8', g2: '#1e9bff' }
     },
     radio: { enabled: true, autoplay: true, volume: 0.6, nowPlayingUrl: '', current: 0, viz: 'barras', stations: DEFAULT_STATIONS() },
     newsSources: [],
@@ -166,7 +166,9 @@
       g.sidebarStyle = 'clara';
       if (!c.color || c.color === '#0a58ca' || c.color === '#eaf6ff' || c.color === CLOCK_OLD) g.clock = clone(DEFAULT.general.clock);
     }
-    cfg.version = 5;
+    // v6: relógio em baixo relevo e temperatura verde em alto relevo (só troca o relógio se ainda for o azul padrão anterior)
+    if (wasVersion < 6) { const g = cfg.general, c = g.clock || {}; if (!c.color || c.color === '#0a58ca' || c.color === '#eaf6ff' || c.color === CLOCK_OLD) g.clock = clone(DEFAULT.general.clock); }
+    cfg.version = 6;
     r.current = Math.min(Math.max(0, +r.current || 0), Math.max(0, r.stations.length - 1));
     if (!['barras', 'espelho', 'onda', 'off'].includes(r.viz)) r.viz = 'barras';
     if (!['escura', 'clara'].includes(cfg.general.sidebarStyle)) cfg.general.sidebarStyle = 'escura';

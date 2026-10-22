@@ -245,7 +245,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="assets/core.js?v=5"></script>
+<script src="assets/core.js?v=6"></script>
 <script>
 (function () {
   'use strict';
@@ -332,7 +332,7 @@
     f.append(field('Fonte dos títulos e relógio', g, 'fontDisplay', { options: InfoTV.FONTS }), field('Fonte dos textos', g, 'fontBody', { options: InfoTV.FONTS }));
     $('fontPath').value = (g.fontCustomSrc || '').startsWith('data:') ? '(arquivo enviado)' : (g.fontCustomSrc || '');
     const c = $('clockFx'); c.innerHTML = ''; const cg = el('div', { class: 'grid' });
-    cg.append(field('Fonte do relógio', g.clock, 'font', { options: [['', 'Mesma dos títulos']].concat(InfoTV.FONTS) }), field('Tamanho do relógio (' + (g.clock.size || 100) + '%)', g.clock, 'size', { type: 'range', min: 60, max: 160, step: 5 }), field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }));
+    cg.append(field('Fonte do relógio', g.clock, 'font', { options: [['', 'Mesma dos títulos']].concat(InfoTV.FONTS) }), field('Tamanho do relógio (' + (g.clock.size || 100) + '%)', g.clock, 'size', { type: 'range', min: 60, max: 160, step: 5 }), field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'baixo', 'alto', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }), field('Cor da temperatura (alto relevo)', g, 'tempColor', { type: 'color' }));
     c.append(cg);
   }
   $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; $('logoName').textContent = f.name; cfg.general.logo = await fileToURL(f, 500, 'image/png'); persist(); renderGeneral(); e.target.value = ''; };
