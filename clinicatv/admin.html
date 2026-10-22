@@ -17,6 +17,20 @@
   .btn { border: 0; cursor: pointer; border-radius: 999px; padding: 11px 20px; font-weight: 700; background: var(--bg); box-shadow: 5px 5px 11px var(--sh2), -5px -5px 11px var(--sh1); transition: .15s; font-size: 14px; }
   .btn:active { box-shadow: inset 3px 3px 7px var(--sh2), inset -3px -3px 7px var(--sh1); }
   .btn.pri { background: #6b7280; color: #fff; } .btn.ok { background: var(--acc); color: #fff; } .btn.del { color: var(--danger); } .btn.sm { padding: 6px 12px; font-size: 13px; }
+  /* ---- Botões "Escolher arquivo" no mesmo layout dos demais botões ---- */
+  input[type=file].neo-in { padding: 7px 10px 7px 8px; color: var(--mut); font-size: 13px; cursor: pointer; }
+  input[type=file]::file-selector-button { border: 0; cursor: pointer; border-radius: 999px; padding: 9px 18px; margin-right: 12px; font: 700 13px 'Montserrat', system-ui, sans-serif; color: #fff; background: var(--acc); box-shadow: 4px 4px 9px var(--sh2), -3px -3px 8px var(--sh1); transition: .15s; }
+  input[type=file]::file-selector-button:hover { filter: brightness(1.06); }
+  input[type=file]::file-selector-button:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,.25); }
+  input[type=checkbox], input[type=radio] { accent-color: var(--acc); width: 18px; height: 18px; cursor: pointer; flex: none; }
+  .btn:hover { filter: brightness(1.03); } .btn.del:hover { color: #fff; background: var(--danger); } .btn.ok:hover, .btn.pri:hover { filter: brightness(1.08); }
+  a.btn { display: inline-block; text-decoration: none; color: inherit; } a.btn.ok { color: #fff; }
+  .logoup { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 16px; border-radius: 22px; background: var(--bg); box-shadow: inset 5px 5px 11px var(--sh2), inset -5px -5px 11px var(--sh1); }
+  .logoup .pvlogo { width: 190px; height: 92px; border-radius: 16px; background: #fff; box-shadow: 4px 4px 10px var(--sh2), -4px -4px 10px var(--sh1); display: grid; place-items: center; overflow: hidden; flex: none; position: relative; }
+  .logoup .pvlogo img { position: absolute; inset: 0; width: 100%; height: 100%; padding: 12px; object-fit: contain; } .logoup .pvlogo span { font-size: 12px; color: var(--mut); }
+  .logoup .side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; min-width: 200px; flex: 1; }
+  .logoup .side small { color: var(--mut); font-size: 12px; line-height: 1.4; }
+  .logoup .row { display: flex; gap: 10px; flex-wrap: wrap; }
   input:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 
   /* ---- Login (neumorfismo) ---- */
@@ -107,9 +121,17 @@
         <h2>Identidade visual</h2><p class="hint">Nome, logo (fica em um cartão claro para qualquer logo aparecer bem), cores, fontes e orientação da TV.</p>
         <div class="grid" id="gGeneral"></div>
         <h3>Logo da clínica</h3>
-        <div class="f"><input type="file" accept="image/*" id="logoFile" class="neo-in" aria-label="Enviar logo">
-          <img id="logoPrev" class="thumb" style="max-height:80px;display:none" alt=""></div>
-        <div class="actions"><button class="btn sm del" id="logoDel">Remover logo</button></div>
+        <div class="logoup">
+          <div class="pvlogo"><img id="logoPrev" alt="Logo atual" style="display:none"><span id="logoNone">Sem logo</span></div>
+          <div class="side">
+            <div class="row">
+              <label class="btn ok" for="logoFile" style="cursor:pointer">📁 Escolher logo</label>
+              <button class="btn del" id="logoDel" type="button">Remover logo</button>
+            </div>
+            <small id="logoName">PNG, JPG ou SVG. Fundo transparente fica melhor.</small>
+            <input type="file" accept="image/*" id="logoFile" hidden aria-label="Enviar logo">
+          </div>
+        </div>
         <h3>Fontes</h3>
         <div class="grid" id="gFonts"></div>
         <div class="info">Para usar a fonte <b>Qurova</b> (ou qualquer outra): coloque o arquivo <code>.woff2 / .ttf / .otf</code> na pasta <code>midia/</code> e informe o caminho abaixo, ou envie o arquivo aqui. Ela passa a valer em todos os títulos, relógio e rodapé.</div>
@@ -302,7 +324,7 @@
       field('Tempo de cada frase de Deus (s)', g, 'verseSeconds', { type: 'number' }),
       field('Mostrar segundos no relógio', g, 'showSeconds', { type: 'checkbox' })
     );
-    const p = $('logoPrev'); if (g.logo) { p.src = g.logo; p.style.display = 'block'; } else p.style.display = 'none';
+    const p = $('logoPrev'); if (g.logo) { p.src = g.logo; p.style.display = 'block'; } else p.style.display = 'none'; $('logoNone').style.display = g.logo ? 'none' : '';
     const f = $('gFonts'); f.innerHTML = '';
     f.append(field('Fonte dos títulos e relógio', g, 'fontDisplay', { options: InfoTV.FONTS }), field('Fonte dos textos', g, 'fontBody', { options: InfoTV.FONTS }));
     $('fontPath').value = (g.fontCustomSrc || '').startsWith('data:') ? '(arquivo enviado)' : (g.fontCustomSrc || '');
@@ -310,7 +332,7 @@
     cg.append(field('Fonte do relógio', g.clock, 'font', { options: [['', 'Mesma dos títulos']].concat(InfoTV.FONTS) }), field('Tamanho do relógio (' + (g.clock.size || 100) + '%)', g.clock, 'size', { type: 'range', min: 60, max: 160, step: 5 }), field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }));
     c.append(cg);
   }
-  $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; cfg.general.logo = await fileToURL(f, 500, 'image/png'); persist(); renderGeneral(); };
+  $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; $('logoName').textContent = f.name; cfg.general.logo = await fileToURL(f, 500, 'image/png'); persist(); renderGeneral(); e.target.value = ''; };
   $('logoDel').onclick = () => { cfg.general.logo = ''; persist(); renderGeneral(); };
   $('fontPath').onchange = (e) => { if (e.target.value !== '(arquivo enviado)') { cfg.general.fontCustomSrc = e.target.value.trim(); persist(); } };
   $('fontFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; cfg.general.fontCustomSrc = await fileToURL(f, 0); persist(); renderGeneral(); };
@@ -462,7 +484,7 @@
     const g = cfg.general, b = $('gScreen'); b.innerHTML = '';
     const tr = [['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Desfocar'], ['wipe', 'Cortina']];
     b.append(field('Tema', g, 'theme', { options: [['claro', 'Claro e limpo (clínica)'], ['escuro', 'Escuro']] }), field('Moldura da tela central', g, 'frame', { options: [['moldura', 'Com moldura'], ['cheia', 'Tela cheia, sem borda']] }),
-      field('Coluna lateral', g, 'sidebar', { options: [['estreita', 'Estreita'], ['normal', 'Normal'], ['larga', 'Larga'], ['oculta', 'Oculta']] }), field('Entrada padrão dos slides', g, 'transition', { options: tr }),
+      field('Coluna lateral', g, 'sidebar', { options: [['estreita', 'Estreita'], ['normal', 'Normal'], ['larga', 'Larga'], ['oculta', 'Oculta']] }), field('Cor da coluna lateral', g, 'sidebarStyle', { options: [['escura', 'Escura (relevo suave, como o admin)'], ['clara', 'Clara']] }), field('Entrar em tela cheia no 1º toque/tecla', g, 'autoFullscreen', { type: 'checkbox' }), field('Entrada padrão dos slides', g, 'transition', { options: tr }),
       field('Zoom geral (' + g.zoom + '%)', g, 'zoom', { type: 'range', min: 60, max: 160, step: 5 }), field('Margem de segurança (' + g.margin + '%)', g, 'margin', { type: 'range', min: 0, max: 8, step: 0.5 }));
     const sh = $('gShow'); sh.innerHTML = '';
     [['brand', 'Logo e nome'], ['weather', 'Clima'], ['schedule', 'Programação do dia'], ['verse', 'Frases de Deus'], ['services', 'Faixa de serviços'], ['ticker', 'Barra de notícias']].forEach(([k, l]) => sh.append(field(l, g.show, k, { type: 'checkbox' })));
@@ -504,7 +526,7 @@
     const r = cfg.radio, b = $('gRadio'); b.innerHTML = '';
     const cur = field('📻 Rádio que toca na TV', r, 'current', { options: stOpts(), num: true, after: () => drawStations() }); cur.querySelector('select').id = 'curStation';
     b.append(field('Ativar rádio na TV', r, 'enabled', { type: 'checkbox' }), field('Tocar ao abrir a TV', r, 'autoplay', { type: 'checkbox' }), cur,
-      field('Gráfico de som (ao lado da rádio)', r, 'viz', { options: [['barras', 'Barras'], ['espelho', 'Barras espelhadas'], ['onda', 'Onda'], ['off', 'Sem gráfico']] }),
+      field('Gráfico de som (no fim da programação)', r, 'viz', { options: [['barras', 'Barras'], ['espelho', 'Barras espelhadas'], ['onda', 'Onda'], ['off', 'Sem gráfico']] }),
       field('Volume (' + Math.round(r.volume * 100) + '%)', r, 'volume', { type: 'range', min: 0, max: 1, step: 0.05 }),
       field('Now playing (opcional, AzuraCast)', r, 'nowPlayingUrl', { ph: 'https://radio.exemplo.com/api/nowplaying/1' }));
     drawStations();

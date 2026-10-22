@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "general": {
     "name": "Clínica TV",
     "subtitle": "Fisio Clínica Estiva",
@@ -14,7 +14,7 @@
     "theme": "claro",
     "orientation": "auto",
     "sidebar": "normal",
-    "frame": "moldura",
+    "frame": "cheia",
     "zoom": 100,
     "margin": 0,
     "transition": "fade",
@@ -23,7 +23,7 @@
       "weather": true,
       "schedule": true,
       "verse": true,
-      "services": true,
+      "services": false,
       "ticker": true
     },
     "slideSeconds": 12,
@@ -44,12 +44,14 @@
     "clock": {
       "font": "Rajdhani",
       "size": 115,
-      "effect": "gradiente",
-      "color": "#0a58ca",
+      "effect": "neon",
+      "color": "#eaf6ff",
       "glow": "#38bdf8",
-      "g1": "#0646b8",
-      "g2": "#1e9bff"
-    }
+      "g1": "#9bd5ff",
+      "g2": "#38bdf8"
+    },
+    "sidebarStyle": "escura",
+    "autoFullscreen": true
   },
   "radio": {
     "enabled": true,

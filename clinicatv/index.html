@@ -21,8 +21,12 @@
   /* ===== Horizontal ===== */
   #app.h { grid-template-columns: var(--sw) 1fr; grid-template-rows: 1fr auto auto; grid-template-areas: "side stage" "side svc" "side lt"; }
   body.no-side #app.h { grid-template-columns: 0 1fr; } body.no-side #side { display: none; }
-  #side { grid-area: side; display: flex; flex-direction: column; gap: .85rem; padding: 1.2rem 1.2rem .8rem; background: var(--panel); border-right: .1rem solid var(--line); box-shadow: var(--shadow); min-height: 0; z-index: 3; }
-  .brand { display: flex; align-items: center; gap: 1rem; min-height: 5rem; padding: .7rem 1rem; border-radius: 1.1rem; background: var(--brandBg); color: var(--brandFg); border: .08rem solid var(--line); }
+  /* Lateral: escura com relevo suave (mesmo efeito do painel admin). Vale também no modo vertical (#side vira display:contents). */
+  #side { --nsh1: #fff; --nsh2: rgba(15,42,51,.16); }
+  body.side-dark #side { --panel:#0b1c2c; --card:#0e2336; --txt:#eaf2f8; --mut:#9db3c6; --line:rgba(255,255,255,.07); --nsh1: rgba(120,170,210,.07); --nsh2: rgba(0,0,0,.55); --vizbg: rgba(0,0,0,.28); }
+  #side { --vizbg: rgba(15,42,51,.07); color: var(--txt); }
+  #side { grid-area: side; display: flex; flex-direction: column; gap: .85rem; padding: 1.2rem 1.2rem .8rem; background: var(--panel); border-right: 0; box-shadow: .3rem 0 1.4rem rgba(0,0,0,.28); min-height: 0; z-index: 3; }
+  .brand { display: flex; align-items: center; gap: 1rem; min-height: 5rem; padding: .7rem 1rem; border-radius: 1.1rem; background: var(--brandBg); color: var(--brandFg); border: 0; box-shadow: .4rem .4rem .9rem var(--nsh2), -.3rem -.3rem .8rem var(--nsh1); }
   .brand img { max-height: 4rem; max-width: 7rem; object-fit: contain; }
   .brand .t1 { font-family: var(--fd); font-size: 1.6rem; font-weight: 700; line-height: 1.05; }
   .brand .t2 { font-size: 1.05rem; opacity: .7; margin-top: .2rem; }
@@ -30,7 +34,7 @@
   .clock .time { font-family: var(--fd); font-size: calc(6.6rem * var(--cs, 1)); font-weight: 700; letter-spacing: .02rem; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .clock .sec { font-family: var(--fd); font-size: calc(2rem * var(--cs, 1)); font-weight: 700; color: var(--clk2, var(--p)); margin-left: .3rem; vertical-align: top; }
   .clock .date { font-size: 1.2rem; color: var(--mut); margin-top: .3rem; }
-  .card { background: var(--card); border: .08rem solid var(--line); border-radius: 1.1rem; padding: .8rem 1rem; }
+  .card { background: var(--card); border: 0; border-radius: 1.2rem; padding: .9rem 1.1rem; box-shadow: .45rem .45rem 1rem var(--nsh2), -.35rem -.35rem .9rem var(--nsh1); }
   .weather .wtop { display: flex; align-items: center; gap: .9rem; }
   .weather .ico { font-size: 3.2rem; line-height: 1; }
   .weather .temp { font-family: var(--fd); font-size: 2.7rem; font-weight: 700; line-height: 1; }
@@ -48,12 +52,16 @@
   .row { display: flex; gap: .8rem; padding: .36rem 0; border-bottom: .06rem solid var(--line); font-size: 1.1rem; line-height: 1.25; }
   .row b { color: var(--p); min-width: 3.8rem; font-variant-numeric: tabular-nums; }
   .row.past { opacity: .4; }
-  .row.now { background: color-mix(in srgb, var(--p) 18%, transparent); margin: 0 -.5rem; padding-left: .5rem; padding-right: .5rem; border-radius: .5rem; font-weight: 700; }
+  .row.now { background: color-mix(in srgb, var(--p) 16%, transparent); margin: .1rem -.5rem; padding-left: .6rem; padding-right: .6rem; border-radius: .7rem; border-bottom-color: transparent; font-weight: 700; box-shadow: inset .2rem .2rem .5rem var(--nsh2), inset -.15rem -.15rem .4rem var(--nsh1); }
   .row.now b { color: var(--s); }
   .empty { color: var(--mut); font-size: 1rem; padding: .6rem 0; }
-  .verse { background: color-mix(in srgb, var(--s) 14%, var(--panel)); border-color: color-mix(in srgb, var(--s) 40%, transparent); min-height: 10.5rem; display: flex; flex-direction: column; justify-content: center; transition: opacity .6s; }
+  .verse { background: color-mix(in srgb, var(--s) 7%, var(--card)); min-height: 10.5rem; display: flex; flex-direction: column; justify-content: center; transition: opacity .6s; }
   .verse .vt { font-size: 1.2rem; line-height: 1.4; font-weight: 500; font-style: italic; }
   .verse .vr { margin-top: .5rem; color: var(--s); font-weight: 700; font-size: 1rem; } .verse .h2 { color: var(--s); }
+  /* gráfico de som: fica no fim da programação */
+  .vizbox { flex: none; display: flex; align-items: center; gap: .7rem; margin-top: .6rem; padding: .45rem .8rem; border-radius: .9rem; background: var(--vizbg); box-shadow: inset .2rem .2rem .5rem var(--nsh2), inset -.15rem -.15rem .4rem var(--nsh1); }
+  .vizbox .vl { font-size: .8rem; font-weight: 700; letter-spacing: .05rem; text-transform: uppercase; color: var(--mut); white-space: nowrap; max-width: 15rem; overflow: hidden; text-overflow: ellipsis; }
+  .vizbox #viz { flex: 1; min-width: 0; height: 3.2rem; display: block; }
   .credit { font-size: .75rem; color: var(--mut); text-align: center; opacity: .8; }
 
   /* ===== Palco com moldura ===== */
@@ -100,7 +108,6 @@
   /* Rádio */
   #radio { position: absolute; top: 2.4rem; right: 2.6rem; z-index: 30; display: flex; align-items: center; gap: .9rem; padding: .5rem 1.3rem .5rem 1rem; max-width: 46rem; background: rgba(6,17,29,.86); color: #eaf2f8; border: .08rem solid rgba(255,255,255,.2); border-radius: 99rem; backdrop-filter: blur(.4rem); cursor: pointer; box-shadow: 0 .4rem 1.4rem rgba(0,0,0,.35); }
   #radio[hidden] { display: none; }
-  #radio #viz { width: 11rem; height: 2.8rem; flex: none; display: block; }
   #radio .rb { width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--p); display: grid; place-items: center; font-size: 1.15rem; color: #fff; flex: none; }
   #radio .rn { font-size: .8rem; font-weight: 700; letter-spacing: .06rem; text-transform: uppercase; color: var(--p); white-space: nowrap; }
   #radio .rt { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 20rem; }
@@ -116,12 +123,18 @@
   #svc .svtrack { display: flex; width: max-content; will-change: transform; padding: .2rem 0; } #svc.pass .sc { margin-right: .8rem; }
 
   /* ===== Barra de notícias com data e hora ===== */
-  #lt { grid-area: lt; margin: .1rem 1.4rem 1.2rem; background: var(--lt); border-radius: 1.2rem; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0; }
+  #lt { --bc: var(--p); grid-area: lt; margin: .1rem 1.4rem 1.2rem; background: var(--lt); border-radius: 1.2rem; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0; }
+  #app.fullbleed #lt { margin: 0; border-radius: 0; box-shadow: 0 -.3rem 1.2rem rgba(0,0,0,.25); } #app.fullbleed.v #lt { margin: 0; }
   .lt-head { display: flex; align-items: stretch; min-height: 6.2rem; min-width: 0; }
-  .lt-date { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 8.5rem; padding: 0 1.4rem; background: #0b3a63; color: #fff; line-height: 1.05; }
-  .lt-date b { font-family: var(--fd); font-size: 2.6rem; } .lt-date small { font-size: 1rem; letter-spacing: .1rem; opacity: .85; } .lt-date em { font-style: normal; font-size: 1.25rem; margin-top: .2rem; color: #9ff0e3; font-variant-numeric: tabular-nums; }
-  .lt-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: .3rem; padding: .6rem 1.6rem; }
-  .lt-badge { align-self: flex-start; padding: .12rem 1rem; color: #fff; font-weight: 700; font-size: 1rem; letter-spacing: .06rem; text-transform: uppercase; border-radius: .3rem; white-space: nowrap; }
+  .lt-date { display: flex; flex-direction: column; align-items: stretch; justify-content: center; gap: .3rem; min-width: 11.5rem; padding: .6rem 1.2rem; background: linear-gradient(160deg, #0e4f80, #0a2c4d); color: #fff; line-height: 1; position: relative; }
+  .lt-date::after { content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: .3rem; background: var(--bc); transition: background .6s; }
+  .lt-date .dd { display: flex; align-items: center; justify-content: center; gap: .7rem; }
+  .lt-date b { font-family: var(--fd); font-size: 3.2rem; font-weight: 700; line-height: .95; }
+  .lt-date .mw { display: flex; flex-direction: column; gap: .3rem; text-align: left; }
+  .lt-date small { font-size: 1.15rem; font-weight: 800; letter-spacing: .12rem; } .lt-date .mw span { font-size: .85rem; letter-spacing: .1rem; opacity: .7; }
+  .lt-date em { font-style: normal; font-family: var(--fd); font-size: 1.35rem; font-weight: 700; text-align: center; padding: .22rem .6rem; border-radius: 99rem; background: rgba(255,255,255,.12); color: #a6f3e8; font-variant-numeric: tabular-nums; letter-spacing: .04rem; }
+  .lt-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: .35rem; padding: .6rem 1.8rem; }
+  .lt-badge { align-self: flex-start; display: inline-flex; align-items: center; gap: .4rem; padding: .22rem 1.1rem; color: #fff; font-weight: 800; font-size: .95rem; letter-spacing: .1rem; text-transform: uppercase; border-radius: 99rem; white-space: nowrap; box-shadow: 0 .2rem .8rem color-mix(in srgb, var(--bc) 50%, transparent); transition: background .6s; }
   .lt-text { font-family: var(--fd); font-size: 2rem; font-weight: 700; line-height: 1.15; color: var(--ltTxt); max-height: 2.35em; overflow: hidden; }
   .lt-detail { font-size: 1.2rem; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lt-crawl { position: relative; height: calc(2.9rem * max(1, var(--ts, 1))); overflow: hidden; display: flex; align-items: center; background: var(--crawl); color: var(--crawlTxt); }
@@ -133,7 +146,8 @@
   #app.v .brand { grid-area: brand; border-radius: 0; border: 0; border-bottom: .08rem solid var(--line); padding: 1rem 1.8rem; }
   #app.v .clock { grid-area: clock; background: var(--panel); padding: 1rem; display: flex; flex-direction: column; justify-content: center; } #app.v .clock .time { font-size: calc(5.4rem * var(--cs, 1)); }
   #app.v .weather { grid-area: weather; border-radius: 0; background: var(--panel); border: 0; border-left: .08rem solid var(--line); }
-  #app.v .sched { grid-area: sched; border-radius: 0; max-height: 24rem; background: var(--panel); border: 0; border-top: .08rem solid var(--line); }
+  #app.v .sched { grid-area: sched; border-radius: 0; max-height: 27rem; background: var(--panel); border: 0; border-top: .08rem solid var(--line); }
+  #app.v .card { box-shadow: none; }
   #app.v .verse { grid-area: verse; border-radius: 0; min-height: 0; border: 0; } #app.v .credit { display: none; }
   #app.v #stage { grid-area: stage; } #app.v #svc { grid-area: svc; } #app.v #lt { grid-area: lt; margin-bottom: 1rem; }
   #app.v .slide .ic { font-size: 7rem; } #app.v .slide.niv { flex-direction: column; gap: 2rem; } #app.v .slide.dc { grid-template-columns: 1fr; grid-template-rows: 1.4fr 1fr; }
@@ -143,8 +157,9 @@
 
   #bar { position: fixed; right: 1rem; bottom: 1rem; z-index: 99; display: flex; gap: .5rem; opacity: 0; pointer-events: none; transition: opacity .3s; }
   body.show-ui #bar { opacity: 1; pointer-events: auto; } body.preview #bar { display: none; }
-  #bar button, #bar a { font: 600 14px system-ui, sans-serif; background: rgba(0,0,0,.8); color: #fff; border: 1px solid rgba(255,255,255,.3); padding: 10px 14px; border-radius: 10px; cursor: pointer; text-decoration: none; }
-  #bar button:hover, #bar a:hover { background: var(--p); }
+  #bar button, #bar a { font: 700 14px 'Montserrat', system-ui, sans-serif; background: #0e2336; color: #eaf2f8; border: 0; padding: 11px 20px; border-radius: 99rem; cursor: pointer; text-decoration: none; box-shadow: 5px 5px 11px rgba(0,0,0,.45), -3px -3px 9px rgba(120,170,210,.08); transition: .15s; }
+  #bar button:hover, #bar a:hover { background: var(--p); color: #fff; }
+  #bar button:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,.5); }
 </style>
 </head>
 <body>
@@ -158,18 +173,18 @@
       <div class="wdays" id="wDays"></div>
       <div class="wupd" id="wUpd"></div>
     </div>
-    <div class="card sched"><div class="h2" id="schedTitle">Programação de hoje</div><div id="schedList"></div></div>
+    <div class="card sched"><div class="h2" id="schedTitle">Programação de hoje</div><div id="schedList"></div><div class="vizbox" id="vizbox" style="display:none"><span class="vl" id="vizLbl">📻 Rádio</span><canvas id="viz" width="352" height="90"></canvas></div></div>
     <div class="card verse" id="verse"><div class="h2">✝ Palavra de Deus</div><div class="vt" id="vText"></div><div class="vr" id="vRef"></div></div>
     <div class="credit">Clínica TV · idealizado por Waldeci Ramos</div>
   </aside>
   <main id="stage">
     <div id="frame"></div>
-    <div id="radio" hidden><canvas id="viz" width="352" height="90"></canvas><div class="rb" id="rBtn">▶</div><div style="min-width:0"><div class="rn" id="rName">Rádio</div><div class="rt" id="rTitle"></div></div></div>
+    <div id="radio" hidden><div class="rb" id="rBtn">▶</div><div style="min-width:0"><div class="rn" id="rName">Rádio</div><div class="rt" id="rTitle"></div></div></div>
   </main>
   <div id="svc"></div>
   <footer id="lt">
     <div class="lt-head">
-      <div class="lt-date"><b id="ltDay"></b><small id="ltMon"></small><em id="ltHr"></em></div>
+      <div class="lt-date"><div class="dd"><b id="ltDay"></b><div class="mw"><small id="ltMon"></small><span id="ltWk"></span></div></div><em id="ltHr"></em></div>
       <div class="lt-main"><div class="lt-badge" id="ltBadge"></div><div class="lt-text" id="ltText"></div><div class="lt-detail" id="ltDetail"></div></div>
     </div>
     <div class="lt-crawl"><div id="tScroll"></div></div>
@@ -206,7 +221,7 @@
     R.style.fontSize = Math.max(5, Math.min(W / base[0], H / base[1]) * ((+g.zoom || 100) / 100)) + 'px';
     R.style.setProperty('--sw', { estreita: '24rem', normal: '30rem', larga: '36rem' }[g.sidebar] || '30rem');
     const B = document.body.classList;
-    B.toggle('dark', g.theme === 'escuro'); B.toggle('compact', cp); B.toggle('no-side', g.sidebar === 'oculta');
+    B.toggle('dark', g.theme === 'escuro'); B.toggle('side-dark', g.theme === 'escuro' || g.sidebarStyle !== 'clara'); B.toggle('compact', cp); B.toggle('no-side', g.sidebar === 'oculta');
     ['brand', 'weather', 'schedule', 'verse', 'services', 'ticker'].forEach((k) => B.toggle('no-' + k, !!g.show && g.show[k] === false));
     R.style.setProperty('--ts', Math.min(2, Math.max(0.5, (+g.tickerSize || 100) / 100)));
     fitClock();
@@ -231,7 +246,7 @@
     $('sec').textContent = cfg && cfg.general.showSeconds ? String(d.getSeconds()).padStart(2, '0') : '';
     const ds = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     $('date').textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
-    $('ltDay').textContent = d.getDate(); $('ltMon').textContent = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase(); $('ltHr').textContent = hh + ':' + mm;
+    $('ltDay').textContent = d.getDate(); $('ltMon').textContent = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase(); $('ltWk').textContent = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').toUpperCase(); $('ltHr').textContent = hh + ':' + mm;
     if (d.getSeconds() === 0) renderSchedule();
   }
 
@@ -331,7 +346,7 @@
     lt.style.display = ''; hIdx = -1;
     const show = () => {
       hIdx = (hIdx + 1) % list.length; const it = list[hIdx], c = catOf(it.cat);
-      $('ltBadge').style.background = c.color; $('ltBadge').textContent = (c.icon || '') + ' ' + c.label;
+      lt.style.setProperty('--bc', c.color); $('ltBadge').style.background = c.color; $('ltBadge').textContent = ((c.icon || '') + ' ' + c.label).trim();
       const box = $('ltText'); box.innerHTML = ''; const sp = document.createElement('span');
       InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)', font: cfg.general.tickerFont || '' }, 0); box.appendChild(sp);
       $('ltDetail').textContent = it.detail || ''; $('ltDetail').style.display = it.detail ? '' : 'none';
@@ -480,7 +495,7 @@
     const r = cfg.radio, st = r.stations[rIdx]; const box = $('radio');
     box.classList.toggle('on', !audio.paused);
     $('rBtn').textContent = audio.paused ? '▶' : '❚❚';
-    $('rName').textContent = st ? '📻 ' + st.name : 'Rádio';
+    $('rName').textContent = st ? '📻 ' + st.name : 'Rádio'; $('vizLbl').textContent = st ? '📻 ' + st.name : '📻 Rádio';
   }
   function rSet(i) {
     const st = cfg.radio.stations[i]; if (!st) return;
@@ -508,7 +523,7 @@
     rNP = setTimeout(rNowPlaying, 20000);
   }
   function radioApply() {
-    const r = cfg.radio, box = $('radio');
+    const r = cfg.radio, box = $('radio'), st0 = r.stations[Math.min(Math.max(0, +r.current || 0), Math.max(0, r.stations.length - 1))]; $('vizLbl').textContent = '📻 ' + (st0 ? st0.name : 'Rádio');
     if (PREVIEW || !r.enabled || !r.stations.length) { box.hidden = true; rWant = false; audio.pause(); rSig = ''; return; }
     box.hidden = false; audio.volume = Math.min(1, Math.max(0, +r.volume || 0.6));
     // trocou a rádio escolhida (ou algum endereço) no admin → muda na hora; só mexer em volume/outros ajustes não reinicia o som
@@ -516,15 +531,16 @@
     if (sig !== rSig) { const was = !audio.paused; rSig = sig; rSet(cur); if (r.autoplay || was) rPlay(); } else rUI();
   }
 
-  /* Gráfico de som ao lado esquerdo da rádio (animação do ritmo — o áudio vem de outro site e o navegador não deixa "ouvir" o sinal) */
+  /* Gráfico de som no fim do cartão da programação (animação do ritmo — o áudio vem de outro site e o navegador não deixa "ouvir" o sinal) */
   const viz = $('viz'), vctx = viz.getContext('2d'), VN = 34;
   const vPh = Array.from({ length: VN }, () => Math.random() * 6.28), vSp = Array.from({ length: VN }, () => 1.5 + Math.random() * 3.4);
   let vE = 0, vLast = 0;
   function vizLoop(t) {
     requestAnimationFrame(vizLoop);
-    if (!cfg || $('radio').hidden) return;
-    const mode = cfg.radio.viz; viz.style.display = mode === 'off' ? 'none' : '';
-    if (mode === 'off' || t - vLast < 32) return; vLast = t;
+    if (!cfg) return;
+    const rr = cfg.radio, on = !!(rr.enabled && rr.stations.length && rr.viz !== 'off' && !document.body.classList.contains('no-schedule') && !document.body.classList.contains('compact')), vb = $('vizbox');
+    if (vb.style.display !== (on ? '' : 'none')) vb.style.display = on ? '' : 'none';
+    const mode = rr.viz; if (!on || t - vLast < 32) return; vLast = t;
     const dpr = Math.min(2, window.devicePixelRatio || 1), w = Math.round(viz.clientWidth * dpr), h = Math.round(viz.clientHeight * dpr);
     if (!w || !h) return; if (viz.width !== w || viz.height !== h) { viz.width = w; viz.height = h; }
     vE += ((!audio.paused && !audio.ended ? 1 : 0.07) - vE) * 0.07;
@@ -563,6 +579,12 @@
   }
   $('bFull').onclick = fullscreen; $('bRot').onclick = rotate; $('bMute').onclick = rToggle;
   addEventListener('keydown', (e) => { const k = e.key.toLowerCase(); if (k === 'f') fullscreen(); if (k === 'r') rotate(); if (k === 'm') rToggle(); if (k === 'n' && cfg.radio.stations.length > 1) { rSet((rIdx + 1) % cfg.radio.stations.length); rPlay(); } });
+  // tela cheia automática: o navegador só permite depois de um toque/clique/tecla; no 1º gesto a TV já entra em tela cheia
+  function autoFull() {
+    if (PREVIEW || !cfg || cfg.general.autoFullscreen === false || document.fullscreenElement) return;
+    const d = document.documentElement; try { ((d.requestFullscreen || d.webkitRequestFullscreen) || (() => Promise.resolve())).call(d).catch(() => {}); } catch (e) {}
+  }
+  ['click', 'keydown', 'touchend'].forEach((ev) => addEventListener(ev, (e) => { if (ev === 'keydown' && ['f', 'F'].includes(e.key)) return; autoFull(); }, { passive: true }));
   let uiT; addEventListener('mousemove', () => { document.body.classList.add('show-ui'); clearTimeout(uiT); uiT = setTimeout(() => document.body.classList.remove('show-ui'), 3000); });
   async function wake() { try { if (!PREVIEW && 'wakeLock' in navigator) await navigator.wakeLock.request('screen'); } catch (e) {} }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
@@ -581,7 +603,8 @@
     document.title = 'Clínica TV · ' + g.name;
     const lg = $('logo'); if (g.logo) { lg.src = g.logo; lg.hidden = false; } else lg.hidden = true;
     const ck = Object.assign({}, InfoTV.DEFAULT.general.clock, g.clock); ck.anim = 'none';
-    if (g.theme === 'escuro' && ck.color === InfoTV.DEFAULT.general.clock.color) { ck.color = '#7cc4ff'; ck.g1 = '#9bd5ff'; ck.g2 = '#38bdf8'; }
+    // relógio padrão é claro com neon (lateral escura); se a lateral for clara, volta ao azul forte para ter contraste
+    if (!(g.theme === 'escuro' || g.sidebarStyle !== 'clara') && ck.color === InfoTV.DEFAULT.general.clock.color) Object.assign(ck, { effect: 'gradiente', color: '#0a58ca', g1: '#0646b8', g2: '#1e9bff' });
     InfoFX.style($('time'), ck, 0); $('time').className += ' time'; $('time').style.fontSize = '';
     $('sec').style.fontFamily = $('time').style.fontFamily; root.setProperty('--clk2', ck.g2 || ck.glow || g.primary);
     layout(); renderSchedule(); nextVerse(); weather(); newsSetup(); lowerThird(); services(); radioApply();
