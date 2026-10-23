@@ -250,7 +250,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="assets/core.js?v=9.1"></script>
+<script src="assets/core.js?v=9.2"></script>
 <script>
 (function () {
   'use strict';
@@ -449,7 +449,7 @@
       g.append(field('Conteúdo da zona', z, 'type', { options: ZT, after: draw }));
       const light = () => { if (CV) fillCanvas(CV); };
       if (z.type === 'image' || z.type === 'video') g.append(field('Ajuste', z, 'fit', { options: [['cover', 'Preencher a zona (corta bordas)'], ['contain', 'Mostrar inteiro (sem cortar)']] }));
-      if (z.type === 'video' || z.type === 'youtube') g.append(field('Tocar com som', z, 'sound', { type: 'checkbox' }));
+      if (z.type === 'video' || z.type === 'youtube') g.append(field('Tocar com som (pausa a rádio)', z, 'sound', { type: 'checkbox' }));
       g.append(field('Cantos arredondados', z, 'radius', { type: 'range', min: 0, max: 5, step: 0.25, after: light }), field('Borda (px)', z, 'border', { type: 'range', min: 0, max: 14, step: 1, after: light }), field('Cor da borda', z, 'borderColor', { type: 'color', after: light }), field('Sombra', z, 'shadow', { type: 'checkbox' }));
       host.append(g);
       if (z.type === 'image' || z.type === 'video') {
@@ -524,8 +524,8 @@
         field('Duração (s)' + (s.type === 'video' || s.type === 'youtube' ? ' · 0 = até o fim do vídeo' : ''), s, 'seconds', { type: 'number' }),
         field('Exibir a partir de', s, 'start', { type: 'date' }), field('Exibir até', s, 'end', { type: 'date' }));
       if (s.type === 'image') g.append(field('Ajuste da imagem', s, 'fit', { options: [['cover', 'Preencher (corta bordas)'], ['contain', 'Mostrar inteira']] }));
-      if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }));
-      if (s.type === 'youtube') g.append(field('Link do YouTube', s, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx' }), field('Tocar com som', s, 'ytSound', { type: 'checkbox' }), field('Começar no segundo', s, 'ytStart', { type: 'number' }));
+      if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }), field('Tocar com o som do vídeo (pausa a rádio)', s, 'vSound', { type: 'checkbox' }));
+      if (s.type === 'youtube') g.append(field('Link do YouTube', s, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx' }), field('Tocar com som (pausa a rádio)', s, 'ytSound', { type: 'checkbox' }), field('Começar no segundo', s, 'ytStart', { type: 'number' }));
       if (s.type === 'zonas') g.append(field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }), field('Quando passar para o próximo', s, 'zEnd', { options: [['tempo', 'Pelo tempo da duração'], ['fim', 'Quando o 1º vídeo das zonas terminar']] }));
       else
       if (s.type === 'text') g.append(field('Ícone / emoji', s, 'icon'), field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));

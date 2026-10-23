@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.1">
+<meta name="build" content="9.2">
 <title>Clínica TV</title>
 <link rel="icon" href="logo.svg">
 <link rel="stylesheet" href="assets/fx.css">
@@ -203,7 +203,7 @@
 </div>
 <div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
-<script src="assets/core.js?v=9.1"></script>
+<script src="assets/core.js?v=9.2"></script>
 <script>
 (function () {
   'use strict';
@@ -403,10 +403,12 @@
   /* ----- vídeo MP4: sempre mudo (a TV não bloqueia), com ganchos para saber quando começa, termina ou falha ----- */
   function videoEl(src, o) {
     const h = o.hooks || {}, v = document.createElement('video');
+    o.sound = !!o.sound && !PREVIEW;
     v.muted = !o.sound; v.defaultMuted = !o.sound; v.autoplay = true; v.playsInline = true; v.preload = 'auto'; v.loop = !!o.loop; v.setAttribute('playsinline', '');
     const go = () => { const p = v.play(); if (p && p.catch) p.catch(() => { if (!v.muted) { v.muted = true; v.play().catch(() => {}); } }); };
     v.addEventListener('canplay', go, { once: true });
-    v.addEventListener('playing', () => { h.onPlay && h.onPlay(); });
+    v.addEventListener('playing', () => { if (o.sound && !v.muted) rHold(); h.onPlay && h.onPlay(); });
+    v.addEventListener('pause', () => { if (v.ended) return; });
     v.addEventListener('ended', () => { if (!v.loop) h.onEnd && h.onEnd(); });
     v.addEventListener('error', () => {
       const c = v.error ? v.error.code : 0;
@@ -433,6 +435,7 @@
   }
   function whenConnected(node, fn, n) { if (node.isConnected) return fn(); if ((n || 0) > 300) return; requestAnimationFrame(() => whenConnected(node, fn, (n || 0) + 1)); }
   function ytFrame(src, o) {
+    o.sound = !!o.sound && !PREVIEW;
     const h = o.hooks || {}, id = ytId(src), f = document.createElement('iframe');
     const q = new URLSearchParams({ enablejsapi: 1, autoplay: 1, mute: o.sound ? 0 : 1, controls: 0, rel: 0, modestbranding: 1, playsinline: 1, iv_load_policy: 3, fs: 0, disablekb: 1, start: Math.max(0, +o.start || 0) });
     if (/^https?:$/.test(location.protocol)) q.set('origin', location.origin);
@@ -445,7 +448,7 @@
           f._yt = new YT.Player(f, { events: {
             onReady: (e) => { try { if (!o.sound) e.target.mute(); e.target.playVideo(); } catch (x) {} },
             onStateChange: (e) => {
-              if (e.data === 1) h.onPlay && h.onPlay();
+              if (e.data === 1) { if (o.sound) rHold(); h.onPlay && h.onPlay(); }
               else if (e.data === 0) { if (o.loop) { try { e.target.seekTo(+o.start || 0); e.target.playVideo(); } catch (x) {} } else h.onEnd && h.onEnd(); }
             },
             onError: (e) => { badge('o YouTube não liberou este vídeo (código ' + (e && e.data) + '): ele pode não permitir exibição em outros sites'); h.onFail && h.onFail(); }
@@ -458,7 +461,7 @@
 
   function mediaEl(s, contain, hooks) {
     if (s.type === 'image') { const i = document.createElement('div'); i.className = 'img' + (contain ? ' contain' : ''); i.style.backgroundImage = 'url("' + InfoTV.mediaURL(s.src) + '")'; return i; }
-    if (s.type === 'video') return videoEl(s.src, { hooks, sound: false });
+    if (s.type === 'video') return videoEl(s.src, { hooks, sound: s.vSound !== false });
     return ytFrame(s.src, { hooks, sound: !!s.ytSound, start: s.ytStart });
   }
   function fxLayer(kind) {
@@ -482,7 +485,7 @@
     if (layer) el.appendChild(layer);
     const wrap = document.createElement('div'); wrap.className = 'vwrap pos-' + pos + (s.vline ? ' vline' : '');
     wrap.style.setProperty('--vlc', s.vlineColor || '#ffffff'); wrap.style.setProperty('--vlw', Math.max(1, Math.min(16, +s.vlineW || 4)) + 'px');
-    const v = videoEl(s.src, { hooks, sound: false }); v.className = 'vmain';
+    const v = videoEl(s.src, { hooks, sound: s.vSound !== false }); v.className = 'vmain';
     let side = null;
     if (img && pos !== 'centro') { side = document.createElement('div'); side.className = 'vside'; side.style.backgroundImage = 'url("' + img + '")'; side.style.backgroundSize = s.vimgfit === 'contain' ? 'contain' : 'cover'; wrap.classList.add('hasside'); }
     if (pos === 'direita' && side) wrap.append(side, v); else if (side) wrap.append(v, side); else wrap.append(v);
@@ -578,7 +581,7 @@
     stT = setTimeout(swap, dur * 450); setTimeout(() => { swap(); fin(); }, (dur + 0.6) * 1000);
   }
   function nextSlide() {
-    clearTimeout(sTimer); clearTimeout(stT); clearInterval(wdT);
+    clearTimeout(sTimer); clearTimeout(stT); clearInterval(wdT); rRelease();
     const list = validSlides(), frame = $('frame');
     if (!list.length) { frame.querySelectorAll('.slide').forEach((n) => n.remove()); curEl = null; sTimer = setTimeout(nextSlide, 5000); return; }
     sIdx = (sIdx + 1) % list.length;
@@ -659,6 +662,10 @@
     audio.play().then(() => { $('radio').classList.remove('hint'); rUI(); rNowPlaying(); rGuard(); })
       .catch(() => { $('radio').classList.add('hint'); $('rTitle').textContent = 'Toque na tela para ativar o som'; });
   }
+  /* vídeo ou YouTube com som: a rádio pausa e volta sozinha quando a publicação termina */
+  let rHeld = false, rResume = false;
+  function rHold() { if (rHeld || !audio) return; rHeld = true; if (!audio.paused) { rResume = true; audio.pause(); rUI(); } }
+  function rRelease() { if (!rHeld) return; rHeld = false; if (rResume) { rResume = false; if (rWant) { rSet(rIdx); rPlay(); } } }
   function rPause() { rWant = false; if (audio) audio.pause(); rUI(); }
   function rToggle() { if (!cfg.radio.stations.length) return; if (!audio || audio.paused) rPlay(); else rPause(); }
   async function rNowPlaying() {
