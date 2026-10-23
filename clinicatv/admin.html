@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Clínica TV · Admin</title>
-<link rel="stylesheet" href="assets/fx.css"><link rel="icon" href="logo.svg">
+<link rel="stylesheet" href="assets/fx.css"><link rel="icon" href="logo.jpg">
 <style>
   :root { --bg:#e6eaf1; --sh1:#ffffff; --sh2:#c5ccd9; --txt:#3b4556; --mut:#7d889b; --acc:#1fb6a6; --danger:#d9534f; --fd:'Comfortaa'; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,23 +17,8 @@
   .btn { border: 0; cursor: pointer; border-radius: 999px; padding: 11px 20px; font-weight: 700; background: var(--bg); box-shadow: 5px 5px 11px var(--sh2), -5px -5px 11px var(--sh1); transition: .15s; font-size: 14px; }
   .btn:active { box-shadow: inset 3px 3px 7px var(--sh2), inset -3px -3px 7px var(--sh1); }
   .btn.pri { background: #6b7280; color: #fff; } .btn.ok { background: var(--acc); color: #fff; } .btn.del { color: var(--danger); } .btn.sm { padding: 6px 12px; font-size: 13px; }
-  /* ---- Botões "Escolher arquivo" no mesmo layout dos demais botões ---- */
-  input[type=file].neo-in { padding: 7px 10px 7px 8px; color: var(--mut); font-size: 13px; cursor: pointer; }
-  input[type=file]::file-selector-button { border: 0; cursor: pointer; border-radius: 999px; padding: 9px 18px; margin-right: 12px; font: 700 13px 'Montserrat', system-ui, sans-serif; color: #fff; background: var(--acc); box-shadow: 4px 4px 9px var(--sh2), -3px -3px 8px var(--sh1); transition: .15s; }
-  input[type=file]::file-selector-button:hover { filter: brightness(1.06); }
-  input[type=file]::file-selector-button:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,.25); }
-  input[type=checkbox], input[type=radio] { accent-color: var(--acc); width: 18px; height: 18px; cursor: pointer; flex: none; }
-  .btn:hover { filter: brightness(1.03); } .btn.del:hover { color: #fff; background: var(--danger); } .btn.ok:hover, .btn.pri:hover { filter: brightness(1.08); }
-  a.btn { display: inline-block; text-decoration: none; color: inherit; } a.btn.ok { color: #fff; }
-  .logoup { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 16px; border-radius: 22px; background: var(--bg); box-shadow: inset 5px 5px 11px var(--sh2), inset -5px -5px 11px var(--sh1); }
-  .logoup .pvlogo { width: 190px; height: 92px; border-radius: 16px; background: #fff; box-shadow: 4px 4px 10px var(--sh2), -4px -4px 10px var(--sh1); display: grid; place-items: center; overflow: hidden; flex: none; position: relative; }
-  .logoup .pvlogo img { position: absolute; inset: 0; width: 100%; height: 100%; padding: 12px; object-fit: contain; } .logoup .pvlogo span { font-size: 12px; color: var(--mut); }
-  .logoup .side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; min-width: 200px; flex: 1; }
-  .logoup .side small { color: var(--mut); font-size: 12px; line-height: 1.4; }
-  .logoup .row { display: flex; gap: 10px; flex-wrap: wrap; }
   input:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 
-  /* ---- Login (neumorfismo) ---- */
   #login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
   #login .box { width: 100%; max-width: 400px; padding: 38px 32px; }
   #login h1 { font-family: var(--fd); font-size: 28px; text-align: center; font-weight: 700; }
@@ -43,7 +28,6 @@
   #loginErr { color: var(--danger); text-align: center; font-size: 13px; margin-top: 14px; min-height: 18px; }
   .foot { text-align: center; color: var(--mut); font-size: 12px; margin-top: 18px; }
 
-  /* ---- Painel ---- */
   #panel { display: none; max-width: 1760px; margin: 0 auto; padding: 20px 18px 60px; }
   header.top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
   header.top h1 { font-family: var(--fd); font-size: 24px; font-weight: 700; flex: 1; min-width: 220px; }
@@ -83,7 +67,6 @@
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
   .chip { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; }
 
-  /* ---- Pré-visualização ao vivo ---- */
   aside.pv { position: sticky; top: 16px; padding: 14px; }
   aside.pv .bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
   aside.pv .bar b { flex: 1; font-size: 13px; }
@@ -118,23 +101,15 @@
     <div id="content">
 
       <section class="tab neo" data-tab="🎨 Identidade">
-        <h2>Identidade visual</h2><p class="hint">Nome, logo (fica em um cartão claro para qualquer logo aparecer bem), cores, fontes e orientação da TV.</p>
+        <h2>Identidade visual</h2><p class="hint">Nome, logo, cores, fontes e orientação da TV.</p>
         <div class="grid" id="gGeneral"></div>
         <h3>Logo da clínica</h3>
-        <div class="logoup">
-          <div class="pvlogo"><img id="logoPrev" alt="Logo atual" style="display:none"><span id="logoNone">Sem logo</span></div>
-          <div class="side">
-            <div class="row">
-              <label class="btn ok" for="logoFile" style="cursor:pointer">📁 Escolher logo</label>
-              <button class="btn del" id="logoDel" type="button">Remover logo</button>
-            </div>
-            <small id="logoName">PNG, JPG ou SVG. Fundo transparente fica melhor.</small>
-            <input type="file" accept="image/*" id="logoFile" hidden aria-label="Enviar logo">
-          </div>
-        </div>
+        <div class="f"><input type="file" accept="image/*" id="logoFile" class="neo-in" aria-label="Enviar logo">
+          <img id="logoPrev" class="thumb" style="max-height:80px;display:none" alt=""></div>
+        <div class="actions"><button class="btn sm del" id="logoDel">Remover logo</button></div>
         <h3>Fontes</h3>
         <div class="grid" id="gFonts"></div>
-        <div class="info">Para usar a fonte <b>Qurova</b> (ou qualquer outra): coloque o arquivo <code>.woff2 / .ttf / .otf</code> na pasta <code>midia/</code> e informe o caminho abaixo, ou envie o arquivo aqui. Ela passa a valer em todos os títulos, relógio e rodapé.</div>
+        <div class="info">Para usar a fonte <b>Qurova</b> (ou qualquer outra): coloque o arquivo <code>.woff2 / .ttf / .otf</code> na pasta <code>midia/</code> e informe o caminho abaixo, ou envie o arquivo aqui.</div>
         <div class="grid">
           <div class="f"><label for="fontPath">Caminho do arquivo da fonte</label><input class="neo-in" id="fontPath" placeholder="midia/Qurova.otf"></div>
           <div class="f"><label for="fontFile">Ou enviar o arquivo da fonte</label><input type="file" class="neo-in" id="fontFile" accept=".woff,.woff2,.ttf,.otf"></div>
@@ -145,7 +120,7 @@
       </section>
 
       <section class="tab neo" data-tab="🌦 Clima e Local">
-        <h2>Clima em tempo real</h2><p class="hint">O clima é buscado pela latitude e longitude e atualiza sozinho a cada 10 minutos. Já vem configurado para Estiva-MG.</p>
+        <h2>Clima em tempo real</h2><p class="hint">O clima é buscado pela latitude e longitude e atualiza sozinho a cada 10 minutos.</p>
         <div class="grid" id="gWeather"></div>
         <div class="actions">
           <button class="btn ok" id="geoFind">🔎 Buscar coordenadas pela cidade</button>
@@ -156,30 +131,24 @@
       </section>
 
       <section class="tab neo" data-tab="🖥 Tela e Layout">
-        <h2>Tela: monitor, TV e celular</h2><p class="hint">Tudo aqui vale para todas as TVs. O tema claro é o visual limpo de clínica. A orientação "Automática" acompanha o aparelho: horizontal na TV e no monitor, vertical em totem e celular (no celular a tela fica enxuta). Se a TV corta as bordas, aumente a margem de segurança.</p>
+        <h2>Tela: monitor, TV e celular</h2><p class="hint">Tudo aqui vale para todas as TVs.</p>
         <div class="grid" id="gScreen"></div>
         <h3>O que aparece na tela</h3><div class="grid" id="gShow"></div>
-        <h3>🎬 Vídeo de transição entre as publicações</h3>
-        <div class="info">Escolha um vídeo curto (MP4, até uns 5 segundos, sem som) que passa por cima da tela na troca de uma publicação para outra. Depois, em <b>Entrada padrão dos slides</b> (ou em cada propaganda) escolha <b>Vídeo de transição</b>. Sem vídeo, a troca usa o efeito comum. Vídeo leve e curto deixa a TV mais fluida.</div>
-        <div class="grid" id="gTrans"></div>
-        <div class="info">Atalhos na TV: <b>F</b> tela cheia · <b>R</b> girar a tela (só neste aparelho) · <b>M</b> liga/pausa a rádio · <b>N</b> próxima rádio. Endereços úteis: <code>?o=v</code> força vertical, <code>?m=1</code> força o modo celular.</div>
       </section>
 
       <section class="tab neo" data-tab="🩺 Serviços">
-        <h2>Faixa de serviços</h2><p class="hint">Fica embaixo da tela central. No modo "Passando" os serviços correm de lado sem parar; no modo "Parada" ganham destaque um de cada vez. Cada serviço pode ter uma foto ou vídeo: aparece como miniatura redonda no cartão e, se marcar, também passa na tela central junto com as propagandas.</p>
-        <div class="grid" id="gSvc"></div>
-        <h3>Serviços</h3>
+        <h2>Faixa de serviços</h2><p class="hint">Fica embaixo da tela central. Os serviços ganham destaque um de cada vez.</p>
         <div id="svcList"></div><div class="actions"><button class="btn ok" id="addSvc">+ Novo serviço</button></div>
       </section>
 
       <section class="tab neo" data-tab="📺 Propagandas">
-        <h2>Publicações e recados (tela central)</h2><p class="hint">Adicione quantas quiser, cada uma com seu tempo, datas, entrada e efeitos. Tipos: imagem, vídeo MP4, YouTube ou slide de texto (ótimo para recados). Modelos prontos para foto: aniversariante e campanha/dica. Todo texto aceita fonte, cor, efeitos e animação. Use as setas para mudar a ordem.</p>
+        <h2>Publicações e recados (tela central)</h2><p class="hint">Adicione quantas quiser, cada uma com seu tempo, datas, entrada e efeitos.</p>
         <div id="slidesList"></div>
         <div class="actions"><button class="btn ok" id="addSlide">+ Nova propaganda</button></div>
       </section>
 
       <section class="tab neo" data-tab="🗓 Programação">
-        <h2>Programação do dia</h2><p class="hint">Aparece na coluna da esquerda. O horário atual fica destacado automaticamente.</p>
+        <h2>Programação do dia</h2><p class="hint">Aparece na coluna da esquerda.</p>
         <div class="days" id="days"></div><div id="schedRows"></div>
         <div class="actions"><button class="btn ok" id="addRow">+ Adicionar horário</button><button class="btn" id="copyAll">Copiar este dia para todos</button></div>
       </section>
@@ -190,36 +159,42 @@
       </section>
 
       <section class="tab neo" data-tab="📰 Rodapé (notícias)">
-        <h2>Rodapé estilo telejornal</h2><p class="hint">Uma manchete por vez no destaque (com a etiqueta da categoria) e todas correndo na faixa de baixo. Crie as categorias que quiser: trânsito, locais, eventos, promoções…</p>
+        <h2>Rodapé estilo telejornal</h2><p class="hint">Uma manchete por vez no destaque e todas correndo na faixa de baixo.</p>
         <div class="grid" id="gTicker"></div>
         <h3>Categorias</h3><div id="catList"></div>
         <div class="actions"><button class="btn ok" id="addCat">+ Nova categoria</button></div>
-        <h3>🔗 Notícias automáticas (cole o endereço do site)</h3>
-        <p class="hint">Em vez de digitar, cole o endereço de uma página (ou feed RSS) e a TV busca sozinha as manchetes ou um trecho do texto e atualiza no intervalo que você escolher. Use "Buscar agora" para ver o que vem. Se a página mostrar o conteúdo só depois de carregar (JavaScript), marque o leitor avançado. Use "Só com estas palavras" para ficar só com o que interessa (ex.: acidente, interdição, lentidão).</p>
-        <div id="srcList"></div>
-        <div class="actions"><button class="btn ok" id="addSrc">+ Nova fonte (endereço)</button></div>
-        <h3>Informações digitadas</h3><div id="tickerList"></div>
+        <h3>Informações</h3><div id="tickerList"></div>
         <div class="actions"><button class="btn ok" id="addTicker">+ Nova informação</button></div>
       </section>
 
       <section class="tab neo" data-tab="📻 Rádio">
-        <h2>Rádio ambiente</h2><p class="hint">Escolha em "Rádio que toca na TV" qual estação toca; a TV troca na hora. Dá para mudar o nome e o endereço de cada rádio ou cadastrar novas. Pode colar o endereço da página do player (Radio Swiss Pop, Jazz ou Classic) que o sistema converte para o áudio. Se a rádio falhar, tenta a próxima automaticamente.</p>
+        <h2>Rádio ambiente</h2><p class="hint">Toca música na TV por um link de transmissão (stream).</p>
         <div class="grid" id="gRadio"></div>
         <h3>Estações</h3><div id="stList"></div>
         <div class="actions"><button class="btn ok" id="addStation">+ Nova estação</button></div>
-        <div class="warn">⚠ O link precisa ser <b>https://</b> (o GitHub Pages bloqueia link http). Navegadores bloqueiam som automático: na TV, abra o Chrome com <code>--autoplay-policy=no-user-gesture-required</code> ou toque uma vez na tela. Teclas na TV: <b>M</b> liga/pausa, <b>N</b> próxima estação.</div>
+      </section>
+
+      <section class="tab neo" data-tab="🧩 Zonas">
+        <h2>Editor de zonas (layout livre)</h2>
+        <p class="hint">Arraste e redimensione os blocos para montar a tela. Cada zona corresponde a um elemento da TV. Salva automaticamente no config.json.</p>
+        <div id="zoneEditor" style="position:relative;width:100%;aspect-ratio:16/9;background:#0b1220;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 2px #1f2a44"></div>
+        <div class="actions" style="margin-top:14px">
+          <button class="btn" id="zoneAdd">+ Nova zona</button>
+          <button class="btn" id="zoneReset">↺ Restaurar layout padrão</button>
+        </div>
+        <div class="info" style="margin-top:14px">Arraste o centro para mover. Arraste o canto inferior direito para redimensionar. Duplo-clique para renomear.</div>
       </section>
 
       <section class="tab neo" data-tab="💾 Publicar e Backup">
         <h2>Publicar, backup e segurança</h2>
-        <div class="info" id="srvNote" style="display:none">✔ <b>Modo servidor Debian:</b> tudo que você altera é salvo no servidor e as TVs atualizam sozinhas em segundos. A senha do painel é a definida na instalação (arquivo /etc/war.env). Use o backup abaixo para guardar uma cópia.</div>
-        <div class="warn" id="warnPass">🔐 O usuário e a senha iniciais vêm do arquivo <b>acesso.json</b> (na pasta do site). A proteção é feita no navegador: serve para esconder o painel, não é segurança de servidor. Se o repositório for público, quem souber o endereço consegue ler esse arquivo; para evitar, defina abaixo uma senha criptografada, que passa a valer no lugar da do arquivo.</div>
+        <div class="info" id="srvNote" style="display:none">✔ <b>Modo servidor Debian:</b> tudo que você altera é salvo no servidor e as TVs atualizam sozinhas em segundos.</div>
+        <div class="warn" id="warnPass">⚠ A senha padrão é <b>admin123</b>. Troque abaixo.</div>
         <div id="modeBox"><h3>Como a TV lê os dados (GitHub Pages)</h3>
         <div class="radio" id="modeRadio">
           <label><input type="radio" name="mode" value="local"> Neste navegador (admin e TV no mesmo computador)</label>
           <label><input type="radio" name="mode" value="repo"> Do arquivo config.json do GitHub (TV em outro aparelho)</label>
         </div>
-        <ol class="steps"><li>Faça as alterações aqui no admin.</li><li>Clique em <b>Baixar config.json</b>.</li><li>No GitHub, substitua o <code>config.json</code> do repositório.</li><li>Nas TVs, deixe "Do arquivo config.json". Elas atualizam em até 2 minutos.</li></ol></div>
+        <ol class="steps"><li>Faça as alterações aqui no admin.</li><li>Clique em <b>Baixar config.json</b>.</li><li>No GitHub, substitua o <code>config.json</code> do repositório.</li><li>Nas TVs, deixe "Do arquivo config.json".</li></ol></div>
         <div class="actions">
           <button class="btn ok" id="btnExport">⬇ Baixar config.json</button>
           <label class="btn" style="cursor:pointer">⬆ Importar config.json<input type="file" id="importFile" accept=".json" hidden></label>
@@ -239,13 +214,13 @@
       <div class="bar"><b>Pré-visualização ao vivo</b>
         <button class="btn sm" id="pvH">Horizontal</button><button class="btn sm" id="pvV">Vertical</button></div>
       <div class="pvbox" id="pvbox"><iframe id="pvf" title="Pré-visualização da TV"></iframe></div>
-      <p class="hint" style="margin:10px 0 0">Mostra exatamente o que a TV exibe. Atualiza a cada alteração.</p>
+      <p class="hint" style="margin:10px 0 0">Mostra exatamente o que a TV exibe.</p>
     </aside>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="assets/core.js?v=8"></script>
+<script src="assets/core.js"></script>
 <script>
 (function () {
   'use strict';
@@ -262,12 +237,11 @@
   }
   let tt; function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 1700); }
   function persist() {
-    Promise.resolve().then(() => InfoTV.save(cfg)).then(() => toast('Salvo ✓'), (e) => alert('Não foi possível salvar: ' + (e && e.message ? e.message : e) + '. Se estiver no servidor, confira a senha e a conexão; no navegador, use arquivos menores.'));
+    Promise.resolve().then(() => InfoTV.save(cfg)).then(() => toast('Salvo ✓'), (e) => alert('Não foi possível salvar: ' + (e && e.message ? e.message : e) + '.'));
   }
   let dt; const persistSoon = () => { clearTimeout(dt); dt = setTimeout(persist, 350); };
   const move = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; };
 
-  /* ---------- campo ligado a um objeto ---------- */
   let uid = 0;
   function field(label, obj, key, o) {
     o = o || {}; const id = 'f' + (++uid); const wrap = el('div', { class: 'f' + (o.type === 'checkbox' ? ' chk' : '') });
@@ -278,22 +252,33 @@
     else if (o.type === 'range') { inp = el('input', { type: 'range', id, min: o.min, max: o.max, step: o.step }); inp.value = obj[key]; }
     else { inp = el('input', { type: o.type || 'text', class: o.type === 'color' ? '' : 'neo-in', id }); inp.value = obj[key] == null ? '' : obj[key]; if (o.ph) inp.placeholder = o.ph; if (o.step) inp.step = o.step; }
     const run = () => {
-      let v = o.type === 'checkbox' ? inp.checked : inp.value; if (o.type === 'number' || o.type === 'range' || o.num) v = +v;
+      let v = o.type === 'checkbox' ? inp.checked : inp.value; if (o.type === 'number' || o.type === 'range') v = +v;
       obj[key] = v; (immediate ? persist : persistSoon)(); if (o.after) o.after(v);
     };
     inp.addEventListener(immediate ? 'change' : 'input', run);
     if (o.type === 'checkbox') wrap.append(el('label', { for: id }, [inp, document.createTextNode(label)])); else wrap.append(el('label', { for: id }, [label]), inp);
     return wrap;
   }
-  const fileToDataURL = (file, max, type) => new Promise((res, rej) => {
+  
+  const fileToDataURL = (file, max) => new Promise((res, rej) => {
     const fr = new FileReader();
-    fr.onload = () => { if (!max) return res(fr.result); const im = new Image(); im.onload = () => { const k = Math.min(1, max / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL(type, 0.82)); }; im.onerror = rej; im.src = fr.result; };
+    fr.onload = () => { 
+      if (!max) return res(fr.result); 
+      const im = new Image(); 
+      im.onload = () => { 
+        const k = Math.min(1, max / Math.max(im.width, im.height)); 
+        const c = document.createElement('canvas'); 
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); 
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); 
+        res(c.toDataURL('image/jpeg', 0.85)); 
+      }; 
+      im.onerror = rej; im.src = fr.result; 
+    };
     fr.onerror = rej; fr.readAsDataURL(file);
   });
 
   const fileToURL = async (file, max, type) => (await InfoTV.isServer()) ? InfoTV.upload(file) : fileToDataURL(file, max, type);
 
-  /* ---------- Editor de texto com efeitos ---------- */
   function fxEditor(st, title, base, bg) {
     const d = el('details', { class: 'fxbox' }); d.append(el('summary', {}, ['✨ ' + title + ' — texto, fonte e efeitos']));
     const pv = el('div', { class: 'pvtext' }); if (bg) pv.style.background = bg; const span = el('span');
@@ -315,7 +300,6 @@
     return d;
   }
 
-  /* ---------- Identidade ---------- */
   function renderGeneral() {
     const g = cfg.general, box = $('gGeneral'); box.innerHTML = '';
     box.append(
@@ -325,23 +309,23 @@
       field('Fundo do cartão da logo', g, 'brandBg', { type: 'color' }), field('Texto do cartão da logo', g, 'brandFg', { type: 'color' }),
       field('Tempo padrão de cada propaganda (s)', g, 'slideSeconds', { type: 'number' }),
       field('Tempo de cada frase de Deus (s)', g, 'verseSeconds', { type: 'number' }),
-      field('Mostrar segundos no relógio', g, 'showSeconds', { type: 'checkbox' })
+      field('Mostrar segundos no relógio', g, 'showSeconds', { type: 'checkbox' }),
+      field('🔴 Modo Plantão (Só toca YouTube ao vivo, esconde o resto)', g, 'liveMode', { type: 'checkbox' })
     );
-    const p = $('logoPrev'); if (g.logo) { p.src = g.logo; p.style.display = 'block'; } else p.style.display = 'none'; $('logoNone').style.display = g.logo ? 'none' : '';
+    const p = $('logoPrev'); if (g.logo) { p.src = g.logo; p.style.display = 'block'; } else p.style.display = 'none';
     const f = $('gFonts'); f.innerHTML = '';
     f.append(field('Fonte dos títulos e relógio', g, 'fontDisplay', { options: InfoTV.FONTS }), field('Fonte dos textos', g, 'fontBody', { options: InfoTV.FONTS }));
     $('fontPath').value = (g.fontCustomSrc || '').startsWith('data:') ? '(arquivo enviado)' : (g.fontCustomSrc || '');
     const c = $('clockFx'); c.innerHTML = ''; const cg = el('div', { class: 'grid' });
-    cg.append(field('Fonte do relógio', g.clock, 'font', { options: [['', 'Mesma dos títulos']].concat(InfoTV.FONTS) }), field('Tamanho do relógio (' + (g.clock.size || 100) + '%)', g.clock, 'size', { type: 'range', min: 60, max: 160, step: 5 }), field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'baixo', 'alto', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }), field('Cor da temperatura (alto relevo)', g, 'tempColor', { type: 'color' }));
+    cg.append(field('Efeito', g.clock, 'effect', { options: InfoTV.EFFECTS.filter((e) => ['none', 'sombra', 'neon', 'gradiente', 'brilho', '3d', 'retro', 'fogo'].includes(e[0])) }), field('Cor', g.clock, 'color', { type: 'color' }), field('Cor do brilho', g.clock, 'glow', { type: 'color' }), field('Gradiente 1', g.clock, 'g1', { type: 'color' }), field('Gradiente 2', g.clock, 'g2', { type: 'color' }));
     c.append(cg);
   }
-  $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; $('logoName').textContent = f.name; cfg.general.logo = await fileToURL(f, 500, 'image/png'); persist(); renderGeneral(); e.target.value = ''; };
+  $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; cfg.general.logo = await fileToURL(f, 500); persist(); renderGeneral(); };
   $('logoDel').onclick = () => { cfg.general.logo = ''; persist(); renderGeneral(); };
   $('fontPath').onchange = (e) => { if (e.target.value !== '(arquivo enviado)') { cfg.general.fontCustomSrc = e.target.value.trim(); persist(); } };
   $('fontFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; cfg.general.fontCustomSrc = await fileToURL(f, 0); persist(); renderGeneral(); };
   $('fontDel').onclick = () => { cfg.general.fontCustomSrc = ''; persist(); renderGeneral(); };
 
-  /* ---------- Clima ---------- */
   function renderWeather() {
     const g = cfg.general, b = $('gWeather'); b.innerHTML = '';
     b.append(field('Cidade (nome exibido)', g, 'city', { ph: 'Estiva, MG' }), field('Latitude', g, 'lat', { type: 'number', step: 'any' }), field('Longitude', g, 'lon', { type: 'number', step: 'any' }));
@@ -366,7 +350,6 @@
     } catch (e) { $('geoOut').textContent = 'Não foi possível consultar o clima agora.'; }
   };
 
-  /* ---------- Propagandas ---------- */
   const TYPES = [['image', '🖼 Imagem'], ['video', '🎬 Vídeo MP4'], ['youtube', '▶ YouTube'], ['text', '📝 Slide de texto']];
   const tLabel = (s) => (TYPES.find((t) => t[0] === s.type) || [])[1];
   function renderSlides() {
@@ -379,8 +362,8 @@
         btn('⧉', () => { const c = InfoTV.clone(s); c.id = InfoTV.rid(); cfg.slides.splice(i + 1, 0, c); persist(); renderSlides(); }),
         btn('🗑', () => { if (sum.dataset.arm) { cfg.slides.splice(i, 1); persist(); renderSlides(); } else { sum.dataset.arm = 1; toast('Clique de novo para excluir'); setTimeout(() => delete sum.dataset.arm, 2500); } }, 'del'));
       const body = el('div', { class: 'body' }); const g = el('div', { class: 'grid' });
-      g.append(field('Tipo', s, 'type', { options: TYPES, after: () => { if (s.type === 'video' && [10, 12].includes(+s.seconds)) { s.seconds = 0; persist(); } renderSlides(); } }), field('Ativa', s, 'active', { type: 'checkbox' }),
-        field('Duração (s)' + (s.type === 'video' ? ' · 0 = até o fim do vídeo' : ''), s, 'seconds', { type: 'number' }),
+      g.append(field('Tipo', s, 'type', { options: TYPES, after: renderSlides }), field('Ativa', s, 'active', { type: 'checkbox' }),
+        field('Duração (s)' + (s.type === 'video' ? ' · 0 = até o fim' : ''), s, 'seconds', { type: 'number' }),
         field('Exibir a partir de', s, 'start', { type: 'date' }), field('Exibir até', s, 'end', { type: 'date' }));
       if (s.type === 'image') g.append(field('Ajuste da imagem', s, 'fit', { options: [['cover', 'Preencher (corta bordas)'], ['contain', 'Mostrar inteira']] }));
       if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }));
@@ -389,61 +372,22 @@
       else g.append(field('Posição do texto sobre a mídia', s, 'pos', { options: [['bottom', 'Embaixo'], ['center', 'Centro'], ['top', 'Em cima']] }));
       if (s.type !== 'text') g.append(field('Modelo da publicação', s, 'tpl', { options: [['cheia', 'Tela cheia (como enviada)'], ['aniversario', 'Aniversariante (foto + parabéns)'], ['dica', 'Campanha / dica (foto + texto ao lado)']], after: renderSlides }));
       if (s.type === 'image') g.append(field('Movimento da imagem', s, 'kb', { options: [['', 'Parada'], ['in', 'Zoom aproximando'], ['out', 'Zoom afastando'], ['pan', 'Deslizando de lado']] }));
-      g.append(field('Entrada na tela', s, 'trans', { options: [['', 'Padrão da TV'], ['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Suave com zoom'], ['wipe', 'Cortina'], ['video', 'Vídeo de transição (Tela e Layout)']] }));
+      g.append(field('Entrada na tela', s, 'trans', { options: [['', 'Padrão da TV'], ['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Desfocar'], ['wipe', 'Cortina']] }));
       if (s.type === 'text' || (s.type !== 'text' && s.tpl !== 'cheia')) g.append(field('Efeito animado de fundo', s, 'bgfx', { options: [['', s.tpl === 'aniversario' ? 'Confete (padrão)' : 'Nenhum'], ['aurora', 'Aurora'], ['bolhas', 'Bolhas'], ['ondas', 'Ondas'], ['confete', 'Confete'], ['brilhos', 'Brilhos']] }));
       if (s.type !== 'text' && s.tpl !== 'cheia') g.append(field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
       body.append(g);
       if (s.type !== 'text' && s.tpl === 'aniversario') body.append(el('div', { class: 'info' }, ['Aniversariante: escreva só o nome da pessoa no texto principal (a TV mostra "Parabéns, Nome!") e a mensagem no texto secundário.']));
-      if (s.type === 'text') {
-        const bu = el('input', { type: 'file', accept: 'video/*', class: 'neo-in', 'aria-label': 'Enviar vídeo de fundo' });
-        bu.onchange = async () => { const f = bu.files[0]; if (!f) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho ao lado.'); toast('Enviando vídeo…'); try { s.bgvid = await InfoTV.upload(f); persist(); renderSlides(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); } };
-        const bp = el('input', { class: 'neo-in', placeholder: 'midia/fundo.mp4' }); bp.value = s.bgvid || ''; bp.onchange = () => { s.bgvid = bp.value.trim(); persist(); renderSlides(); };
-        body.append(el('div', { class: 'grid', style: 'margin-top:14px' }, [el('div', { class: 'f' }, [el('label', {}, ['Vídeo de fundo no lugar da cor (opcional)']), bu]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho do vídeo']), bp])]));
-        if (s.bgvid) body.append(el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { s.bgvid = ''; persist(); renderSlides(); } }, ['Remover vídeo de fundo'])]));
-      }
       if (s.type === 'video') {
         const vu = el('input', { type: 'file', accept: 'video/*', class: 'neo-in' });
         vu.onchange = async () => { if (!vu.files[0]) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho acima.'); toast('Enviando vídeo…'); try { s.src = await InfoTV.upload(vu.files[0]); persist(); renderSlides(); } catch (e) { alert('Falha no envio: ' + e.message); } };
         body.append(el('div', { class: 'f', style: 'margin-top:14px' }, [el('label', {}, ['Enviar vídeo do computador (servidor Debian)']), vu]));
-        // teste automático do endereço: diz se o vídeo abre e, se não abrir, por quê
-        const st = el('div', { class: 'info', style: 'margin-top:12px' }, ['']);
-        body.append(st);
-        const url0 = InfoTV.mediaURL(s.src);
-        if (!url0) st.style.display = 'none';
-        else {
-          const conv = url0 !== String(s.src || '').trim() ? ' (o link da página foi convertido automaticamente para o link direto do arquivo)' : '';
-          st.textContent = '⏳ Testando o vídeo…' + conv;
-          const pv = document.createElement('video'); pv.muted = true; pv.preload = 'metadata'; let fin = false;
-          const done = (t) => { if (fin) return; fin = true; st.textContent = t; pv.removeAttribute('src'); pv.load(); };
-          pv.onloadedmetadata = () => done(pv.videoWidth ? '✔ Vídeo OK: ' + pv.videoWidth + '×' + pv.videoHeight + ', ' + Math.round(pv.duration) + ' s' + conv : '✖ Só o áudio abriu: a imagem está em um formato que o navegador não lê (H.265/HEVC). Converta para MP4 H.264 + AAC.');
-          pv.onerror = () => done('✖ O navegador não conseguiu abrir este endereço. Confira: 1) o endereço precisa ser o link direto do arquivo .mp4 (no GitHub use o botão "Raw" ou deixe o link da página, que é convertido); 2) o arquivo existe e é público; 3) o vídeo é MP4 H.264 + AAC (não H.265/HEVC).');
-          setTimeout(() => done('⚠ O vídeo demora para responder. Pode ser um arquivo muito grande; prefira vídeos curtos e leves (até ~20 MB).'), 12000);
-          pv.src = url0;
-        }
-      }
-      if (s.type === 'video' && s.tpl === 'cheia') {
-        const vg = el('div', { class: 'grid', style: 'margin-top:14px' });
-        vg.append(field('Ajuste do vídeo', s, 'vfit', { options: [['contain', 'Manter formato e tamanho (sem esticar nem cortar)'], ['cover', 'Preencher a tela inteira (corta as bordas)']], after: renderSlides }));
-        if (s.vfit !== 'cover') {
-          vg.append(field('Posição do vídeo na tela', s, 'vpos', { options: [['esquerda', 'Esquerda'], ['centro', 'Centro'], ['direita', 'Direita']], after: renderSlides }), field('Tamanho do vídeo (%)', s, 'vsize', { type: 'number' }),
-            field('Linha suave em volta', s, 'vline', { type: 'checkbox' }), field('Cor da linha', s, 'vlineColor', { type: 'color' }), field('Espessura da linha (px)', s, 'vlineW', { type: 'number' }),
-            field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
-          body.append(el('h3', {}, ['🎞 Vídeo e imagem juntos']), vg);
-          const iu = el('input', { type: 'file', accept: 'image/*', class: 'neo-in', 'aria-label': 'Imagem junto do vídeo' });
-          iu.onchange = async () => { if (!iu.files[0]) return; s.vimg = await fileToURL(iu.files[0], 1280, 'image/jpeg'); persist(); renderSlides(); };
-          const ip = el('input', { class: 'neo-in', placeholder: 'midia/imagem.jpg  ou  https://…' }); ip.value = (s.vimg || '').startsWith('data:') ? '' : (s.vimg || '');
-          ip.onchange = () => { s.vimg = ip.value.trim(); persist(); renderSlides(); };
-          body.append(el('div', { class: 'grid', style: 'margin-top:14px' }, [el('div', { class: 'f' }, [el('label', {}, ['Imagem junto do vídeo (opcional)']), iu]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço da imagem']), ip])]));
-          if (s.vimg) body.append(el('div', { class: 'grid', style: 'margin-top:10px' }, [field('Imagem: ocupar o espaço', s, 'vimgfit', { options: [['cover', 'Preencher o espaço (corta bordas)'], ['contain', 'Mostrar inteira']] }), el('div', { class: 'f' }, [el('img', { class: 'thumb', src: InfoTV.mediaURL(s.vimg), alt: '' }), el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { s.vimg = ''; persist(); renderSlides(); } }, ['Remover imagem'])])])]));
-          body.append(el('div', { class: 'info' }, ['O vídeo é ajustado para caber na área da tela sem esticar nem cortar. Com o vídeo à esquerda ou à direita, a imagem ocupa o espaço que sobra do outro lado; com o vídeo no centro, a imagem vira o fundo. Sem imagem, o espaço que sobra fica com as cores de fundo.']));
-        } else body.append(vg);
       }
       if (s.type === 'image') {
         const up = el('input', { type: 'file', accept: 'image/*', class: 'neo-in', id: 'up' + s.id });
-        up.onchange = async () => { if (!up.files[0]) return; s.src = await fileToURL(up.files[0], 1920, 'image/jpeg'); persist(); renderSlides(); };
+        up.onchange = async () => { if (!up.files[0]) return; s.src = await fileToURL(up.files[0], 1920); persist(); renderSlides(); };
         const url = el('input', { class: 'neo-in', placeholder: 'midia/banner.jpg  ou  https://…' }); url.value = (s.src || '').startsWith('data:') ? '' : (s.src || '');
         url.onchange = () => { s.src = url.value; persist(); renderSlides(); };
-        body.append(el('div', { class: 'grid', style: 'margin-top:14px' }, [el('div', { class: 'f' }, [el('label', { for: up.id }, ['Enviar imagem do computador']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço da imagem']), url])]));
+        body.append(el('div', { class: 'grid', style: 'margin-top:14px' }, [el('div', { class: 'f' }, [el('label', { for: up.id }, ['Enviar imagem do computador (JPG)']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço da imagem']), url])]));
         if (s.src) body.append(el('img', { class: 'thumb', src: s.src, alt: '' }));
       }
       const bgc = s.type === 'text' ? 'linear-gradient(135deg,' + s.bg1 + ',' + s.bg2 + ')' : '#16202c';
@@ -454,7 +398,6 @@
   }
   $('addSlide').onclick = () => { const s = InfoTV.normSlide({ type: 'image', t1: { text: '' }, t2: { text: '', effect: 'none', anim: 'fade' } }); cfg.slides.push(s); openIds.add(s.id); persist(); renderSlides(); };
 
-  /* ---------- Programação ---------- */
   const DN = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   function renderSched() {
     const d = $('days'); d.innerHTML = '';
@@ -470,131 +413,97 @@
   $('addRow').onclick = () => { (cfg.schedule[curDay] = cfg.schedule[curDay] || []).push({ time: '', text: '' }); persist(); renderSched(); };
   $('copyAll').onclick = () => { for (let i = 0; i < 7; i++) cfg.schedule[i] = InfoTV.clone(cfg.schedule[curDay]); persist(); toast('Copiado para todos os dias'); };
 
-  /* ---------- listas simples ---------- */
-  function simpleList(boxId, arr, mk, addId, blank, onChange) {
+  function simpleList(boxId, arr, mk, addId, blank) {
     const box = $(boxId);
     const draw = () => {
       box.innerHTML = '';
       arr().forEach((it, i) => {
         const head = el('div', { class: 'head' }, [el('b', {}, ['#' + (i + 1)])]);
-        [['↑', -1], ['↓', 1]].forEach(([t, dd]) => head.append(el('button', { class: 'btn sm', onclick: () => { move(arr(), i, dd); onChange && onChange('move', i, dd); persist(); draw(); } }, [t])));
-        head.append(el('button', { class: 'btn sm del', onclick: () => { arr().splice(i, 1); onChange && onChange('del', i); persist(); draw(); afterList(); } }, ['🗑']));
+        [['↑', -1], ['↓', 1]].forEach(([t, dd]) => head.append(el('button', { class: 'btn sm', onclick: () => { move(arr(), i, dd); persist(); draw(); } }, [t])));
+        head.append(el('button', { class: 'btn sm del', onclick: () => { arr().splice(i, 1); persist(); draw(); afterList(); } }, ['🗑']));
         box.append(el('div', { class: 'item' }, [head, el('div', { style: 'height:12px' }), ...mk(it)]));
       });
     };
-    $(addId).onclick = () => { arr().push(InfoTV.clone(blank())); onChange && onChange('add'); persist(); draw(); afterList(); };
+    $(addId).onclick = () => { arr().push(InfoTV.clone(blank())); persist(); draw(); afterList(); };
     return draw;
   }
-  function afterList() { drawTicker(); if (typeof drawSources === 'function') drawSources(); }
+  function afterList() { drawTicker(); }
   const drawVerses = simpleList('versesList', () => cfg.verses, (v) => [field('Texto', v, 'text', { type: 'textarea' }), el('div', { style: 'height:10px' }), field('Referência', v, 'ref', { ph: 'Salmos 23:1' })], 'addVerse', () => ({ text: '', ref: '' }));
 
-  /* ---------- Rodapé + categorias ---------- */
-  function renderTickerCfg() { const b = $('gTicker'); b.innerHTML = ''; b.append(field('Segundos de cada manchete', cfg.general, 'headlineSeconds', { type: 'number' }), field('Velocidade da faixa (maior = mais rápida)', cfg.general, 'tickerSpeed', { type: 'number' }),
-    field('Fonte da barra', cfg.general, 'tickerFont', { options: [['', 'Padrão']].concat(InfoTV.FONTS) }), field('Tamanho do texto da faixa (' + (cfg.general.tickerSize || 100) + '%)', cfg.general, 'tickerSize', { type: 'range', min: 60, max: 200, step: 5 }),
-    field('Proxy próprio para buscar sites (opcional)', cfg.general, 'newsProxy', { ph: 'https://meuproxy.com/?url={url}' })); }
+  function renderTickerCfg() { const b = $('gTicker'); b.innerHTML = ''; b.append(field('Segundos de cada manchete', cfg.general, 'headlineSeconds', { type: 'number' }), field('Velocidade da faixa (maior = mais rápida)', cfg.general, 'tickerSpeed', { type: 'number' })); }
   const drawCats = simpleList('catList', () => cfg.categories, (c) => [el('div', { class: 'grid' }, [field('Emoji', c, 'icon'), field('Nome da etiqueta', c, 'label'), field('Cor', c, 'color', { type: 'color' }), field('Identificador', c, 'id', { after: () => {} })])], 'addCat', () => ({ id: 'cat' + InfoTV.rid(), label: 'Nova categoria', icon: '⭐', color: '#6366f1' }));
   const drawTicker = simpleList('tickerList', () => cfg.ticker, (t) => [el('div', { class: 'grid' }, [field('Categoria', t, 'cat', { options: cfg.categories.map((c) => [c.id, (c.icon || '') + ' ' + c.label]) }), field('Ativa', t, 'active', { type: 'checkbox' })]), el('div', { style: 'height:10px' }), field('Texto', t, 'text', { type: 'textarea' }), el('div', { style: 'height:10px' }), el('div', { class: 'grid' }, [field('Detalhe (linha menor, opcional)', t, 'detail'), field('Segundos no destaque (0 = padrão)', t, 'seconds', { type: 'number' }), field('Exibir a partir de', t, 'start', { type: 'date' }), field('Exibir até', t, 'end', { type: 'date' }), field('Entrada do texto', t, 'anim', { options: [['up', 'Subir'], ['fade', 'Aparecer'], ['zoom', 'Zoom'], ['blur', 'Desfocar'], ['letras', 'Letras uma a uma'], ['digitar', 'Máquina de escrever']] })])], 'addTicker', () => ({ cat: cfg.categories[0].id, text: '', active: true, detail: '', seconds: 0, start: '', end: '', anim: 'up' }));
 
-  /* ---------- Notícias automáticas (endereços) ---------- */
-  const catOpts = () => cfg.categories.map((c) => [c.id, (c.icon || '') + ' ' + c.label]);
-  const drawSources = simpleList('srcList', () => cfg.newsSources, (s) => {
-    const out = el('div', { class: 'info', style: 'display:none' });
-    const test = el('button', { class: 'btn sm ok', onclick: async () => {
-      out.style.display = ''; out.textContent = 'Buscando… (pode levar até 1 minuto)';
-      const r = await InfoNews.fetchSource(s, cfg.general.newsProxy); out.textContent = '';
-      if (!r.items.length) { out.textContent = '⚠ ' + r.error + '. Tente marcar "Página carrega com JavaScript", tirar o filtro de palavras ou usar o endereço do feed RSS do site.'; return; }
-      out.append(el('b', {}, ['✔ Encontrado (' + r.via + '):']));
-      r.items.forEach((it) => out.append(el('div', { style: 'margin-top:6px' }, ['• ' + it.text + (it.detail ? '  — ' + it.detail : '')])));
-    } }, ['🔎 Buscar agora']);
-    return [el('div', { class: 'grid' }, [
-      field('Endereço do site ou feed RSS', s, 'url', { ph: 'https://rodovias.motiva.com.br/minas-sp/' }),
-      field('Categoria (etiqueta)', s, 'cat', { options: catOpts() }),
-      field('O que pegar', s, 'mode', { options: [['manchetes', 'Manchetes (títulos)'], ['trecho', 'Trecho da mensagem (texto abaixo do título)'], ['pagina', 'Resumo da página (descrição)']] }),
-      field('Quantidade de itens', s, 'max', { type: 'number' }),
-      field('Atualizar a cada (minutos)', s, 'minutes', { type: 'number' }),
-      field('Nome na linha pequena (opcional)', s, 'label'),
-      field('Só com estas palavras (vírgula)', s, 'filter', { ph: 'acidente, interdição, lentidão' }),
-      field('Ignorar se tiver (vírgula)', s, 'exclude', { ph: 'publicidade' }),
-      field('Ativa', s, 'active', { type: 'checkbox' }),
-      field('Página carrega com JavaScript (leitor avançado)', s, 'js', { type: 'checkbox' })]),
-    el('details', { class: 'fxbox' }, [el('summary', {}, ['Avançado: pegar só uma parte da página (seletor CSS)']), field('Seletor CSS', s, 'selector', { ph: '.noticia h3' })]),
-    el('div', { class: 'actions' }, [test]), out];
-  }, 'addSrc', () => InfoTV.normSource({ cat: cfg.categories[0] ? cfg.categories[0].id : 'aviso' }));
-
-  /* ---------- Tela e serviços ---------- */
   function renderScreen() {
     const g = cfg.general, b = $('gScreen'); b.innerHTML = '';
-    const tr = [['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Suave com zoom'], ['wipe', 'Cortina'], ['video', 'Vídeo de transição (definido abaixo)']];
+    const tr = [['fade', 'Aparecer suave'], ['slide', 'Deslizar'], ['zoom', 'Zoom'], ['flip', 'Virar'], ['blur', 'Desfocar'], ['wipe', 'Cortina']];
     b.append(field('Tema', g, 'theme', { options: [['claro', 'Claro e limpo (clínica)'], ['escuro', 'Escuro']] }), field('Moldura da tela central', g, 'frame', { options: [['moldura', 'Com moldura'], ['cheia', 'Tela cheia, sem borda']] }),
-      field('Coluna lateral', g, 'sidebar', { options: [['estreita', 'Estreita'], ['normal', 'Normal'], ['larga', 'Larga'], ['oculta', 'Oculta']] }), field('Cor da coluna lateral', g, 'sidebarStyle', { options: [['escura', 'Escura (relevo suave, como o admin)'], ['clara', 'Clara']] }), field('Entrar em tela cheia no 1º toque/tecla', g, 'autoFullscreen', { type: 'checkbox' }), field('Entrada padrão dos slides', g, 'transition', { options: tr }),
+      field('Coluna lateral', g, 'sidebar', { options: [['estreita', 'Estreita'], ['normal', 'Normal'], ['larga', 'Larga'], ['oculta', 'Oculta']] }), field('Entrada padrão dos slides', g, 'transition', { options: tr }),
       field('Zoom geral (' + g.zoom + '%)', g, 'zoom', { type: 'range', min: 60, max: 160, step: 5 }), field('Margem de segurança (' + g.margin + '%)', g, 'margin', { type: 'range', min: 0, max: 8, step: 0.5 }));
-    const tb = $('gTrans'); tb.innerHTML = '';
-    const tup = el('input', { type: 'file', accept: 'video/*', class: 'neo-in', 'aria-label': 'Enviar vídeo de transição' });
-    tup.onchange = async () => { const f = tup.files[0]; if (!f) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho ao lado.'); toast('Enviando vídeo…'); try { g.transVideo = await InfoTV.upload(f); persist(); renderScreen(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); } };
-    const tpath = el('input', { class: 'neo-in', placeholder: 'midia/transicao.mp4' }); tpath.value = (g.transVideo || '').startsWith('data:') ? '' : (g.transVideo || '');
-    tpath.onchange = () => { g.transVideo = tpath.value.trim(); persist(); renderScreen(); };
-    tb.append(el('div', { class: 'f' }, [el('label', {}, ['Enviar vídeo do computador (servidor Debian)']), tup]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho do vídeo']), tpath]));
-    if (g.transVideo) tb.append(el('div', { class: 'f' }, [el('video', { class: 'thumb', src: InfoTV.mediaURL(g.transVideo), muted: '', controls: '', playsinline: '' }), el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { g.transVideo = ''; persist(); renderScreen(); } }, ['Remover vídeo'])])]));
     const sh = $('gShow'); sh.innerHTML = '';
     [['brand', 'Logo e nome'], ['weather', 'Clima'], ['schedule', 'Programação do dia'], ['verse', 'Frases de Deus'], ['services', 'Faixa de serviços'], ['ticker', 'Barra de notícias']].forEach(([k, l]) => sh.append(field(l, g.show, k, { type: 'checkbox' })));
   }
-  function renderSvcCfg() {
-    const g = cfg.general, b = $('gSvc'); b.innerHTML = '';
-    b.append(field('Modo da faixa', g, 'svcMode', { options: [['passando', 'Passando (letreiro contínuo)'], ['parada', 'Parada (destaca um de cada vez)']] }),
-      field('Velocidade (maior = mais rápido)', g, 'svcSpeed', { type: 'number' }),
-      field('Fonte da faixa', g, 'svcFont', { options: [['', 'Padrão']].concat(InfoTV.FONTS) }),
-      field('Tamanho do texto (' + (g.svcSize || 100) + '%)', g, 'svcSize', { type: 'range', min: 60, max: 200, step: 5 }));
-  }
-  const isVid = (u) => /\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(u || '') || /^data:video/.test(u || '');
-  const drawSvc = simpleList('svcList', () => cfg.services, (v) => {
-    const up = el('input', { type: 'file', accept: 'image/*,video/*', class: 'neo-in', 'aria-label': 'Enviar foto ou vídeo do serviço' });
-    up.onchange = async () => {
-      const f = up.files[0]; if (!f) return;
-      try {
-        if (f.type.startsWith('video/')) { if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho ao lado.'); toast('Enviando vídeo…'); v.src = await InfoTV.upload(f); v.type = 'video'; }
-        else { v.src = await fileToURL(f, 1600, 'image/jpeg'); v.type = 'image'; }
-        persist(); drawSvc();
-      } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); }
-    };
-    const path = el('input', { class: 'neo-in', placeholder: 'midia/fisio.jpg  ou  midia/fisio.mp4' }); path.value = (v.src || '').startsWith('data:') ? '' : (v.src || '');
-    path.onchange = () => { v.src = path.value.trim(); v.type = v.src ? (isVid(v.src) ? 'video' : 'image') : ''; persist(); drawSvc(); };
-    const prev = !v.src ? null : v.type === 'video' ? el('video', { class: 'thumb', src: v.src, muted: '', controls: '', playsinline: '' }) : el('img', { class: 'thumb', src: v.src, alt: '' });
-    const box = el('details', { class: 'fxbox' }); if (v.src) box.open = true;
-    box.append(el('summary', {}, ['🖼 Foto ou vídeo deste serviço']),
-      el('div', { class: 'grid', style: 'margin-top:12px' }, [field('Mostrar também na tela central', v, 'stage', { type: 'checkbox' }), field('Segundos na tela central' + (v.type === 'video' ? ' (0 = até o fim)' : ''), v, 'seconds', { type: 'number' })]),
-      el('div', { class: 'grid', style: 'margin-top:12px' }, [el('div', { class: 'f' }, [el('label', {}, ['Enviar foto ou vídeo do computador']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço do arquivo']), path])]));
-    if (prev) { box.append(prev); box.append(el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { v.src = ''; v.type = ''; persist(); drawSvc(); } }, ['Remover foto/vídeo'])])); }
-    return [el('div', { class: 'grid' }, [field('Ícone / emoji (deixe vazio para não mostrar)', v, 'icon'), field('Nome do serviço', v, 'label'), field('Ativo', v, 'active', { type: 'checkbox' })]), box];
-  }, 'addSvc', () => ({ icon: '', label: '', active: true, type: '', src: '', stage: true, seconds: 8 }));
+  const drawSvc = simpleList('svcList', () => cfg.services, (v) => [el('div', { class: 'grid' }, [field('Ícone / emoji', v, 'icon'), field('Nome do serviço', v, 'label'), field('Ativo', v, 'active', { type: 'checkbox' })])], 'addSvc', () => ({ icon: '✚', label: '', active: true }));
 
-  /* ---------- Rádio ---------- */
   let testAudio = null;
-  const stOpts = () => { const l = cfg.radio.stations.map((s, i) => [String(i), s.name || ('Rádio ' + (i + 1))]); return l.length ? l : [['0', '(nenhuma cadastrada)']]; };
-  function refreshCurSel() { const sel = $('curStation'); if (!sel) return; sel.innerHTML = ''; stOpts().forEach(([v, t]) => sel.append(el('option', { value: v }, [t]))); sel.value = String(cfg.radio.current || 0); }
   function renderRadio() {
     const r = cfg.radio, b = $('gRadio'); b.innerHTML = '';
-    const cur = field('📻 Rádio que toca na TV', r, 'current', { options: stOpts(), num: true, after: () => drawStations() }); cur.querySelector('select').id = 'curStation';
-    b.append(field('Ativar rádio na TV', r, 'enabled', { type: 'checkbox' }), field('Tocar ao abrir a TV', r, 'autoplay', { type: 'checkbox' }), cur,
-      field('Gráfico de som (no cartão da rádio)', r, 'viz', { options: [['barras', 'Barras'], ['espelho', 'Barras espelhadas'], ['onda', 'Onda'], ['off', 'Sem gráfico']] }),
+    b.append(field('Ativar rádio na TV', r, 'enabled', { type: 'checkbox' }), field('Tocar ao abrir a TV', r, 'autoplay', { type: 'checkbox' }),
       field('Volume (' + Math.round(r.volume * 100) + '%)', r, 'volume', { type: 'range', min: 0, max: 1, step: 0.05 }),
       field('Now playing (opcional, AzuraCast)', r, 'nowPlayingUrl', { ph: 'https://radio.exemplo.com/api/nowplaying/1' }));
     drawStations();
   }
-  const drawStations = simpleList('stList', () => cfg.radio.stations, (s) => {
-    const idx = cfg.radio.stations.indexOf(s), on = idx === (+cfg.radio.current || 0);
-    return [el('div', { class: 'grid' }, [field('Nome da rádio', s, 'name', { after: refreshCurSel }), field('Endereço (stream de áudio ou página do player)', s, 'url', { ph: 'https://…/stream.mp3' })]),
-      el('div', { class: 'actions' }, [
-        el('button', { class: 'btn sm ' + (on ? 'ok' : ''), onclick: () => { cfg.radio.current = idx; persist(); renderRadio(); toast('Esta rádio vai tocar na TV'); } }, [on ? '✔ Tocando na TV' : '◉ Tocar esta na TV']),
-        el('button', { class: 'btn sm', onclick: () => { if (testAudio) testAudio.pause(); testAudio = new Audio(InfoTV.resolveStream(s.url)); testAudio.play().then(() => toast('Tocando teste…')).catch(() => toast('Não foi possível tocar este link')); } }, ['▶ Testar aqui']),
-        el('button', { class: 'btn sm', onclick: () => testAudio && testAudio.pause() }, ['■ Parar teste'])])];
-  }, 'addStation', () => ({ name: '', url: '' }), (kind, i, dd) => {
-    const r = cfg.radio, n = r.stations.length;
-    if (kind === 'move') { if (r.current === i) r.current = i + dd; else if (r.current === i + dd) r.current = i; }
-    else if (kind === 'del') { if (i < r.current) r.current--; r.current = Math.max(0, Math.min(r.current, n - 1)); }
-    refreshCurSel();
-  });
+  const drawStations = simpleList('stList', () => cfg.radio.stations, (s) => [el('div', { class: 'grid' }, [field('Nome da rádio', s, 'name'), field('Link do stream (https://)', s, 'url', { ph: 'https://…/stream.mp3' })]),
+    el('div', { class: 'actions' }, [el('button', { class: 'btn sm', onclick: () => { if (testAudio) testAudio.pause(); testAudio = new Audio(s.url); testAudio.play().then(() => toast('Tocando teste…')).catch(() => toast('Não foi possível tocar este link')); } }, ['▶ Testar']), el('button', { class: 'btn sm', onclick: () => testAudio && testAudio.pause() }, ['■ Parar'])])], 'addStation', () => ({ name: '', url: '' }));
 
-  /* ---------- Backup / segurança ---------- */
+  function renderZones() {
+    const ed = $('zoneEditor'); if (!ed) return;
+    ed.innerHTML = '';
+    (cfg.zones || []).forEach((z, i) => {
+      const el = document.createElement('div');
+      el.style.cssText = `position:absolute;left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%;background:rgba(31,182,166,.18);border:2px solid #1fb6a6;border-radius:8px;color:#eaf2f8;font:600 12px system-ui;display:flex;align-items:flex-start;justify-content:flex-start;padding:6px;cursor:move;user-select:none;box-sizing:border-box`;
+      el.textContent = z.label + (z.locked ? ' 🔒' : '');
+      el.onmousedown = (e) => {
+        if (z.locked || e.target.classList.contains('rs')) return;
+        const r = ed.getBoundingClientRect(), sx = e.clientX, sy = e.clientY, ox = z.x, oy = z.y;
+        const mm = (ev) => {
+          z.x = Math.max(0, Math.min(100 - z.w, ox + (ev.clientX - sx) / r.width * 100));
+          z.y = Math.max(0, Math.min(100 - z.h, oy + (ev.clientY - sy) / r.height * 100));
+          el.style.left = z.x + '%'; el.style.top = z.y + '%';
+        };
+        const up = () => { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', up); persist(); };
+        document.addEventListener('mousemove', mm); document.addEventListener('mouseup', up);
+        e.preventDefault();
+      };
+      if (!z.locked) {
+        const rs = document.createElement('div'); rs.className = 'rs';
+        rs.style.cssText = 'position:absolute;right:-4px;bottom:-4px;width:14px;height:14px;background:#1fb6a6;border-radius:50%;cursor:nwse-resize';
+        rs.onmousedown = (e) => {
+          e.stopPropagation();
+          const r = ed.getBoundingClientRect(), sx = e.clientX, sy = e.clientY, ow = z.w, oh = z.h;
+          const mm = (ev) => {
+            z.w = Math.max(5, Math.min(100 - z.x, ow + (ev.clientX - sx) / r.width * 100));
+            z.h = Math.max(5, Math.min(100 - z.y, oh + (ev.clientY - sy) / r.height * 100));
+            el.style.width = z.w + '%'; el.style.height = z.h + '%';
+          };
+          const up = () => { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', up); persist(); };
+          document.addEventListener('mousemove', mm); document.addEventListener('mouseup', up);
+        };
+        el.appendChild(rs);
+      }
+      ed.appendChild(el);
+    });
+  }
+  $('zoneAdd').onclick = () => {
+    cfg.zones = cfg.zones || [];
+    cfg.zones.push({ id:'z_'+InfoTV.rid(), label:'Nova zona', x:10, y:10, w:30, h:20, type:'custom', locked:false });
+    persist(); renderZones();
+  };
+  $('zoneReset').onclick = () => {
+    if (!confirm('Restaurar layout padrão de zonas?')) return;
+    cfg.zones = InfoTV.DEFAULT.zones; persist(); renderZones();
+  };
+
   function renderBackup() {
     document.querySelectorAll('input[name=mode]').forEach((r) => { r.checked = r.value === InfoTV.getMode(); r.onchange = () => { InfoTV.setMode(r.value); toast('Modo: ' + (r.value === 'repo' ? 'config.json do GitHub' : 'este navegador')); }; });
     $('newUser').value = cfg.admin.user;
@@ -609,7 +518,6 @@
     persist(); $('newPass').value = ''; toast('Acesso atualizado ✓');
   };
 
-  /* ---------- Pré-visualização ---------- */
   let pvO = 'h';
   function pvFit() {
     const b = $('pvbox'), v = pvO !== 'h', w = v ? 1080 : 1920, h = v ? 1920 : 1080, f = $('pvf');
@@ -620,8 +528,7 @@
   $('pvH').onclick = () => { pvO = 'h'; pvLoad(); }; $('pvV').onclick = () => { pvO = 'v'; pvLoad(); };
   addEventListener('resize', pvFit);
 
-  /* ---------- Abas / login ---------- */
-  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderScreen(); renderSvcCfg(); drawSvc(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawSources(); drawTicker(); renderRadio(); renderBackup(); }
+  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderScreen(); drawSvc(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawTicker(); renderRadio(); renderZones(); renderBackup(); }
   function buildTabs() {
     const secs = [...document.querySelectorAll('section.tab')], nav = $('tabs'); nav.innerHTML = '';
     const show = (n) => { secs.forEach((s) => s.classList.toggle('on', s.dataset.tab === n)); [...nav.children].forEach((b) => b.classList.toggle('on', b.textContent === n)); };
@@ -634,11 +541,8 @@
   }
   $('loginForm').onsubmit = async (e) => {
     e.preventDefault();
-    const c = await InfoTV.load(), u = $('lUser').value.trim(), p = $('lPass').value; let ok = false;
-    if (c.admin.hash) ok = u === c.admin.user && (await InfoTV.sha256(p)) === c.admin.hash;       // senha trocada no painel tem prioridade
-    else { const a = await InfoTV.loadAccess();                                                   // senão vale o arquivo acesso.json
-      if (a) ok = u === a.user && (a.hash ? (await InfoTV.sha256(p)) === a.hash : (a.pass !== '' && p === a.pass));
-      else ok = u === c.admin.user && p === 'admin123'; }
+    const c = await InfoTV.load(), hash = c.admin.hash, u = $('lUser').value.trim(), p = $('lPass').value;
+    const ok = u === c.admin.user && (hash ? (await InfoTV.sha256(p)) === hash : p === 'admin123');
     if (ok) enter(); else $('loginErr').textContent = 'Usuário ou senha incorretos.';
   };
   $('btnLogout').onclick = () => { sessionStorage.removeItem(SESSION); location.reload(); };
