@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.2">
+<meta name="build" content="9.3">
 <title>Clínica TV</title>
 <link rel="icon" href="logo.svg">
 <link rel="stylesheet" href="assets/fx.css">
@@ -112,6 +112,7 @@
   /* zonas: retângulos (em % da tela) com imagem, vídeo, YouTube ou texto */
   .slide.zonas { display: block; } .zone { position: absolute; overflow: hidden; z-index: 2; }
   .zone .img, .zone video, .zone iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background-position: center; background-repeat: no-repeat; }
+  .zone .pl { transition: opacity .6s; } .zone.zlist { background: transparent; }
   .zone .ztext { position: absolute; inset: 0; display: flex; align-items: center; padding: .6rem 1rem; font-family: var(--fd), sans-serif; font-weight: 700; line-height: 1.15; white-space: pre-line; text-shadow: 0 .1rem .4rem rgba(0,0,0,.35); overflow: hidden; }
   #vErr { position: absolute; left: 1rem; top: 1rem; z-index: 30; max-width: 70%; padding: .5rem 1rem; border-radius: .8rem; background: rgba(160,30,30,.92); color: #fff; font: 600 1rem/1.3 system-ui, sans-serif; display: none; } #vErr.on { display: block; }
   /* efeitos de fundo animados */
@@ -203,7 +204,7 @@
 </div>
 <div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
-<script src="assets/core.js?v=9.2"></script>
+<script src="assets/core.js?v=9.3"></script>
 <script>
 (function () {
   'use strict';
@@ -503,18 +504,55 @@
     if ((s.t1 && s.t1.text) || (s.t2 && s.t2.text)) { const ov = document.createElement('div'); ov.className = 'ov pos-' + (s.pos || 'bottom'); ov.append(textBlock('tx1', s.t1, 3.4), textBlock('tx2', s.t2, 1.8)); el.appendChild(ov); }
     return el;
   }
+  const FITCSS = { cover: 'cover', contain: 'contain', fill: 'fill' }, BGFIT = { cover: 'cover', contain: 'contain', fill: '100% 100%' };
+  /* zona com lista: cada zona passa as suas imagens e vídeos sozinha, independente das outras */
+  function playlist(d, z, stops) {
+    const items = (z.items || []).filter((i) => i.src);
+    if (!items.length) return;
+    let i = -1, tm = null, dead = false, prev = null;
+    stops.push(() => { dead = true; clearTimeout(tm); });
+    const next = () => {
+      if (dead) return; clearTimeout(tm); rRelease();
+      i = (i + 1) % items.length; const it = items[i], single = items.length === 1, hooks = { onEnd: next, onFail: () => go(2500) }; let node;
+      const go = (ms) => { clearTimeout(tm); tm = setTimeout(next, ms); }, lim = +it.seconds > 0 ? +it.seconds : 0;
+      if (it.type === 'video') {
+        node = videoEl(it.src, { loop: single, sound: !!it.sound, hooks }); node.style.objectFit = FITCSS[it.fit] || 'cover';
+        hooks.onPlay = () => { if (hooks._p) return; hooks._p = 1; go((lim || 900) * 1000); }; go(30000);
+      } else if (it.type === 'youtube') {
+        node = ytFrame(it.src, { loop: single && !lim, sound: !!it.sound, start: 0, hooks });
+        hooks.onPlay = () => { if (hooks._p) return; hooks._p = 1; go((lim || 4 * 3600) * 1000); }; hooks.noApi = () => go((lim || 30) * 1000); go(30000);
+      } else {
+        node = document.createElement('div'); node.className = 'img'; node.style.backgroundSize = BGFIT[it.fit] || 'cover'; node.style.backgroundImage = 'url("' + InfoTV.mediaURL(it.src) + '")';
+        if (!single) go((lim || 8) * 1000);
+      }
+      node.classList.add('pl'); node.style.opacity = 0; d.appendChild(node);
+      requestAnimationFrame(() => requestAnimationFrame(() => { node.style.opacity = 1; }));
+      const old = prev; prev = node; if (old) setTimeout(() => { try { if (old.pause) old.pause(); old.remove(); } catch (e) {} }, 700);
+    };
+    next();
+  }
+  /* modo "zonas fixas": a tela central é um mosaico permanente, cada zona com a sua lista */
+  let mosaicEl = null;
+  function stopMosaic() { if (mosaicEl) { mosaicEl._stop && mosaicEl._stop(); mosaicEl.remove(); mosaicEl = null; rRelease(); } }
+  function startMosaic() {
+    stopMosaic(); const frame = $('frame');
+    frame.querySelectorAll('.slide').forEach((n) => { n._stop && n._stop(); n.remove(); }); curEl = null;
+    const el = document.createElement('div'); el.className = 'slide zonas'; buildZones(Object.assign({ zEnd: 'tempo' }, cfg.general.mosaic || {}), el, null);
+    frame.appendChild(el); mosaicEl = el; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
+  }
   function buildZones(s, el, layer) {
     el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
     if (layer) el.appendChild(layer);
-    const main = {}; let mainSet = false;
+    const main = {}, stops = []; let mainSet = false; el._stop = () => stops.forEach((f) => { try { f(); } catch (e) {} });
     (s.zones || []).forEach((z) => {
       const d = document.createElement('div'); d.className = 'zone z-' + z.type;
       d.style.left = z.x + '%'; d.style.top = z.y + '%'; d.style.width = z.w + '%'; d.style.height = z.h + '%'; d.style.borderRadius = (+z.radius || 0) + 'rem';
       const sh = []; if (+z.border > 0) sh.push('0 0 0 ' + (z.border / 16) + 'rem ' + (z.borderColor || '#fff')); if (z.shadow) sh.push('0 .6rem 1.8rem rgba(0,0,0,.4)'); if (sh.length) d.style.boxShadow = sh.join(',');
       const isMain = s.zEnd === 'fim' && !mainSet && (z.type === 'video' || z.type === 'youtube') && z.src;
       if (isMain) { mainSet = true; el._main = main; }
-      if (z.type === 'image' && z.src) { const i = document.createElement('div'); i.className = 'img'; i.style.backgroundSize = z.fit === 'contain' ? 'contain' : 'cover'; i.style.backgroundImage = 'url("' + InfoTV.mediaURL(z.src) + '")'; d.appendChild(i); }
-      else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); v.style.objectFit = z.fit === 'contain' ? 'contain' : 'cover'; d.appendChild(v); }
+      if (z.type === 'image' && z.src) { const i = document.createElement('div'); i.className = 'img'; i.style.backgroundSize = BGFIT[z.fit] || 'cover'; i.style.backgroundImage = 'url("' + InfoTV.mediaURL(z.src) + '")'; d.appendChild(i); }
+      else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); v.style.objectFit = FITCSS[z.fit] || 'cover'; d.appendChild(v); if (!(+z.bgAlpha > 0)) d.style.background = '#000'; }
+      else if (z.type === 'lista') playlist(d, z, stops);
       else if (z.type === 'youtube' && z.src) d.appendChild(ytFrame(z.src, { loop: !isMain, sound: !!z.sound, start: 0, hooks: isMain ? main : {} }));
       else if (z.type === 'text') {
         const t = document.createElement('div'); t.className = 'ztext'; t.textContent = z.text || '';
@@ -523,6 +561,7 @@
         if (+z.bgAlpha > 0) t.style.background = 'color-mix(in srgb, ' + (z.bg || '#0f766e') + ' ' + Math.min(100, +z.bgAlpha) + '%, transparent)';
         d.appendChild(t);
       }
+      if (+z.bgAlpha > 0 && z.type !== 'text') d.style.background = 'color-mix(in srgb, ' + (z.bg || '#000') + ' ' + Math.min(100, +z.bgAlpha) + '%, transparent)';
       el.appendChild(d);
     });
     return el;
@@ -582,6 +621,8 @@
   }
   function nextSlide() {
     clearTimeout(sTimer); clearTimeout(stT); clearInterval(wdT); rRelease();
+    if (cfg.general.stageMode === 'zonas' && !(PREVIEW && Q.get('slide'))) { startMosaic(); return; }
+    if (mosaicEl) stopMosaic();
     const list = validSlides(), frame = $('frame');
     if (!list.length) { frame.querySelectorAll('.slide').forEach((n) => n.remove()); curEl = null; sTimer = setTimeout(nextSlide, 5000); return; }
     sIdx = (sIdx + 1) % list.length;
@@ -590,7 +631,7 @@
       frame.appendChild(el);
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
       const old = curEl; curEl = el;
-      if (old) { old.classList.remove('on'); setTimeout(() => old.remove(), 1200); }
+      if (old) { old.classList.remove('on'); setTimeout(() => { old._stop && old._stop(); old.remove(); }, 1200); }
       const secs = Math.max(3, +s.seconds || +g.slideSeconds || 12), main = el._main, go = (ms) => { clearTimeout(sTimer); sTimer = setTimeout(nextSlide, ms); };
       clearInterval(wdT);
       if (main) {

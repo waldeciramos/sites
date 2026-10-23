@@ -17,7 +17,7 @@ nav a{display:inline-block;margin:3px 8px 3px 0;color:var(--ac);text-decoration:
 </style></head><body><main>
 <h1>Clínica TV — instalação no Debian (rede interna)</h1>
 <div class="sub">Sistema idealizado por Waldeci Ramos · funciona no GitHub Pages <b>e</b> no servidor da clínica, com o mesmo pacote</div>
-<nav><a href="#como">Como funciona</a><a href="#instalar">1. Instalar</a><a href="#tv">2. Abrir na TV</a><a href="#usar">3. Usar o painel</a><a href="#midia">Vídeos e fotos</a><a href="#youtube">YouTube</a><a href="#zonas">Zonas</a><a href="#rede">Rede interna</a><a href="#backup">Backup e atualização</a><a href="#problemas">Problemas</a><a href="#github">GitHub Pages</a></nav>
+<nav><a href="#como">Como funciona</a><a href="#instalar">1. Instalar</a><a href="#tv">2. Abrir na TV</a><a href="#usar">3. Usar o painel</a><a href="#midia">Vídeos e fotos</a><a href="#youtube">YouTube</a><a href="#zonas">Zonas</a><a href="#mosaico">Mosaico</a><a href="#rede">Rede interna</a><a href="#backup">Backup e atualização</a><a href="#problemas">Problemas</a><a href="#github">GitHub Pages</a></nav>
 
 <section id="como"><h2>Como funciona</h2>
 <table><tr><th></th><th>Servidor Debian (interno)</th><th>GitHub Pages</th></tr>
@@ -90,6 +90,8 @@ bash converter-video.sh meu-video.mov</code></pre>
 <li>Em <b>Quando passar para o próximo</b>: "pelo tempo" ou "quando o 1º vídeo terminar".</li></ol>
 <p>As medidas são em % da tela central, então funcionam em TV, monitor e totem. Zonas mais acima na lista ficam na frente (botões "trazer para frente" e "enviar para trás").</p></section>
 
+<section id="mosaico"><h2>Tela central em zonas fixas (mosaico)</h2>
+<p>Na aba <b>🧩 Tela em zonas</b> escolha <b>"Zonas fixas"</b>. A tela central passa a ficar dividida em 1, 2, 3, 4, 6 ou mais zonas ao mesmo tempo. Cada zona do tipo <b>🎞 Lista</b> tem a sua própria sequência de imagens e vídeos, que passa sozinha e independente das outras zonas. Para cada item você escolhe os segundos (vídeo com 0 toca até o fim), o ajuste (<b>preencher</b>, <b>inteiro</b> ou <b>esticar</b>) e se toca com som (pausa a rádio). Voltando para "Slides", a TV volta a mostrar uma propaganda por vez.</p></section>
 <section id="rede"><h2>Deixar só na rede interna</h2>
 <ul><li>O servidor não precisa de porta aberta para a internet: <b>não faça redirecionamento de porta</b> no roteador para ele.</li>
 <li>Para travar o acesso à sua rede, use <code>--rede 192.168.2.0/24</code> no instalador (troque pela faixa da sua rede) ou configure o <code>ufw</code> à mão.</li>

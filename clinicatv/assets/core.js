@@ -60,8 +60,9 @@
 
   /* zona = retângulo dentro da tela central (valores em % da tela), com imagem, vídeo, YouTube ou texto */
   const zdef = (z) => {
-    z = Object.assign({ id: '', type: 'image', src: '', x: 0, y: 0, w: 50, h: 50, fit: 'cover', radius: 0, border: 0, borderColor: '#ffffff', shadow: false, sound: false, text: '', color: '#ffffff', size: 1, align: 'center', bg: '#0f766e', bgAlpha: 0, font: '' }, z || {});
+    z = Object.assign({ id: '', type: 'image', src: '', x: 0, y: 0, w: 50, h: 50, fit: 'cover', items: [], radius: 0, border: 0, borderColor: '#ffffff', shadow: false, sound: false, text: '', color: '#ffffff', size: 1, align: 'center', bg: '#0f766e', bgAlpha: 0, font: '' }, z || {});
     z.id = z.id || rid();
+    z.items = (Array.isArray(z.items) ? z.items : []).map((it) => Object.assign({ type: 'image', src: '', seconds: 8, fit: 'cover', sound: false }, it));
     ['x', 'y', 'w', 'h'].forEach((k) => { z[k] = Math.round(Math.min(100, Math.max(0, +z[k] || 0)) * 10) / 10; });
     z.w = Math.max(4, Math.min(z.w, 100 - z.x)); z.h = Math.max(4, Math.min(z.h, 100 - z.y));
     return z;
@@ -98,6 +99,7 @@
       tickerFont: '', tickerSize: 100,
       svcMode: 'passando', svcSpeed: 60, svcFont: '', svcSize: 100,
       newsProxy: '',
+      stageMode: 'slides', mosaic: { id: 'mosaico', bg1: '#0b3b4a', bg2: '#0b1d2e', zones: [] },
       sideLogo: 'midia/logo-clinica.jpg', sideLogoShow: true, sideLogoH: 100, sideLogoBg: '#ffffff',
       clock: { font: 'Rajdhani', size: 115, effect: 'baixo', color: '#1565d8', glow: '#38bdf8', g1: '#0646b8', g2: '#1e9bff' }
     },
@@ -180,6 +182,8 @@
     if (wasVersion < 6) { const g = cfg.general, c = g.clock || {}; if (!c.color || c.color === '#0a58ca' || c.color === '#eaf6ff' || c.color === CLOCK_OLD) g.clock = clone(DEFAULT.general.clock); }
     // v7: a faixa de serviços ("barrinhas") foi removida da TV
     cfg.general.show.services = false;
+    cfg.general.mosaic.zones = (Array.isArray(cfg.general.mosaic.zones) ? cfg.general.mosaic.zones : []).map(zdef);
+    if (!['slides', 'zonas'].includes(cfg.general.stageMode)) cfg.general.stageMode = 'slides';
     cfg.version = 7;
     r.current = Math.min(Math.max(0, +r.current || 0), Math.max(0, r.stations.length - 1));
     if (!['barras', 'espelho', 'onda', 'off'].includes(r.viz)) r.viz = 'barras';

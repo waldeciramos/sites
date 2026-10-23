@@ -30,3 +30,5 @@ O navegador não deixa ler outro site direto, então a TV usa leitores públicos
 - **YouTube** com API oficial: duração 0 = toca até o fim e volta aos slides; opção de som e de início.
 - **Vídeos**: aviso na tela quando um vídeo não abre, plano B em `.webm`, passa adiante se travar; `converter-video.sh` converte para H.264+AAC.
 - **Rádio**: o gráfico usa o sinal real quando a rádio permite e nunca fica parado.
+
+- **Tela em zonas (mosaico)**: aba "Tela em zonas" — a tela central fica dividida em várias zonas fixas, cada uma com a sua lista de imagens e vídeos e ajuste preencher/inteiro/esticar.
