@@ -110,22 +110,22 @@
   #radio.hint { animation: hint 1.4s ease-in-out infinite; }
   @keyframes eq { 0%, 100% { height: 25%; } 50% { height: 100%; } } @keyframes hint { 50% { box-shadow: 0 0 0 .6rem color-mix(in srgb, var(--p) 40%, transparent); } }
 
-  /* ===== Faixa de serviços ===== */
-  #svc { grid-area: svc; display: flex; gap: .8rem; padding: .3rem 1.4rem .7rem; overflow: hidden; }
+  /* ===== Faixa de serviços (Única) ===== */
+  #svc { grid-area: svc; display: flex; gap: .8rem; padding: .3rem 1.4rem .7rem; overflow: hidden; flex-wrap: nowrap; }
   #svc .sc { display: flex; align-items: center; gap: .55rem; padding: .5rem 1.1rem; border-radius: 99rem; background: var(--panel); border: .08rem solid var(--line); font-size: 1.15rem; font-weight: 600; white-space: nowrap; transition: .5s; }
   #svc .sc span { font-size: 1.3rem; } #svc .sc.hl { background: var(--p); color: #fff; border-color: var(--p); transform: translateY(-.12rem); box-shadow: 0 .3rem .9rem color-mix(in srgb, var(--p) 45%, transparent); }
 
-  /* ===== Barra de notícias ===== */
-  #lt { grid-area: lt; margin: .1rem 1.4rem 1.2rem; background: var(--lt); border-radius: 1.2rem; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0; }
-  .lt-head { display: flex; align-items: stretch; min-height: 6.2rem; min-width: 0; }
-  .lt-date { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 8.5rem; padding: 0 1.4rem; background: #0b3a63; color: #fff; line-height: 1.05; }
-  .lt-date b { font-family: var(--fd); font-size: 2.6rem; } .lt-date small { font-size: 1rem; letter-spacing: .1rem; opacity: .85; } .lt-date em { font-style: normal; font-size: 1.25rem; margin-top: .2rem; color: #9ff0e3; font-variant-numeric: tabular-nums; }
-  .lt-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: .3rem; padding: .6rem 1.6rem; }
-  .lt-badge { align-self: flex-start; padding: .12rem 1rem; color: #fff; font-weight: 700; font-size: 1rem; letter-spacing: .06rem; text-transform: uppercase; border-radius: .3rem; white-space: nowrap; }
-  .lt-text { font-family: var(--fd); font-size: 2rem; font-weight: 700; line-height: 1.15; color: var(--ltTxt); max-height: 2.35em; overflow: hidden; }
-  .lt-detail { font-size: 1.2rem; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lt-crawl { position: relative; height: 2.9rem; overflow: hidden; display: flex; align-items: center; background: var(--crawl); color: var(--crawlTxt); }
-  #tScroll { position: absolute; left: 0; white-space: nowrap; font-size: 1.3rem; font-weight: 500; will-change: transform; } #tScroll em { font-style: normal; font-weight: 800; margin-right: .4rem; } #tScroll i { font-style: normal; color: var(--s); margin: 0 1.6rem; }
+  /* ===== Barra de notícias (Estilo Telejornal Moderno) ===== */
+  #lt { grid-area: lt; margin: .1rem 1.4rem 1.2rem; background: #0f172a; border-radius: 1.2rem; overflow: hidden; box-shadow: 0 .6rem 2rem rgba(0,0,0,.35); display: flex; flex-direction: column; min-width: 0; border: 1px solid rgba(255,255,255,.08); }
+  .lt-head { display: flex; align-items: stretch; min-height: 7.2rem; min-width: 0; }
+  .lt-date { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 9rem; padding: 0 1.4rem; background: linear-gradient(180deg, #1e3a8a, #0f172a); color: #fff; line-height: 1.05; border-right: 1px solid rgba(255,255,255,.1); }
+  .lt-date b { font-family: var(--fd); font-size: 3rem; font-weight: 800; text-shadow: 0 .2rem .4rem rgba(0,0,0,.5); } .lt-date small { font-size: 1rem; letter-spacing: .15rem; opacity: .9; font-weight: 600; margin-top: .2rem; } .lt-date em { font-style: normal; font-size: 1.2rem; margin-top: .4rem; color: #fbbf24; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .lt-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: .4rem; padding: .8rem 1.8rem; }
+  .lt-badge { align-self: flex-start; padding: .2rem 1.2rem; background: var(--p); color: #fff; font-weight: 800; font-size: .85rem; letter-spacing: .08rem; text-transform: uppercase; border-radius: .4rem; white-space: nowrap; box-shadow: 0 .2rem .4rem rgba(0,0,0,.3); }
+  .lt-text { font-family: var(--fd); font-size: 2.2rem; font-weight: 800; line-height: 1.15; color: #f8fafc; max-height: 2.35em; overflow: hidden; text-shadow: 0 .1rem .2rem rgba(0,0,0,.5); }
+  .lt-detail { font-size: 1.15rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lt-crawl { position: relative; height: 3.2rem; overflow: hidden; display: flex; align-items: center; background: #1e293b; border-top: 1px solid rgba(255,255,255,.08); color: #cbd5e1; }
+  #tScroll { position: absolute; left: 0; white-space: nowrap; font-size: 1.2rem; font-weight: 500; will-change: transform; } #tScroll em { font-style: normal; font-weight: 800; margin-right: .4rem; color: #fbbf24; } #tScroll i { font-style: normal; color: var(--p); margin: 0 1.6rem; }
 
   /* ===== Vertical ===== */
   #app.v { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto auto auto; grid-template-areas: "brand brand" "clock weather" "stage stage" "sched verse" "svc svc" "lt lt"; }
@@ -298,7 +298,7 @@
       hIdx = (hIdx + 1) % list.length; const it = list[hIdx], c = catOf(it.cat);
       $('ltBadge').style.background = c.color; $('ltBadge').textContent = (c.icon || '') + ' ' + c.label;
       const box = $('ltText'); box.innerHTML = ''; const sp = document.createElement('span');
-      InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)' }, 0); box.appendChild(sp);
+      InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: '#f8fafc' }, 0); box.appendChild(sp);
       $('ltDetail').textContent = it.detail || ''; $('ltDetail').style.display = it.detail ? '' : 'none';
       hTimer = setTimeout(show, Math.max(4, +it.seconds || +cfg.general.headlineSeconds || 9) * 1000);
     };
@@ -324,10 +324,31 @@
   }
   function services() {
     clearInterval(svT);
-    const b = $('svc'), l = (cfg.services || []).filter((s) => s.active !== false && s.label); b.innerHTML = ''; b.style.display = l.length ? '' : 'none';
-    l.forEach((s) => { const c = document.createElement('div'); c.className = 'sc'; c.innerHTML = '<span></span><b></b>'; c.children[0].textContent = s.icon || '✚'; c.children[1].textContent = s.label; b.appendChild(c); });
-    const ch = [...b.children]; if (!ch.length) return; let i = 0; ch[0].classList.add('hl');
-    svT = setInterval(() => { ch.forEach((c) => c.classList.remove('hl')); ch[++i % ch.length].classList.add('hl'); }, 2600);
+    const b = $('svc'), l = (cfg.services || []).filter((s) => s.active !== false && s.label); 
+    b.innerHTML = ''; 
+    b.style.display = l.length ? '' : 'none';
+    
+    const seen = new Set();
+    l.forEach((s) => {
+      if (seen.has(s.label)) return;
+      seen.add(s.label);
+      
+      const c = document.createElement('div'); 
+      c.className = 'sc'; 
+      c.innerHTML = '<span></span><b></b>'; 
+      c.children[0].textContent = s.icon || '✚'; 
+      c.children[1].textContent = s.label; 
+      b.appendChild(c); 
+    });
+    
+    const ch = [...b.children]; 
+    if (!ch.length) return; 
+    let i = 0; 
+    ch[0].classList.add('hl');
+    svT = setInterval(() => { 
+      ch.forEach((c) => c.classList.remove('hl')); 
+      ch[++i % ch.length].classList.add('hl'); 
+    }, 2600);
   }
 
   /* ===== Slides: vídeo + YouTube API ===== */
