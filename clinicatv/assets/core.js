@@ -188,7 +188,9 @@
   }
   const build = (raw) => normalize(merge(DEFAULT, raw), (raw && +raw.version) || 2);
 
-  function getMode() { try { return localStorage.getItem(MODE_KEY) || 'local'; } catch (e) { return 'local'; } }
+  // TV de verdade (index.html sem ?preview) começa sempre lendo o config.json publicado; o admin e o pré-visualizar usam o navegador
+  const isTV = () => /(^|\/)(index\.html)?$/.test(location.pathname) && !/[?&]preview/.test(location.search);
+  function getMode() { try { return localStorage.getItem(MODE_KEY) || (isTV() ? 'repo' : 'local'); } catch (e) { return isTV() ? 'repo' : 'local'; } }
   function setMode(m) { try { localStorage.setItem(MODE_KEY, m); } catch (e) {} }
 
   function loadLocal() { try { const raw = localStorage.getItem(KEY); return raw ? build(JSON.parse(raw)) : null; } catch (e) { return null; } }

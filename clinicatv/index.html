@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="build" content="9.1">
 <title>Clínica TV</title>
 <link rel="icon" href="logo.svg">
 <link rel="stylesheet" href="assets/fx.css">
@@ -202,7 +203,7 @@
 </div>
 <div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
-<script src="assets/core.js?v=8"></script>
+<script src="assets/core.js?v=9.1"></script>
 <script>
 (function () {
   'use strict';
@@ -784,6 +785,10 @@
       const n = await InfoTV.loadRepo();
       if (n && JSON.stringify(n) !== JSON.stringify(cfg)) { cfg = n; apply(); }
     }, 120000);
+    // versão nova do sistema publicada (GitHub ou servidor)? confere a cada 10 min e recarrega sozinho
+    if (!PREVIEW) setInterval(async () => {
+      try { const t = await (await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })).text(); const m = /<meta name="build" content="([^"]+)"/.exec(t), cur = document.querySelector('meta[name=build]'); if (m && cur && m[1] !== cur.content) location.reload(); } catch (e) {}
+    }, 10 * 60 * 1000);
     if (!PREVIEW) setTimeout(() => location.reload(), 24 * 3600 * 1000);   // recarrega 1x por dia
   }
   init();
