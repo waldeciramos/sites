@@ -245,7 +245,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="assets/core.js?v=6"></script>
+<script src="assets/core.js?v=8"></script>
 <script>
 (function () {
   'use strict';
@@ -379,8 +379,8 @@
         btn('⧉', () => { const c = InfoTV.clone(s); c.id = InfoTV.rid(); cfg.slides.splice(i + 1, 0, c); persist(); renderSlides(); }),
         btn('🗑', () => { if (sum.dataset.arm) { cfg.slides.splice(i, 1); persist(); renderSlides(); } else { sum.dataset.arm = 1; toast('Clique de novo para excluir'); setTimeout(() => delete sum.dataset.arm, 2500); } }, 'del'));
       const body = el('div', { class: 'body' }); const g = el('div', { class: 'grid' });
-      g.append(field('Tipo', s, 'type', { options: TYPES, after: renderSlides }), field('Ativa', s, 'active', { type: 'checkbox' }),
-        field('Duração (s)' + (s.type === 'video' ? ' · 0 = até o fim' : ''), s, 'seconds', { type: 'number' }),
+      g.append(field('Tipo', s, 'type', { options: TYPES, after: () => { if (s.type === 'video' && [10, 12].includes(+s.seconds)) { s.seconds = 0; persist(); } renderSlides(); } }), field('Ativa', s, 'active', { type: 'checkbox' }),
+        field('Duração (s)' + (s.type === 'video' ? ' · 0 = até o fim do vídeo' : ''), s, 'seconds', { type: 'number' }),
         field('Exibir a partir de', s, 'start', { type: 'date' }), field('Exibir até', s, 'end', { type: 'date' }));
       if (s.type === 'image') g.append(field('Ajuste da imagem', s, 'fit', { options: [['cover', 'Preencher (corta bordas)'], ['contain', 'Mostrar inteira']] }));
       if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }));
@@ -405,6 +405,38 @@
         const vu = el('input', { type: 'file', accept: 'video/*', class: 'neo-in' });
         vu.onchange = async () => { if (!vu.files[0]) return; if (!(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho acima.'); toast('Enviando vídeo…'); try { s.src = await InfoTV.upload(vu.files[0]); persist(); renderSlides(); } catch (e) { alert('Falha no envio: ' + e.message); } };
         body.append(el('div', { class: 'f', style: 'margin-top:14px' }, [el('label', {}, ['Enviar vídeo do computador (servidor Debian)']), vu]));
+        // teste automático do endereço: diz se o vídeo abre e, se não abrir, por quê
+        const st = el('div', { class: 'info', style: 'margin-top:12px' }, ['']);
+        body.append(st);
+        const url0 = InfoTV.mediaURL(s.src);
+        if (!url0) st.style.display = 'none';
+        else {
+          const conv = url0 !== String(s.src || '').trim() ? ' (o link da página foi convertido automaticamente para o link direto do arquivo)' : '';
+          st.textContent = '⏳ Testando o vídeo…' + conv;
+          const pv = document.createElement('video'); pv.muted = true; pv.preload = 'metadata'; let fin = false;
+          const done = (t) => { if (fin) return; fin = true; st.textContent = t; pv.removeAttribute('src'); pv.load(); };
+          pv.onloadedmetadata = () => done(pv.videoWidth ? '✔ Vídeo OK: ' + pv.videoWidth + '×' + pv.videoHeight + ', ' + Math.round(pv.duration) + ' s' + conv : '✖ Só o áudio abriu: a imagem está em um formato que o navegador não lê (H.265/HEVC). Converta para MP4 H.264 + AAC.');
+          pv.onerror = () => done('✖ O navegador não conseguiu abrir este endereço. Confira: 1) o endereço precisa ser o link direto do arquivo .mp4 (no GitHub use o botão "Raw" ou deixe o link da página, que é convertido); 2) o arquivo existe e é público; 3) o vídeo é MP4 H.264 + AAC (não H.265/HEVC).');
+          setTimeout(() => done('⚠ O vídeo demora para responder. Pode ser um arquivo muito grande; prefira vídeos curtos e leves (até ~20 MB).'), 12000);
+          pv.src = url0;
+        }
+      }
+      if (s.type === 'video' && s.tpl === 'cheia') {
+        const vg = el('div', { class: 'grid', style: 'margin-top:14px' });
+        vg.append(field('Ajuste do vídeo', s, 'vfit', { options: [['contain', 'Manter formato e tamanho (sem esticar nem cortar)'], ['cover', 'Preencher a tela inteira (corta as bordas)']], after: renderSlides }));
+        if (s.vfit !== 'cover') {
+          vg.append(field('Posição do vídeo na tela', s, 'vpos', { options: [['esquerda', 'Esquerda'], ['centro', 'Centro'], ['direita', 'Direita']], after: renderSlides }), field('Tamanho do vídeo (%)', s, 'vsize', { type: 'number' }),
+            field('Linha suave em volta', s, 'vline', { type: 'checkbox' }), field('Cor da linha', s, 'vlineColor', { type: 'color' }), field('Espessura da linha (px)', s, 'vlineW', { type: 'number' }),
+            field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
+          body.append(el('h3', {}, ['🎞 Vídeo e imagem juntos']), vg);
+          const iu = el('input', { type: 'file', accept: 'image/*', class: 'neo-in', 'aria-label': 'Imagem junto do vídeo' });
+          iu.onchange = async () => { if (!iu.files[0]) return; s.vimg = await fileToURL(iu.files[0], 1280, 'image/jpeg'); persist(); renderSlides(); };
+          const ip = el('input', { class: 'neo-in', placeholder: 'midia/imagem.jpg  ou  https://…' }); ip.value = (s.vimg || '').startsWith('data:') ? '' : (s.vimg || '');
+          ip.onchange = () => { s.vimg = ip.value.trim(); persist(); renderSlides(); };
+          body.append(el('div', { class: 'grid', style: 'margin-top:14px' }, [el('div', { class: 'f' }, [el('label', {}, ['Imagem junto do vídeo (opcional)']), iu]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço da imagem']), ip])]));
+          if (s.vimg) body.append(el('div', { class: 'grid', style: 'margin-top:10px' }, [field('Imagem: ocupar o espaço', s, 'vimgfit', { options: [['cover', 'Preencher o espaço (corta bordas)'], ['contain', 'Mostrar inteira']] }), el('div', { class: 'f' }, [el('img', { class: 'thumb', src: InfoTV.mediaURL(s.vimg), alt: '' }), el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { s.vimg = ''; persist(); renderSlides(); } }, ['Remover imagem'])])])]));
+          body.append(el('div', { class: 'info' }, ['O vídeo é ajustado para caber na área da tela sem esticar nem cortar. Com o vídeo à esquerda ou à direita, a imagem ocupa o espaço que sobra do outro lado; com o vídeo no centro, a imagem vira o fundo. Sem imagem, o espaço que sobra fica com as cores de fundo.']));
+        } else body.append(vg);
       }
       if (s.type === 'image') {
         const up = el('input', { type: 'file', accept: 'image/*', class: 'neo-in', id: 'up' + s.id });
@@ -502,7 +534,7 @@
     const tpath = el('input', { class: 'neo-in', placeholder: 'midia/transicao.mp4' }); tpath.value = (g.transVideo || '').startsWith('data:') ? '' : (g.transVideo || '');
     tpath.onchange = () => { g.transVideo = tpath.value.trim(); persist(); renderScreen(); };
     tb.append(el('div', { class: 'f' }, [el('label', {}, ['Enviar vídeo do computador (servidor Debian)']), tup]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho do vídeo']), tpath]));
-    if (g.transVideo) tb.append(el('div', { class: 'f' }, [el('video', { class: 'thumb', src: g.transVideo, muted: '', controls: '', playsinline: '' }), el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { g.transVideo = ''; persist(); renderScreen(); } }, ['Remover vídeo'])])]));
+    if (g.transVideo) tb.append(el('div', { class: 'f' }, [el('video', { class: 'thumb', src: InfoTV.mediaURL(g.transVideo), muted: '', controls: '', playsinline: '' }), el('div', { class: 'actions' }, [el('button', { class: 'btn sm del', onclick: () => { g.transVideo = ''; persist(); renderScreen(); } }, ['Remover vídeo'])])]));
     const sh = $('gShow'); sh.innerHTML = '';
     [['brand', 'Logo e nome'], ['weather', 'Clima'], ['schedule', 'Programação do dia'], ['verse', 'Frases de Deus'], ['services', 'Faixa de serviços'], ['ticker', 'Barra de notícias']].forEach(([k, l]) => sh.append(field(l, g.show, k, { type: 'checkbox' })));
   }

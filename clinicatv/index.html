@@ -76,6 +76,13 @@
   #tvid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 25; opacity: 0; pointer-events: none; transition: opacity .2s; background: transparent; } #tvid.on { opacity: 1; }
   .tr-video { transition-duration: .35s, .35s, .35s; }
   .slide .bgvid { z-index: 0; } .slide.hasvid::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,.32); z-index: 1; }
+  /* vídeo mantendo o formato: caixa com o tamanho certo do vídeo, posição à esquerda/centro/direita, imagem ao lado e linha suave */
+  .vbox .vwrap { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; gap: 2.2rem; padding: 2rem 2.4rem; }
+  .vwrap.pos-esquerda { justify-content: flex-start; } .vwrap.pos-centro { justify-content: center; } .vwrap.pos-direita { justify-content: flex-end; }
+  .vbox .vwrap video.vmain { position: relative; inset: auto; flex: none; width: auto; height: auto; object-fit: contain; border-radius: 1.4rem; background: #000; opacity: 0; transition: opacity .4s; }
+  .vbox .vside { flex: 1; min-width: 0; align-self: stretch; border-radius: 1.4rem; background-position: center; background-repeat: no-repeat; }
+  .vbox .vbgimg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+  .vwrap.vline .vmain, .vwrap.vline .vside { box-shadow: 0 0 0 var(--vlw, 4px) color-mix(in srgb, var(--vlc, #fff) 55%, transparent), 0 0 2.4rem color-mix(in srgb, var(--vlc, #fff) 30%, transparent); }
   .slide.text { flex-direction: column; padding: 4rem; }
   .slide.text::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 82% 18%, rgba(255,255,255,.14), transparent 45%); pointer-events: none; }
   .slide .ic { font-size: 8rem; line-height: 1; margin-bottom: 1.4rem; position: relative; z-index: 1; }
@@ -191,7 +198,7 @@
 </div>
 <div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
-<script src="assets/core.js?v=6"></script>
+<script src="assets/core.js?v=8"></script>
 <script>
 (function () {
   'use strict';
@@ -378,7 +385,7 @@
   function svcChip(s) {
     const c = document.createElement('div'); c.className = 'sc';
     if (s.src && s.type === 'image') { const i = document.createElement('img'); i.className = 'th'; i.src = s.src; i.alt = ''; c.appendChild(i); }
-    else if (s.src && s.type === 'video') { const v = document.createElement('video'); v.className = 'th'; v.src = s.src; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true; c.appendChild(v); v.play && v.play().catch(() => {}); }
+    else if (s.src && s.type === 'video') { const v = document.createElement('video'); v.className = 'th'; v.src = InfoTV.mediaURL(s.src); v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true; c.appendChild(v); v.play && v.play().catch(() => {}); }
     else if (s.icon) { const ic = document.createElement('span'); ic.textContent = s.icon; c.appendChild(ic); }
     const b = document.createElement('b'); b.textContent = s.label; c.appendChild(b); return c;
   }
@@ -423,8 +430,8 @@
   function ytId(u) { const m = String(u).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); }
   function textBlock(cls, st, base) { const w = document.createElement('div'); w.className = cls; if (st && st.text) { const s = document.createElement('span'); InfoFX.text(s, st.text, st, base); w.appendChild(s); } return w; }
   function mediaEl(s, contain) {
-    if (s.type === 'image') { const i = document.createElement('div'); i.className = 'img' + (contain ? ' contain' : ''); i.style.backgroundImage = 'url("' + (s.src || '') + '")'; return i; }
-    if (s.type === 'video') { const v = document.createElement('video'); v.src = s.src; v.muted = true; v.autoplay = true; v.playsInline = true; return v; }
+    if (s.type === 'image') { const i = document.createElement('div'); i.className = 'img' + (contain ? ' contain' : ''); i.style.backgroundImage = 'url("' + InfoTV.mediaURL(s.src) + '")'; return i; }
+    if (s.type === 'video') { const v = document.createElement('video'); v.src = InfoTV.mediaURL(s.src); v.muted = true; v.autoplay = true; v.playsInline = true; v.preload = 'auto'; v.addEventListener('canplay', () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); }, { once: true }); return v; }
     const f = document.createElement('iframe'); f.src = 'https://www.youtube.com/embed/' + ytId(s.src) + '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1'; f.allow = 'autoplay; encrypted-media'; return f;
   }
   function fxLayer(kind) {
@@ -441,6 +448,31 @@
     if (kind === 'ondas') { const p = '<svg viewBox="0 0 2400 120" preserveAspectRatio="none"><path d="M0 60Q150 0 300 60T600 60T900 60T1200 60T1500 60T1800 60T2100 60T2400 60V120H0Z"/></svg>'; d.innerHTML = p + p; }
     return d;
   }
+  function buildVideoBox(s, el, layer) {
+    const pos = s.vpos === 'esquerda' || s.vpos === 'direita' ? s.vpos : 'centro', img = InfoTV.mediaURL(s.vimg);
+    el.classList.add('vbox'); el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
+    if (img && pos === 'centro') { const bi = document.createElement('div'); bi.className = 'vbgimg'; bi.style.backgroundImage = 'url("' + img + '")'; el.appendChild(bi); el.classList.add('hasvid'); }
+    if (layer) el.appendChild(layer);
+    const wrap = document.createElement('div'); wrap.className = 'vwrap pos-' + pos + (s.vline ? ' vline' : '');
+    wrap.style.setProperty('--vlc', s.vlineColor || '#ffffff'); wrap.style.setProperty('--vlw', Math.max(1, Math.min(16, +s.vlineW || 4)) + 'px');
+    const v = document.createElement('video'); v.className = 'vmain'; v.src = InfoTV.mediaURL(s.src); v.muted = true; v.autoplay = true; v.playsInline = true; v.preload = 'auto';
+    v.addEventListener('canplay', () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); }, { once: true });
+    let side = null;
+    if (img && pos !== 'centro') { side = document.createElement('div'); side.className = 'vside'; side.style.backgroundImage = 'url("' + img + '")'; side.style.backgroundSize = s.vimgfit === 'contain' ? 'contain' : 'cover'; wrap.classList.add('hasside'); }
+    if (pos === 'direita' && side) wrap.append(side, v); else if (side) wrap.append(v, side); else wrap.append(v);
+    el.appendChild(wrap);
+    const fit = () => {   // cabe na área sem esticar e sem cortar; só muda de tamanho, nunca de formato
+      const vw = v.videoWidth, vh = v.videoHeight; if (!vw || !vh || !wrap.clientWidth) return;
+      const cs = getComputedStyle(wrap), pad = (a, b) => (parseFloat(cs[a]) || 0) + (parseFloat(cs[b]) || 0);
+      let aw = wrap.clientWidth - pad('paddingLeft', 'paddingRight'), ah = wrap.clientHeight - pad('paddingTop', 'paddingBottom');
+      if (side) aw = aw * 0.62;   // deixa pelo menos ~38% da largura para a imagem
+      const k = Math.min(aw / vw, ah / vh) * (Math.max(20, Math.min(100, +s.vsize || 100)) / 100);
+      v.style.width = Math.round(vw * k) + 'px'; v.style.height = Math.round(vh * k) + 'px'; v.style.opacity = 1;
+    };
+    v.addEventListener('loadedmetadata', fit); if (window.ResizeObserver) new ResizeObserver(fit).observe(wrap);
+    if ((s.t1 && s.t1.text) || (s.t2 && s.t2.text)) { const ov = document.createElement('div'); ov.className = 'ov pos-' + (s.pos || 'bottom'); ov.append(textBlock('tx1', s.t1, 3.4), textBlock('tx2', s.t2, 1.8)); el.appendChild(ov); }
+    return el;
+  }
   function buildSlide(s) {
     const g = cfg.general, el = document.createElement('div'), tpl = s.type === 'text' ? 'texto' : (s.tpl || 'cheia');
     el.className = 'slide ' + s.type + ' tr-' + (s.trans || g.transition || 'fade') + (s.type === 'image' && s.kb ? ' kb-' + s.kb : '');
@@ -449,7 +481,7 @@
     const layer = fxLayer(s.bgfx || (tpl === 'aniversario' ? 'confete' : ''));
     if (tpl === 'texto') {
       el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
-      if (s.bgvid) { const bv = document.createElement('video'); bv.className = 'bgvid'; bv.src = s.bgvid; bv.muted = true; bv.loop = true; bv.autoplay = true; bv.playsInline = true; el.classList.add('hasvid'); el.appendChild(bv); bv.play && bv.play().catch(() => {}); }
+      if (s.bgvid) { const bv = document.createElement('video'); bv.className = 'bgvid'; bv.src = InfoTV.mediaURL(s.bgvid); bv.muted = true; bv.loop = true; bv.autoplay = true; bv.playsInline = true; el.classList.add('hasvid'); el.appendChild(bv); bv.play && bv.play().catch(() => {}); }
       if (layer) el.appendChild(layer);
       if (s.icon) { const ic = document.createElement('div'); ic.className = 'ic'; ic.textContent = s.icon; el.appendChild(ic); }
       el.append(textBlock('tx tx1', s.t1, 4.6), textBlock('tx tx2', s.t2, 2.3)); return el;
@@ -468,6 +500,7 @@
       const pn = document.createElement('div'); pn.className = 'pn'; pn.append(textBlock('tx tx1', s.t1, 3.4), textBlock('tx tx2', s.t2, 1.7)); el.append(ph, pn); return el;
     }
     // tela cheia (como enviada)
+    if (s.type === 'video' && s.vfit !== 'cover') return buildVideoBox(s, el, layer);
     const contain = s.type === 'image' && s.fit === 'contain';
     if (contain) { const b = document.createElement('div'); b.className = 'bgb'; b.style.backgroundImage = 'url("' + (s.src || '') + '")'; el.appendChild(b); }
     if (layer) el.appendChild(layer);
@@ -477,7 +510,7 @@
   }
   let stT = null;
   function playStinger(cb) {   // vídeo de transição (vinheta) por cima da tela; a próxima publicação entra por baixo no meio dele
-    const tv = $('tvid'), src = cfg.general.transVideo; let swapped = false, done = false;
+    const tv = $('tvid'), src = InfoTV.mediaURL(cfg.general.transVideo); let swapped = false, done = false;
     const swap = () => { if (!swapped) { swapped = true; cb(); } };
     const fin = () => { if (done) return; done = true; tv.classList.remove('on'); setTimeout(() => { try { tv.pause(); } catch (e) {} }, 300); };
     if (tv.getAttribute('data-src') !== src) { tv.setAttribute('data-src', src); tv.src = src; }
@@ -500,8 +533,13 @@
       if (old) { old.classList.remove('on'); setTimeout(() => old.remove(), 1200); }
       const secs = Math.max(3, +s.seconds || +g.slideSeconds || 12);
       if (s.type === 'video') {
-        const v = el.querySelector('video'); if (v) { v.onended = nextSlide; v.onerror = () => { sTimer = setTimeout(nextSlide, 3000); }; }
-        sTimer = setTimeout(nextSlide, (+s.seconds > 0 ? secs : 600) * 1000);
+        // a duração só começa a contar quando o vídeo realmente começa a rodar; se não começar em 25 s, passa adiante
+        const v = el.querySelector('video'), go = (ms) => { clearTimeout(sTimer); sTimer = setTimeout(nextSlide, ms); };
+        if (list.length === 1 && v && !(+s.seconds > 0)) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
+        else {
+          if (v) { v.onended = nextSlide; v.onerror = () => go(3000); v.onplaying = () => { if (!v._st) { v._st = 1; go((+s.seconds > 0 ? secs : 900) * 1000); } }; }
+          go(25000);
+        }
       } else sTimer = setTimeout(nextSlide, secs * 1000);
     };
     if ((s.trans || g.transition) === 'video' && g.transVideo && curEl) playStinger(show); else show();

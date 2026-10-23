@@ -59,7 +59,7 @@
   const tdef = (o) => Object.assign({ text: '', font: '', size: 1, color: '#ffffff', effect: 'sombra', glow: '#00e5ff', g1: '#ffffff', g2: '#ffd54f', anim: 'up' }, o || {});
 
   function normSlide(s) {
-    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '' }, s || {});
+    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4 }, s || {});
     s.id = s.id || rid();
     s.t1 = tdef(s.t1 || { text: s.title || '' });
     s.t2 = tdef(s.t2 || { text: s.body || '', effect: 'none', anim: 'fade' });
@@ -304,7 +304,16 @@
     return { fetchSource, build };
   })();
 
-  window.InfoTV = { DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess };
+  // Converte links "de página" em links diretos do arquivo (GitHub blob, Dropbox, Google Drive), para vídeo/imagem abrirem na TV.
+  function mediaURL(u) {
+    u = String(u || '').trim(); let m;
+    if ((m = u.match(/^https?:\/\/(?:www\.)?github\.com\/([^/]+)\/([^/]+)\/blob\/(.+?)(?:\?.*)?$/i))) return 'https://raw.githubusercontent.com/' + m[1] + '/' + m[2] + '/' + m[3];
+    if ((m = u.match(/^https?:\/\/(?:www\.)?github\.com\/([^/]+)\/([^/]+)\/raw\/(.+?)(?:\?.*)?$/i))) return 'https://raw.githubusercontent.com/' + m[1] + '/' + m[2] + '/' + m[3];
+    if (/^https?:\/\/(?:www\.)?dropbox\.com\//i.test(u)) return u.replace(/^https?:\/\/(?:www\.)?dropbox\.com/i, 'https://dl.dropboxusercontent.com').replace(/[?&]dl=0/, '');
+    if ((m = u.match(/^https?:\/\/drive\.google\.com\/file\/d\/([\w-]+)/i))) return 'https://drive.google.com/uc?export=download&id=' + m[1];
+    return u;
+  }
+  window.InfoTV = { mediaURL, DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess };
   window.InfoNews = InfoNews;
   window.InfoFX = { style: fxStyle, text: fxText };
   try { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONTS_CSS; document.head.appendChild(l); } catch (e) {}
