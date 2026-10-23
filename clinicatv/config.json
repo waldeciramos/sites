@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "general": {
     "name": "Clínica TV",
     "subtitle": "Fisio Clínica Estiva",
@@ -36,10 +36,6 @@
     "fontCustomSrc": "",
     "tickerFont": "",
     "tickerSize": 100,
-    "svcMode": "passando",
-    "svcSpeed": 60,
-    "svcFont": "",
-    "svcSize": 100,
     "newsProxy": "",
     "clock": {
       "font": "Rajdhani",
@@ -53,7 +49,11 @@
     "sidebarStyle": "clara",
     "autoFullscreen": true,
     "transVideo": "",
-    "tempColor": "#1fa35c"
+    "tempColor": "#1fa35c",
+    "sideLogo": "midia/logo-clinica.jpg",
+    "sideLogoShow": true,
+    "sideLogoH": 100,
+    "sideLogoBg": "#ffffff"
   },
   "radio": {
     "enabled": true,
@@ -136,6 +136,47 @@
       "bgvid": ""
     },
     {
+      "active": true,
+      "start": "",
+      "end": "",
+      "fit": "contain",
+      "pos": "bottom",
+      "icon": "",
+      "bg1": "#0b3b4a",
+      "bg2": "#0b1d2e",
+      "src": "midia/apae.jpg",
+      "tpl": "cheia",
+      "trans": "",
+      "kb": "",
+      "bgfx": "",
+      "bgvid": "",
+      "id": "apae01",
+      "type": "image",
+      "seconds": 14,
+      "t1": {
+        "text": "",
+        "font": "",
+        "size": 1,
+        "color": "#ffffff",
+        "effect": "sombra",
+        "glow": "#00e5ff",
+        "g1": "#ffffff",
+        "g2": "#ffd54f",
+        "anim": "up"
+      },
+      "t2": {
+        "text": "",
+        "font": "",
+        "size": 1,
+        "color": "#ffffff",
+        "effect": "none",
+        "glow": "#00e5ff",
+        "g1": "#ffffff",
+        "g2": "#ffd54f",
+        "anim": "fade"
+      }
+    },
+    {
       "id": "cys7aa",
       "type": "text",
       "active": true,
@@ -177,6 +218,47 @@
       "bgvid": ""
     },
     {
+      "active": true,
+      "start": "",
+      "end": "",
+      "fit": "contain",
+      "pos": "bottom",
+      "icon": "",
+      "bg1": "#0b3b4a",
+      "bg2": "#0b1d2e",
+      "src": "midia/banner.jpg",
+      "tpl": "cheia",
+      "trans": "",
+      "kb": "",
+      "bgfx": "",
+      "bgvid": "",
+      "id": "banner01",
+      "type": "image",
+      "seconds": 14,
+      "t1": {
+        "text": "",
+        "font": "",
+        "size": 1,
+        "color": "#ffffff",
+        "effect": "sombra",
+        "glow": "#00e5ff",
+        "g1": "#ffffff",
+        "g2": "#ffd54f",
+        "anim": "up"
+      },
+      "t2": {
+        "text": "",
+        "font": "",
+        "size": 1,
+        "color": "#ffffff",
+        "effect": "none",
+        "glow": "#00e5ff",
+        "g1": "#ffffff",
+        "g2": "#ffd54f",
+        "anim": "fade"
+      }
+    },
+    {
       "id": "2sktl7",
       "type": "text",
       "active": true,
@@ -216,6 +298,53 @@
         "anim": "fade"
       },
       "bgvid": ""
+    },
+    {
+      "active": true,
+      "start": "",
+      "end": "",
+      "fit": "cover",
+      "pos": "bottom",
+      "icon": "",
+      "bg1": "#0b3b4a",
+      "bg2": "#0b1d2e",
+      "src": "midia/deus.mp4",
+      "tpl": "cheia",
+      "trans": "",
+      "kb": "",
+      "bgfx": "",
+      "bgvid": "",
+      "id": "deus01",
+      "type": "video",
+      "seconds": 0,
+      "vfit": "contain",
+      "vpos": "centro",
+      "vsize": 100,
+      "vline": true,
+      "vlineColor": "#ffffff",
+      "vlineW": 4,
+      "t1": {
+        "text": "",
+        "font": "",
+        "size": 1,
+        "color": "#ffffff",
+        "effect": "sombra",
+        "glow": "#00e5ff",
+        "g1": "#ffffff",
+        "g2": "#ffd54f",
+        "anim": "up"
+      },
+      "t2": {
+        "text": "",
+        "font": "",
+        "size": 1,
+        "color": "#ffffff",
+        "effect": "none",
+        "glow": "#00e5ff",
+        "g1": "#ffffff",
+        "g2": "#ffd54f",
+        "anim": "fade"
+      }
     },
     {
       "id": "khb7it",
@@ -474,62 +603,6 @@
       "start": "",
       "end": "",
       "anim": "up"
-    }
-  ],
-  "services": [
-    {
-      "icon": "",
-      "label": "Fisioterapia ortopédica",
-      "active": true,
-      "type": "",
-      "src": "",
-      "stage": true,
-      "seconds": 8
-    },
-    {
-      "icon": "🧘",
-      "label": "Pilates",
-      "active": true,
-      "type": "",
-      "src": "",
-      "stage": true,
-      "seconds": 8
-    },
-    {
-      "icon": "🏃",
-      "label": "RPG",
-      "active": true,
-      "type": "",
-      "src": "",
-      "stage": true,
-      "seconds": 8
-    },
-    {
-      "icon": "🧠",
-      "label": "Neurofuncional",
-      "active": true,
-      "type": "",
-      "src": "",
-      "stage": true,
-      "seconds": 8
-    },
-    {
-      "icon": "💆",
-      "label": "Drenagem linfática",
-      "active": true,
-      "type": "",
-      "src": "",
-      "stage": true,
-      "seconds": 8
-    },
-    {
-      "icon": "💧",
-      "label": "Reabilitação pós-cirúrgica",
-      "active": true,
-      "type": "",
-      "src": "",
-      "stage": true,
-      "seconds": 8
     }
   ],
   "admin": {

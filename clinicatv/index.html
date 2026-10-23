@@ -19,22 +19,22 @@
   #app.rot270 { left: 0; top: 0; width: calc(100vh - 2 * var(--my)); height: calc(100vw - 2 * var(--mx)); transform-origin: 0 0; transform: translate(var(--mx), calc(100vh - var(--my))) rotate(-90deg); }
 
   /* ===== Horizontal ===== */
-  #app.h { grid-template-columns: var(--sw) 1fr; grid-template-rows: 1fr auto auto; grid-template-areas: "side stage" "side svc" "side lt"; }
+  #app.h { grid-template-columns: var(--sw) 1fr; grid-template-rows: 1fr auto; grid-template-areas: "side stage" "side lt"; }
   body.no-side #app.h { grid-template-columns: 0 1fr; } body.no-side #side { display: none; }
   /* Lateral: escura com relevo suave (mesmo efeito do painel admin). Vale também no modo vertical (#side vira display:contents). */
   #side { --panel:#e6eaf1; --card:#e6eaf1; --line:rgba(15,42,51,.08); --nsh1:#fff; --nsh2:#c5ccd9; --eh:#fff; --es:rgba(15,42,51,.3); }
   body.side-dark #side { --panel:#0b1c2c; --card:#0e2336; --txt:#eaf2f8; --mut:#9db3c6; --line:rgba(255,255,255,.07); --nsh1: rgba(120,170,210,.07); --nsh2: rgba(0,0,0,.55); --vizbg: rgba(0,0,0,.28); --eh: rgba(140,190,230,.25); --es: rgba(0,0,0,.7); }
   #side { --vizbg:#e6eaf1; color: var(--txt); }
-  #side { grid-area: side; display: flex; flex-direction: column; gap: .85rem; padding: 1.2rem 1.2rem .8rem; background: var(--panel); border-right: 0; box-shadow: .3rem 0 1.2rem rgba(15,42,51,.14); min-height: 0; z-index: 3; }
+  #side { grid-area: side; display: flex; flex-direction: column; gap: .6rem; padding: .9rem 1.2rem .5rem; background: var(--panel); border-right: 0; box-shadow: .3rem 0 1.2rem rgba(15,42,51,.14); min-height: 0; z-index: 3; }
   .brand { display: flex; align-items: center; gap: 1rem; min-height: 5rem; padding: .7rem 1rem; border-radius: 1.1rem; background: var(--brandBg); color: var(--brandFg); border: 0; box-shadow: .4rem .4rem .9rem var(--nsh2), -.3rem -.3rem .8rem var(--nsh1); }
   .brand img { max-height: 4rem; max-width: 7rem; object-fit: contain; }
   .brand .t1 { font-family: var(--fd); font-size: 1.6rem; font-weight: 700; line-height: 1.05; }
   .brand .t2 { font-size: 1.05rem; opacity: .7; margin-top: .2rem; }
   .clock { text-align: center; }
-  .clock .time { font-family: var(--fd); font-size: calc(6.6rem * var(--cs, 1)); font-weight: 700; letter-spacing: .02rem; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .clock .time { font-family: var(--fd); font-size: calc(5.6rem * var(--cs, 1)); font-weight: 700; letter-spacing: .02rem; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .clock .sec { font-family: var(--fd); font-size: calc(2rem * var(--cs, 1)); font-weight: 700; color: var(--clk2, var(--p)); margin-left: .3rem; vertical-align: top; }
-  .clock .date { font-size: 1.2rem; color: var(--mut); margin-top: .3rem; }
-  .card { background: var(--card); border: 0; border-radius: 1.2rem; padding: .9rem 1.1rem; box-shadow: .45rem .45rem 1rem var(--nsh2), -.35rem -.35rem .9rem var(--nsh1); }
+  .clock .date { font-size: 1.1rem; color: var(--mut); margin-top: .1rem; }
+  .card { background: var(--card); border: 0; border-radius: 1.2rem; padding: .7rem 1.1rem; box-shadow: .45rem .45rem 1rem var(--nsh2), -.35rem -.35rem .9rem var(--nsh1); }
   .weather .wtop { display: flex; align-items: center; gap: .9rem; }
   .weather .ico { font-size: 3.2rem; line-height: 1; }
   .weather .temp { font-family: var(--tf, var(--fd)); font-size: 3.2rem; font-weight: 700; line-height: 1; color: var(--tempc, #1fa35c); text-shadow: -.035em -.035em .02em var(--eh), .04em .05em .05em var(--es); letter-spacing: .02rem; }
@@ -42,23 +42,31 @@
   .weather .minmax { margin-left: auto; text-align: right; font-size: 1rem; color: var(--mut); line-height: 1.5; }
   .weather .city { font-size: .8rem; text-transform: uppercase; letter-spacing: .08rem; color: var(--p); font-weight: 700; }
   .wstats { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem .8rem; margin-top: .6rem; font-size: .95rem; color: var(--mut); } .wstats b { color: var(--txt); }
-  .wdays { display: flex; margin-top: .7rem; padding-top: .6rem; border-top: .06rem solid var(--line); text-align: center; }
-  .wdays div { flex: 1; display: flex; flex-direction: column; gap: .12rem; font-size: .95rem; }
-  .wdays b { color: var(--p); font-size: .78rem; text-transform: uppercase; letter-spacing: .04rem; } .wdays span { font-size: 1.45rem; } .wdays i { font-style: normal; font-weight: 700; } .wdays u { text-decoration: none; color: var(--mut); }
-  .wupd { font-size: .7rem; color: var(--mut); margin-top: .4rem; text-align: right; }
+  .weather .minmax .mx, .weather .minmax .mn { display: block; font-size: 1.05rem; } .weather .minmax b { font-size: 1.35rem; color: var(--txt); } .weather .minmax .mx b { color: #d9480f; } .weather .minmax .mn b { color: #1c7ed6; }
+  .weather .minmax small, .wdays small { font-size: .62em; font-weight: 700; text-transform: uppercase; letter-spacing: .04rem; color: var(--mut); margin-right: .15rem; }
+  .wdays { display: flex; align-items: stretch; gap: .25rem; margin-top: .5rem; padding-top: .45rem; border-top: .06rem solid var(--line); text-align: center; }
+  .wdays div { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: .1rem; font-size: .88rem; padding: .25rem .1rem; border-radius: .8rem; white-space: nowrap; }
+  .wdays b { color: var(--p); font-size: .78rem; text-transform: uppercase; letter-spacing: .04rem; } .wdays span { font-size: 1.45rem; line-height: 1.15; } .wdays i { font-style: normal; font-weight: 700; color: #d9480f; } .wdays u { text-decoration: none; font-weight: 700; color: #1c7ed6; }
+  .wdays div.today { flex: 1.9; background: color-mix(in srgb, var(--p) 14%, transparent); box-shadow: inset .15rem .15rem .4rem var(--nsh2), inset -.12rem -.12rem .3rem var(--nsh1); gap: .15rem; font-size: 1.05rem; }
+  .wdays .today b { color: var(--s); font-size: 1rem; letter-spacing: .08rem; } .wdays .today span { font-size: 2.5rem; } .wdays .today i, .wdays .today u { font-size: 1.25rem; }
+  .wupd { display: none; }
   .sched { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .h2 { font-size: .8rem; font-weight: 700; color: var(--p); letter-spacing: .15rem; text-transform: uppercase; margin-bottom: .45rem; }
-  #schedList { flex: 1; overflow: hidden; position: relative; }
-  .row { display: flex; gap: .8rem; padding: .36rem 0; border-bottom: .06rem solid var(--line); font-size: 1.1rem; line-height: 1.25; }
+  #schedList { flex: 1; min-height: 6.2rem; overflow: hidden; position: relative; }
+  .row { display: flex; gap: .8rem; padding: .28rem 0; border-bottom: .06rem solid var(--line); font-size: 1.1rem; line-height: 1.25; }
   .row b { color: var(--p); min-width: 3.8rem; font-variant-numeric: tabular-nums; }
   .row.past { opacity: .4; }
   .row.now { background: color-mix(in srgb, var(--p) 16%, transparent); margin: .1rem -.5rem; padding-left: .6rem; padding-right: .6rem; border-radius: .7rem; border-bottom-color: transparent; font-weight: 700; box-shadow: inset .2rem .2rem .5rem var(--nsh2), inset -.15rem -.15rem .4rem var(--nsh1); }
   .row.now b { color: var(--s); }
   .empty { color: var(--mut); font-size: 1rem; padding: .6rem 0; }
-  .verse { background: color-mix(in srgb, var(--s) 7%, var(--card)); min-height: 10.5rem; display: flex; flex-direction: column; justify-content: center; transition: opacity .6s; }
-  .verse .vt { font-size: 1.2rem; line-height: 1.4; font-weight: 500; font-style: italic; }
+  .verse { background: color-mix(in srgb, var(--s) 7%, var(--card)); min-height: 0; padding-top: .6rem; padding-bottom: .6rem; display: flex; flex-direction: column; justify-content: center; transition: opacity .6s; }
+  .verse .vt { font-size: 1.1rem; line-height: 1.3; font-weight: 500; font-style: italic; }
   .verse .vr { margin-top: .5rem; color: var(--s); font-weight: 700; font-size: 1rem; } .verse .h2 { color: var(--s); }
-  .credit { font-size: .75rem; color: var(--mut); text-align: center; opacity: .8; }
+  .credit { display: none; font-size: .75rem; color: var(--mut); text-align: center; opacity: .8; }
+
+  /* Logo da clínica entre a programação e a rádio */
+  #sideLogo { flex: none; margin-top: .6rem; height: calc(6.2rem * var(--slh, 1)); display: flex; align-items: center; justify-content: center; padding: .3rem; border-radius: 1rem; background: var(--slbg, #fff); overflow: hidden; box-shadow: .2rem .2rem .5rem var(--nsh2), -.15rem -.15rem .4rem var(--nsh1); }
+  #sideLogo[hidden], body.no-sidelogo #sideLogo { display: none; } #sideLogo img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
   /* ===== Palco com moldura ===== */
   #stage { grid-area: stage; position: relative; min-height: 0; padding: 1.4rem 1.4rem .8rem; }
@@ -79,7 +87,7 @@
   /* vídeo mantendo o formato: caixa com o tamanho certo do vídeo, posição à esquerda/centro/direita, imagem ao lado e linha suave */
   .vbox .vwrap { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; gap: 2.2rem; padding: 2rem 2.4rem; }
   .vwrap.pos-esquerda { justify-content: flex-start; } .vwrap.pos-centro { justify-content: center; } .vwrap.pos-direita { justify-content: flex-end; }
-  .vbox .vwrap video.vmain { position: relative; inset: auto; flex: none; width: auto; height: auto; object-fit: contain; border-radius: 1.4rem; background: #000; opacity: 0; transition: opacity .4s; }
+  .vbox .vwrap video.vmain { position: relative; inset: auto; flex: none; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 1.4rem; background: #000; opacity: 0; transition: opacity .4s; }
   .vbox .vside { flex: 1; min-width: 0; align-self: stretch; border-radius: 1.4rem; background-position: center; background-repeat: no-repeat; }
   .vbox .vbgimg { position: absolute; inset: 0; background-size: cover; background-position: center; }
   .vwrap.vline .vmain, .vwrap.vline .vside { box-shadow: 0 0 0 var(--vlw, 4px) color-mix(in srgb, var(--vlc, #fff) 55%, transparent), 0 0 2.4rem color-mix(in srgb, var(--vlc, #fff) 30%, transparent); }
@@ -100,6 +108,11 @@
   /* modelo campanha / dica */
   .slide.dc { display: grid; grid-template-columns: 1.8fr 1fr; text-align: left; background: linear-gradient(160deg, var(--b1), var(--b2)); }
   .dc .ph { position: relative; overflow: hidden; } .dc .pn { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; gap: 1.2rem; padding: 3rem; }
+  /* zonas: retângulos (em % da tela) com imagem, vídeo, YouTube ou texto */
+  .slide.zonas { display: block; } .zone { position: absolute; overflow: hidden; z-index: 2; }
+  .zone .img, .zone video, .zone iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background-position: center; background-repeat: no-repeat; }
+  .zone .ztext { position: absolute; inset: 0; display: flex; align-items: center; padding: .6rem 1rem; font-family: var(--fd), sans-serif; font-weight: 700; line-height: 1.15; white-space: pre-line; text-shadow: 0 .1rem .4rem rgba(0,0,0,.35); overflow: hidden; }
+  #vErr { position: absolute; left: 1rem; top: 1rem; z-index: 30; max-width: 70%; padding: .5rem 1rem; border-radius: .8rem; background: rgba(160,30,30,.92); color: #fff; font: 600 1rem/1.3 system-ui, sans-serif; display: none; } #vErr.on { display: block; }
   /* efeitos de fundo animados */
   .bgfx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; } .bgfx i { position: absolute; display: block; }
   .bgfx i { will-change: transform; }
@@ -113,21 +126,13 @@
   .bgfx-ondas svg:nth-child(1) { bottom: 0; height: 34%; } .bgfx-ondas svg:nth-child(2) { bottom: 0; height: 26%; animation-duration: 22s; animation-direction: reverse; } @keyframes wave { to { transform: translateX(-50%); } }
 
   /* Rádio */
-  #radio { flex: none; margin-top: .6rem; padding: .6rem .8rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .4rem .8rem; align-items: center; border-radius: 1rem; background: var(--vizbg); box-shadow: inset .2rem .2rem .5rem var(--nsh2), inset -.15rem -.15rem .4rem var(--nsh1); cursor: pointer; }
+  #radio { flex: none; margin-top: .5rem; padding: .45rem .8rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .4rem .8rem; align-items: center; border-radius: 1rem; background: var(--vizbg); box-shadow: inset .2rem .2rem .5rem var(--nsh2), inset -.15rem -.15rem .4rem var(--nsh1); cursor: pointer; }
   #radio[hidden] { display: none; }
   #radio .rb { width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--p); display: grid; place-items: center; font-size: 1.1rem; color: #fff; box-shadow: .15rem .15rem .4rem var(--nsh2), -.1rem -.1rem .3rem var(--nsh1); }
   #radio .rn { font-size: .78rem; font-weight: 700; letter-spacing: .06rem; text-transform: uppercase; color: var(--p); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #radio .rt { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--txt); }
-  #radio #viz { grid-column: 1 / -1; width: 100%; height: 3rem; display: block; }
+  #radio #viz { grid-column: 1 / -1; width: 100%; height: 2.2rem; display: block; }
   #radio.hint .rb { animation: hintp 1.2s ease-in-out infinite; } @keyframes hintp { 50% { transform: scale(1.15); } }
-
-  /* ===== Faixa de serviços ===== */
-  #svc { grid-area: svc; display: flex; gap: .8rem; padding: .3rem 1.4rem .7rem; overflow: hidden; }
-  #svc .sc { display: flex; align-items: center; gap: .55rem; padding: .5rem 1.1rem; border-radius: 99rem; background: var(--panel); border: .08rem solid var(--line); font-family: var(--sf, inherit); font-size: calc(1.15rem * var(--ss, 1)); font-weight: 600; white-space: nowrap; transition: .5s; flex: none; }
-  #svc .sc span { font-size: calc(1.3rem * var(--ss, 1)); } #svc .sc .th { width: calc(2.3rem * var(--ss, 1)); height: calc(2.3rem * var(--ss, 1)); border-radius: 50%; object-fit: cover; flex: none; margin-left: -.5rem; background: #0002; }
-  #svc .sc.hl { background: var(--p); color: #fff; border-color: var(--p); transform: translateY(-.12rem); box-shadow: 0 .3rem .9rem color-mix(in srgb, var(--p) 45%, transparent); }
-  #svc.pass { display: block; padding: .3rem 0 .7rem; position: relative; -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
-  #svc .svtrack { display: flex; width: max-content; will-change: transform; padding: .2rem 0; } #svc.pass .sc { margin-right: .8rem; }
 
   /* ===== Barra de notícias com data e hora ===== */
   #lt { --bc: var(--p); grid-area: lt; margin: .1rem 1.4rem 1.2rem; background: var(--lt); border-radius: 1.2rem; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0; }
@@ -148,7 +153,7 @@
   #tScroll { position: absolute; left: 0; white-space: nowrap; font-size: calc(1.3rem * var(--ts, 1)); font-weight: 500; will-change: transform; } #tScroll em { font-style: normal; font-weight: 800; margin-right: .4rem; } #tScroll i { font-style: normal; color: var(--s); margin: 0 1.6rem; }
 
   /* ===== Vertical (monitor girado, totem ou celular) ===== */
-  #app.v { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto auto auto; grid-template-areas: "brand brand" "clock weather" "stage stage" "sched verse" "svc svc" "lt lt"; }
+  #app.v { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto auto; grid-template-areas: "brand brand" "clock weather" "stage stage" "sched verse" "lt lt"; }
   #app.v #side { display: contents; }
   #app.v .brand { grid-area: brand; border-radius: 0; border: 0; border-bottom: .08rem solid var(--line); padding: 1rem 1.8rem; }
   #app.v .clock { grid-area: clock; background: var(--panel); padding: 1rem; display: flex; flex-direction: column; justify-content: center; } #app.v .clock .time { font-size: calc(5.4rem * var(--cs, 1)); }
@@ -156,11 +161,11 @@
   #app.v .sched { grid-area: sched; border-radius: 0; max-height: 30rem; background: var(--panel); border: 0; border-top: .08rem solid var(--line); }
   #app.v .card { box-shadow: none; }
   #app.v .verse { grid-area: verse; border-radius: 0; min-height: 0; border: 0; } #app.v .credit { display: none; }
-  #app.v #stage { grid-area: stage; } #app.v #svc { grid-area: svc; } #app.v #lt { grid-area: lt; margin-bottom: 1rem; }
+  #app.v #stage { grid-area: stage; } #app.v #lt { grid-area: lt; margin-bottom: 1rem; }
   #app.v .slide .ic { font-size: 7rem; } #app.v .slide.niv { flex-direction: column; gap: 2rem; } #app.v .slide.dc { grid-template-columns: 1fr; grid-template-rows: 1.4fr 1fr; }
   body.compact #app.v { grid-template-areas: "brand brand" "clock weather" "stage stage" "lt lt"; }
-  body.compact #app.v .sched, body.compact #app.v .verse, body.compact #svc { display: none; }
-  body.no-brand .brand, body.no-weather .weather, body.no-schedule .sched, body.no-verse .verse, body.no-services #svc, body.no-ticker #lt { display: none !important; }
+  body.compact #app.v .sched, body.compact #app.v .verse { display: none; }
+  body.no-brand .brand, body.no-weather .weather, body.no-schedule .sched, body.no-verse .verse, body.no-ticker #lt { display: none !important; }
 
   #bar { position: fixed; right: 1rem; bottom: 1rem; z-index: 99; display: flex; gap: .5rem; opacity: 0; pointer-events: none; transition: opacity .3s; }
   body.show-ui #bar { opacity: 1; pointer-events: auto; } body.preview #bar { display: none; }
@@ -180,15 +185,14 @@
       <div class="wdays" id="wDays"></div>
       <div class="wupd" id="wUpd"></div>
     </div>
-    <div class="card sched"><div class="h2" id="schedTitle">Programação de hoje</div><div id="schedList"></div><div id="radio" hidden><div class="rb" id="rBtn">▶</div><div style="min-width:0"><div class="rn" id="rName">Rádio</div><div class="rt" id="rTitle"></div></div><canvas id="viz" width="352" height="90"></canvas></div></div>
+    <div class="card sched"><div class="h2" id="schedTitle">Programação de hoje</div><div id="schedList"></div><div id="sideLogo" hidden><img id="sideLogoImg" alt="Fisio Clínica"></div><div id="radio" hidden><div class="rb" id="rBtn">▶</div><div style="min-width:0"><div class="rn" id="rName">Rádio</div><div class="rt" id="rTitle"></div></div><canvas id="viz" width="352" height="90"></canvas></div></div>
     <div class="card verse" id="verse"><div class="h2">✝ Palavra de Deus</div><div class="vt" id="vText"></div><div class="vr" id="vRef"></div></div>
     <div class="credit">Clínica TV · idealizado por Waldeci Ramos</div>
   </aside>
   <main id="stage">
-    <div id="frame"><video id="tvid" muted playsinline preload="auto"></video></div>
+    <div id="frame"><video id="tvid" muted playsinline preload="auto"></video><div id="vErr"></div></div>
   </main>
-  <div id="svc"></div>
-  <footer id="lt">
+    <footer id="lt">
     <div class="lt-head">
       <div class="lt-date"><div class="dd"><b id="ltDay"></b><div class="mw"><small id="ltMon"></small><span id="ltWk"></span></div></div><em id="ltHr"></em></div>
       <div class="lt-main"><div class="lt-badge" id="ltBadge"></div><div class="lt-text" id="ltText"></div><div class="lt-detail" id="ltDetail"></div></div>
@@ -229,11 +233,12 @@
     R.style.setProperty('--sw', { estreita: '24rem', normal: '30rem', larga: '36rem' }[g.sidebar] || '30rem');
     const B = document.body.classList;
     B.toggle('dark', g.theme === 'escuro'); B.toggle('side-dark', g.theme === 'escuro' || g.sidebarStyle === 'escura'); B.toggle('compact', cp); B.toggle('no-side', g.sidebar === 'oculta');
-    ['brand', 'weather', 'schedule', 'verse', 'services', 'ticker'].forEach((k) => B.toggle('no-' + k, !!g.show && g.show[k] === false));
+    ['brand', 'weather', 'schedule', 'verse', 'ticker'].forEach((k) => B.toggle('no-' + k, !!g.show && g.show[k] === false));
+    B.toggle('no-sidelogo', g.sideLogoShow === false || !g.sideLogo);
     R.style.setProperty('--ts', Math.min(2, Math.max(0.5, (+g.tickerSize || 100) / 100)));
     fitClock();
   }
-  let rzT; addEventListener('resize', () => { layout(); clearTimeout(rzT); rzT = setTimeout(services, 300); });
+  addEventListener('resize', layout);
 
   /* relógio: encolhe sozinho se a fonte/tamanho escolhidos não couberem na coluna */
   function fitClock() {
@@ -306,10 +311,10 @@
       if (!c.is_day && (c.weather_code === 0 || c.weather_code === 1)) emoji = '🌙';
       $('wIco').textContent = emoji; $('wDesc').textContent = ic[1];
       $('wTemp').textContent = Math.round(c.temperature_2m) + '°C';
-      $('wMm').innerHTML = '▲ ' + Math.round(d.temperature_2m_max[0]) + '° &nbsp;▼ ' + Math.round(d.temperature_2m_min[0]) + '°';
+      $('wMm').innerHTML = '<span class="mx"><small>máx</small><b>' + Math.round(d.temperature_2m_max[0]) + '°</b></span><span class="mn"><small>mín</small><b>' + Math.round(d.temperature_2m_min[0]) + '°</b></span>';
       $('wHum').textContent = Math.round(c.relative_humidity_2m) + '%'; $('wWind').textContent = Math.round(c.wind_speed_10m) + ' km/h';
       $('wFeel').textContent = Math.round(c.apparent_temperature) + '°'; $('wRain').textContent = Math.round(d.precipitation_probability_max[0] || 0) + '%';
-      $('wDays').innerHTML = d.time.map((x, k) => '<div><b>' + (k ? new Date(x + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '') : 'hoje') + '</b><span>' + wmo(d.weather_code[k])[0] + '</span><i>' + Math.round(d.temperature_2m_max[k]) + '°</i><u>' + Math.round(d.temperature_2m_min[k]) + '°</u></div>').join('');
+      $('wDays').innerHTML = d.time.map((x, k) => '<div' + (k ? '' : ' class="today"') + '><b>' + (k ? new Date(x + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '') : 'Hoje') + '</b><span>' + wmo(d.weather_code[k])[0] + '</span><i><small>máx</small>' + Math.round(d.temperature_2m_max[k]) + '°</i><u><small>mín</small>' + Math.round(d.temperature_2m_min[k]) + '°</u></div>').join('');
       const n = new Date(); $('wUpd').textContent = 'Atualizado às ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
     } catch (e) { $('wDesc').textContent = 'Clima indisponível'; }
     wTimer = setTimeout(weather, 10 * 60 * 1000);
@@ -343,7 +348,7 @@
   }
 
   const items = () => { const t = new Date().toISOString().slice(0, 10); return (cfg.ticker || []).filter((x) => x.active !== false && x.text && (!x.start || x.start <= t) && (!x.end || x.end >= t)).concat(newsItems()); };
-  let hTimer = null, hIdx = -1, tRaf = null, svT = null, svRaf = null;
+  let hTimer = null, hIdx = -1, tRaf = null;
   function lowerThird() {
     clearTimeout(hTimer); cancelAnimationFrame(tRaf);
     const tf = cfg.general.tickerFont ? "'" + cfg.general.tickerFont + "', var(--fd), sans-serif" : '';
@@ -380,59 +385,80 @@
     const f = (h) => Math.round(parseInt(h, 16) + (255 - parseInt(h, 16)) * 0.45);
     return 'rgb(' + f(m[1]) + ',' + f(m[2]) + ',' + f(m[3]) + ')';
   }
-  /* Faixa de serviços: "passando" (letreiro contínuo) ou "parada" (destaque um de cada vez).
-     Cada serviço pode ter foto/vídeo (miniatura redonda no cartão) e ainda entrar na tela central. */
-  function svcChip(s) {
-    const c = document.createElement('div'); c.className = 'sc';
-    if (s.src && s.type === 'image') { const i = document.createElement('img'); i.className = 'th'; i.src = s.src; i.alt = ''; c.appendChild(i); }
-    else if (s.src && s.type === 'video') { const v = document.createElement('video'); v.className = 'th'; v.src = InfoTV.mediaURL(s.src); v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true; c.appendChild(v); v.play && v.play().catch(() => {}); }
-    else if (s.icon) { const ic = document.createElement('span'); ic.textContent = s.icon; c.appendChild(ic); }
-    const b = document.createElement('b'); b.textContent = s.label; c.appendChild(b); return c;
-  }
-  function services() {
-    clearInterval(svT); cancelAnimationFrame(svRaf);
-    const g = cfg.general, b = $('svc'), l = (cfg.services || []).filter((s) => s.active !== false && s.label);
-    b.innerHTML = ''; b.className = ''; b.style.display = l.length ? '' : 'none';
-    if (g.show && g.show.services === false) return;   // faixa desligada: não gasta processamento
-    b.style.setProperty('--ss', Math.min(2, Math.max(0.6, (+g.svcSize || 100) / 100)));
-    b.style.setProperty('--sf', g.svcFont ? "'" + g.svcFont + "', var(--fb), sans-serif" : 'inherit');
-    if (!l.length) return;
-    if (g.svcMode === 'parada') {
-      l.forEach((s) => b.appendChild(svcChip(s)));
-      const ch = [...b.children]; let i = 0; ch[0].classList.add('hl');
-      svT = setInterval(() => { ch.forEach((c) => c.classList.remove('hl')); ch[++i % ch.length].classList.add('hl'); }, 2600); return;
-    }
-    b.classList.add('pass');
-    const track = document.createElement('div'); track.className = 'svtrack'; b.appendChild(track);
-    const fill = (n) => { track.innerHTML = ''; for (let k = 0; k < n; k++) l.forEach((s) => track.appendChild(svcChip(s))); return track.scrollWidth; };
-    const one = fill(1), reps = one > 0 ? Math.max(1, Math.ceil(b.clientWidth / one)) : 1;
-    const unit = fill(reps); for (let k = 0; k < reps; k++) l.forEach((s) => track.appendChild(svcChip(s)));   // 2 blocos iguais = laço sem emendas
-    if (!(unit > 0)) return;
-    let x = 0, last = performance.now();
-    (function step(now) {
-      const rem = REMK;
-      x -= (now - last) / 1000 * (+g.svcSpeed || 60) * rem; last = now; if (x <= -unit) x += unit;
-      track.style.transform = 'translate3d(' + x + 'px,0,0)'; svRaf = requestAnimationFrame(step);
-    })(last);
-  }
-  function svcSlides() {
-    return (cfg.services || []).filter((s) => s.active !== false && s.stage !== false && s.src && (s.type === 'image' || s.type === 'video')).map((s) => InfoTV.normSlide({
-      id: 'svc-' + s.label, type: s.type, seconds: s.type === 'video' ? s.seconds : (s.seconds || 8), src: s.src, fit: 'cover', tpl: 'cheia', pos: 'bottom', icon: '',
-      t1: { text: s.label, effect: 'sombra', anim: 'up' }, t2: { text: '', effect: 'none', anim: 'fade' } }));
-  }
-
   /* ================= Publicações (slides): modelos, entradas e efeitos ================= */
   let sIdx = -1, sTimer = null, curEl = null;
   function validSlides() {
+    if (PREVIEW && Q.get('slide')) { const one = (cfg.slides || []).find((x) => x.id === Q.get('slide')); if (one) return [one]; }   // pré-visualização de uma publicação só
     const today = new Date().toISOString().slice(0, 10);
-    return (cfg.slides || []).filter((s) => s.active !== false && (!s.start || s.start <= today) && (!s.end || s.end >= today)).concat(svcSlides());
+    return (cfg.slides || []).filter((s) => s.active !== false && (!s.start || s.start <= today) && (!s.end || s.end >= today));
   }
   function ytId(u) { const m = String(u).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); }
   function textBlock(cls, st, base) { const w = document.createElement('div'); w.className = cls; if (st && st.text) { const s = document.createElement('span'); InfoFX.text(s, st.text, st, base); w.appendChild(s); } return w; }
-  function mediaEl(s, contain) {
+  /* ----- aviso discreto quando um vídeo não abre (ajuda a achar o problema na TV) ----- */
+  let errT = null;
+  function badge(msg) { const b = $('vErr'); if (!b) return; b.textContent = '⚠ ' + msg; b.classList.add('on'); clearTimeout(errT); errT = setTimeout(() => b.classList.remove('on'), 7000); try { console.warn('[ClinicaTV] ' + msg); } catch (e) {} }
+  const MERR = { 1: 'carregamento interrompido', 2: 'falha de rede ao baixar o arquivo', 3: 'o navegador não conseguiu decodificar o vídeo', 4: 'formato ou endereço não suportado (use MP4 H.264 + AAC e confira o caminho)' };
+
+  /* ----- vídeo MP4: sempre mudo (a TV não bloqueia), com ganchos para saber quando começa, termina ou falha ----- */
+  function videoEl(src, o) {
+    const h = o.hooks || {}, v = document.createElement('video');
+    v.muted = !o.sound; v.defaultMuted = !o.sound; v.autoplay = true; v.playsInline = true; v.preload = 'auto'; v.loop = !!o.loop; v.setAttribute('playsinline', '');
+    const go = () => { const p = v.play(); if (p && p.catch) p.catch(() => { if (!v.muted) { v.muted = true; v.play().catch(() => {}); } }); };
+    v.addEventListener('canplay', go, { once: true });
+    v.addEventListener('playing', () => { h.onPlay && h.onPlay(); });
+    v.addEventListener('ended', () => { if (!v.loop) h.onEnd && h.onEnd(); });
+    v.addEventListener('error', () => {
+      const c = v.error ? v.error.code : 0;
+      // navegador sem H.264: tenta o mesmo arquivo em .webm (se existir na mesma pasta)
+      if (c === 4 && !v._alt && /\.(mp4|m4v|mov)(\?.*)?$/i.test(v.src)) { v._alt = 1; v.src = v.src.replace(/\.(mp4|m4v|mov)(\?.*)?$/i, '.webm'); return; }
+      badge('vídeo não abriu: ' + (MERR[c] || 'erro desconhecido') + ' — ' + String(src).split('/').pop()); h.onFail && h.onFail();
+    });
+    v.src = InfoTV.mediaURL(src);
+    return v;
+  }
+
+  /* ----- YouTube com a API oficial: sabe quando o vídeo termina e devolve a tela aos slides ----- */
+  let ytP = null;
+  function ytAPI() {
+    if (ytP) return ytP;
+    ytP = new Promise((res) => {
+      if (window.YT && YT.Player) return res(true);
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { try { prev && prev(); } catch (e) {} res(true); };
+      const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api'; sc.onerror = () => { ytP = null; res(false); };
+      document.head.appendChild(sc); setTimeout(() => res(!!(window.YT && YT.Player)), 12000);
+    });
+    return ytP;
+  }
+  function whenConnected(node, fn, n) { if (node.isConnected) return fn(); if ((n || 0) > 300) return; requestAnimationFrame(() => whenConnected(node, fn, (n || 0) + 1)); }
+  function ytFrame(src, o) {
+    const h = o.hooks || {}, id = ytId(src), f = document.createElement('iframe');
+    const q = new URLSearchParams({ enablejsapi: 1, autoplay: 1, mute: o.sound ? 0 : 1, controls: 0, rel: 0, modestbranding: 1, playsinline: 1, iv_load_policy: 3, fs: 0, disablekb: 1, start: Math.max(0, +o.start || 0) });
+    if (/^https?:$/.test(location.protocol)) q.set('origin', location.origin);
+    f.src = 'https://www.youtube.com/embed/' + id + '?' + q; f.allow = 'autoplay; encrypted-media'; f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    if (!id) { setTimeout(() => { badge('link do YouTube inválido'); h.onFail && h.onFail(); }, 50); return f; }
+    ytAPI().then((ok) => {
+      if (!ok) { badge('sem acesso ao YouTube (internet?) — usando só o tempo da publicação'); h.noApi && h.noApi(); return; }
+      whenConnected(f, () => {
+        try {
+          f._yt = new YT.Player(f, { events: {
+            onReady: (e) => { try { if (!o.sound) e.target.mute(); e.target.playVideo(); } catch (x) {} },
+            onStateChange: (e) => {
+              if (e.data === 1) h.onPlay && h.onPlay();
+              else if (e.data === 0) { if (o.loop) { try { e.target.seekTo(+o.start || 0); e.target.playVideo(); } catch (x) {} } else h.onEnd && h.onEnd(); }
+            },
+            onError: (e) => { badge('o YouTube não liberou este vídeo (código ' + (e && e.data) + '): ele pode não permitir exibição em outros sites'); h.onFail && h.onFail(); }
+          } });
+        } catch (e) { h.noApi && h.noApi(); }
+      });
+    });
+    return f;
+  }
+
+  function mediaEl(s, contain, hooks) {
     if (s.type === 'image') { const i = document.createElement('div'); i.className = 'img' + (contain ? ' contain' : ''); i.style.backgroundImage = 'url("' + InfoTV.mediaURL(s.src) + '")'; return i; }
-    if (s.type === 'video') { const v = document.createElement('video'); v.src = InfoTV.mediaURL(s.src); v.muted = true; v.autoplay = true; v.playsInline = true; v.preload = 'auto'; v.addEventListener('canplay', () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); }, { once: true }); return v; }
-    const f = document.createElement('iframe'); f.src = 'https://www.youtube.com/embed/' + ytId(s.src) + '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1'; f.allow = 'autoplay; encrypted-media'; return f;
+    if (s.type === 'video') return videoEl(s.src, { hooks, sound: false });
+    return ytFrame(s.src, { hooks, sound: !!s.ytSound, start: s.ytStart });
   }
   function fxLayer(kind) {
     if (!kind) return null;
@@ -448,15 +474,14 @@
     if (kind === 'ondas') { const p = '<svg viewBox="0 0 2400 120" preserveAspectRatio="none"><path d="M0 60Q150 0 300 60T600 60T900 60T1200 60T1500 60T1800 60T2100 60T2400 60V120H0Z"/></svg>'; d.innerHTML = p + p; }
     return d;
   }
-  function buildVideoBox(s, el, layer) {
+  function buildVideoBox(s, el, layer, hooks) {
     const pos = s.vpos === 'esquerda' || s.vpos === 'direita' ? s.vpos : 'centro', img = InfoTV.mediaURL(s.vimg);
     el.classList.add('vbox'); el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
     if (img && pos === 'centro') { const bi = document.createElement('div'); bi.className = 'vbgimg'; bi.style.backgroundImage = 'url("' + img + '")'; el.appendChild(bi); el.classList.add('hasvid'); }
     if (layer) el.appendChild(layer);
     const wrap = document.createElement('div'); wrap.className = 'vwrap pos-' + pos + (s.vline ? ' vline' : '');
     wrap.style.setProperty('--vlc', s.vlineColor || '#ffffff'); wrap.style.setProperty('--vlw', Math.max(1, Math.min(16, +s.vlineW || 4)) + 'px');
-    const v = document.createElement('video'); v.className = 'vmain'; v.src = InfoTV.mediaURL(s.src); v.muted = true; v.autoplay = true; v.playsInline = true; v.preload = 'auto';
-    v.addEventListener('canplay', () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); }, { once: true });
+    const v = videoEl(s.src, { hooks, sound: false }); v.className = 'vmain';
     let side = null;
     if (img && pos !== 'centro') { side = document.createElement('div'); side.className = 'vside'; side.style.backgroundImage = 'url("' + img + '")'; side.style.backgroundSize = s.vimgfit === 'contain' ? 'contain' : 'cover'; wrap.classList.add('hasside'); }
     if (pos === 'direita' && side) wrap.append(side, v); else if (side) wrap.append(v, side); else wrap.append(v);
@@ -469,16 +494,43 @@
       const k = Math.min(aw / vw, ah / vh) * (Math.max(20, Math.min(100, +s.vsize || 100)) / 100);
       v.style.width = Math.round(vw * k) + 'px'; v.style.height = Math.round(vh * k) + 'px'; v.style.opacity = 1;
     };
-    v.addEventListener('loadedmetadata', fit); if (window.ResizeObserver) new ResizeObserver(fit).observe(wrap);
+    v.addEventListener('loadedmetadata', fit); v.addEventListener('loadeddata', fit); v.addEventListener('playing', fit); if (window.ResizeObserver) new ResizeObserver(fit).observe(wrap);
+    v.addEventListener('playing', () => setTimeout(() => { if (v.style.opacity !== '1') { v.style.height = '100%'; v.style.opacity = 1; } }, 600));   // garantia: nunca deixa o vídeo invisível
     if ((s.t1 && s.t1.text) || (s.t2 && s.t2.text)) { const ov = document.createElement('div'); ov.className = 'ov pos-' + (s.pos || 'bottom'); ov.append(textBlock('tx1', s.t1, 3.4), textBlock('tx2', s.t2, 1.8)); el.appendChild(ov); }
     return el;
   }
+  function buildZones(s, el, layer) {
+    el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
+    if (layer) el.appendChild(layer);
+    const main = {}; let mainSet = false;
+    (s.zones || []).forEach((z) => {
+      const d = document.createElement('div'); d.className = 'zone z-' + z.type;
+      d.style.left = z.x + '%'; d.style.top = z.y + '%'; d.style.width = z.w + '%'; d.style.height = z.h + '%'; d.style.borderRadius = (+z.radius || 0) + 'rem';
+      const sh = []; if (+z.border > 0) sh.push('0 0 0 ' + (z.border / 16) + 'rem ' + (z.borderColor || '#fff')); if (z.shadow) sh.push('0 .6rem 1.8rem rgba(0,0,0,.4)'); if (sh.length) d.style.boxShadow = sh.join(',');
+      const isMain = s.zEnd === 'fim' && !mainSet && (z.type === 'video' || z.type === 'youtube') && z.src;
+      if (isMain) { mainSet = true; el._main = main; }
+      if (z.type === 'image' && z.src) { const i = document.createElement('div'); i.className = 'img'; i.style.backgroundSize = z.fit === 'contain' ? 'contain' : 'cover'; i.style.backgroundImage = 'url("' + InfoTV.mediaURL(z.src) + '")'; d.appendChild(i); }
+      else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); v.style.objectFit = z.fit === 'contain' ? 'contain' : 'cover'; d.appendChild(v); }
+      else if (z.type === 'youtube' && z.src) d.appendChild(ytFrame(z.src, { loop: !isMain, sound: !!z.sound, start: 0, hooks: isMain ? main : {} }));
+      else if (z.type === 'text') {
+        const t = document.createElement('div'); t.className = 'ztext'; t.textContent = z.text || '';
+        t.style.fontSize = (2.2 * (+z.size || 1)) + 'rem'; t.style.color = z.color || '#fff'; t.style.justifyContent = z.align === 'left' ? 'flex-start' : z.align === 'right' ? 'flex-end' : 'center'; t.style.textAlign = z.align || 'center';
+        if (z.font) t.style.fontFamily = "'" + z.font + "', var(--fd), sans-serif";
+        if (+z.bgAlpha > 0) t.style.background = 'color-mix(in srgb, ' + (z.bg || '#0f766e') + ' ' + Math.min(100, +z.bgAlpha) + '%, transparent)';
+        d.appendChild(t);
+      }
+      el.appendChild(d);
+    });
+    return el;
+  }
   function buildSlide(s) {
-    const g = cfg.general, el = document.createElement('div'), tpl = s.type === 'text' ? 'texto' : (s.tpl || 'cheia');
-    el.className = 'slide ' + s.type + ' tr-' + (s.trans || g.transition || 'fade') + (s.type === 'image' && s.kb ? ' kb-' + s.kb : '');
+    const g = cfg.general, el = document.createElement('div'), tpl = (s.type === 'text' || s.type === 'zonas') ? 'texto' : (s.tpl || 'cheia');
+    const main = {}; if (s.type === 'video' || s.type === 'youtube') el._main = main;
+    el.className = 'slide ' + (s.type === 'zonas' ? 'zonas' : s.type) + ' tr-' + (s.trans || g.transition || 'fade') + (s.type === 'image' && s.kb ? ' kb-' + s.kb : '');
     el.style.setProperty('--dur', (Math.max(3, +s.seconds || +g.slideSeconds || 12) + 2) + 's');
     el.style.setProperty('--b1', s.bg1 || '#1b2f6b'); el.style.setProperty('--b2', s.bg2 || '#0b1233');
     const layer = fxLayer(s.bgfx || (tpl === 'aniversario' ? 'confete' : ''));
+    if (s.type === 'zonas') return buildZones(s, el, layer);
     if (tpl === 'texto') {
       el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
       if (s.bgvid) { const bv = document.createElement('video'); bv.className = 'bgvid'; bv.src = InfoTV.mediaURL(s.bgvid); bv.muted = true; bv.loop = true; bv.autoplay = true; bv.playsInline = true; el.classList.add('hasvid'); el.appendChild(bv); bv.play && bv.play().catch(() => {}); }
@@ -488,7 +540,7 @@
     }
     if (tpl === 'aniversario') {
       el.classList.add('niv'); if (layer) el.appendChild(layer);
-      const pol = document.createElement('div'); pol.className = 'pol'; pol.appendChild(mediaEl(s, false));
+      const pol = document.createElement('div'); pol.className = 'pol'; pol.appendChild(mediaEl(s, false, main));
       const who = document.createElement('div'); who.className = 'who';
       const pre = document.createElement('div'); pre.className = 'pre'; pre.textContent = 'Parabéns,'; who.appendChild(pre);
       const t1 = s.t1 && s.t1.text ? Object.assign({}, s.t1, { text: s.t1.text + '!' }) : null;
@@ -496,19 +548,23 @@
     }
     if (tpl === 'dica') {
       el.classList.add('dc'); if (layer) el.appendChild(layer);
-      const ph = document.createElement('div'); ph.className = 'ph'; ph.appendChild(mediaEl(s, false));
+      const ph = document.createElement('div'); ph.className = 'ph'; ph.appendChild(mediaEl(s, false, main));
       const pn = document.createElement('div'); pn.className = 'pn'; pn.append(textBlock('tx tx1', s.t1, 3.4), textBlock('tx tx2', s.t2, 1.7)); el.append(ph, pn); return el;
     }
     // tela cheia (como enviada)
-    if (s.type === 'video' && s.vfit !== 'cover') return buildVideoBox(s, el, layer);
+    if (s.type === 'video' && s.vfit !== 'cover') return buildVideoBox(s, el, layer, main);
     const contain = s.type === 'image' && s.fit === 'contain';
     if (contain) { const b = document.createElement('div'); b.className = 'bgb'; b.style.backgroundImage = 'url("' + (s.src || '') + '")'; el.appendChild(b); }
     if (layer) el.appendChild(layer);
-    el.appendChild(mediaEl(s, contain));
+    el.appendChild(mediaEl(s, contain, main));
     if ((s.t1 && s.t1.text) || (s.t2 && s.t2.text)) { const ov = document.createElement('div'); ov.className = 'ov pos-' + (s.pos || 'bottom'); ov.append(textBlock('tx1', s.t1, 3.4), textBlock('tx2', s.t2, 1.8)); el.appendChild(ov); }
     return el;
   }
-  let stT = null;
+  let stT = null, wdT = null;
+  function watch(v) {   // vídeo travou (rede/decodificação) por 15 s → passa para o próximo
+    clearInterval(wdT); let last = -1, n = 0;
+    wdT = setInterval(() => { if (v.paused || v.ended) return; if (v.currentTime === last) { if (++n >= 5) { clearInterval(wdT); badge('o vídeo travou e foi pulado'); nextSlide(); } } else { last = v.currentTime; n = 0; } }, 3000);
+  }
   function playStinger(cb) {   // vídeo de transição (vinheta) por cima da tela; a próxima publicação entra por baixo no meio dele
     const tv = $('tvid'), src = InfoTV.mediaURL(cfg.general.transVideo); let swapped = false, done = false;
     const swap = () => { if (!swapped) { swapped = true; cb(); } };
@@ -521,7 +577,7 @@
     stT = setTimeout(swap, dur * 450); setTimeout(() => { swap(); fin(); }, (dur + 0.6) * 1000);
   }
   function nextSlide() {
-    clearTimeout(sTimer); clearTimeout(stT);
+    clearTimeout(sTimer); clearTimeout(stT); clearInterval(wdT);
     const list = validSlides(), frame = $('frame');
     if (!list.length) { frame.querySelectorAll('.slide').forEach((n) => n.remove()); curEl = null; sTimer = setTimeout(nextSlide, 5000); return; }
     sIdx = (sIdx + 1) % list.length;
@@ -531,48 +587,82 @@
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
       const old = curEl; curEl = el;
       if (old) { old.classList.remove('on'); setTimeout(() => old.remove(), 1200); }
-      const secs = Math.max(3, +s.seconds || +g.slideSeconds || 12);
-      if (s.type === 'video') {
-        // a duração só começa a contar quando o vídeo realmente começa a rodar; se não começar em 25 s, passa adiante
-        const v = el.querySelector('video'), go = (ms) => { clearTimeout(sTimer); sTimer = setTimeout(nextSlide, ms); };
-        if (list.length === 1 && v && !(+s.seconds > 0)) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
+      const secs = Math.max(3, +s.seconds || +g.slideSeconds || 12), main = el._main, go = (ms) => { clearTimeout(sTimer); sTimer = setTimeout(nextSlide, ms); };
+      clearInterval(wdT);
+      if (main) {
+        // vídeo MP4 / YouTube: com duração 0 vale "até o fim do vídeo" e depois a TV volta aos slides.
+        // Com duração maior que 0 ela é o tempo máximo. Se o vídeo não começar em 30 s, segue adiante.
+        const lim = s.type === 'zonas' ? 0 : (+s.seconds > 0 ? secs : 0), v = el.querySelector('video');
+        if (list.length === 1 && s.type === 'video' && !lim && v) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
         else {
-          if (v) { v.onended = nextSlide; v.onerror = () => go(3000); v.onplaying = () => { if (!v._st) { v._st = 1; go((+s.seconds > 0 ? secs : 900) * 1000); } }; }
-          go(25000);
+          main.onEnd = nextSlide; main.onFail = () => go(3000);
+          main.noApi = () => go(Math.max(10, lim || 30) * 1000);
+          main.onPlay = () => { if (main._p) return; main._p = 1; go((lim || (s.type === 'youtube' ? 4 * 3600 : 900)) * 1000); if (v) watch(v); };
+          go(30000);
         }
       } else sTimer = setTimeout(nextSlide, secs * 1000);
     };
     if ((s.trans || g.transition) === 'video' && g.transVideo && curEl) playStinger(show); else show();
   }
 
-  /* ================= Rádio ================= */
-  const audio = new Audio(); audio.preload = 'none';
-  let rIdx = 0, rSig = '', rWant = false, rNP = null, rRetry = null;
+  /* ================= Rádio =================
+     O som vem de outro site. O navegador só deixa "ouvir" o sinal (para o gráfico) se a rádio liberar (CORS);
+     tentamos assim primeiro e, se a rádio não liberar, tocamos normalmente e o gráfico segue animado sozinho. */
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let audio = null, actx = null, analyser = null, fdata = null, rIdx = 0, rSig = '', rWant = false, rNP = null, rRetry = null, rChk = null;
+  const noCors = new Set();
+  const playing = () => !!audio && !audio.paused && !audio.ended && audio.readyState > 1;
   function rUI() {
-    const r = cfg.radio, st = r.stations[rIdx]; const box = $('radio');
-    box.classList.toggle('on', !audio.paused);
-    $('rBtn').textContent = audio.paused ? '▶' : '❚❚';
+    const r = cfg.radio, st = r.stations[rIdx], on = !!audio && !audio.paused;
+    $('radio').classList.toggle('on', on); $('rBtn').textContent = on ? '❚❚' : '▶';
     $('rName').textContent = st ? '📻 ' + st.name : 'Rádio';
+  }
+  function mkAudio(cors) {
+    const a = new Audio(); a.preload = 'none'; a._cors = cors; if (cors) a.crossOrigin = 'anonymous';
+    a.addEventListener('error', () => {
+      if (a !== audio || !rWant) return; clearTimeout(rRetry);
+      const st = cfg.radio.stations[rIdx];
+      if (a._cors && st) { noCors.add(InfoTV.resolveStream(st.url)); rSet(rIdx); rPlay(); return; }   // a rádio não libera o gráfico real: toca sem ele
+      rRetry = setTimeout(() => { const n = cfg.radio.stations.length; if (n > 1) rSet((rIdx + 1) % n); else { audio.load(); } rPlay(); }, 4000);
+    });
+    a.addEventListener('ended', () => { if (a === audio && rWant) { a.load(); rPlay(); } });
+    a.addEventListener('play', rUI); a.addEventListener('pause', rUI);
+    return a;
+  }
+  function wire(a) {
+    analyser = null;
+    try {
+      if (!actx) actx = new AC();
+      const src = actx.createMediaElementSource(a); analyser = actx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.6;
+      src.connect(analyser); analyser.connect(actx.destination); fdata = new Uint8Array(analyser.frequencyBinCount);
+    } catch (e) { analyser = null; }
   }
   function rSet(i) {
     const st = cfg.radio.stations[i]; if (!st) return;
-    rIdx = i; audio.src = InfoTV.resolveStream(st.url); audio.volume = Math.min(1, Math.max(0, +cfg.radio.volume || 0.6)); $('rTitle').textContent = ''; rUI();
+    rIdx = i; const url = InfoTV.resolveStream(st.url), cors = !!AC && !PREVIEW && !noCors.has(url);
+    if (audio) { try { audio.pause(); audio.removeAttribute('src'); audio.load(); } catch (e) {} }
+    audio = mkAudio(cors); analyser = null; if (cors) wire(audio);
+    audio.src = url; audio.volume = Math.min(1, Math.max(0, +cfg.radio.volume || 0.6)); $('rTitle').textContent = ''; rUI();
+  }
+  function rGuard() {   // se o analisador travar o som (contexto suspenso), recomeça sem ele: o som vem sempre primeiro
+    clearTimeout(rChk);
+    rChk = setTimeout(() => {
+      if (!audio || !audio._cors || audio.paused || !actx || actx.state === 'running') return;
+      actx.resume().catch(() => {});
+      setTimeout(() => { if (audio && audio._cors && !audio.paused && actx.state !== 'running') { const st = cfg.radio.stations[rIdx]; if (st) noCors.add(InfoTV.resolveStream(st.url)); rSet(rIdx); rPlay(); } }, 1500);
+    }, 2000);
   }
   function rPlay() {
-    rWant = true; audio.play().then(() => { $('radio').classList.remove('hint'); rUI(); rNowPlaying(); })
+    if (!audio) rSet(rIdx); if (!audio) return;
+    rWant = true; if (actx && actx.state === 'suspended') actx.resume().catch(() => {});
+    audio.play().then(() => { $('radio').classList.remove('hint'); rUI(); rNowPlaying(); rGuard(); })
       .catch(() => { $('radio').classList.add('hint'); $('rTitle').textContent = 'Toque na tela para ativar o som'; });
   }
-  function rPause() { rWant = false; audio.pause(); rUI(); }
-  function rToggle() { if (!cfg.radio.stations.length) return; if (audio.paused) { if (!audio.src) rSet(rIdx); rPlay(); } else rPause(); }
-  audio.addEventListener('error', () => {
-    if (!rWant) return; clearTimeout(rRetry);
-    rRetry = setTimeout(() => { const n = cfg.radio.stations.length; if (n > 1) rSet((rIdx + 1) % n); else audio.load(); rPlay(); }, 4000);
-  });
-  audio.addEventListener('ended', () => { if (rWant) { audio.load(); rPlay(); } });
-  audio.addEventListener('play', rUI); audio.addEventListener('pause', rUI);
+  function rPause() { rWant = false; if (audio) audio.pause(); rUI(); }
+  function rToggle() { if (!cfg.radio.stations.length) return; if (!audio || audio.paused) rPlay(); else rPause(); }
   async function rNowPlaying() {
     clearTimeout(rNP); const r = cfg.radio;
-    if (!r.nowPlayingUrl || audio.paused) { if (!r.nowPlayingUrl) $('rTitle').textContent = 'Ao vivo'; return; }
+    if (!r.nowPlayingUrl || !audio || audio.paused) { if (!r.nowPlayingUrl) $('rTitle').textContent = 'Ao vivo'; return; }
     try {
       let j = await (await fetch(r.nowPlayingUrl, { cache: 'no-store' })).json(); if (Array.isArray(j)) j = j[rIdx] || j[0];
       const sg = j.now_playing && j.now_playing.song; $('rTitle').textContent = sg ? (sg.text || (sg.artist + ' – ' + sg.title)) : 'Ao vivo';
@@ -581,29 +671,41 @@
   }
   function radioApply() {
     const r = cfg.radio, box = $('radio');
-    if (!r.enabled || !r.stations.length) { box.hidden = true; rWant = false; audio.pause(); rSig = ''; return; }
-    if (PREVIEW) { box.hidden = false; rIdx = Math.min(Math.max(0, +r.current || 0), r.stations.length - 1); rUI(); return; }
-    box.hidden = false; audio.volume = Math.min(1, Math.max(0, +r.volume || 0.6));
+    if (!r.enabled || !r.stations.length) { box.hidden = true; rWant = false; if (audio) audio.pause(); rSig = ''; return; }
+    box.hidden = false;
+    if (PREVIEW) { rIdx = Math.min(Math.max(0, +r.current || 0), r.stations.length - 1); rUI(); return; }
+    if (audio) audio.volume = Math.min(1, Math.max(0, +r.volume || 0.6));
     // trocou a rádio escolhida (ou algum endereço) no admin → muda na hora; só mexer em volume/outros ajustes não reinicia o som
     const cur = Math.min(Math.max(0, +r.current || 0), r.stations.length - 1), sig = JSON.stringify(r.stations.map((s) => s.url)) + '|' + cur;
-    if (sig !== rSig) { const was = !audio.paused; rSig = sig; rSet(cur); if (r.autoplay || was) rPlay(); } else rUI();
+    if (sig !== rSig) { const was = playing(); rSig = sig; rSet(cur); if (r.autoplay || was) rPlay(); } else rUI();
   }
 
-  /* Gráfico de som no cartão da rádio (fim da programação) (animação do ritmo — o áudio vem de outro site e o navegador não deixa "ouvir" o sinal) */
+  /* Gráfico de som: usa o sinal real da rádio quando ela libera; senão anima sozinho (nunca fica parado) */
   const viz = $('viz'), vctx = viz.getContext('2d'), VN = 34;
-  const vPh = Array.from({ length: VN }, () => Math.random() * 6.28), vSp = Array.from({ length: VN }, () => 1.5 + Math.random() * 3.4);
-  let vE = 0, vLast = 0;
+  const vPh = Array.from({ length: VN }, () => Math.random() * 6.28), vSp = Array.from({ length: VN }, () => 1.5 + Math.random() * 3.4), vLv = new Array(VN).fill(0.05);
+  let vE = 0.2, vLast = 0, vSig = 0;
+  function vizLevels(t) {
+    const s = t / 1000, lv = new Array(VN);
+    if (playing() && analyser && fdata && actx && actx.state === 'running') {
+      analyser.getByteFrequencyData(fdata); let sum = 0;
+      for (let i = 0; i < VN; i++) { const idx = Math.min(fdata.length - 1, 1 + Math.floor(Math.pow(i / VN, 1.6) * fdata.length * 0.7)); const v = fdata[idx] / 255; sum += v; lv[i] = Math.min(1, Math.pow(v, 1.1) * 1.3); }
+      if (sum > 0.4) vSig = t;
+      if (t - vSig < 6000) { for (let i = 0; i < VN; i++) { vLv[i] += (lv[i] - vLv[i]) * (lv[i] > vLv[i] ? 0.6 : 0.2); lv[i] = Math.max(0.04, vLv[i]); } return lv; }
+    }
+    // animação própria: forte quando toca; suave (mas viva) quando parada ou no preview do admin
+    vE += ((playing() ? 1 : (PREVIEW ? 0.6 : 0.28)) - vE) * 0.08;
+    for (let i = 0; i < VN; i++) { const env = Math.pow(Math.abs(Math.sin(s * vSp[i] + vPh[i])), 1.25) * (0.55 + 0.45 * Math.sin(s * 0.9 + i * 0.35)) * (1 - i / VN * 0.3); vLv[i] = Math.max(0.05, vE * (0.14 + 0.86 * env)); lv[i] = vLv[i]; }
+    return lv;
+  }
   function vizLoop(t) {
     requestAnimationFrame(vizLoop);
     if (!cfg) return;
     const rr = cfg.radio, on = !$('radio').hidden && rr.viz !== 'off';
     if (viz.style.display !== (on ? '' : 'none')) viz.style.display = on ? '' : 'none';
-    const mode = rr.viz; if (!on || t - vLast < 40) return; vLast = t;
+    const mode = rr.viz; if (!on || t - vLast < 33) return; vLast = t;
     const dpr = Math.min(1.5, window.devicePixelRatio || 1), w = Math.round(viz.clientWidth * dpr), h = Math.round(viz.clientHeight * dpr);
     if (!w || !h) return; if (viz.width !== w || viz.height !== h) { viz.width = w; viz.height = h; }
-    vE += ((!audio.paused && !audio.ended ? 1 : 0.07) - vE) * 0.07;
-    const s = t / 1000, g = cfg.general, c1 = g.primary || '#1fb6a6', c2 = g.secondary || '#d4a93c';
-    const lv = []; for (let i = 0; i < VN; i++) { const env = Math.pow(Math.abs(Math.sin(s * vSp[i] + vPh[i])), 1.25) * (0.55 + 0.45 * Math.sin(s * 0.9 + i * 0.35)) * (1 - i / VN * 0.3); lv.push(Math.max(0.04, vE * (0.14 + 0.86 * env))); }
+    const g = cfg.general, c1 = g.primary || '#1fb6a6', c2 = g.secondary || '#d4a93c', lv = vizLevels(t);
     vctx.clearRect(0, 0, w, h);
     const gr = vctx.createLinearGradient(0, h, 0, 0); gr.addColorStop(0, c1); gr.addColorStop(1, c2);
     vctx.fillStyle = gr; vctx.strokeStyle = gr;
@@ -622,7 +724,7 @@
   requestAnimationFrame(vizLoop);
   $('radio').addEventListener('click', (e) => { e.stopPropagation(); rToggle(); });
   // 1º toque/tecla libera o áudio quando o navegador bloqueia o autoplay
-  ['click', 'keydown', 'touchstart'].forEach((ev) => addEventListener(ev, () => { if (cfg && cfg.radio.enabled && cfg.radio.autoplay && rWant && audio.paused) rPlay(); }, { passive: true }));
+  ['click', 'keydown', 'touchstart'].forEach((ev) => addEventListener(ev, () => { if (actx && actx.state === 'suspended') actx.resume().catch(() => {}); if (cfg && cfg.radio.enabled && cfg.radio.autoplay && rWant && audio && audio.paused) rPlay(); }, { passive: true }));
 
   /* ================= Tela cheia / giro / atalhos ================= */
   function fullscreen() {
@@ -665,14 +767,17 @@
     if ((g.theme === 'escuro' || g.sidebarStyle === 'escura') && ck.color === InfoTV.DEFAULT.general.clock.color) Object.assign(ck, { color: '#6fb8ff', g1: '#9bd5ff', g2: '#38bdf8' });
     InfoFX.style($('time'), ck, 0); $('time').className += ' time'; $('time').style.fontSize = '';
     $('sec').style.fontFamily = $('time').style.fontFamily; root.setProperty('--tf', ck.font ? "'" + ck.font + "', var(--fd)" : 'var(--fd)'); root.setProperty('--tempc', g.tempColor || '#1fa35c'); root.setProperty('--clk2', ck.g2 || ck.glow || g.primary);
-    layout(); renderSchedule(); nextVerse(); weather(); newsSetup(); lowerThird(); services(); radioApply();
+    const sl = $('sideLogo'), sli = $('sideLogoImg');
+    if (g.sideLogo && g.sideLogoShow !== false) { if (sli.getAttribute('src') !== g.sideLogo) sli.src = g.sideLogo; sl.hidden = false; } else sl.hidden = true;
+    root.setProperty('--slh', Math.min(2.2, Math.max(0.5, (+g.sideLogoH || 100) / 100))); root.setProperty('--slbg', g.sideLogoBg || '#ffffff');
+    layout(); renderSchedule(); nextVerse(); weather(); newsSetup(); lowerThird(); radioApply();
     sIdx = -1; nextSlide();
   }
 
   async function init() {
     cfg = await InfoTV.load();
     apply(); tick(); setInterval(tick, 1000); wake();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitClock(); services(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitClock(); });
     let ct; InfoTV.onChange(() => { clearTimeout(ct); ct = setTimeout(async () => { cfg = await InfoTV.load(); apply(); }, 1200); });
     setInterval(async () => {   // modo GitHub: confere config.json a cada 2 minutos
       if (InfoTV.getMode() !== 'repo' || await InfoTV.isServer()) return;

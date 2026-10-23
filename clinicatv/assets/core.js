@@ -58,12 +58,21 @@
   /* ---------- Modelo de dados ---------- */
   const tdef = (o) => Object.assign({ text: '', font: '', size: 1, color: '#ffffff', effect: 'sombra', glow: '#00e5ff', g1: '#ffffff', g2: '#ffd54f', anim: 'up' }, o || {});
 
+  /* zona = retângulo dentro da tela central (valores em % da tela), com imagem, vídeo, YouTube ou texto */
+  const zdef = (z) => {
+    z = Object.assign({ id: '', type: 'image', src: '', x: 0, y: 0, w: 50, h: 50, fit: 'cover', radius: 0, border: 0, borderColor: '#ffffff', shadow: false, sound: false, text: '', color: '#ffffff', size: 1, align: 'center', bg: '#0f766e', bgAlpha: 0, font: '' }, z || {});
+    z.id = z.id || rid();
+    ['x', 'y', 'w', 'h'].forEach((k) => { z[k] = Math.round(Math.min(100, Math.max(0, +z[k] || 0)) * 10) / 10; });
+    z.w = Math.max(4, Math.min(z.w, 100 - z.x)); z.h = Math.max(4, Math.min(z.h, 100 - z.y));
+    return z;
+  };
   function normSlide(s) {
-    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4 }, s || {});
+    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4, ytSound: false, ytStart: 0, zones: [], zEnd: 'tempo' }, s || {});
     s.id = s.id || rid();
     s.t1 = tdef(s.t1 || { text: s.title || '' });
     s.t2 = tdef(s.t2 || { text: s.body || '', effect: 'none', anim: 'fade' });
     delete s.title; delete s.body;
+    s.zones = (Array.isArray(s.zones) ? s.zones : []).map(zdef);
     return s;
   }
 
@@ -76,7 +85,7 @@
   ];
   const CLOCK_OLD = '#0f766e';
   const DEFAULT = {
-    version: 6,
+    version: 7,
     general: {
       name: 'Clínica TV', subtitle: 'Fisio Clínica Estiva', logo: 'logo.svg',
       brandBg: '#ffffff', brandFg: '#0b1d2e',
@@ -89,6 +98,7 @@
       tickerFont: '', tickerSize: 100,
       svcMode: 'passando', svcSpeed: 60, svcFont: '', svcSize: 100,
       newsProxy: '',
+      sideLogo: 'midia/logo-clinica.jpg', sideLogoShow: true, sideLogoH: 100, sideLogoBg: '#ffffff',
       clock: { font: 'Rajdhani', size: 115, effect: 'baixo', color: '#1565d8', glow: '#38bdf8', g1: '#0646b8', g2: '#1e9bff' }
     },
     radio: { enabled: true, autoplay: true, volume: 0.6, nowPlayingUrl: '', current: 0, viz: 'barras', stations: DEFAULT_STATIONS() },
@@ -168,7 +178,9 @@
     }
     // v6: relógio em baixo relevo e temperatura verde em alto relevo (só troca o relógio se ainda for o azul padrão anterior)
     if (wasVersion < 6) { const g = cfg.general, c = g.clock || {}; if (!c.color || c.color === '#0a58ca' || c.color === '#eaf6ff' || c.color === CLOCK_OLD) g.clock = clone(DEFAULT.general.clock); }
-    cfg.version = 6;
+    // v7: a faixa de serviços ("barrinhas") foi removida da TV
+    cfg.general.show.services = false;
+    cfg.version = 7;
     r.current = Math.min(Math.max(0, +r.current || 0), Math.max(0, r.stations.length - 1));
     if (!['barras', 'espelho', 'onda', 'off'].includes(r.viz)) r.viz = 'barras';
     if (!['escura', 'clara'].includes(cfg.general.sidebarStyle)) cfg.general.sidebarStyle = 'escura';
@@ -191,21 +203,35 @@
 
   let bc = null; try { bc = new BroadcastChannel('infotv'); } catch (e) {}
   let inflight = Promise.resolve();
+  const TOKEN_KEY = 'infotv_token';
+  const getToken = () => { try { return sessionStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; } };
+  const setToken = (t) => { try { t ? sessionStorage.setItem(TOKEN_KEY, t) : sessionStorage.removeItem(TOKEN_KEY); } catch (e) {} };
+  const authErr = (r) => (r.status === 401 ? new Error('sessão expirada: saia e entre de novo no painel') : new Error('HTTP ' + r.status));
   function saveServer(cfg) {
     const body = JSON.stringify(cfg);
-    inflight = inflight.catch(() => {}).then(async () => { const r = await fetch('api/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body }); if (!r.ok) throw new Error('HTTP ' + r.status); });
+    inflight = inflight.catch(() => {}).then(async () => { const r = await fetch('api/config', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': getToken() }, body }); if (!r.ok) throw authErr(r); });
     return inflight;
+  }
+  async function login(user, pass) {
+    const r = await fetch('api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: user, senha: pass }) });
+    if (!r.ok) return false; const j = await r.json(); setToken(j.token || ''); return !!j.token;
+  }
+  async function hasSession() { if (!getToken()) return false; try { const r = await fetch('api/sessao', { headers: { 'x-token': getToken() }, cache: 'no-store' }); return r.ok; } catch (e) { return false; } }
+  async function changeAccess(user, pass) {
+    const r = await fetch('api/acesso', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-token': getToken() }, body: JSON.stringify({ usuario: user, senha: pass }) });
+    if (!r.ok) throw authErr(r);
   }
   function save(cfg) { if (SRV === true) return saveServer(cfg); localStorage.setItem(KEY, JSON.stringify(cfg)); try { bc && bc.postMessage('changed'); } catch (e) {} }
   async function upload(file) {
-    const f = new FormData(); f.append('arquivo', file, file.name);
-    const r = await fetch('api/upload', { method: 'POST', body: f }); if (!r.ok) throw new Error('HTTP ' + r.status);
+    const r = await fetch('api/upload', { method: 'POST', headers: { 'x-token': getToken(), 'x-filename': encodeURIComponent(file.name), 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+    if (!r.ok) throw authErr(r);
     return (await r.json()).url;
   }
   function onChange(fn) {
     if (bc) bc.onmessage = fn;
     window.addEventListener('storage', (e) => { if (e.key === KEY || e.key === ORIENT_KEY) fn(); });
-    srvP.then((ok) => { if (!ok) return; const sc = document.createElement('script'); sc.src = 'socket.io/socket.io.js'; sc.onload = () => { try { io().on('mudou', fn); } catch (e) {} }; document.head.appendChild(sc); });
+    // servidor Debian: avisos ao vivo (SSE). Se a conexão cair, o navegador reconecta sozinho.
+    srvP.then((ok) => { if (!ok || !window.EventSource) return; try { const es = new EventSource('api/eventos'); es.addEventListener('mudou', () => fn()); } catch (e) {} });
   }
   function getOrient() { try { return localStorage.getItem(ORIENT_KEY) || ''; } catch (e) { return ''; } }
   function setOrient(v) { try { v ? localStorage.setItem(ORIENT_KEY, v) : localStorage.removeItem(ORIENT_KEY); } catch (e) {} }
@@ -313,7 +339,7 @@
     if ((m = u.match(/^https?:\/\/drive\.google\.com\/file\/d\/([\w-]+)/i))) return 'https://drive.google.com/uc?export=download&id=' + m[1];
     return u;
   }
-  window.InfoTV = { mediaURL, DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess };
+  window.InfoTV = { mediaURL, DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess, login, hasSession, setToken, getToken, changeAccess, zdef };
   window.InfoNews = InfoNews;
   window.InfoFX = { style: fxStyle, text: fxText };
   try { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONTS_CSS; document.head.appendChild(l); } catch (e) {}

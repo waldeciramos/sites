@@ -1,14 +1,9 @@
 # Clínica TV
 TV indoor para clínicas: publicações com efeitos, recados, clima, programação do dia, frases, serviços, rádio e barra de notícias com data e hora. Idealizado por Waldeci Ramos.
 
-## Publicar no GitHub Pages
-1. Crie um repositório e envie o conteúdo desta pasta (index.html, admin.html, acesso.json, assets, config.json, logo.svg, midia, fontes).
-2. Settings → Pages → Branch `main` / `(root)` → Save.
-3. TV: `https://SEU-USUARIO.github.io/SEU-REPO/` · Admin: `.../admin.html` (usuário e senha iniciais estão no arquivo `acesso.json`).
-4. No GitHub o admin salva no navegador. Para atualizar as TVs: Admin → Publicar e Backup → "Baixar config.json" → substitua no repositório. TVs em "Do arquivo config.json" atualizam em até 2 minutos. Imagens e vídeos vão na pasta `midia/`.
-
-## No servidor Debian
-Use o `war.zip` e o `instalador.html`: lá tudo é salvo no servidor, o envio de imagens e vídeos funciona pelo painel e as TVs atualizam ao vivo. Esta mesma pasta (`public/`) é a que o servidor serve.
+## Dois modos, o mesmo pacote
+- **GitHub Pages**: envie `index.html, admin.html, acesso.json, config.json, logo.svg, assets/, fontes/, midia/`; Settings → Pages → `main` / root. No GitHub o admin salva no navegador; para atualizar as TVs baixe o `config.json` (Publicar e Backup) e substitua no repositório (TVs atualizam em até 2 minutos). Fotos e vídeos vão na pasta `midia/`.
+- **Servidor Debian (rede interna)**: `sudo bash instalar-debian.sh` (instala Node, cria o serviço `clinicatv`, define a senha do painel). Tudo é salvo no servidor, envio de fotos/vídeos pelo painel e TVs atualizam ao vivo. Passo a passo completo em **MANUAL-DEBIAN.html**.
 
 ## Na TV
 **F** tela cheia · **R** gira a tela (neste aparelho) · **M** rádio · **N** próxima rádio. Endereço com `?o=v` força vertical e `?m=1` força o modo celular.
@@ -25,3 +20,13 @@ Coloque `Qurova.woff2` e `Agency.woff2` (ou .otf/.ttf) na pasta `fontes/`. Confi
 
 ## Sobre as notícias por endereço
 O navegador não deixa ler outro site direto, então a TV usa leitores públicos (allorigins, corsproxy e r.jina.ai, este com JavaScript). Se quiser independência deles, informe seu próprio proxy em Rodapé → "Proxy próprio" (use `{url}` onde entra o endereço). Dados com mais de 3 horas deixam de ser exibidos.
+
+## Novidades da versão 8.1
+- **Sem a faixa de serviços** ("barrinhas"): removida da tela e do painel.
+- **Clima**: o dia de hoje fica maior e destacado; "máx" e "mín" escritos.
+- **Logo da clínica** na coluna lateral, entre a programação do dia e a rádio (Identidade → Logo na coluna lateral).
+- **Propagandas em JPG** já incluídas em `midia/` (APAE, palmilhas, logo).
+- **Zonas** (tipo de propaganda): monte a tela com vários quadros de imagem, vídeo, YouTube e texto, arrastando e redimensionando.
+- **YouTube** com API oficial: duração 0 = toca até o fim e volta aos slides; opção de som e de início.
+- **Vídeos**: aviso na tela quando um vídeo não abre, plano B em `.webm`, passa adiante se travar; `converter-video.sh` converte para H.264+AAC.
+- **Rádio**: o gráfico usa o sinal real quando a rádio permite e nunca fica parado.
