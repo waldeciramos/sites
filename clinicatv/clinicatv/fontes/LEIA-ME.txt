@@ -1,7 +1,0 @@
-Coloque aqui os arquivos das fontes (confira a licença de uso de cada uma):
-
-  Qurova.woff2   (ou Qurova.otf / Qurova.ttf)   -> logo e títulos
-  Agency.woff2   (ou Agency.otf / Agency.ttf)   -> textos e avisos
-
-Já incluídas: Rajdhani-600.woff2 e Rajdhani-700.woff2 (fonte do relógio, licença OFL).
-Depois recarregue a tela da TV (F5). Sem os arquivos, o sistema usa fontes parecidas.
