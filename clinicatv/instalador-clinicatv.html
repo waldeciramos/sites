@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clínica TV — instalador para Debian</title>
+<style>
+  :root { --bg:#e6eaf1; --txt:#1f2f3a; --mut:#5d7680; --sh1:#ffffff; --sh2:#c5ccd9; --p:#1fb6a6; --warn-bg:#fff4d6; --warn-tx:#6b4e00; --code-bg:#0b1c2c; --code-tx:#d7ecf7; --err:#d33; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0e1b27; --txt:#e8f1f7; --mut:#9db3c6; --sh1:rgba(120,170,210,.08); --sh2:rgba(0,0,0,.6); --warn-bg:#3b3112; --warn-tx:#ffe08a; --code-bg:#050d15; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: max(16px, env(safe-area-inset-top)) 16px 40px; }
+  main { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 8px 0 2px; } h2 { font-size: 17px; margin: 0 0 12px; }
+  .sub { color: var(--mut); margin: 0 0 18px; }
+  .card { background: var(--bg); border-radius: 20px; padding: 18px; margin-bottom: 18px; box-shadow: .35rem .35rem .9rem var(--sh2), -.3rem -.3rem .8rem var(--sh1); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  label { display: block; font-size: 12px; font-weight: 700; color: var(--mut); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+  input[type=text], input[type=password] { width: 100%; padding: 11px 13px; border: 0; border-radius: 12px; background: var(--bg); color: var(--txt); font: inherit; box-shadow: inset .2rem .2rem .5rem var(--sh2), inset -.15rem -.15rem .4rem var(--sh1); }
+  input:focus-visible, button:focus-visible { outline: 2px solid var(--p); outline-offset: 2px; }
+  .hint { font-size: 12.5px; color: var(--mut); margin-top: 4px; }
+  .chk { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; font-size: 14px; }
+  .chk input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--p); }
+  .warn { background: var(--warn-bg); color: var(--warn-tx); border-radius: 12px; padding: 10px 13px; margin-top: 12px; font-size: 13.5px; display: none; }
+  .warn.on { display: block; }
+  .err { color: var(--err); font-size: 13px; margin-top: 4px; min-height: 1em; }
+  button { font: inherit; font-weight: 700; border: 0; border-radius: 14px; padding: 11px 16px; cursor: pointer; color: var(--txt); background: var(--bg); box-shadow: .25rem .25rem .6rem var(--sh2), -.2rem -.2rem .5rem var(--sh1); }
+  button:active { box-shadow: inset .2rem .2rem .45rem var(--sh2), inset -.15rem -.15rem .4rem var(--sh1); }
+  button.main { background: var(--p); color: #fff; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  pre { margin: 0; background: var(--code-bg); color: var(--code-tx); padding: 14px; border-radius: 14px; overflow: auto; max-height: 420px; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
+  .step { display: grid; grid-template-columns: 34px 1fr; gap: 12px; margin-bottom: 16px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; background: var(--p); color: #fff; display: grid; place-items: center; font-weight: 800; }
+  .cmd { display: flex; gap: 8px; align-items: stretch; margin-top: 6px; }
+  .step > div:last-child { min-width: 0; }
+  .cmd pre { flex: 1; min-width: 0; max-height: none; padding: 10px 12px; }
+  .cmd button { padding: 0 14px; }
+  .urls a { color: var(--p); font-weight: 700; word-break: break-all; }
+  code { background: rgba(127,127,127,.18); padding: 1px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>📺 Clínica TV — instalador para Debian</h1>
+  <p class="sub">Preencha os dados do servidor e baixe o script. Ele instala a Clínica TV sozinho a partir do zip que estiver no servidor (e, rodando de novo, atualiza sem apagar suas mídias nem sua configuração).</p>
+
+  <section class="card" aria-labelledby="t1">
+    <h2 id="t1">1. Dados do servidor</h2>
+    <div class="grid">
+      <div><label for="ip">IP do servidor</label><input id="ip" type="text" value="192.168.2.70" inputmode="decimal" autocomplete="off"><div class="err" id="eIp"></div></div>
+      <div><label for="porta">Porta do site</label><input id="porta" type="text" value="8080" inputmode="numeric" autocomplete="off"><div class="hint">8080 evita conflito com o site que já usa a porta 80.</div><div class="err" id="ePorta"></div></div>
+      <div><label for="zipdir">Pasta do zip no servidor</label><input id="zipdir" type="text" value="/home/fisioclinica/htdocs/local.fisioclinica/htdocs" autocomplete="off"><div class="err" id="eDir"></div></div>
+      <div><label for="zip">Nome do zip</label><input id="zip" type="text" value="clinicatv_9_6.zip" autocomplete="off"><div class="hint">Se não achar esse nome, usa o clinicatv*.zip mais novo da pasta.</div></div>
+      <div><label for="senha">Senha do painel (usuário: admin)</label><input id="senha" type="password" autocomplete="new-password" placeholder="vazio = o script pergunta"><div class="hint"><label style="display:inline;text-transform:none;font-weight:400;cursor:pointer"><input type="checkbox" id="ver" style="width:auto"> mostrar senha</label></div><div class="err" id="eSenha"></div></div>
+    </div>
+    <label class="chk" for="fw"><input type="checkbox" id="fw"><span><b>Ligar o firewall (ufw)</b> liberando só uma rede para SSH e para o site</span></label>
+    <div id="fwBox" style="display:none;margin-top:10px"><label for="rede">Rede liberada</label><input id="rede" type="text" value="192.168.2.0/24" autocomplete="off"><div class="err" id="eRede"></div></div>
+    <div class="warn on" id="wFw" style="display:none">⚠ O firewall bloqueia tudo o que não for dessa rede, inclusive os outros sites hospedados neste servidor (portas 80, 443 e do painel do servidor). Deixe desligado se este Debian tem outros serviços.</div>
+    <div class="warn" id="w80">⚠ A porta 80 provavelmente já está em uso pelo seu site atual. O script para sem mexer em nada se a porta estiver ocupada por outro serviço.</div>
+  </section>
+
+  <section class="card" aria-labelledby="t2">
+    <h2 id="t2">2. Script gerado</h2>
+    <pre id="out" tabindex="0" aria-label="Script de instalação gerado"></pre>
+    <div class="row">
+      <button class="main" id="baixar">⬇ Baixar instalar-clinicatv.sh</button>
+      <button id="copiar">📋 Copiar o script</button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="t3">
+    <h2 id="t3">3. Como instalar</h2>
+    <div class="step"><div class="num">1</div><div><b>Envie o zip</b> para o servidor (se ainda não estiver lá). No seu computador:
+      <div class="cmd"><pre id="c1"></pre><button data-c="c1" aria-label="Copiar comando 1">📋</button></div></div></div>
+    <div class="step"><div class="num">2</div><div><b>Envie o script</b> que você baixou:
+      <div class="cmd"><pre id="c2"></pre><button data-c="c2" aria-label="Copiar comando 2">📋</button></div></div></div>
+    <div class="step"><div class="num">3</div><div><b>Rode no servidor</b> (entre por SSH):
+      <div class="cmd"><pre id="c3"></pre><button data-c="c3" aria-label="Copiar comando 3">📋</button></div></div></div>
+    <p class="urls">Depois de instalar:<br>TV: <a id="uTv" href="#" target="_blank" rel="noopener"></a><br>Painel: <a id="uAd" href="#" target="_blank" rel="noopener"></a></p>
+    <p class="hint">Ver se está rodando: <code>systemctl status clinicatv</code> · Logs: <code>journalctl -u clinicatv -f</code></p>
+  </section>
+</main>
+
+<script type="text/plain" id="tpl">#!/usr/bin/env bash
+# Clínica TV — instalador gerado em @@DATA@@
+# Servidor @@IPRAW@@ · porta @@PORTARAW@@
+set -euo pipefail
+
+PORTA=@@PORTA@@
+IP=@@IP@@
+ZIPDIR=@@ZIPDIR@@
+ZIP=@@ZIP@@
+SENHA=@@SENHA@@
+REDE=@@REDE@@
+
+[ "$(id -u)" -eq 0 ] || { echo "Rode como root:  sudo bash $0"; exit 1; }
+
+echo "==> Procurando o pacote"
+ZIPPATH="$ZIPDIR/$ZIP"
+if [ ! -f "$ZIPPATH" ]; then
+  ZIPPATH="$(ls -t "$ZIPDIR"/clinicatv*.zip 2>/dev/null | head -n1 || true)"
+fi
+if [ -z "$ZIPPATH" ] || [ ! -f "$ZIPPATH" ]; then
+  echo "Não achei $ZIP em $ZIPDIR. Envie o zip para essa pasta e rode de novo."; exit 1
+fi
+echo "    Usando: $ZIPPATH"
+
+echo "==> Preparando o servidor"
+apt-get update -y
+DEBIAN_FRONTEND=noninteractive apt-get install -y unzip curl ca-certificates iproute2
+
+if ss -ltnH "sport = :$PORTA" | grep -q . && ! systemctl is-active --quiet clinicatv; then
+  echo "A porta $PORTA já está em uso por outro serviço (nada foi alterado). Escolha outra porta no instalador:"
+  ss -ltnp "sport = :$PORTA" || true
+  exit 1
+fi
+
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+unzip -q -o "$ZIPPATH" -d "$TMP"
+SCRIPT="$(find "$TMP" -name instalar-debian.sh -print -quit)"
+if [ -z "$SCRIPT" ]; then
+  echo "O zip não tem o instalar-debian.sh (pacote errado?)."; exit 1
+fi
+
+ARGS=(--porta "$PORTA")
+if [ -n "$SENHA" ]; then ARGS+=(--senha "$SENHA"); fi
+if [ -n "$REDE" ]; then ARGS+=(--rede "$REDE"); fi
+bash "$SCRIPT" "${ARGS[@]}"
+
+sleep 1
+if curl -fsS "http://127.0.0.1:$PORTA/api/ping" | grep -q clinicatv; then
+  echo "Servidor respondeu OK."
+else
+  echo "Atenção: o servidor não respondeu em 127.0.0.1:$PORTA. Veja: journalctl -u clinicatv -n 50"
+fi
+echo
+echo "TV:     http://$IP:$PORTA/"
+echo "Painel: http://$IP:$PORTA/admin.html   (usuário: admin)"
+</script>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const sq = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";   // aspas simples seguras para o shell
+  const tpl = $('tpl').textContent.replace(/^\n/, '');
+  let script = '', ok = false;
+
+  function validar() {
+    const ip = $('ip').value.trim(), porta = $('porta').value.trim(), dir = $('zipdir').value.trim(), senha = $('senha').value, fw = $('fw').checked, rede = $('rede').value.trim();
+    const e = { Ip: '', Porta: '', Dir: '', Senha: '', Rede: '' };
+    if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(ip) || ip.split('.').some((n) => +n > 255)) e.Ip = 'Informe um IP válido, ex.: 192.168.2.70';
+    if (!/^\d+$/.test(porta) || +porta < 1 || +porta > 65535) e.Porta = 'Porta entre 1 e 65535';
+    if (!/^\/[^\n\r]*$/.test(dir)) e.Dir = 'Informe o caminho completo, começando com /';
+    if (senha && senha.length < 4) e.Senha = 'Mínimo de 4 caracteres (ou deixe vazio)';
+    if (fw && !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(rede)) e.Rede = 'Use o formato 192.168.2.0/24';
+    Object.keys(e).forEach((k) => { $('e' + k).textContent = e[k]; });
+    return { ok: !Object.values(e).some(Boolean), ip, porta, dir, senha, fw, rede };
+  }
+
+  function gerar() {
+    const v = validar(); ok = v.ok;
+    $('fwBox').style.display = v.fw ? 'block' : 'none'; $('wFw').style.display = v.fw ? 'block' : 'none'; $('w80').classList.toggle('on', v.porta === '80');
+    $('baixar').disabled = $('copiar').disabled = !ok;
+    if (!ok) { $('out').textContent = 'Corrija os campos em vermelho para gerar o script.'; return; }
+    const zip = $('zip').value.trim() || 'clinicatv_9_6.zip';
+    const map = { DATA: new Date().toLocaleString('pt-BR'), IPRAW: v.ip, PORTARAW: v.porta, PORTA: sq(v.porta), IP: sq(v.ip), ZIPDIR: sq(v.dir.replace(/\/+$/, '') || '/'), ZIP: sq(zip), SENHA: sq(v.senha), REDE: sq(v.fw ? v.rede : '') };
+    script = tpl.replace(/@@(\w+)@@/g, (m, k) => (k in map ? map[k] : m));
+    // a senha não aparece na tela; só vai no arquivo baixado/copiado
+    $('out').textContent = v.senha ? script.replace(sq(v.senha), "'••••••••'") : script;
+    const dest = v.dir.replace(/\/+$/, '');
+    $('c1').textContent = 'scp ' + zip + ' SEU_USUARIO@' + v.ip + ':' + dest + '/';
+    $('c2').textContent = 'scp instalar-clinicatv.sh SEU_USUARIO@' + v.ip + ':/tmp/';
+    $('c3').textContent = 'sudo bash /tmp/instalar-clinicatv.sh';
+    const suf = v.porta === '80' ? '' : ':' + v.porta, base = 'http://' + v.ip + suf;
+    $('uTv').textContent = $('uTv').href = base + '/'; $('uAd').textContent = $('uAd').href = base + '/admin.html';
+  }
+
+  function copiar(txt, btn) {
+    const feito = () => { const t = btn.textContent; btn.textContent = '✔ Copiado'; setTimeout(() => { btn.textContent = t; }, 1400); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(feito, () => fallback());
+    else fallback();
+    function fallback() { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); feito(); } catch (e) { alert('Não consegui copiar. Selecione e copie manualmente.'); } ta.remove(); }
+  }
+
+  ['ip', 'porta', 'zipdir', 'zip', 'senha', 'rede'].forEach((id) => $(id).addEventListener('input', gerar));
+  $('fw').addEventListener('change', gerar);
+  $('ver').addEventListener('change', () => { $('senha').type = $('ver').checked ? 'text' : 'password'; });
+  $('copiar').addEventListener('click', () => ok && copiar(script, $('copiar')));
+  $('baixar').addEventListener('click', () => {
+    if (!ok) return;
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([script.replace(/\r/g, '')], { type: 'text/x-shellscript' })); a.download = 'instalar-clinicatv.sh';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+  document.querySelectorAll('button[data-c]').forEach((b) => b.addEventListener('click', () => copiar($(b.dataset.c).textContent, b)));
+  gerar();
+})();
+</script>
+</body>
+</html>
