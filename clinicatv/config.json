@@ -114,21 +114,11 @@
           "src": "midia/deus.mp4",
           "x": 0,
           "y": 0,
-          "w": 49.5,
+          "w": 100,
           "h": 100,
-          "fit": "cover",
-          "sound": true
-        },
-        {
-          "id": "dz2",
-          "type": "video",
-          "src": "midia/deus.mp4",
-          "x": 50.5,
-          "y": 0,
-          "w": 49.5,
-          "h": 100,
-          "fit": "cover",
-          "sound": false
+          "fit": "contain",
+          "sound": true,
+          "radius": 0
         }
       ]
     },

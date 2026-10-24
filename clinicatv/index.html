@@ -627,7 +627,7 @@ if (/[?&]limpar/.test(location.search)) {
       const isMain = s.zEnd === 'fim' && !mainSet && (z.type === 'video' || z.type === 'youtube') && z.src;
       if (isMain) { mainSet = true; el._main = main; }
       if (z.type === 'image' && z.src) { const i = document.createElement('div'); i.className = 'img'; i.style.backgroundSize = BGFIT[z.fit] || 'cover'; i.style.backgroundImage = 'url("' + InfoTV.mediaURL(z.src) + '")'; d.appendChild(i); }
-      else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); v.style.objectFit = FITCSS[z.fit] || 'cover'; d.appendChild(v); if (!(+z.bgAlpha > 0)) d.style.background = '#000'; }
+      else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); v.style.objectFit = FITCSS[z.fit] || 'cover'; d.appendChild(v); if (!(+z.bgAlpha > 0)) { if (z.fit === 'contain') v.style.background = 'transparent'; else d.style.background = '#000'; } }   // "inteiro": o vídeo aparece no tamanho dele e o fundo da publicação fica à mostra
       else if (z.type === 'lista') playlist(d, z, stops);
       else if (z.type === 'live' && z.src) d.appendChild(liveEl(z, stops));
       else if (z.type === 'youtube' && z.src) d.appendChild(ytFrame(z.src, { loop: !isMain, sound: !!z.sound, start: 0, hooks: isMain ? main : {} }));
