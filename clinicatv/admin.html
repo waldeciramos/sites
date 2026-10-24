@@ -630,8 +630,30 @@
         host.append(tg);
       }
       const geo = el('div', { class: 'grid', style: 'margin-top:12px' });
-      const gf = (l, k) => field(l, z, k, { type: 'number', step: 'any', after: () => { Object.assign(z, InfoTV.zdef(z)); light(); } });
+      /* tamanho ideal da mídia: medido numa TV Full HD 16:9 (área das propagandas = 1440 x 902 px) */
+      const SW = 1440, SH = 902, RAT = [[1, 1, '1:1'], [4, 5, '4:5'], [3, 4, '3:4'], [2, 3, '2:3'], [9, 16, '9:16'], [16, 9, '16:9'], [4, 3, '4:3'], [3, 2, '3:2'], [16, 10, '16:10'], [5, 4, '5:4'], [21, 9, '21:9']];
+      const szInfo = el('div', { class: 'info', style: 'margin-top:10px' });
+      const szUpd = () => {
+        const pw = Math.round(z.w * SW / 100), ph = Math.round(z.h * SH / 100), r = pw / ph, nm = RAT.reduce((b, c) => (Math.abs(Math.log(r / (c[0] / c[1]))) < Math.abs(Math.log(r / (b[0] / b[1]))) ? c : b));
+        szInfo.textContent = '📐 Tamanho ideal da imagem/vídeo nesta zona (TV Full HD 16:9): ' + pw + ' × ' + ph + ' px — proporção ' + nm[2] + ' (' + r.toFixed(2) + '). Para ficar nítido use o dobro (' + pw * 2 + ' × ' + ph * 2 + '). Em outras proporções de tela, o ajuste Automático completa com desfoque suave.';
+      };
+      const gf = (l, k) => field(l, z, k, { type: 'number', step: 'any', after: () => { Object.assign(z, InfoTV.zdef(z)); light(); szUpd(); } });
       geo.append(gf('Posição X (%)', 'x'), gf('Posição Y (%)', 'y'), gf('Largura (%)', 'w'), gf('Altura (%)', 'h')); host.append(geo);
+      if (z.type === 'image' || z.type === 'video') {
+        szUpd(); host.append(szInfo);
+        host.append(el('div', { class: 'actions' }, [el('button', { class: 'btn sm ok', type: 'button', title: 'Muda a largura da zona para ter a mesma proporção do arquivo escolhido (mantém a altura e a posição)', onclick: () => {
+          if (!z.src) return toast('Escolha primeiro a imagem ou o vídeo desta zona');
+          const done = (nw, nh) => {
+            if (!nw || !nh) return toast('Não consegui ler o tamanho do arquivo');
+            const ar = nw / nh; let w = z.h * ar * SH / SW, h = z.h;
+            if (z.x + w > 100) { w = 100 - z.x; h = w * SW / (SH * ar); }
+            z.w = w; z.h = h; Object.assign(z, InfoTV.zdef(z)); persist(); draw(); toast('Zona ajustada à proporção do arquivo ✓');
+          };
+          const u = InfoTV.mediaURL(z.src);
+          if (z.type === 'image') { const im = new Image(); im.onload = () => done(im.naturalWidth, im.naturalHeight); im.onerror = () => toast('Não consegui abrir o arquivo'); im.src = u; }
+          else { const v = document.createElement('video'); v.preload = 'metadata'; v.onloadedmetadata = () => done(v.videoWidth, v.videoHeight); v.onerror = () => toast('Não consegui abrir o arquivo'); v.src = u; }
+        } }, ['📐 Ajustar a zona à proporção do arquivo'])]));
+      }
       const bt = (t, fn, cls) => el('button', { class: 'btn sm ' + (cls || ''), onclick: fn }, [t]);
       host.append(el('div', { class: 'actions' }, [
         bt('⬆ Trazer para frente', () => { if (i < s.zones.length - 1) { move(s.zones, i, 1); persist(); draw(); } }), bt('⬇ Enviar para trás', () => { if (i > 0) { move(s.zones, i, -1); persist(); draw(); } }),
