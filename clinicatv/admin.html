@@ -245,12 +245,18 @@
           <label><input type="radio" name="mode" value="local"> Neste navegador (admin e TV no mesmo computador)</label>
           <label><input type="radio" name="mode" value="repo"> Do arquivo config.json do GitHub (TV em outro aparelho)</label>
         </div>
-        <ol class="steps"><li>Faça as alterações aqui no admin.</li><li>Clique em <b>Baixar config.json</b>.</li><li>No GitHub, substitua o <code>config.json</code> do repositório.</li><li>Nas TVs, deixe "Do arquivo config.json". Elas atualizam em até 2 minutos.</li></ol></div>
+        <ol class="steps"><li>Faça as alterações aqui no admin.</li><li>Clique em <b>🚀 Publicar no GitHub</b> (ou em <b>Baixar config.json</b> e substitua o arquivo no GitHub).</li><li>Nas TVs, deixe "Do arquivo config.json". Elas atualizam em até 2 minutos.</li></ol></div>
         <div class="actions">
           <button class="btn ok" id="btnExport">⬇ Baixar config.json</button>
           <label class="btn" style="cursor:pointer">⬆ Importar config.json<input type="file" id="importFile" accept=".json" hidden></label>
           <button class="btn del" id="btnReset">Restaurar padrão</button>
         </div>
+        <div id="pubBox"><h3>🚀 Publicar no GitHub (atualiza a TV)</h3>
+        <p class="hint"><b>Por que isso existe:</b> no GitHub Pages o painel <b>não grava no site</b>; o que você muda aqui fica guardado só neste navegador. A TV publicada lê apenas o arquivo <code>config.json</code> do repositório, por isso ela não muda sozinha. Para as mudanças chegarem à TV há dois caminhos: (1) <b>Baixar config.json</b> e substituí-lo no GitHub à mão, ou (2) o botão abaixo, que envia o <code>config.json</code> direto para o repositório. Depois de publicar, a TV atualiza em até 2 minutos (ou na hora com <code>index.html?limpar=1</code>). Se o painel mostrar uma versão antiga, use <b>↩ Descartar o que está só neste navegador</b> (em Cache) para carregar o config publicado.</p>
+        <div class="f"><label for="ghToken">Chave de acesso do GitHub (token)</label><input class="neo-in" id="ghToken" type="password" autocomplete="off" placeholder="github_pat_…"></div>
+        <p class="hint">Como criar a chave (uma vez só): GitHub → seu perfil → <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</b>. Em <i>Repository access</i> escolha só o repositório da TV e em <i>Permissions → Contents</i> marque <b>Read and write</b>. Cole a chave aqui. Ela fica guardada apenas neste navegador; não a mostre a ninguém e não a salve dentro do repositório.</p>
+        <div class="actions"><button class="btn ok" id="ghPublish">🚀 Publicar config.json no GitHub agora</button><button class="btn del" id="ghTokenClear">Esquecer a chave</button></div>
+        <div class="hint" id="pubMsg" style="margin-top:8px"></div></div>
         <div id="ghBox"><h3>📂 Pasta midia do GitHub (escolher imagens e vídeos já enviados)</h3>
         <p class="hint">No GitHub Pages o painel não consegue gravar arquivos. Envie as imagens e vídeos para a pasta <code>midia</code> do repositório (no GitHub: Add file ▸ Upload files) e eles aparecem aqui nas listas "Escolher da pasta midia". O endereço do repositório é descoberto sozinho; só preencha abaixo se a lista vier vazia.</p>
         <div class="grid">
@@ -880,7 +886,7 @@
   function renderBackup() {
     document.querySelectorAll('input[name=mode]').forEach((r) => { r.checked = r.value === InfoTV.getMode(); r.onchange = () => { InfoTV.setMode(r.value); toast('Modo: ' + (r.value === 'repo' ? 'config.json do GitHub' : 'este navegador')); }; });
     $('newUser').value = cfg.admin.user;
-    InfoTV.isServer().then((sv) => { ['modeBox', 'warnPass', 'ghBox'].forEach((id) => { $(id).style.display = sv ? 'none' : ''; }); if (!sv) ghInit(); $('passBox').style.display = ''; $('srvNote').style.display = sv ? '' : 'none'; if (sv) $('newPass').placeholder = 'deixe vazio para manter a atual'; });
+    InfoTV.isServer().then((sv) => { ['modeBox', 'warnPass', 'ghBox', 'pubBox'].forEach((id) => { $(id).style.display = sv ? 'none' : ''; }); if (!sv) ghInit(); $('passBox').style.display = ''; $('srvNote').style.display = sv ? '' : 'none'; if (sv) $('newPass').placeholder = 'deixe vazio para manter a atual'; });
   }
   const ghRepoNow = () => { const g = ghSaved(), c = g.owner && g.repo ? { owner: g.owner, repo: g.repo, path: g.path || 'midia' } : (ghGuess()[0] || {}); return c; };
   function ghInit() {
@@ -910,6 +916,39 @@
     toast('Descartando…'); await limparCaches(); InfoTV.clearLocal(); location.href = location.pathname + '?v=' + Date.now();
   };
   $('btnExport').onclick = () => { const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' })), download: 'config.json' }); a.click(); };
+  /* ---------- Publicar o config.json direto no repositório do GitHub ---------- */
+  const TOK_KEY = 'ctv.gh.token';
+  const b64u = (str) => btoa(unescape(encodeURIComponent(str)));
+  async function ghPublicar() {
+    const msg = (t) => { $('pubMsg').textContent = t; };
+    const tok = $('ghToken').value.trim(); if (!tok) return msg('⚠ Cole a chave de acesso do GitHub primeiro.');
+    try { localStorage.setItem(TOK_KEY, tok); } catch (e) {}
+    const cands = ghCands(); if (!cands.length) return msg('⚠ Não achei o repositório. Preencha usuário e repositório em "Pasta midia do GitHub" abaixo.');
+    const H = { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' };
+    msg('Publicando…'); let last = '';
+    for (const c of cands) {
+      const dir = c.path.split('/').slice(0, -1).join('/'), file = (dir ? dir + '/' : '') + 'config.json';
+      const url = 'https://api.github.com/repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) + '/contents/' + file.split('/').map(encodeURIComponent).join('/');
+      try {
+        const g = await fetch(url, { headers: H, cache: 'no-store' });
+        if (g.status === 401) return msg('⚠ A chave foi recusada (inválida ou vencida). Crie outra.');
+        if (g.status === 404) { last = 'Não encontrei ' + c.owner + '/' + c.repo + '/' + file + ' (ou a chave não tem acesso a esse repositório).'; continue; }
+        if (!g.ok) { last = 'GitHub respondeu ' + g.status; continue; }
+        const sha = (await g.json()).sha;
+        const body = JSON.stringify({ message: 'Atualiza config.json pelo painel da Clínica TV', content: b64u(JSON.stringify(cfg, null, 2)), sha });
+        const r = await fetch(url, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body });
+        if (r.status === 403) return msg('⚠ A chave não tem permissão de escrita. Em Permissions → Contents escolha "Read and write".');
+        if (r.status === 409 || r.status === 422) { last = 'O arquivo mudou no GitHub enquanto você publicava. Tente de novo.'; continue; }
+        if (!r.ok) { last = 'Falha ao gravar (' + r.status + ')'; continue; }
+        const stamp = new Date().toLocaleTimeString('pt-BR');
+        return msg('✔ Publicado às ' + stamp + ' em ' + c.owner + '/' + c.repo + '/' + file + '. O GitHub Pages leva cerca de 1 a 2 minutos; a TV atualiza sozinha (ou abra index.html?limpar=1).');
+      } catch (e) { last = 'Sem conexão com o GitHub.'; }
+    }
+    msg('⚠ ' + (last || 'Não foi possível publicar.'));
+  }
+  try { $('ghToken').value = localStorage.getItem(TOK_KEY) || ''; } catch (e) {}
+  $('ghPublish').onclick = ghPublicar;
+  $('ghTokenClear').onclick = () => { try { localStorage.removeItem(TOK_KEY); } catch (e) {} $('ghToken').value = ''; $('pubMsg').textContent = 'Chave esquecida neste navegador.'; };
   $('importFile').onchange = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { cfg = InfoTV.build(JSON.parse(r.result)); persist(); renderAll(); toast('Configuração importada'); } catch (x) { toast('Arquivo inválido'); } }; r.readAsText(f); };
   let armReset = 0; $('btnReset').onclick = () => { if (Date.now() - armReset < 3000) { cfg = InfoTV.build({}); persist(); renderAll(); } else { armReset = Date.now(); toast('Clique de novo para restaurar o padrão'); } };
   $('btnPass').onclick = async () => {

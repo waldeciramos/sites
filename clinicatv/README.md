@@ -56,3 +56,7 @@ O navegador não deixa ler outro site direto, então a TV usa leitores públicos
 - **GitHub Pages**: as listas "Escolher da pasta midia" leem a pasta `midia` do repositório pela API pública do GitHub (o repositório é descoberto pelo endereço; se precisar, ajuste em Publicar e Backup › 📂 Pasta midia do GitHub). Envie os arquivos ao repositório e use "Testar e atualizar a lista".
 - **Debian**: o arquivo enviado pelo painel é gravado em `midia/` no servidor e já aparece na lista.
 - Link do YouTube colado em "Vídeo MP4" (publicação, zona ou lista) vira YouTube automaticamente.
+
+## Versão 9.8 — publicar no GitHub pelo painel
+- **Publicar e Backup › 🚀 Publicar no GitHub**: envia o `config.json` direto para o repositório (sem baixar e subir à mão). Precisa de uma chave (fine-grained token) só do repositório da TV, com *Contents: Read and write*; ela fica guardada apenas no navegador do admin.
+- No GitHub Pages o painel não grava no site: o que se muda fica no navegador até ser publicado. A TV lê só o `config.json` do repositório e atualiza em até 2 minutos. Se o painel mostrar versão antiga, use *Descartar o que está só neste navegador*.
