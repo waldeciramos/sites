@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.5">
+<meta name="build" content="9.6">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b1c2c">
@@ -722,7 +722,7 @@
         // vídeo MP4 / YouTube: com duração 0 vale "até o fim do vídeo" e depois a TV volta aos slides.
         // Com duração maior que 0 ela é o tempo máximo. Se o vídeo não começar em 30 s, segue adiante.
         const lim = (s.type === 'zonas' || (s.split && s.zEnd === 'fim')) ? 0 : (+s.seconds > 0 ? secs : 0), v = el.querySelector('video');
-        if (list.length === 1 && s.type === 'video' && !lim && v && !(+s.every > 0)) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
+        if (list.length === 1 && s.type === 'video' && !lim && v && !(+s.every > 0) && !s.split) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
         else {
           main.onEnd = nextSlide; main.onFail = () => go(3000);
           main.noApi = () => go(Math.max(10, lim || 30) * 1000);

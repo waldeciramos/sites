@@ -98,6 +98,26 @@
   .zed .zb.sel { border-color: #ffd54f; box-shadow: 0 0 0 2px #ffd54f; }
   .zed .zb .zh { position: absolute; width: 16px; height: 16px; margin: -8px; border-radius: 50%; background: #ffd54f; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
   .zh.nw { left: 0; top: 0; cursor: nwse-resize; } .zh.ne { left: 100%; top: 0; cursor: nesw-resize; } .zh.sw { left: 0; top: 100%; cursor: nesw-resize; } .zh.se { left: 100%; top: 100%; cursor: nwse-resize; }
+  .zed .zb .zi { flex-direction: column; gap: 2px; }
+  .zed .zb .zn { font: 800 clamp(20px, 4.6vw, 40px)/1 system-ui, sans-serif; color: #fff; text-shadow: 0 2px 6px #000, 0 0 3px #000; background: rgba(0,0,0,.38); border-radius: 50%; min-width: 1.5em; padding: .1em .25em; text-align: center; }
+  .zed .zb .zl { max-width: 94%; font: 700 11px/1.2 system-ui, sans-serif; background: rgba(0,0,0,.55); padding: 2px 6px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .zed .zb.drop { outline: 3px dashed #ffd54f; outline-offset: -3px; }
+  .zpres { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .zpre { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 7px 8px 6px; border: 0; border-radius: 14px; background: var(--panel, #e6eaf1); box-shadow: .22rem .22rem .5rem var(--nsh2, #c5ccd9), -.18rem -.18rem .45rem var(--nsh1, #fff); cursor: pointer; font: 600 10.5px/1.15 inherit; color: inherit; max-width: 104px; text-align: center; }
+  .zpre:hover { transform: translateY(-1px); } .zpre:active { box-shadow: inset .2rem .2rem .45rem var(--nsh2, #c5ccd9), inset -.15rem -.15rem .4rem var(--nsh1, #fff); }
+  .zpm { position: relative; width: 88px; aspect-ratio: 16/10; background: #0b3b4a; border-radius: 5px; overflow: hidden; }
+  .zpm i { position: absolute; box-sizing: border-box; border: 1.5px solid #fff; background: rgba(31,182,166,.6); display: grid; place-items: center; font: 800 11px system-ui, sans-serif; font-style: normal; color: #fff; }
+  .zcards { display: grid; gap: 10px; margin-top: 14px; }
+  .zcard { border-radius: 16px; padding: 10px 12px; background: var(--panel, #e6eaf1); box-shadow: .22rem .22rem .5rem var(--nsh2, #c5ccd9), -.18rem -.18rem .45rem var(--nsh1, #fff); border: 2px solid transparent; }
+  .zcard.sel { border-color: #1fb6a6; } .zcard.drop { border-color: #ffd54f; border-style: dashed; }
+  .zch { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; cursor: pointer; }
+  .zbadge { width: 30px; height: 30px; border-radius: 50%; background: #1fb6a6; color: #fff; display: grid; place-items: center; font: 800 15px system-ui, sans-serif; flex: none; }
+  .zcn { flex: 1; min-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zts { max-width: 210px; }
+  .zpos { display: flex; gap: 4px; } .zpos button { width: 30px; height: 30px; border: 0; border-radius: 9px; cursor: pointer; background: var(--panel, #e6eaf1); box-shadow: .12rem .12rem .3rem var(--nsh2, #c5ccd9), -.1rem -.1rem .25rem var(--nsh1, #fff); color: inherit; font-size: 14px; }
+  .zsrc { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin-top: 10px; align-items: end; }
+  .zsrc label { display: block; font-size: 11px; opacity: .75; margin-bottom: 3px; }
+  details.zprops > summary { font-weight: 800; cursor: pointer; margin-bottom: 8px; }
   .zed .zb .zx { position: absolute; right: -9px; top: -9px; width: 22px; height: 22px; border-radius: 50%; background: #e5484d; color: #fff; border: 2px solid #fff; display: grid; place-items: center; font: 800 13px/1 system-ui, sans-serif; cursor: pointer; z-index: 5; box-shadow: 0 1px 4px rgba(0,0,0,.55); } .zed .zb .zx:hover { background: #ff2d3a; transform: scale(1.12); }
   .zprops { margin-top: 10px; padding-top: 4px; border-top: 1px dashed var(--sh2); }
   @media (max-width: 1280px) { .layout { grid-template-columns: 190px minmax(0, 1fr); } aside.pv { position: static; grid-column: 1 / -1; order: 3; } }
@@ -418,8 +438,27 @@
     ['1 grande + faixa', [[0, 0, 100, 78], [0, 78, 100, 22]]],
     ['4 quadros', [[0, 0, 50, 50], [50, 0, 50, 50], [0, 50, 50, 50], [50, 50, 50, 50]]],
     ['6 quadros', [[0, 0, 33.3, 50], [33.3, 0, 33.4, 50], [66.7, 0, 33.3, 50], [0, 50, 33.3, 50], [33.3, 50, 33.4, 50], [66.7, 50, 33.3, 50]]],
+    ['Em pé no meio + 2 laterais', [[30, 0, 40, 100], [0, 0, 30, 100], [70, 0, 30, 100]]],
+    ['3 linhas', [[0, 0, 100, 33.3], [0, 33.3, 100, 33.4], [0, 66.7, 100, 33.3]]],
     ['Destaque no centro', [[8, 6, 84, 72], [8, 82, 84, 12]]]
   ];
+  /* ---- ajudas das zonas ---- */
+  const MEDIA_TYPES = ['image', 'video', 'youtube', 'live'];
+  const zHas = (z) => z.type === 'text' ? !!(z.text && z.text !== 'Texto') : z.type === 'lista' ? z.items.some((i) => i.src) : !!z.src;
+  const zName = (z) => {
+    if (z.type === 'text') return '📝 ' + String(z.text || 'Texto').replace(/\s+/g, ' ').slice(0, 26);
+    if (z.type === 'lista') return '🎞 Lista · ' + z.items.length + ' ' + (z.items.length === 1 ? 'item' : 'itens');
+    if (!z.src) return (ZICON[z.type] || '') + ' (vazia — escolha o conteúdo)';
+    if (/^data:/.test(z.src)) return (ZICON[z.type] || '') + ' imagem enviada';
+    let n = z.src; try { n = decodeURIComponent(n); } catch (e) {} n = n.split('?')[0].split('/').filter(Boolean).pop() || n;
+    return (ZICON[z.type] || '') + ' ' + (z.type === 'youtube' || z.type === 'live' ? 'ao vivo/YouTube: ' : '') + n;
+  };
+  /* ao dividir uma publicação de imagem/vídeo/YouTube/TV, o conteúdo dela vira a zona 1 (com o nome) e o fundo da publicação sai, para não tocar duas vezes */
+  function seedZones(s) {
+    if (s.type === 'zonas' || !MEDIA_TYPES.includes(s.type) || !s.src || s.zones.some(zHas)) return;
+    const z = InfoTV.zdef({ type: s.type, src: s.src, fit: s.type === 'video' ? (s.vfit === 'cover' ? 'cover' : 'contain') : (s.fit || 'cover'), sound: s.type === 'video' ? s.vSound !== false : !!s.ytSound, x: 0, y: 0, w: 100, h: 100 });
+    s.zones = [z]; s.splitBase = 'nenhum'; zsel[s.id] = z.id;
+  }
   const zsel = {};
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   function zonesEditor(s, defType) {
@@ -429,9 +468,50 @@
     const place = (b, z) => { b.style.left = z.x + '%'; b.style.top = z.y + '%'; b.style.width = z.w + '%'; b.style.height = z.h + '%'; };
     const addZone = (type) => { const n = s.zones.length, z = InfoTV.zdef({ type, x: clamp(8 + n * 4, 0, 60), y: clamp(8 + n * 4, 0, 60), w: 40, h: 40 }); if (type === 'text') { z.text = 'Texto'; z.bgAlpha = 100; } s.zones.push(z); zsel[s.id] = z.id; persist(); draw(); };
     const applyPreset = (list) => {
-      list.forEach((p, i) => { const z = s.zones[i] || (s.zones.push(InfoTV.zdef({ type: defType })), s.zones[s.zones.length - 1]); Object.assign(z, { x: p[0], y: p[1], w: p[2], h: p[3] }); });
-      zsel[s.id] = s.zones[0].id; persist(); draw(); toast('Modelo aplicado — agora escolha o conteúdo de cada zona');
+      seedZones(s);
+      list.forEach((p, i) => { let z = s.zones[i]; if (!z) { z = InfoTV.zdef({ type: defType }); s.zones.push(z); } Object.assign(z, { x: p[0], y: p[1], w: p[2], h: p[3] }); });
+      s.zones = s.zones.filter((z, i) => i < list.length || zHas(z));   // zonas vazias que sobram saem; as que têm conteúdo ficam
+      zsel[s.id] = s.zones[0].id; persist(); draw(); toast('Divisão aplicada — cada zona tem um número; escolha o conteúdo de cada uma nos cartões abaixo');
     };
+    const thumb = (name, list) => {
+      const m = el('div', { class: 'zpm' }); list.forEach((p, i) => { const r = el('i', {}, [String(i + 1)]); r.style.cssText = 'left:' + p[0] + '%;top:' + p[1] + '%;width:' + p[2] + '%;height:' + p[3] + '%'; m.append(r); });
+      return el('button', { class: 'zpre', type: 'button', title: name, onclick: () => applyPreset(list) }, [m, el('span', {}, [name])]);
+    };
+    const snapTo = (z, where) => {
+      if (where === 'full') Object.assign(z, { x: 0, y: 0, w: 100, h: 100 });
+      else { const r = { tl: [0, 0], tr: [100 - z.w, 0], bl: [0, 100 - z.h], br: [100 - z.w, 100 - z.h], c: [(100 - z.w) / 2, (100 - z.h) / 2] }[where]; z.x = Math.round(r[0] * 10) / 10; z.y = Math.round(r[1] * 10) / 10; }
+      persist(); draw();
+    };
+    const sendFile = async (z, f) => {
+      if (!f) return; const isV = /^video\//.test(f.type), isI = /^image\//.test(f.type); if (!isV && !isI) return alert('Use uma imagem ou um vídeo.');
+      try { if (isV && !(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e escolha-o na lista ou informe o caminho.'); toast('Enviando…'); z.type = isV ? 'video' : 'image'; z.src = await fileToURL(f, 1920, 'image/jpeg'); persist(); draw(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); }
+    };
+    const dropOn = (node, z) => {
+      node.ondragover = (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); node.classList.add('drop'); } };
+      node.ondragleave = () => node.classList.remove('drop');
+      node.ondrop = (e) => { e.preventDefault(); node.classList.remove('drop'); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) sendFile(z, f); };
+    };
+    function zcard(z, idx) {
+      const on = z.id === zsel[s.id], c = el('div', { class: 'zcard' + (on ? ' sel' : '') });
+      const head = el('div', { class: 'zch' }); head.onclick = (e) => { if (e.target.closest('select,button,input')) return; zsel[s.id] = z.id; draw(); };
+      const ts = el('select', { class: 'neo-in zts', 'aria-label': 'Tipo de conteúdo da zona ' + (idx + 1) }); ZT.forEach(([v, l]) => ts.append(el('option', { value: v }, [l]))); ts.value = z.type;
+      ts.onchange = () => { z.type = ts.value; if (z.type === 'text' && !z.text) { z.text = 'Texto'; z.bgAlpha = 100; } zsel[s.id] = z.id; persist(); draw(); };
+      const pb = (t, w, tip) => el('button', { type: 'button', title: tip, 'aria-label': tip, onclick: () => snapTo(z, w) }, [t]);
+      const pos = el('div', { class: 'zpos' }, [pb('↖', 'tl', 'Levar para o canto de cima, esquerda'), pb('↗', 'tr', 'Levar para o canto de cima, direita'), pb('↙', 'bl', 'Levar para o canto de baixo, esquerda'), pb('↘', 'br', 'Levar para o canto de baixo, direita'), pb('◎', 'c', 'Centralizar'), pb('⛶', 'full', 'Ocupar a tela toda')]);
+      const del = el('button', { class: 'btn sm del', type: 'button', title: 'Tirar esta zona', onclick: () => { const k = s.zones.indexOf(z); s.zones.splice(k, 1); zsel[s.id] = ''; persist(); draw(); toast('Zona removida'); } }, ['🗑']);
+      head.append(el('span', { class: 'zbadge' }, [String(idx + 1)]), el('b', { class: 'zcn' }, [zName(z)]), ts, pos, del); c.append(head);
+      const set = (u) => { z.src = u; persist(); draw(); };
+      if (z.type === 'image' || z.type === 'video') {
+        const up = el('input', { type: 'file', accept: z.type === 'image' ? 'image/*' : 'video/*', class: 'neo-in', 'aria-label': 'Enviar arquivo' }); up.onchange = () => sendFile(z, up.files[0]);
+        const pth = el('input', { class: 'neo-in', placeholder: z.type === 'image' ? 'midia/foto.jpg' : 'midia/video.mp4' }); pth.value = (z.src || '').startsWith('data:') ? '' : (z.src || ''); pth.onchange = () => set(pth.value.trim());
+        c.append(el('div', { class: 'zsrc' }, [el('div', {}, [el('label', {}, ['Escolher da pasta midia']), mediaPicker(z.type, set)]), el('div', {}, [el('label', {}, ['Enviar do computador (ou arraste para o quadro)']), up]), el('div', {}, [el('label', {}, ['…ou caminho']), pth])]));
+      } else if (z.type === 'youtube' || z.type === 'live') {
+        const pth = el('input', { class: 'neo-in', placeholder: z.type === 'youtube' ? 'https://youtu.be/xxxxxxxxxxx' : 'https://…/canal.m3u8  ou  link do YouTube ao vivo' }); pth.value = z.src || ''; pth.onchange = () => set(pth.value.trim());
+        c.append(el('div', { class: 'zsrc' }, [el('div', { style: 'grid-column:1/-1' }, [el('label', {}, [z.type === 'youtube' ? 'Link do YouTube' : 'Endereço da transmissão (.m3u8, YouTube ao vivo, canal ou página)']), pth])]));
+      } else if (z.type === 'lista') c.append(el('div', { class: 'hint', style: 'margin-top:8px' }, [on ? 'A lista de imagens e vídeos desta zona está nos ajustes logo abaixo ⬇' : 'Clique neste cartão para editar a lista de imagens e vídeos.']));
+      else c.append(el('div', { class: 'hint', style: 'margin-top:8px' }, [on ? 'Escreva o texto desta zona nos ajustes logo abaixo ⬇' : 'Clique neste cartão para escrever o texto.']));
+      dropOn(c, z); return c;
+    }
     function startDrag(ev, z, mode, cv, box) {
       ev.preventDefault(); ev.stopPropagation(); if (zsel[s.id] !== z.id) { zsel[s.id] = z.id; draw(); return startDragLater(ev, z, mode); }
       const r = cv.getBoundingClientRect(), x0 = ev.clientX, y0 = ev.clientY, o = { x: z.x, y: z.y, w: z.w, h: z.h }, q = (v) => Math.round(v / snapV) * snapV;
@@ -476,30 +556,18 @@
     }
     function props(z, host) {
       const i = s.zones.indexOf(z);
-      host.append(el('h3', {}, ['Zona ' + (i + 1) + ' — ' + (ZT.find((t) => t[0] === z.type) || [])[1]]));
+      host.append(el('summary', {}, ['⚙ Ajustes avançados da zona ' + (i + 1) + ' — ' + (ZT.find((t) => t[0] === z.type) || [])[1]]));
       const g = el('div', { class: 'grid' });
-      g.append(field('Conteúdo da zona', z, 'type', { options: ZT, after: draw }));
       const light = () => { if (CV) fillCanvas(CV); };
       if (z.type === 'image' || z.type === 'video' || z.type === 'live') g.append(field('Ajuste do ' + (z.type === 'image' ? 'imagem' : 'vídeo') + ' na zona', z, 'fit', { options: FITS }));
       if (z.type !== 'text') g.append(field('Fundo da zona (aparece nas sobras)', z, 'bg', { type: 'color', after: light }), field('Fundo: opacidade (' + z.bgAlpha + '%)', z, 'bgAlpha', { type: 'range', min: 0, max: 100, step: 5 }));
       if (z.type === 'video' || z.type === 'youtube' || z.type === 'live') g.append(field('Tocar com som (pausa a rádio)', z, 'sound', { type: 'checkbox' }));
       g.append(field('Cantos arredondados', z, 'radius', { type: 'range', min: 0, max: 5, step: 0.25, after: light }), field('Borda (px)', z, 'border', { type: 'range', min: 0, max: 14, step: 1, after: light }), field('Cor da borda', z, 'borderColor', { type: 'color', after: light }), field('Sombra', z, 'shadow', { type: 'checkbox' }));
       host.append(g);
-      if (z.type === 'image' || z.type === 'video') {
-        const up = el('input', { type: 'file', accept: z.type === 'image' ? 'image/*' : 'video/*', class: 'neo-in', 'aria-label': 'Enviar arquivo da zona' });
-        up.onchange = async () => {
-          const f = up.files[0]; if (!f) return;
-          try { if (z.type === 'video' && !(await InfoTV.isServer())) return alert('Enviar vídeo só funciona no servidor Debian. No GitHub, coloque o arquivo na pasta midia e informe o caminho ao lado.'); toast('Enviando…'); z.src = await fileToURL(f, 1920, 'image/jpeg'); persist(); draw(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); }
-        };
-        const p = el('input', { class: 'neo-in', placeholder: z.type === 'image' ? 'midia/foto.jpg' : 'midia/video.mp4' }); p.value = (z.src || '').startsWith('data:') ? '' : (z.src || ''); p.onchange = () => { z.src = p.value.trim(); persist(); draw(); };
-        host.append(el('div', { class: 'grid', style: 'margin-top:12px' }, [el('div', { class: 'f' }, [el('label', {}, ['Enviar do computador']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço']), p]), el('div', { class: 'f' }, [el('label', {}, ['…ou da pasta midia']), mediaPicker(z.type, (u) => { z.src = u; persist(); draw(); })])]));
+      if (z.type === 'image' || z.type === 'video' || z.type === 'youtube' || z.type === 'live') {
+        if (z.type === 'live') host.append(el('div', { class: 'info' }, ['TV ao vivo: aceita transmissão HLS (.m3u8), YouTube ao vivo (link da live ou do canal) ou página da internet. Precisa de internet na TV. Para não cortar a imagem, use "Mostrar inteiro" em Ajuste.']));
       } else if (z.type === 'lista') {
         itemsEditor(z, host);
-      } else if (z.type === 'live') {
-        host.append(el('div', { style: 'margin-top:12px' }, [field('Endereço da transmissão ao vivo', z, 'src', { ph: 'https://…/canal.m3u8  ou  link do YouTube ao vivo', after: light })]),
-          el('div', { class: 'info' }, ['Aceita: <b>1)</b> transmissão HLS (endereço terminado em .m3u8, usado por canais de TV e câmeras); <b>2)</b> YouTube ao vivo (link do vídeo da live, ou o link do canal <code>youtube.com/channel/UC…</code>, que abre a live do canal); <b>3)</b> um endereço de página da internet (alguns sites não permitem aparecer dentro de outra tela). Precisa de internet na TV. Use \"Mostrar inteiro\" para não cortar a imagem. Para pegar a <b>tela toda</b>, deixe esta zona com 100% de largura e altura (ou use o tipo de publicação \"TV ao vivo\").'.replace(/<\/?(b|code)>/g, '')]));
-      } else if (z.type === 'youtube') {
-        host.append(el('div', { style: 'margin-top:12px' }, [field('Link do YouTube', z, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx', after: light })]), el('div', { class: 'info' }, ['O vídeo repete sozinho dentro da zona. Para a tela voltar aos slides quando o vídeo terminar, use a opção "Passar para o próximo quando o 1º vídeo terminar" acima.']));
       } else {
         const tg = el('div', { class: 'grid', style: 'margin-top:12px' });
         tg.append(field('Texto', z, 'text', { type: 'textarea', after: light }), field('Cor do texto', z, 'color', { type: 'color', after: light }), field('Tamanho (' + z.size + 'x)', z, 'size', { type: 'range', min: 0.4, max: 4, step: 0.1, after: light }), field('Alinhamento', z, 'align', { options: [['left', 'Esquerda'], ['center', 'Centro'], ['right', 'Direita']] }),
@@ -522,8 +590,8 @@
         const b = el('div', { class: 'zb' + (z.id === zsel[s.id] ? ' sel' : ''), 'data-zid': z.id }); place(b, z); b.style.zIndex = String(idx + 1); b.style.borderRadius = (z.radius || 0) * 4 + 'px';
         const inner = el('div', { class: 'zi' }); const _im = z.type === 'lista' ? ((z.items.find((x) => x.type === 'image' && x.src) || {}).src) : (z.type === 'image' ? z.src : ''); if (_im) inner.style.backgroundImage = 'url("' + InfoTV.mediaURL(_im) + '")'; inner.style.backgroundSize = z.fit === 'contain' ? 'contain' : 'cover';
         if (z.type === 'text') { inner.style.background = 'color-mix(in srgb, ' + (z.bg || '#0f766e') + ' ' + (z.bgAlpha || 0) + '%, transparent)'; inner.style.color = z.color; }
-        inner.append(el('span', {}, [(z.type === 'text' ? '' : ZICON[z.type] + ' ') + (z.type === 'text' ? (z.text || 'Texto') : ('Zona ' + (idx + 1) + (z.type === 'lista' ? ' · ' + z.items.length + ' itens' : (z.src ? '' : ' (vazia)'))))]));
-        b.append(inner); b.onpointerdown = (e) => startDrag(e, z, 'move', cv, b);
+        inner.append(el('b', { class: 'zn' }, [String(idx + 1)]), el('span', { class: 'zl' }, [zName(z)]));
+        b.append(inner); b.onpointerdown = (e) => startDrag(e, z, 'move', cv, b); dropOn(b, z);
         const xb = el('span', { class: 'zx', title: 'Tirar esta zona', 'aria-label': 'Tirar esta zona' }, ['×']);
         xb.onpointerdown = (e) => { e.stopPropagation(); e.preventDefault(); };
         xb.onclick = (e) => { e.stopPropagation(); const k = s.zones.indexOf(z); if (k < 0) return; s.zones.splice(k, 1); if (zsel[s.id] === z.id) zsel[s.id] = ''; persist(); draw(); toast('Zona removida'); };
@@ -536,9 +604,9 @@
     function draw() {
       root.innerHTML = '';
       if (!sel()) zsel[s.id] = s.zones.length ? s.zones[s.zones.length - 1].id : '';
-      root.append(el('div', { class: 'info' }, ['Escolha um modelo (ou adicione zonas), depois <b>arraste</b> cada quadro para mover e puxe as <b>bolinhas dos cantos</b> para mudar o tamanho. As medidas são em % da tela central, então valem para TV, monitor e totem. Uma zona mais acima na lista fica na frente.'.replace(/<\/?b>/g, '')]));
-      const bar = el('div', { class: 'actions', style: 'margin-top:0' }); ZPRESETS.forEach(([name, list]) => bar.append(el('button', { class: 'btn sm', onclick: () => applyPreset(list) }, [name]))); root.append(el('div', { class: 'f' }, [el('label', {}, ['Modelos prontos de divisão']), bar]));
-      const add = el('div', { class: 'actions' }); ZT.slice().reverse().forEach(([t, l]) => add.append(el('button', { class: 'btn sm ok', onclick: () => addZone(t) }, ['+ ' + l]))); root.append(add);
+      root.append(el('div', { class: 'info' }, ['Passo a passo: escolha uma divisão, arraste cada quadro numerado para onde quiser e puxe as bolinhas dos cantos para o tamanho. As medidas são em % da tela, então valem para TV, monitor e totem. A zona de número maior fica na frente.'.replace(/<\/?b>/g, '')]));
+      const bar = el('div', { class: 'zpres' }); ZPRESETS.forEach(([name, list]) => bar.append(thumb(name, list))); root.append(el('div', { class: 'f' }, [el('label', {}, ['1) Escolha como dividir a tela (os números mostram cada zona)']), bar]));
+      const add = el('div', { class: 'actions' }); ZT.slice().reverse().forEach(([t, l]) => add.append(el('button', { class: 'btn sm ok', onclick: () => addZone(t) }, ['+ ' + l]))); root.append(el('div', { class: 'f' }, [el('label', {}, ['…ou acrescente mais uma zona']), add]));
       const opt = el('div', { class: 'grid', style: 'margin:14px 0' });
       const sn = el('select', { class: 'neo-in' }); [['1', 'Livre (1%)'], ['2.5', 'Ímã de 2,5%'], ['5', 'Ímã de 5%'], ['10', 'Ímã de 10%']].forEach(([v, l]) => sn.append(el('option', { value: v }, [l]))); sn.value = String(snapV); sn.onchange = () => { snapV = +sn.value; };
       const rt = el('select', { class: 'neo-in' }); [['1.55', 'Editor no formato da TV (horizontal)'], ['1', 'Editor quadrado'], ['0.72', 'Editor vertical (totem)']].forEach(([v, l]) => rt.append(el('option', { value: v }, [l]))); rt.value = String(ratio); rt.onchange = () => { ratio = +rt.value; draw(); };
@@ -547,7 +615,8 @@
       cv.append(el('div', { class: 'zgrid' }));
       CV = cv; fillCanvas(cv);
       root.append(cv, el('div', { class: 'znums hint', style: 'margin-top:8px' }, [sel() ? 'x ' + sel().x + '%  y ' + sel().y + '%  ·  largura ' + sel().w + '%  altura ' + sel().h + '%' : 'Nenhuma zona ainda: escolha um modelo ou clique em "+ Imagem".']));
-      const z = sel(); if (z) { const host = el('div', { class: 'zprops' }); props(z, host); root.append(host); }
+      root.append(el('div', { class: 'f', style: 'margin-top:16px' }, [el('label', {}, ['2) Escolha o conteúdo de cada zona · arraste uma foto/vídeo do computador direto para o quadro, ou use os botões ↖ ↗ ↙ ↘ ◎ ⛶ para levar a zona ao canto']), el('div', { class: 'zcards' }, s.zones.map((zz, ix) => zcard(zz, ix)))]));
+      const z = sel(); if (z) { const host = el('details', { class: 'zprops', open: '' }); props(z, host); root.append(host); }
     }
     draw(); return root;
   }
@@ -570,7 +639,7 @@
       if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }), field('Tocar com o som do vídeo (pausa a rádio)', s, 'vSound', { type: 'checkbox' }));
       if (s.type === 'live') g.append(field('Endereço da transmissão (.m3u8, YouTube ao vivo ou página)', s, 'src', { ph: 'https://…/canal.m3u8' }), field('Ajuste', s, 'fit', { options: [['contain', 'Mostrar inteiro'], ['cover', 'Preencher (corta bordas)']] }), field('Tocar com som (pausa a rádio)', s, 'ytSound', { type: 'checkbox' }));
       if (s.type === 'youtube') g.append(field('Link do YouTube', s, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx' }), field('Tocar com som (pausa a rádio)', s, 'ytSound', { type: 'checkbox' }), field('Começar no segundo', s, 'ytStart', { type: 'number' }));
-      if (s.type !== 'zonas') g.append(field('✂ Dividir esta tela em zonas', s, 'split', { type: 'checkbox', after: renderSlides }));
+      if (s.type !== 'zonas') g.append(field('✂ Dividir esta tela em zonas', s, 'split', { type: 'checkbox', after: () => { if (s.split && !s.zones.length) seedZones(s); persist(); renderSlides(); } }));
       if (s.type !== 'zonas' && s.split) g.append(field('Fundo da divisão', s, 'splitBase', { options: [['manter', 'Manter o conteúdo desta publicação atrás das zonas'], ['nenhum', 'Só as zonas (fundo liso)']] }), field('Quando passar para o próximo', s, 'zEnd', { options: [['tempo', 'Pelo tempo da duração'], ['fim', 'Quando o 1º vídeo das zonas terminar']] }));
       if (s.type === 'zonas') g.append(field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }), field('Quando passar para o próximo', s, 'zEnd', { options: [['tempo', 'Pelo tempo da duração'], ['fim', 'Quando o 1º vídeo das zonas terminar']] }));
       else

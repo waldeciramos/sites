@@ -44,3 +44,8 @@ O navegador não deixa ler outro site direto, então a TV usa leitores públicos
 ## Versão 9.5 — dividir qualquer publicação em zonas e TV ao vivo
 - Em *Publicações*, cada item tem a opção **✂ Dividir esta tela em zonas**. Ao marcar, aparece o editor: modelos prontos (2, 3, 4, 6 zonas…), arrastar para posicionar, puxar os cantos para o tamanho, e em cada zona escolher imagem, vídeo, lista, YouTube, **TV ao vivo** ou texto. "Fundo da divisão" escolhe entre manter o conteúdo da própria publicação atrás das zonas ou só as zonas.
 - **TV ao vivo** (zona ou publicação de tela toda): transmissão HLS (`.m3u8`, leitor `assets/hls.min.js` já incluído), YouTube ao vivo (link da live ou do canal `youtube.com/channel/UC…`) ou página da internet (alguns sites não permitem). Precisa de internet na TV.
+
+## Versão 9.6 — zonas mais fáceis
+- Ao marcar **✂ Dividir esta tela em zonas** numa publicação de imagem, vídeo, YouTube ou TV ao vivo, o conteúdo dela vira a **zona 1** (com o nome do arquivo) e o fundo da publicação sai, para não tocar duas vezes.
+- Escolha a divisão por **miniaturas numeradas** (2 colunas, 3 colunas, 1 grande + 2, em pé no meio + 2 laterais, 4, 6 quadros…). Cada zona mostra seu **número e o nome** do vídeo/imagem dentro do quadro.
+- Abaixo do quadro há um **cartão por zona**: tipo, escolher da pasta midia, enviar do computador ou colar o caminho/link. Os botões ↖ ↗ ↙ ↘ ◎ ⛶ levam a zona ao canto, ao centro ou à tela toda; você também pode **arrastar uma foto/vídeo do computador direto para o quadro**.
