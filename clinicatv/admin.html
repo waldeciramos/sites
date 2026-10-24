@@ -386,7 +386,7 @@
   };
 
   /* ---------- Propagandas ---------- */
-  const TYPES = [['image', '🖼 Imagem'], ['video', '🎬 Vídeo MP4'], ['youtube', '▶ YouTube'], ['zonas', '🧩 Zonas (montar a tela)'], ['text', '📝 Slide de texto']];
+  const TYPES = [['image', '🖼 Imagem'], ['video', '🎬 Vídeo MP4'], ['youtube', '▶ YouTube'], ['zonas', '🧩 Zonas (montar a tela)'], ['live', '📺 TV ao vivo (tela toda)'], ['text', '📝 Slide de texto']];
   const tLabel = (s) => (TYPES.find((t) => t[0] === s.type) || [])[1];
   /* ---------- Biblioteca de arquivos já enviados (servidor) ---------- */
   async function midiaList() {
@@ -406,8 +406,8 @@
   }
 
   /* ---------- Editor de zonas: monte a tela central com vários quadros ---------- */
-  const ZT = [['lista', '🎞 Lista de imagens e vídeos'], ['image', '🖼 Imagem'], ['video', '🎬 Vídeo MP4'], ['youtube', '▶ YouTube'], ['text', '📝 Texto']];
-  const ZICON = { lista: '🎞', image: '🖼', video: '🎬', youtube: '▶', text: '📝' };
+  const ZT = [['lista', '🎞 Lista de imagens e vídeos'], ['image', '🖼 Imagem'], ['video', '🎬 Vídeo MP4'], ['youtube', '▶ YouTube'], ['live', '📺 TV ao vivo / transmissão'], ['text', '📝 Texto']];
+  const ZICON = { lista: '🎞', image: '🖼', video: '🎬', youtube: '▶', live: '📺', text: '📝' };
   const FITS = [['cover', 'Preencher a zona (corta bordas)'], ['contain', 'Mostrar inteiro (sobram bordas)'], ['fill', 'Esticar para encher (muda o formato)']];
   const ZPRESETS = [
     ['1 zona (tela toda)', [[0, 0, 100, 100]]],
@@ -480,9 +480,9 @@
       const g = el('div', { class: 'grid' });
       g.append(field('Conteúdo da zona', z, 'type', { options: ZT, after: draw }));
       const light = () => { if (CV) fillCanvas(CV); };
-      if (z.type === 'image' || z.type === 'video') g.append(field('Ajuste do ' + (z.type === 'video' ? 'vídeo' : 'imagem') + ' na zona', z, 'fit', { options: FITS }));
+      if (z.type === 'image' || z.type === 'video' || z.type === 'live') g.append(field('Ajuste do ' + (z.type === 'image' ? 'imagem' : 'vídeo') + ' na zona', z, 'fit', { options: FITS }));
       if (z.type !== 'text') g.append(field('Fundo da zona (aparece nas sobras)', z, 'bg', { type: 'color', after: light }), field('Fundo: opacidade (' + z.bgAlpha + '%)', z, 'bgAlpha', { type: 'range', min: 0, max: 100, step: 5 }));
-      if (z.type === 'video' || z.type === 'youtube') g.append(field('Tocar com som (pausa a rádio)', z, 'sound', { type: 'checkbox' }));
+      if (z.type === 'video' || z.type === 'youtube' || z.type === 'live') g.append(field('Tocar com som (pausa a rádio)', z, 'sound', { type: 'checkbox' }));
       g.append(field('Cantos arredondados', z, 'radius', { type: 'range', min: 0, max: 5, step: 0.25, after: light }), field('Borda (px)', z, 'border', { type: 'range', min: 0, max: 14, step: 1, after: light }), field('Cor da borda', z, 'borderColor', { type: 'color', after: light }), field('Sombra', z, 'shadow', { type: 'checkbox' }));
       host.append(g);
       if (z.type === 'image' || z.type === 'video') {
@@ -495,6 +495,9 @@
         host.append(el('div', { class: 'grid', style: 'margin-top:12px' }, [el('div', { class: 'f' }, [el('label', {}, ['Enviar do computador']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho / endereço']), p]), el('div', { class: 'f' }, [el('label', {}, ['…ou da pasta midia']), mediaPicker(z.type, (u) => { z.src = u; persist(); draw(); })])]));
       } else if (z.type === 'lista') {
         itemsEditor(z, host);
+      } else if (z.type === 'live') {
+        host.append(el('div', { style: 'margin-top:12px' }, [field('Endereço da transmissão ao vivo', z, 'src', { ph: 'https://…/canal.m3u8  ou  link do YouTube ao vivo', after: light })]),
+          el('div', { class: 'info' }, ['Aceita: <b>1)</b> transmissão HLS (endereço terminado em .m3u8, usado por canais de TV e câmeras); <b>2)</b> YouTube ao vivo (link do vídeo da live, ou o link do canal <code>youtube.com/channel/UC…</code>, que abre a live do canal); <b>3)</b> um endereço de página da internet (alguns sites não permitem aparecer dentro de outra tela). Precisa de internet na TV. Use \"Mostrar inteiro\" para não cortar a imagem. Para pegar a <b>tela toda</b>, deixe esta zona com 100% de largura e altura (ou use o tipo de publicação \"TV ao vivo\").'.replace(/<\/?(b|code)>/g, '')]));
       } else if (z.type === 'youtube') {
         host.append(el('div', { style: 'margin-top:12px' }, [field('Link do YouTube', z, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx', after: light })]), el('div', { class: 'info' }, ['O vídeo repete sozinho dentro da zona. Para a tela voltar aos slides quando o vídeo terminar, use a opção "Passar para o próximo quando o 1º vídeo terminar" acima.']));
       } else {
@@ -565,7 +568,10 @@
         field('Passar a cada (minutos) · 0 = no rodízio normal', s, 'every', { type: 'number', ph: 'ex.: 30' }));
       if (s.type === 'image') g.append(field('Ajuste da imagem', s, 'fit', { options: [['cover', 'Preencher (corta bordas)'], ['contain', 'Mostrar inteira']] }));
       if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }), field('Tocar com o som do vídeo (pausa a rádio)', s, 'vSound', { type: 'checkbox' }));
+      if (s.type === 'live') g.append(field('Endereço da transmissão (.m3u8, YouTube ao vivo ou página)', s, 'src', { ph: 'https://…/canal.m3u8' }), field('Ajuste', s, 'fit', { options: [['contain', 'Mostrar inteiro'], ['cover', 'Preencher (corta bordas)']] }), field('Tocar com som (pausa a rádio)', s, 'ytSound', { type: 'checkbox' }));
       if (s.type === 'youtube') g.append(field('Link do YouTube', s, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx' }), field('Tocar com som (pausa a rádio)', s, 'ytSound', { type: 'checkbox' }), field('Começar no segundo', s, 'ytStart', { type: 'number' }));
+      if (s.type !== 'zonas') g.append(field('✂ Dividir esta tela em zonas', s, 'split', { type: 'checkbox', after: renderSlides }));
+      if (s.type !== 'zonas' && s.split) g.append(field('Fundo da divisão', s, 'splitBase', { options: [['manter', 'Manter o conteúdo desta publicação atrás das zonas'], ['nenhum', 'Só as zonas (fundo liso)']] }), field('Quando passar para o próximo', s, 'zEnd', { options: [['tempo', 'Pelo tempo da duração'], ['fim', 'Quando o 1º vídeo das zonas terminar']] }));
       if (s.type === 'zonas') g.append(field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }), field('Quando passar para o próximo', s, 'zEnd', { options: [['tempo', 'Pelo tempo da duração'], ['fim', 'Quando o 1º vídeo das zonas terminar']] }));
       else
       if (s.type === 'text') g.append(field('Ícone / emoji', s, 'icon'), field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
@@ -579,7 +585,7 @@
       if (+s.every > 0) body.append(el('div', { class: 'info' }, ['Esta publicação só entra na TV de ' + s.every + ' em ' + s.every + ' minutos (assim que a publicação que estiver na tela terminar). Nos intervalos, passam as outras publicações normalmente. Deixe 0 para ela seguir o rodízio comum.']));
       body.append(el('div', { class: 'actions', style: 'margin:10px 0 0' }, [el('button', { class: 'btn sm', onclick: () => { pvSlide = s.id; pvLoad(); toast('Pré-visualização mostra só esta publicação'); } }, ['👁 Ver só esta no pré-visualizar'])]));
       if (s.type === 'youtube') body.append(el('div', { class: 'info' }, ['Precisa de internet na TV. Com duração 0 o vídeo toca até o fim e a TV volta aos slides; com um valor maior que 0 ele é cortado nesse tempo. Alguns vídeos não permitem ser exibidos em outros sites (a TV mostra um aviso e passa adiante). Para tocar com som no navegador da TV, abra-o com --autoplay-policy=no-user-gesture-required.']));
-      if (s.type === 'zonas') { pvSlide = pvSlide || ''; body.append(zonesEditor(s)); }
+      if (s.type === 'zonas' || s.split) { pvSlide = pvSlide || ''; if (s.split) body.append(el('div', { class: 'info' }, ['Divisão ativa: use os modelos prontos (2, 3, 4, 6 zonas…) ou "+ Zona", arraste cada quadro para mudar a posição e puxe os cantos para o tamanho. Em cada zona escolha a imagem, o vídeo, o YouTube, a TV ao vivo ou o texto. Para ocupar a tela toda, use "1 zona (tela toda)".'])); body.append(zonesEditor(s)); }
       if (s.type !== 'text' && s.tpl === 'aniversario') body.append(el('div', { class: 'info' }, ['Aniversariante: escreva só o nome da pessoa no texto principal (a TV mostra "Parabéns, Nome!") e a mensagem no texto secundário.']));
       if (s.type === 'text') {
         const bu = el('input', { type: 'file', accept: 'video/*', class: 'neo-in', 'aria-label': 'Enviar vídeo de fundo' });

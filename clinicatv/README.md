@@ -40,3 +40,7 @@ O navegador não deixa ler outro site direto, então a TV usa leitores públicos
 - **Celular**: ao abrir, aparece "Toque para abrir em tela cheia"; um toque no meio expande a tela e liga a rádio. No iPhone o Safari não tem tela cheia de site: use Compartilhar → Adicionar à Tela de Início.
 - **Barra inferior** (dia, mês, hora e informações) com o mesmo relevo esculpido/rebaixado da lateral e a fonte do relógio (Rajdhani).
 - **Trânsito/notícias**: no servidor Debian a própria TV busca a página (`/api/noticia`), sem depender de sites públicos. Precisa atualizar o `server.js` e reiniciar: `sudo systemctl restart clinicatv`. A fonte Motiva vem marcada como **Ativa**; confira em Notícias → 🔎 Buscar agora.
+
+## Versão 9.5 — dividir qualquer publicação em zonas e TV ao vivo
+- Em *Publicações*, cada item tem a opção **✂ Dividir esta tela em zonas**. Ao marcar, aparece o editor: modelos prontos (2, 3, 4, 6 zonas…), arrastar para posicionar, puxar os cantos para o tamanho, e em cada zona escolher imagem, vídeo, lista, YouTube, **TV ao vivo** ou texto. "Fundo da divisão" escolhe entre manter o conteúdo da própria publicação atrás das zonas ou só as zonas.
+- **TV ao vivo** (zona ou publicação de tela toda): transmissão HLS (`.m3u8`, leitor `assets/hls.min.js` já incluído), YouTube ao vivo (link da live ou do canal `youtube.com/channel/UC…`) ou página da internet (alguns sites não permitem). Precisa de internet na TV.

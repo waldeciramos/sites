@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.4">
+<meta name="build" content="9.5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b1c2c">
@@ -113,6 +113,7 @@
   .slide.dc { display: grid; grid-template-columns: 1.8fr 1fr; text-align: left; background: linear-gradient(160deg, var(--b1), var(--b2)); }
   .dc .ph { position: relative; overflow: hidden; } .dc .pn { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; gap: 1.2rem; padding: 3rem; }
   /* zonas: retângulos (em % da tela) com imagem, vídeo, YouTube ou texto */
+  .zover { position: absolute; inset: 0; z-index: 6; } .zone .zlive { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
   .slide.zonas { display: block; } .zone { position: absolute; overflow: hidden; z-index: 2; }
   .zone .img, .zone video, .zone iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background-position: center; background-repeat: no-repeat; }
   .zone .pl { transition: opacity .6s; } .zone.zlist { background: transparent; }
@@ -430,7 +431,7 @@
     const today = new Date().toISOString().slice(0, 10);
     return (cfg.slides || []).filter((s) => s.active !== false && (!s.start || s.start <= today) && (!s.end || s.end >= today));
   }
-  function ytId(u) { const m = String(u).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); }
+  function ytId(u) { const m = String(u).match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); }
   function textBlock(cls, st, base) { const w = document.createElement('div'); w.className = cls; if (st && st.text) { const s = document.createElement('span'); InfoFX.text(s, st.text, st, base); w.appendChild(s); } return w; }
   /* ----- aviso discreto quando um vídeo não abre (ajuda a achar o problema na TV) ----- */
   let errT = null;
@@ -576,8 +577,35 @@
     const el = document.createElement('div'); el.className = 'slide zonas'; buildZones(Object.assign({ zEnd: 'tempo' }, cfg.general.mosaic || {}), el, null);
     frame.appendChild(el); mosaicEl = el; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   }
+
+  /* ----- TV ao vivo: transmissão HLS (.m3u8), YouTube ao vivo (vídeo ou canal) ou uma página da internet ----- */
+  let hlsP = null;
+  function hlsLoad() { return hlsP || (hlsP = new Promise((ok) => { if (window.Hls) return ok(true); const sc = document.createElement('script'); sc.src = 'assets/hls.min.js'; sc.onload = () => ok(!!window.Hls); sc.onerror = () => ok(false); document.head.appendChild(sc); })); }
+  function liveEl(z, stops) {
+    const src = String(z.src || '').trim(), sound = !!z.sound && !PREVIEW;
+    const ch = src.match(/youtube\.com\/channel\/(UC[\w-]{22})/i);
+    if (ch) {   // canal do YouTube: abre a transmissão ao vivo do canal
+      const f = document.createElement('iframe'); f.className = 'zlive'; f.allow = 'autoplay; encrypted-media; picture-in-picture'; f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      f.src = 'https://www.youtube.com/embed/live_stream?channel=' + ch[1] + '&autoplay=1&mute=' + (sound ? 0 : 1) + '&controls=0&rel=0&modestbranding=1&playsinline=1'; return f;
+    }
+    if (ytId(src)) return ytFrame(src, { loop: false, sound, start: 0, hooks: {} });
+    if (/\.(m3u8|mp4|webm)(\?|#|$)/i.test(src)) {
+      const v = document.createElement('video'); v.className = 'zlive'; v.muted = !sound; v.defaultMuted = !sound; v.autoplay = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.style.objectFit = FITCSS[z.fit] || 'contain';
+      const go = () => v.play().catch(() => {});
+      if (!/\.m3u8/i.test(src)) { v.src = InfoTV.mediaURL(src); v.loop = true; go(); }
+      else if (v.canPlayType('application/vnd.apple.mpegurl')) { v.src = src; go(); }
+      else hlsLoad().then((ok) => {
+        if (!ok) return badge('não foi possível carregar o leitor de transmissão ao vivo');
+        const h = new Hls({ lowLatencyMode: true, maxBufferLength: 20 }); let rec = 0;
+        h.on(Hls.Events.ERROR, (e, d) => { if (!d.fatal) return; if (++rec > 6) return badge('a transmissão ao vivo não abriu (endereço ou rede)'); if (d.type === Hls.ErrorTypes.NETWORK_ERROR) setTimeout(() => h.startLoad(), 3000); else if (d.type === Hls.ErrorTypes.MEDIA_ERROR) h.recoverMediaError(); else { h.destroy(); badge('a transmissão ao vivo não abriu'); } });
+        h.loadSource(src); h.attachMedia(v); h.on(Hls.Events.MANIFEST_PARSED, go); stops.push(() => { try { h.destroy(); } catch (e) {} });
+      });
+      return v;
+    }
+    const f = document.createElement('iframe'); f.className = 'zlive'; f.src = src; f.allow = 'autoplay; fullscreen; encrypted-media'; f.setAttribute('referrerpolicy', 'no-referrer'); return f;   // página da internet (alguns sites não permitem ser exibidos assim)
+  }
   function buildZones(s, el, layer) {
-    el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
+    if (!s.bgnone) el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
     if (layer) el.appendChild(layer);
     const main = {}, stops = []; let mainSet = false; el._stop = () => stops.forEach((f) => { try { f(); } catch (e) {} });
     (s.zones || []).forEach((z) => {
@@ -589,6 +617,7 @@
       if (z.type === 'image' && z.src) { const i = document.createElement('div'); i.className = 'img'; i.style.backgroundSize = BGFIT[z.fit] || 'cover'; i.style.backgroundImage = 'url("' + InfoTV.mediaURL(z.src) + '")'; d.appendChild(i); }
       else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); v.style.objectFit = FITCSS[z.fit] || 'cover'; d.appendChild(v); if (!(+z.bgAlpha > 0)) d.style.background = '#000'; }
       else if (z.type === 'lista') playlist(d, z, stops);
+      else if (z.type === 'live' && z.src) d.appendChild(liveEl(z, stops));
       else if (z.type === 'youtube' && z.src) d.appendChild(ytFrame(z.src, { loop: !isMain, sound: !!z.sound, start: 0, hooks: isMain ? main : {} }));
       else if (z.type === 'text') {
         const t = document.createElement('div'); t.className = 'ztext'; t.textContent = z.text || '';
@@ -602,13 +631,24 @@
     });
     return el;
   }
+  /* publicação dividida em zonas: o conteúdo da própria publicação fica de fundo e as zonas abrem por cima (ou só as zonas, com fundo liso) */
   function buildSlide(s) {
+    if (!s.split || !(s.zones || []).length || s.type === 'zonas') return buildBase(s);
+    if (s.splitBase === 'nenhum') return buildBase(Object.assign({}, s, { type: 'zonas' }));
+    const el = buildBase(s), zl = document.createElement('div'); zl.className = 'zover';
+    buildZones(Object.assign({}, s, { bgnone: true }), zl, null); el.appendChild(zl);
+    const prev = el._stop; el._stop = () => { try { prev && prev(); } catch (e) {} zl._stop && zl._stop(); };
+    if (!el._main && zl._main) el._main = zl._main;
+    return el;
+  }
+  function buildBase(s) {
     const g = cfg.general, el = document.createElement('div'), tpl = (s.type === 'text' || s.type === 'zonas') ? 'texto' : (s.tpl || 'cheia');
     const main = {}; if (s.type === 'video' || s.type === 'youtube') el._main = main;
-    el.className = 'slide ' + (s.type === 'zonas' ? 'zonas' : s.type) + ' tr-' + (s.trans || g.transition || 'fade') + (s.type === 'image' && s.kb ? ' kb-' + s.kb : '');
+    el.className = 'slide ' + (s.type === 'zonas' || s.type === 'live' ? 'zonas' : s.type) + ' tr-' + (s.trans || g.transition || 'fade') + (s.type === 'image' && s.kb ? ' kb-' + s.kb : '');
     el.style.setProperty('--dur', (Math.max(3, +s.seconds || +g.slideSeconds || 12) + 2) + 's');
     el.style.setProperty('--b1', s.bg1 || '#1b2f6b'); el.style.setProperty('--b2', s.bg2 || '#0b1233');
     const layer = fxLayer(s.bgfx || (tpl === 'aniversario' ? 'confete' : ''));
+    if (s.type === 'live') return buildZones({ bg1: '#000', bg2: '#000', zones: [InfoTV.zdef({ type: 'live', src: s.src, fit: s.fit === 'cover' ? 'cover' : 'contain', sound: !!s.ytSound, x: 0, y: 0, w: 100, h: 100 })] }, el, null);
     if (s.type === 'zonas') return buildZones(s, el, layer);
     if (tpl === 'texto') {
       el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
@@ -681,7 +721,7 @@
       if (main) {
         // vídeo MP4 / YouTube: com duração 0 vale "até o fim do vídeo" e depois a TV volta aos slides.
         // Com duração maior que 0 ela é o tempo máximo. Se o vídeo não começar em 30 s, segue adiante.
-        const lim = s.type === 'zonas' ? 0 : (+s.seconds > 0 ? secs : 0), v = el.querySelector('video');
+        const lim = (s.type === 'zonas' || (s.split && s.zEnd === 'fim')) ? 0 : (+s.seconds > 0 ? secs : 0), v = el.querySelector('video');
         if (list.length === 1 && s.type === 'video' && !lim && v && !(+s.every > 0)) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
         else {
           main.onEnd = nextSlide; main.onFail = () => go(3000);

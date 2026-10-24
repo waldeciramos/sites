@@ -68,7 +68,7 @@
     return z;
   };
   function normSlide(s) {
-    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, every: 0, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4, ytSound: false, vSound: true, ytStart: 0, zones: [], zEnd: 'tempo' }, s || {});
+    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, every: 0, split: false, splitBase: 'manter', start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4, ytSound: false, vSound: true, ytStart: 0, zones: [], zEnd: 'tempo' }, s || {});
     s.id = s.id || rid();
     s.t1 = tdef(s.t1 || { text: s.title || '' });
     s.t2 = tdef(s.t2 || { text: s.body || '', effect: 'none', anim: 'fade' });
