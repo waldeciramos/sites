@@ -630,8 +630,8 @@
         host.append(tg);
       }
       const geo = el('div', { class: 'grid', style: 'margin-top:12px' });
-      /* tamanho ideal da mídia: medido numa TV Full HD 16:9 (área das propagandas = 1440 x 902 px) */
-      const SW = 1440, SH = 902, RAT = [[1, 1, '1:1'], [4, 5, '4:5'], [3, 4, '3:4'], [2, 3, '2:3'], [9, 16, '9:16'], [16, 9, '16:9'], [4, 3, '4:3'], [3, 2, '3:2'], [16, 10, '16:10'], [5, 4, '5:4'], [21, 9, '21:9']];
+      /* tamanho ideal da mídia: medido numa TV Full HD 16:9 (área das propagandas = 1440 x 864 px, com a barra inferior fixa) */
+      const SW = 1440, SH = 864, RAT = [[1, 1, '1:1'], [5, 6, '5:6'], [4, 5, '4:5'], [3, 4, '3:4'], [2, 3, '2:3'], [9, 16, '9:16'], [16, 9, '16:9'], [4, 3, '4:3'], [3, 2, '3:2'], [16, 10, '16:10'], [5, 4, '5:4'], [21, 9, '21:9']];
       const szInfo = el('div', { class: 'info', style: 'margin-top:10px' });
       const szUpd = () => {
         const pw = Math.round(z.w * SW / 100), ph = Math.round(z.h * SH / 100), r = pw / ph, nm = RAT.reduce((b, c) => (Math.abs(Math.log(r / (c[0] / c[1]))) < Math.abs(Math.log(r / (b[0] / b[1]))) ? c : b));

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.10">
+<meta name="build" content="9.11">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b1c2c">
@@ -195,6 +195,12 @@
   #lt .lt-main { padding: .4rem 1.2rem; } #lt .lt-text { color: var(--ltTxt); text-shadow: .035em .04em .025em var(--eh), -.025em -.03em .03em var(--es); } #lt .lt-detail { color: var(--mut); }
   #lt .lt-badge { box-shadow: .15rem .15rem .4rem var(--nsh2), -.1rem -.1rem .3rem var(--nsh1); }
   #lt .lt-crawl { margin: .2rem .8rem .8rem; border-radius: 1rem; background: var(--vizbg); color: var(--crawlTxt); box-shadow: inset .25rem .25rem .6rem var(--nsh2), inset -.2rem -.2rem .5rem var(--nsh1); }
+  /* barra inferior com tamanho FIXO: o texto longo é cortado em 2 linhas e a barra (e a área das propagandas) nunca muda de altura */
+  #lt .lt-head { height: 9.6rem; min-height: 9.6rem; max-height: 9.6rem; overflow: hidden; }
+  #lt .lt-main { overflow: hidden; justify-content: center; gap: .3rem; }
+  #lt .lt-badge { flex: none; min-height: 1.7rem; }
+  #lt .lt-text { flex: none; height: 4.7rem; max-height: 4.7rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  #lt .lt-detail { flex: none; height: 1.5rem; line-height: 1.5rem; }
   #lt #tScroll { padding-left: .6rem; }
 
   /* ===== Celular: toque para tela cheia + rádio ===== */
@@ -413,7 +419,7 @@ if (/[?&]limpar/.test(location.search)) {
       lt.style.setProperty('--bc', c.color); $('ltBadge').style.background = c.color; $('ltBadge').textContent = ((c.icon || '') + ' ' + c.label).trim();
       const box = $('ltText'); box.innerHTML = ''; const sp = document.createElement('span');
       InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)', font: cfg.general.tickerFont || ((cfg.general.clock || {}).font) || '' }, 0); box.appendChild(sp);
-      $('ltDetail').textContent = it.detail || ''; $('ltDetail').style.display = it.detail ? '' : 'none';
+      $('ltDetail').textContent = it.detail || ''; $('ltDetail').style.visibility = it.detail ? '' : 'hidden';   // a linha de detalhe sempre ocupa o lugar: a barra não muda de tamanho
       hTimer = setTimeout(show, Math.max(4, +it.seconds || +cfg.general.headlineSeconds || 9) * 1000);
     };
     show();
