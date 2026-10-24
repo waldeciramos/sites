@@ -140,7 +140,7 @@
 <div id="panel">
   <header class="top">
     <h1>⚙ Clínica TV · Administração<small id="clinicName"></small></h1>
-    <a class="btn ok" href="index.html" target="_blank" style="text-decoration:none">▶ Abrir TV</a>
+    <a class="btn ok" href="index.html?limpar=1&debug" target="_blank" style="text-decoration:none" title="Limpa o cache e abre a TV com a etiqueta de versão">▶ Abrir TV (atualizada)</a>
     <button class="btn" id="btnLogout">Sair</button>
   </header>
   <div class="layout">
@@ -917,7 +917,7 @@
   };
   $('btnExport').onclick = () => { const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' })), download: 'config.json' }); a.click(); };
   /* ---------- Publicar o config.json direto no repositório do GitHub ---------- */
-  const TOK_KEY = 'ctv.gh.token';
+  const TOK_KEY = 'ctv.gh.token'; let ghOk = false;
   const b64u = (str) => btoa(unescape(encodeURIComponent(str)));
   async function ghPublicar() {
     const msg = (t) => { $('pubMsg').textContent = t; };
@@ -941,13 +941,26 @@
         if (r.status === 409 || r.status === 422) { last = 'O arquivo mudou no GitHub enquanto você publicava. Tente de novo.'; continue; }
         if (!r.ok) { last = 'Falha ao gravar (' + r.status + ')'; continue; }
         const stamp = new Date().toLocaleTimeString('pt-BR');
-        return msg('✔ Publicado às ' + stamp + ' em ' + c.owner + '/' + c.repo + '/' + file + '. O GitHub Pages leva cerca de 1 a 2 minutos; a TV atualiza sozinha (ou abra index.html?limpar=1).');
+        ghOk = true; return msg('✔ Publicado às ' + stamp + ' em ' + c.owner + '/' + c.repo + '/' + file + '. O GitHub Pages leva cerca de 1 a 2 minutos; a TV atualiza sozinha (ou abra index.html?limpar=1).');
       } catch (e) { last = 'Sem conexão com o GitHub.'; }
     }
     msg('⚠ ' + (last || 'Não foi possível publicar.'));
   }
   try { $('ghToken').value = localStorage.getItem(TOK_KEY) || ''; } catch (e) {}
-  $('ghPublish').onclick = ghPublicar;
+  /* depois de publicar: abre a TV já limpando o cache, quando o GitHub Pages terminar de publicar (aba aberta no clique para o navegador não bloquear) */
+  const TV_URL = () => location.origin + location.pathname.replace(/(admin(\.html)?\/?)?$/, '') + 'index.html?limpar=1&debug';
+  $('ghPublish').onclick = async () => {
+    let w = null; try { w = window.open('', 'ctvTV'); if (w) w.document.body.innerHTML = '<p style="font:16px sans-serif;padding:20px">Aguardando o GitHub publicar…</p>'; } catch (e) {}
+    ghOk = false; await ghPublicar();
+    if (!ghOk) { try { w && w.close(); } catch (e) {} return; }
+    const base = $('pubMsg').textContent; let n = 90;
+    const t = setInterval(() => {
+      if (--n > 0) { $('pubMsg').textContent = base + ' · A TV abre atualizada em ' + n + ' s…'; return; }
+      clearInterval(t); $('pubMsg').textContent = base;
+      if (w && !w.closed) w.location.href = TV_URL(); else window.open(TV_URL(), 'ctvTV');
+    }, 1000);
+  };
+  limparCaches();   // ao abrir ou dar F5 no admin: limpa as cópias de arquivos guardadas pelo navegador (não apaga suas configurações)
   $('ghTokenClear').onclick = () => { try { localStorage.removeItem(TOK_KEY); } catch (e) {} $('ghToken').value = ''; $('pubMsg').textContent = 'Chave esquecida neste navegador.'; };
   $('importFile').onchange = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { cfg = InfoTV.build(JSON.parse(r.result)); persist(); renderAll(); toast('Configuração importada'); } catch (x) { toast('Arquivo inválido'); } }; r.readAsText(f); };
   let armReset = 0; $('btnReset').onclick = () => { if (Date.now() - armReset < 3000) { cfg = InfoTV.build({}); persist(); renderAll(); } else { armReset = Date.now(); toast('Clique de novo para restaurar o padrão'); } };

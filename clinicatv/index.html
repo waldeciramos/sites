@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.7">
+<meta name="build" content="9.9">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b1c2c">
@@ -242,14 +242,15 @@
 <div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
 <script>
-/* index.html?limpar=1 : apaga cópias guardadas (cache, configuração local) e abre a TV de novo, já com tudo atualizado */
+/* index.html?limpar=1 : apaga as cópias guardadas (cache e modo) e abre a TV de novo, já com tudo atualizado; com &debug mantém a etiqueta detalhada */
 if (/[?&]limpar/.test(location.search)) {
   window.stop && window.stop();
   (async () => {
     try { if (navigator.serviceWorker) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch (e) {}
     try { if (window.caches) for (const k of await caches.keys()) await caches.delete(k); } catch (e) {}
-    try { Object.keys(localStorage).filter((k) => /^(infotv|ctv)/i.test(k)).forEach((k) => localStorage.removeItem(k)); sessionStorage.clear(); } catch (e) {}
-    location.replace(location.pathname + '?v=' + Date.now());
+    // só apaga o que é cópia (modo, notícias guardadas, controle de horários); NÃO apaga o rascunho do admin nem a chave do GitHub, que moram no mesmo navegador
+    try { ['infotv_mode', 'infotv_news_cache', 'ctv.lastShown'].forEach((k) => localStorage.removeItem(k)); } catch (e) {}
+    location.replace(location.pathname + '?v=' + Date.now() + (/[?&]debug/.test(location.search) ? '&debug' : ''));
   })();
 }
 </script>
@@ -799,6 +800,7 @@ if (/[?&]limpar/.test(location.search)) {
     }, 2000);
   }
   function rPlay() {
+    if (rHeld) { rWant = true; rResume = true; return; }   // vídeo com som no ar: a rádio espera e volta quando ele termina
     if (!audio) rSet(rIdx); if (!audio) return;
     rWant = true; if (actx && actx.state === 'suspended') actx.resume().catch(() => {});
     audio.play().then(() => { $('radio').classList.remove('hint'); rUI(); rNowPlaying(); rGuard(); })
@@ -806,7 +808,7 @@ if (/[?&]limpar/.test(location.search)) {
   }
   /* vídeo ou YouTube com som: a rádio pausa e volta sozinha quando a publicação termina */
   let rHeld = false, rResume = false;
-  function rHold() { if (rHeld || !audio) return; rHeld = true; if (!audio.paused) { rResume = true; audio.pause(); rUI(); } }
+  function rHold() { if (rHeld) return; rHeld = true; if (audio && !audio.paused) { rResume = true; audio.pause(); rUI(); } else if (rWant) rResume = true; }
   function rRelease() { if (!rHeld) return; rHeld = false; if (rResume) { rResume = false; if (rWant) { rSet(rIdx); rPlay(); } } }
   function rPause() { rWant = false; if (audio) audio.pause(); rUI(); }
   function rToggle() { if (!cfg.radio.stations.length) return; if (!audio || audio.paused) rPlay(); else rPause(); }
@@ -970,12 +972,33 @@ if (/[?&]limpar/.test(location.search)) {
     cfg = await InfoTV.load();
     apply(); tick(); setInterval(tick, 1000); wake(); tapSetup();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitClock(); });
-    let ct; InfoTV.onChange(() => { clearTimeout(ct); ct = setTimeout(async () => { cfg = await InfoTV.load(); apply(); }, 1200); });
-    setInterval(async () => {   // modo GitHub: confere config.json a cada 2 minutos
+    /* config novo chegou: se mudou só a rádio (rádio escolhida, gráfico de som, volume), troca na hora sem reiniciar as propagandas */
+    const strip = (c) => JSON.stringify(Object.assign({}, c, { radio: 0 }));
+    function applyNew(n, force) {
+      if (!n) return;
+      const same = JSON.stringify(n) === JSON.stringify(cfg);
+      if (same && !force) return;
+      const radioOnly = !same && strip(n) === strip(cfg);
+      cfg = n; radioOnly ? radioApply() : apply();
+    }
+    /* etiqueta de versão (sempre visível, discreta): confira se é a versão e o config que você subiu. Com ?debug mostra também as zonas */
+    const BUILD = (document.querySelector('meta[name=build]') || {}).content || '?';
+    function dbg(n, origem) {
+      let b = document.getElementById('dbgBadge');
+      if (!b) { b = document.createElement('div'); b.id = 'dbgBadge'; document.body.appendChild(b); }
+      const full = Q.has('debug');
+      b.style.cssText = full ? 'position:fixed;left:6px;top:6px;z-index:99999;background:rgba(0,0,0,.8);color:#fff;font:12px/1.35 monospace;padding:6px 9px;border-radius:6px;max-width:92vw;pointer-events:none'
+        : 'position:fixed;left:8px;bottom:2px;z-index:99999;color:#5d7680;opacity:.75;font:600 9px/1.2 monospace;pointer-events:none;text-shadow:0 0 2px #fff';
+      const z = ((n.slides || [])[0] || {}).zones || [], hh = new Date().toLocaleTimeString('pt-BR');
+      b.textContent = 'TV v' + BUILD + ' · config: ' + (n.rev || 'antigo') + ' · ' + hh + (full ? ' · ' + origem + ' · rádio: ' + n.radio.viz + ' #' + n.radio.current + ' · 1ª propaganda: ' + z.map((q) => q.type + '@' + q.x + '/' + q.w).join(' | ') : '');
+    }
+    dbg(cfg, 'config carregado (' + InfoTV.getMode() + ')');
+    let ct; InfoTV.onChange(() => { clearTimeout(ct); ct = setTimeout(async () => { applyNew(await InfoTV.load(), true); dbg(cfg, 'alterado no admin'); }, 400); });
+    setInterval(async () => {   // modo GitHub: confere config.json a cada 10 segundos (o GitHub Pages em si leva 1 a 2 min para publicar o arquivo novo)
       if (InfoTV.getMode() !== 'repo' || await InfoTV.isServer()) return;
       const n = await InfoTV.loadRepo();
-      if (n && JSON.stringify(n) !== JSON.stringify(cfg)) { cfg = n; apply(); }
-    }, 120000);
+      if (n) { applyNew(n, false); dbg(cfg, 'config.json do GitHub'); }
+    }, 10000);
     // versão nova do sistema publicada (GitHub ou servidor)? confere a cada 10 min e recarrega sozinho
     if (!PREVIEW) setInterval(async () => {
       try { const t = await (await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })).text(); const m = /<meta name="build" content="([^"]+)"/.exec(t), cur = document.querySelector('meta[name=build]'); if (m && cur && m[1] !== cur.content) location.replace(location.pathname + '?v=' + encodeURIComponent(m[1]) + '.' + Date.now()); } catch (e) {}
