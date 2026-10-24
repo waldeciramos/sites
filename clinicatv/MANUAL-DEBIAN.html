@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clínica TV — Manual de instalação no Debian (rede interna)</title>
+<style>
+:root{--bg:#e6eaf1;--tx:#2f3a4b;--mut:#6b778a;--ac:#1fb6a6;--cd:#fff}
+*{box-sizing:border-box}body{margin:0;font:16px/1.65 system-ui,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx)}
+main{max-width:920px;margin:0 auto;padding:28px 18px 80px}
+h1{font-size:28px;margin:0 0 4px}h2{margin:38px 0 10px;font-size:22px;border-left:6px solid var(--ac);padding-left:12px}h3{margin:22px 0 6px;font-size:17px}
+.sub{color:var(--mut);margin-bottom:22px}
+section,.box{background:var(--cd);border-radius:18px;padding:6px 22px 18px;box-shadow:6px 6px 16px #c5ccd9,-6px -6px 16px #fff;margin:18px 0}
+pre{background:#0f1b2a;color:#d7e6f5;padding:14px 16px;border-radius:12px;overflow:auto;font:14px/1.5 ui-monospace,Consolas,monospace;position:relative}
+code{background:#eef1f6;padding:1px 6px;border-radius:6px;font-size:.92em}pre code{background:none;padding:0}
+.ok{background:#dff5f2;color:#0b5c53;padding:10px 14px;border-radius:12px}.warn{background:#fff3cd;color:#7a5c00;padding:10px 14px;border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px solid #e1e6ee;padding:8px 6px;text-align:left;vertical-align:top}
+nav a{display:inline-block;margin:3px 8px 3px 0;color:var(--ac);text-decoration:none;font-weight:600}
+@media print{body{background:#fff}section{box-shadow:none;border:1px solid #ddd}}
+</style></head><body><main>
+<h1>Clínica TV — instalação no Debian (rede interna)</h1>
+<div class="sub">Sistema idealizado por Waldeci Ramos · funciona no GitHub Pages <b>e</b> no servidor da clínica, com o mesmo pacote</div>
+<nav><a href="#como">Como funciona</a><a href="#instalar">1. Instalar</a><a href="#tv">2. Abrir na TV</a><a href="#usar">3. Usar o painel</a><a href="#midia">Vídeos e fotos</a><a href="#youtube">YouTube</a><a href="#zonas">Zonas</a><a href="#mosaico">Mosaico</a><a href="#rede">Rede interna</a><a href="#backup">Backup e atualização</a><a href="#problemas">Problemas</a><a href="#github">GitHub Pages</a></nav>
+
+<section id="como"><h2>Como funciona</h2>
+<table><tr><th></th><th>Servidor Debian (interno)</th><th>GitHub Pages</th></tr>
+<tr><td>Onde roda</td><td>No servidor da clínica, só na rede interna</td><td>Na internet (github.io)</td></tr>
+<tr><td>Salvar no painel</td><td>Grava no servidor; <b>as TVs atualizam sozinhas em segundos</b></td><td>Grava no navegador; para as TVs, baixe o <code>config.json</code> e troque no repositório</td></tr>
+<tr><td>Enviar fotos e vídeos</td><td>Pelo painel (botão de enviar) — ficam em <code>midia/</code></td><td>Não; coloque os arquivos na pasta <code>midia/</code> do repositório</td></tr>
+<tr><td>Senha do painel</td><td>Definida na instalação, protegida no servidor</td><td>Arquivo <code>acesso.json</code> (só esconde o painel)</td></tr></table>
+<p>O que ainda precisa de <b>internet</b> mesmo no modo interno: clima, rádios (Radio Swiss), notícias automáticas, vídeos do YouTube e as fontes do Google. Fotos, vídeos enviados, programação, frases e recados funcionam sem internet.</p></section>
+
+<section id="instalar"><h2>1. Instalar no servidor Debian</h2>
+<p>Serve para Debian 12 ou 13. Você precisa de acesso ao servidor por SSH (ou no teclado dele) e de um usuário com <code>sudo</code>.</p>
+<h3>1.1 Levar o pacote até o servidor</h3>
+<p>No computador onde está o <code>clinicatv.zip</code> (troque <code>usuario</code> e <code>IP-DO-SERVIDOR</code>):</p>
+<pre><code>scp clinicatv.zip usuario@IP-DO-SERVIDOR:~</code></pre>
+<p>No Windows, pode usar o WinSCP ou um pendrive.</p>
+<h3>1.2 Descompactar e instalar</h3>
+<pre><code>sudo apt update &amp;&amp; sudo apt install -y unzip
+unzip clinicatv.zip
+cd clinicatv
+sudo bash instalar-debian.sh</code></pre>
+<p>O instalador: instala o Node.js, cria o usuário do serviço, copia tudo para <code>/opt/clinicatv</code>, pergunta a <b>senha do painel</b> (usuário <code>admin</code>), cria o serviço que <b>liga sozinho com o servidor</b> e mostra os endereços no final. Opções úteis:</p>
+<pre><code>sudo bash instalar-debian.sh --porta 8080                 # em vez da porta 80
+sudo bash instalar-debian.sh --rede 192.168.2.0/24        # liga o firewall liberando só essa rede
+sudo bash instalar-debian.sh --senha NovaSenha            # troca a senha</code></pre>
+<div class="warn"><b>Cuidado com <code>--rede</code>:</b> ela liga o firewall (ufw) e libera SSH e site apenas para a rede informada. Use só se você acessa o servidor de dentro dessa rede; se acessar por VPN ou de outra rede, não use e configure o firewall à mão.</div>
+<h3>1.3 Conferir</h3>
+<pre><code>systemctl status clinicatv          # deve mostrar "active (running)"
+curl http://localhost/api/ping      # deve responder {"clinicatv":true,...}
+journalctl -u clinicatv -n 50       # últimas mensagens do serviço</code></pre>
+<p class="ok">Pronto. No navegador de qualquer aparelho da rede: <code>http://IP-DO-SERVIDOR/</code> (TV) e <code>http://IP-DO-SERVIDOR/admin.html</code> (painel).</p>
+<p>Dica: deixe o servidor com <b>IP fixo</b> (ou reserve o IP no roteador) para o endereço da TV nunca mudar.</p></section>
+
+<section id="tv"><h2>2. Abrir na TV</h2>
+<p>A TV (ou o mini PC ligado por HDMI) só precisa abrir o endereço do servidor em tela cheia. Para a <b>rádio tocar sozinha</b> e o YouTube com som, o navegador precisa da opção de autoplay.</p>
+<h3>Windows (Chrome ou Edge)</h3>
+<p>Crie um atalho com este destino e coloque-o em <code>shell:startup</code> para abrir junto com o Windows:</p>
+<pre><code>"C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk --autoplay-policy=no-user-gesture-required --noerrdialogs --disable-infobars http://IP-DO-SERVIDOR/</code></pre>
+<h3>Linux com tela (Chromium)</h3>
+<pre><code>chromium --kiosk --autoplay-policy=no-user-gesture-required --noerrdialogs --disable-infobars http://IP-DO-SERVIDOR/</code></pre>
+<p>No Debian com <code>sudo apt install chromium</code>, o navegador já toca vídeos MP4 (H.264). <b>Atenção:</b> alguns Chromium de outras origens (por exemplo, builds sem codecs) não tocam H.264; veja "Problemas".</p>
+<p>Teclas na TV: <b>F</b> tela cheia · <b>R</b> girar a tela · <b>M</b> liga/pausa a rádio · <b>N</b> próxima rádio. Para sair do modo quiosque: <b>Alt+F4</b>.</p>
+<h3>Monitor ligado no próprio servidor (opcional)</h3>
+<p class="warn">Esta parte não foi testada no meu ambiente; use o PC/TV com navegador (acima) se puder. Em um servidor só com terminal, dá para usar o <code>cage</code> (mini ambiente gráfico) com o Chromium: <code>sudo apt install cage chromium</code> e, no console do servidor, <code>cage -- chromium --kiosk --autoplay-policy=no-user-gesture-required http://localhost/</code>. Para iniciar sozinho no boot é preciso criar um serviço de login automático; me peça que eu monto esse passo a passo.</p></section>
+
+<section id="usar"><h2>3. Usar o painel</h2>
+<ol><li>Abra <code>http://IP-DO-SERVIDOR/admin.html</code> e entre com <code>admin</code> e a senha da instalação.</li>
+<li>À direita há a <b>pré-visualização ao vivo</b>. Em cada propaganda existe o botão <b>👁 Ver só esta</b> para ver somente ela.</li>
+<li>Tudo que você muda é salvo na hora e a TV atualiza sozinha.</li>
+<li>Troque a senha em <b>Publicar e Backup → Usuário e senha do admin</b>.</li></ol>
+<p>Abas principais: <b>Identidade</b> (logo da clínica na coluna lateral, cores, fontes), <b>Clima e Local</b>, <b>Tela e Layout</b>, <b>Propagandas</b> (imagem, vídeo, YouTube, zonas, texto), <b>Programação</b>, <b>Frases</b>, <b>Rodapé (notícias)</b>, <b>Rádio</b>.</p></section>
+
+<section id="midia"><h2>Vídeos e fotos (tudo interno)</h2>
+<p>Em <b>Propagandas → Nova propaganda</b> escolha Imagem ou Vídeo e use <b>Enviar do computador</b>. Os arquivos ficam em <code>/opt/clinicatv/midia/</code> e passam a aparecer na lista <b>"…ou da pasta midia"</b>. Também dá para copiar arquivos direto para essa pasta:</p>
+<pre><code>sudo cp meu-video.mp4 /opt/clinicatv/midia/ &amp;&amp; sudo chown clinicatv: /opt/clinicatv/midia/*</code></pre>
+<p><b>Formato de vídeo que toca em qualquer TV:</b> MP4 com vídeo H.264 e áudio AAC (não use H.265/HEVC). Para converter qualquer vídeo (celular, WhatsApp etc.):</p>
+<pre><code>sudo apt install -y ffmpeg
+bash converter-video.sh meu-video.mov</code></pre>
+<p>O script também oferece criar um <code>.webm</code> com o mesmo nome. Se o navegador da TV não souber tocar o MP4, ele usa esse <code>.webm</code> sozinho. Fotos: JPG ou PNG de até 1920 px ficam leves e nítidas.</p>
+<p><b>Vídeo MP4 com duração 0</b> toca até o fim e depois a TV volta aos slides. Se um vídeo não abrir, aparece um aviso vermelho no canto da tela explicando o motivo (e a TV passa para o próximo).</p></section>
+
+<section id="youtube"><h2>Vídeos do YouTube</h2>
+<p>Em <b>Propagandas</b>, escolha o tipo <b>▶ YouTube</b> e cole o link (youtu.be, youtube.com/watch, shorts). Com <b>duração 0</b> o vídeo toca até o fim e a TV <b>volta aos slides</b>; com um número maior que 0, ele é cortado nesse tempo. É possível começar em um segundo específico e (com a opção de autoplay do navegador) tocar com som.</p>
+<p class="warn">Precisa de internet na TV. Alguns vídeos não permitem ser exibidos em outros sites: nesse caso a TV mostra um aviso e passa para o próximo. Se o YouTube não responder, a publicação usa só o tempo definido.</p></section>
+
+<section id="zonas"><h2>Zonas: montar a tela com vários quadros</h2>
+<p>Em <b>Propagandas → Nova propaganda → Tipo "🧩 Zonas"</b>:</p>
+<ol><li>Clique em um <b>modelo pronto</b> (2 colunas, 1 grande + 2 pequenas, 4 quadros…) ou em <b>+ Imagem / + Vídeo / + YouTube / + Texto</b>.</li>
+<li><b>Arraste</b> cada quadro para mover; <b>puxe as bolinhas amarelas</b> dos cantos para mudar o tamanho. Use o "Ímã" para alinhar.</li>
+<li>Com a zona selecionada, escolha o conteúdo (enviar arquivo, caminho, link do YouTube ou texto), cantos arredondados, borda e sombra.</li>
+<li>Em <b>Quando passar para o próximo</b>: "pelo tempo" ou "quando o 1º vídeo terminar".</li></ol>
+<p>As medidas são em % da tela central, então funcionam em TV, monitor e totem. Zonas mais acima na lista ficam na frente (botões "trazer para frente" e "enviar para trás").</p></section>
+
+<section id="mosaico"><h2>Tela central em zonas fixas (mosaico)</h2>
+<p>Na aba <b>🧩 Tela em zonas</b> escolha <b>"Zonas fixas"</b>. A tela central passa a ficar dividida em 1, 2, 3, 4, 6 ou mais zonas ao mesmo tempo. Cada zona do tipo <b>🎞 Lista</b> tem a sua própria sequência de imagens e vídeos, que passa sozinha e independente das outras zonas. Para cada item você escolhe os segundos (vídeo com 0 toca até o fim), o ajuste (<b>preencher</b>, <b>inteiro</b> ou <b>esticar</b>) e se toca com som (pausa a rádio). Voltando para "Slides", a TV volta a mostrar uma propaganda por vez.</p></section>
+<section id="rede"><h2>Deixar só na rede interna</h2>
+<ul><li>O servidor não precisa de porta aberta para a internet: <b>não faça redirecionamento de porta</b> no roteador para ele.</li>
+<li>Para travar o acesso à sua rede, use <code>--rede 192.168.2.0/24</code> no instalador (troque pela faixa da sua rede) ou configure o <code>ufw</code> à mão.</li>
+<li>Só quem entra no painel com a senha consegue alterar a TV; qualquer aparelho da rede consegue <i>ver</i> a TV.</li>
+<li>Os arquivos de senha e o código do servidor não são entregues pelo site.</li></ul></section>
+
+<section id="backup"><h2>Backup, atualização e remoção</h2>
+<h3>Backup (configurações + mídias)</h3>
+<pre><code>sudo tar czf clinicatv-backup-$(date +%F).tar.gz -C /opt/clinicatv dados midia</code></pre>
+<h3>Restaurar</h3>
+<pre><code>sudo systemctl stop clinicatv
+sudo tar xzf clinicatv-backup-AAAA-MM-DD.tar.gz -C /opt/clinicatv
+sudo chown -R clinicatv: /opt/clinicatv/dados /opt/clinicatv/midia
+sudo systemctl start clinicatv</code></pre>
+<h3>Atualizar para uma versão nova</h3>
+<p>Descompacte o novo pacote e rode <code>sudo bash instalar-debian.sh</code> de novo. As configurações (<code>dados/</code>), a senha e as mídias enviadas são mantidas.</p>
+<h3>Trazer a configuração antiga</h3>
+<p>No painel antigo: <b>Publicar e Backup → Baixar config.json</b>. No novo: <b>Importar config.json</b>.</p>
+<h3>Remover</h3>
+<pre><code>sudo systemctl disable --now clinicatv
+sudo rm /etc/systemd/system/clinicatv.service /etc/clinicatv.env
+sudo rm -r /opt/clinicatv &amp;&amp; sudo userdel clinicatv</code></pre></section>
+
+<section id="problemas"><h2>Problemas comuns</h2>
+<table>
+<tr><td><b>Vídeo não aparece</b></td><td>Veja o aviso vermelho no canto da TV. "Formato não suportado": converta com <code>converter-video.sh</code> (H.264 + AAC) e, de preferência, gere também o <code>.webm</code>. Confira também se o navegador da TV é o Chromium/Chrome do Debian (com codecs). No painel, a propaganda de vídeo mostra "✔ Vídeo OK" ou o motivo do erro.</td></tr>
+<tr><td><b>Rádio não toca sozinha</b></td><td>O navegador bloqueia som automático. Abra com <code>--autoplay-policy=no-user-gesture-required</code> (veja "Abrir na TV") ou toque uma vez na tela.</td></tr>
+<tr><td><b>Gráfico da rádio</b></td><td>Usa o sinal real do som quando a rádio permite; se não permitir, anima sozinho. Ele nunca fica parado, mesmo com a rádio pausada (movimento suave).</td></tr>
+<tr><td><b>Painel diz "sessão expirada"</b></td><td>Saia e entre de novo (a sessão vale 12 horas ou até reiniciar o serviço).</td></tr>
+<tr><td><b>Porta 80 em uso</b></td><td>Outro serviço (Nginx/Apache) usa a porta. Reinstale com <code>--porta 8080</code> ou desligue o outro serviço.</td></tr>
+<tr><td><b>Não abre de outro aparelho</b></td><td>Confira o IP (<code>hostname -I</code>), o firewall (<code>sudo ufw status</code>) e se está na mesma rede.</td></tr>
+<tr><td><b>Fontes Qurova/Agency</b></td><td>Copie os arquivos <code>Qurova.woff2</code> e <code>Agency.woff2</code> para <code>/opt/clinicatv/fontes/</code> (confira a licença). Sem eles usa fontes parecidas.</td></tr>
+</table></section>
+
+<section id="github"><h2>Usar também no GitHub Pages</h2>
+<ol><li>Crie um repositório e envie estes arquivos/pastas: <code>index.html, admin.html, acesso.json, config.json, logo.svg, assets/, fontes/, midia/</code>. (Pode enviar o <code>server.js</code> junto: ele não atrapalha.)</li>
+<li><b>Settings → Pages</b> → Branch <code>main</code> / <code>(root)</code> → Save.</li>
+<li>TV: <code>https://SEU-USUARIO.github.io/SEU-REPO/</code> · Painel: <code>.../admin.html</code> (usuário e senha em <code>acesso.json</code>; troque a senha padrão e prefira repositório privado).</li>
+<li>Para atualizar as TVs: Painel → Publicar e Backup → <b>Baixar config.json</b> → substitua o arquivo no repositório. Elas atualizam em até 2 minutos (modo "Do arquivo config.json").</li>
+<li>Fotos e vídeos: coloque os arquivos na pasta <code>midia/</code> do repositório e use o caminho <code>midia/arquivo.jpg</code>. O GitHub limita arquivos a 100 MB; prefira vídeos leves.</li></ol></section>
+<p class="sub">Clínica TV · idealizado por Waldeci Ramos</p>
+</main></body></html>
