@@ -32,3 +32,11 @@ O navegador não deixa ler outro site direto, então a TV usa leitores públicos
 - **Rádio**: o gráfico usa o sinal real quando a rádio permite e nunca fica parado.
 
 - **Tela em zonas (mosaico)**: aba "Tela em zonas" — a tela central fica dividida em várias zonas fixas, cada uma com a sua lista de imagens e vídeos e ajuste preencher/inteiro/esticar.
+
+## Novidades da versão 9.4
+- **Zonas dentro da propaganda**: a aba "Tela em zonas" saiu. Em *Publicações* escolha o tipo **Zonas** e monte os quadros; cada propaganda de zonas tem seu tempo e entra no rodízio. Quem usava o mosaico fixo teve o desenho convertido em uma publicação de zonas automaticamente. Cada quadro tem um **×** vermelho para tirar a zona.
+- **Passar a cada N minutos**: em qualquer publicação (vídeo, imagem, zonas…) o campo *Passar a cada (minutos)* faz ela aparecer, por exemplo, de 30 em 30 minutos (assim que a que estiver na tela terminar). 0 = rodízio normal.
+- **Marca d'água**: o logo da clínica saiu da coluna lateral e fica transparente no canto inferior direito do campo de propagandas (posição, tamanho e transparência em *Identidade*). `midia/logo-clinica.png` já vem com fundo transparente.
+- **Celular**: ao abrir, aparece "Toque para abrir em tela cheia"; um toque no meio expande a tela e liga a rádio. No iPhone o Safari não tem tela cheia de site: use Compartilhar → Adicionar à Tela de Início.
+- **Barra inferior** (dia, mês, hora e informações) com o mesmo relevo esculpido/rebaixado da lateral e a fonte do relógio (Rajdhani).
+- **Trânsito/notícias**: no servidor Debian a própria TV busca a página (`/api/noticia`), sem depender de sites públicos. Precisa atualizar o `server.js` e reiniciar: `sudo systemctl restart clinicatv`. A fonte Motiva vem marcada como **Ativa**; confira em Notícias → 🔎 Buscar agora.

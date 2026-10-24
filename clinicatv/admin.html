@@ -98,6 +98,7 @@
   .zed .zb.sel { border-color: #ffd54f; box-shadow: 0 0 0 2px #ffd54f; }
   .zed .zb .zh { position: absolute; width: 16px; height: 16px; margin: -8px; border-radius: 50%; background: #ffd54f; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
   .zh.nw { left: 0; top: 0; cursor: nwse-resize; } .zh.ne { left: 100%; top: 0; cursor: nesw-resize; } .zh.sw { left: 0; top: 100%; cursor: nesw-resize; } .zh.se { left: 100%; top: 100%; cursor: nwse-resize; }
+  .zed .zb .zx { position: absolute; right: -9px; top: -9px; width: 22px; height: 22px; border-radius: 50%; background: #e5484d; color: #fff; border: 2px solid #fff; display: grid; place-items: center; font: 800 13px/1 system-ui, sans-serif; cursor: pointer; z-index: 5; box-shadow: 0 1px 4px rgba(0,0,0,.55); } .zed .zb .zx:hover { background: #ff2d3a; transform: scale(1.12); }
   .zprops { margin-top: 10px; padding-top: 4px; border-top: 1px dashed var(--sh2); }
   @media (max-width: 1280px) { .layout { grid-template-columns: 190px minmax(0, 1fr); } aside.pv { position: static; grid-column: 1 / -1; order: 3; } }
   @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } nav.tabs { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 8px; } nav.tabs .btn { width: auto; white-space: nowrap; } .row2, .row3 { grid-template-columns: 1fr; } section.tab { padding: 18px; } }
@@ -141,8 +142,8 @@
             <input type="file" accept="image/*" id="logoFile" hidden aria-label="Enviar logo">
           </div>
         </div>
-        <h3>Logo na coluna lateral (entre a programação do dia e a rádio)</h3>
-        <p class="hint">Cartão com a logo da Fisio Clínica. Já vem configurada com o arquivo <code>midia/logo-clinica.jpg</code>; troque por outro arquivo se quiser.</p>
+        <h3>Marca d'água da clínica (canto do campo de propagandas)</h3>
+        <p class="hint">O logo fica transparente no canto da tela das propagandas, como o logo das emissoras de TV, e deixou a coluna lateral. Já vem com <code>midia/logo-clinica.png</code> (fundo transparente). Se enviar um JPG com fundo branco, a TV tira o branco de fora sozinha.</p>
         <div class="grid" id="gSideLogo"></div>
         <h3>Fontes</h3>
         <div class="grid" id="gFonts"></div>
@@ -178,15 +179,9 @@
       </section>
 
       <section class="tab neo" data-tab="📺 Propagandas">
-        <h2>Publicações e recados (tela central)</h2><p class="hint">Adicione quantas quiser, cada uma com seu tempo, datas, entrada e efeitos. Tipos: imagem, vídeo MP4, YouTube, slide de texto (ótimo para recados) ou <b>Zonas</b> (monte a tela com vários quadros: fotos, vídeos e textos lado a lado). Vídeo MP4 e YouTube com duração 0 tocam até o fim e a TV volta aos slides. Modelos prontos para foto: aniversariante e campanha/dica. Todo texto aceita fonte, cor, efeitos e animação. Use as setas para mudar a ordem.</p>
+        <h2>Publicações e recados (tela central)</h2><p class="hint">Adicione quantas quiser, cada uma com seu tempo, datas, entrada e efeitos. Tipos: imagem, vídeo MP4, YouTube, slide de texto (ótimo para recados) ou <b>Zonas</b> (monte a propaganda com vários quadros: fotos, vídeos e textos lado a lado; cada propaganda de zonas tem o seu tempo e entra no rodízio). Em qualquer uma você pode usar <b>Passar a cada (minutos)</b> para o vídeo/propaganda aparecer, por exemplo, de 30 em 30 minutos. Vídeo MP4 e YouTube com duração 0 tocam até o fim e a TV volta aos slides. Modelos prontos para foto: aniversariante e campanha/dica. Todo texto aceita fonte, cor, efeitos e animação. Use as setas para mudar a ordem.</p>
         <div id="slidesList"></div>
         <div class="actions"><button class="btn ok" id="addSlide">+ Nova propaganda</button></div>
-      </section>
-
-      <section class="tab neo" data-tab="🧩 Tela em zonas">
-        <h2>Tela central em zonas (mosaico)</h2><p class="hint">Em vez de uma propaganda por vez, a tela central fica dividida em zonas que funcionam ao mesmo tempo: 1, 2, 3, 4, 6 ou quantas quiser. Cada zona tem a sua <b>lista de imagens e vídeos</b>, que passa sozinha, e você escolhe como o vídeo se ajusta (preencher, inteiro ou esticar). Escolha "Zonas fixas" abaixo para ligar; "Slides" volta ao modo de uma propaganda por vez.</p>
-        <div class="grid" id="gMosaic"></div>
-        <div id="mosaicEd"></div>
       </section>
 
       <section class="tab neo" data-tab="🗓 Programação">
@@ -348,13 +343,16 @@
   }
   function renderSideLogo() {
     const g = cfg.general, b = $('gSideLogo'); b.innerHTML = '';
-    b.append(field('Mostrar o logo na coluna lateral', g, 'sideLogoShow', { type: 'checkbox' }), field('Tamanho do cartão (' + (g.sideLogoH || 100) + '%)', g, 'sideLogoH', { type: 'range', min: 50, max: 220, step: 5 }), field('Fundo do cartão', g, 'sideLogoBg', { type: 'color' }));
-    const up = el('input', { type: 'file', accept: 'image/*', class: 'neo-in', 'aria-label': 'Enviar logo da coluna lateral' });
-    up.onchange = async () => { const f = up.files[0]; if (!f) return; try { g.sideLogo = await fileToURL(f, 900, 'image/jpeg'); persist(); renderSideLogo(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); } };
-    const p = el('input', { class: 'neo-in', placeholder: 'midia/logo-clinica.jpg' }); p.value = (g.sideLogo || '').startsWith('data:') ? '(arquivo enviado)' : (g.sideLogo || '');
+    b.append(field('Mostrar a marca d\'água', g, 'sideLogoShow', { type: 'checkbox' }),
+      field('Posição', g, 'wmPos', { options: [['br', 'Embaixo à direita (padrão)'], ['bl', 'Embaixo à esquerda'], ['tr', 'Em cima à direita'], ['tl', 'Em cima à esquerda']], after: renderSideLogo }),
+      field('Tamanho (' + (g.sideLogoH || 100) + '%)', g, 'sideLogoH', { type: 'range', min: 50, max: 220, step: 5 }),
+      field('Transparência: visibilidade (' + (g.wmOpacity || 75) + '%)', g, 'wmOpacity', { type: 'range', min: 15, max: 100, step: 5 }));
+    const up = el('input', { type: 'file', accept: 'image/*', class: 'neo-in', 'aria-label': 'Enviar logo da marca d\'água' });
+    up.onchange = async () => { const f = up.files[0]; if (!f) return; try { g.sideLogo = await fileToURL(f, 700, 'image/png'); persist(); renderSideLogo(); } catch (e) { alert('Falha no envio: ' + (e && e.message ? e.message : e)); } };
+    const p = el('input', { class: 'neo-in', placeholder: 'midia/logo-clinica.png' }); p.value = (g.sideLogo || '').startsWith('data:') ? '(arquivo enviado)' : (g.sideLogo || '');
     p.onchange = () => { if (p.value !== '(arquivo enviado)') { g.sideLogo = p.value.trim(); persist(); renderSideLogo(); } };
-    b.append(el('div', { class: 'f' }, [el('label', {}, ['Enviar outra imagem']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho da imagem']), p]), el('div', { class: 'f' }, [el('label', {}, ['…ou da pasta midia']), mediaPicker('image', (u) => { g.sideLogo = u; persist(); renderSideLogo(); })]));
-    if (g.sideLogo) b.append(el('div', { class: 'f' }, [el('label', {}, ['Como fica']), el('img', { class: 'thumb', src: g.sideLogo, alt: '', style: 'background:' + (g.sideLogoBg || '#fff') + ';max-height:110px' })]));
+    b.append(el('div', { class: 'f' }, [el('label', {}, ['Enviar outra imagem (PNG transparente é o ideal)']), up]), el('div', { class: 'f' }, [el('label', {}, ['…ou caminho da imagem']), p]), el('div', { class: 'f' }, [el('label', {}, ['…ou da pasta midia']), mediaPicker('image', (u) => { g.sideLogo = u; persist(); renderSideLogo(); })]));
+    if (g.sideLogo) b.append(el('div', { class: 'f' }, [el('label', {}, ['Como fica sobre uma propaganda']), el('div', { style: 'position:relative;height:150px;border-radius:12px;background:linear-gradient(135deg,#0b3b4a,#1fb6a6 55%,#d4a93c);overflow:hidden' }, [el('img', { src: InfoTV.mediaURL(g.sideLogo), alt: '', style: 'position:absolute;' + ((g.wmPos || 'br')[0] === 't' ? 'top' : 'bottom') + ':8px;' + ((g.wmPos || 'br')[1] === 'l' ? 'left' : 'right') + ':10px;height:' + Math.round(54 * (g.sideLogoH || 100) / 100) + 'px;max-height:90%;opacity:' + ((g.wmOpacity || 75) / 100) + ';filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px rgba(255,255,255,.55)) drop-shadow(0 2px 5px rgba(0,0,0,.45))' })])]));
   }
   $('logoFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; $('logoName').textContent = f.name; cfg.general.logo = await fileToURL(f, 500, 'image/png'); persist(); renderGeneral(); e.target.value = ''; };
   $('logoDel').onclick = () => { cfg.general.logo = ''; persist(); renderGeneral(); };
@@ -523,6 +521,10 @@
         if (z.type === 'text') { inner.style.background = 'color-mix(in srgb, ' + (z.bg || '#0f766e') + ' ' + (z.bgAlpha || 0) + '%, transparent)'; inner.style.color = z.color; }
         inner.append(el('span', {}, [(z.type === 'text' ? '' : ZICON[z.type] + ' ') + (z.type === 'text' ? (z.text || 'Texto') : ('Zona ' + (idx + 1) + (z.type === 'lista' ? ' · ' + z.items.length + ' itens' : (z.src ? '' : ' (vazia)'))))]));
         b.append(inner); b.onpointerdown = (e) => startDrag(e, z, 'move', cv, b);
+        const xb = el('span', { class: 'zx', title: 'Tirar esta zona', 'aria-label': 'Tirar esta zona' }, ['×']);
+        xb.onpointerdown = (e) => { e.stopPropagation(); e.preventDefault(); };
+        xb.onclick = (e) => { e.stopPropagation(); const k = s.zones.indexOf(z); if (k < 0) return; s.zones.splice(k, 1); if (zsel[s.id] === z.id) zsel[s.id] = ''; persist(); draw(); toast('Zona removida'); };
+        b.append(xb);
         if (z.id === zsel[s.id]) ['nw', 'ne', 'sw', 'se'].forEach((m) => { const h = el('i', { class: 'zh ' + m }); h.onpointerdown = (e) => startDrag(e, z, m, cv, b); b.append(h); });
         cv.append(b);
       });
@@ -559,7 +561,8 @@
       const body = el('div', { class: 'body' }); const g = el('div', { class: 'grid' });
       g.append(field('Tipo', s, 'type', { options: TYPES, after: () => { if ((s.type === 'video' || s.type === 'youtube') && [10, 12].includes(+s.seconds)) { s.seconds = 0; persist(); } renderSlides(); } }), field('Ativa', s, 'active', { type: 'checkbox' }),
         field('Duração (s)' + (s.type === 'video' || s.type === 'youtube' ? ' · 0 = até o fim do vídeo' : ''), s, 'seconds', { type: 'number' }),
-        field('Exibir a partir de', s, 'start', { type: 'date' }), field('Exibir até', s, 'end', { type: 'date' }));
+        field('Exibir a partir de', s, 'start', { type: 'date' }), field('Exibir até', s, 'end', { type: 'date' }),
+        field('Passar a cada (minutos) · 0 = no rodízio normal', s, 'every', { type: 'number', ph: 'ex.: 30' }));
       if (s.type === 'image') g.append(field('Ajuste da imagem', s, 'fit', { options: [['cover', 'Preencher (corta bordas)'], ['contain', 'Mostrar inteira']] }));
       if (s.type === 'video') g.append(field('Endereço do vídeo MP4', s, 'src', { ph: 'midia/video.mp4' }), field('Tocar com o som do vídeo (pausa a rádio)', s, 'vSound', { type: 'checkbox' }));
       if (s.type === 'youtube') g.append(field('Link do YouTube', s, 'src', { ph: 'https://youtu.be/xxxxxxxxxxx' }), field('Tocar com som (pausa a rádio)', s, 'ytSound', { type: 'checkbox' }), field('Começar no segundo', s, 'ytStart', { type: 'number' }));
@@ -573,6 +576,7 @@
       if (s.type === 'text' || s.type === 'zonas' || s.tpl !== 'cheia') g.append(field('Efeito animado de fundo', s, 'bgfx', { options: [['', s.tpl === 'aniversario' ? 'Confete (padrão)' : 'Nenhum'], ['aurora', 'Aurora'], ['bolhas', 'Bolhas'], ['ondas', 'Ondas'], ['confete', 'Confete'], ['brilhos', 'Brilhos']] }));
       if (s.type !== 'text' && s.type !== 'zonas' && s.tpl !== 'cheia') g.append(field('Cor de fundo 1', s, 'bg1', { type: 'color' }), field('Cor de fundo 2', s, 'bg2', { type: 'color' }));
       body.append(g);
+      if (+s.every > 0) body.append(el('div', { class: 'info' }, ['Esta publicação só entra na TV de ' + s.every + ' em ' + s.every + ' minutos (assim que a publicação que estiver na tela terminar). Nos intervalos, passam as outras publicações normalmente. Deixe 0 para ela seguir o rodízio comum.']));
       body.append(el('div', { class: 'actions', style: 'margin:10px 0 0' }, [el('button', { class: 'btn sm', onclick: () => { pvSlide = s.id; pvLoad(); toast('Pré-visualização mostra só esta publicação'); } }, ['👁 Ver só esta no pré-visualizar'])]));
       if (s.type === 'youtube') body.append(el('div', { class: 'info' }, ['Precisa de internet na TV. Com duração 0 o vídeo toca até o fim e a TV volta aos slides; com um valor maior que 0 ele é cortado nesse tempo. Alguns vídeos não permitem ser exibidos em outros sites (a TV mostra um aviso e passa adiante). Para tocar com som no navegador da TV, abra-o com --autoplay-policy=no-user-gesture-required.']));
       if (s.type === 'zonas') { pvSlide = pvSlide || ''; body.append(zonesEditor(s)); }
@@ -634,11 +638,6 @@
       d.append(sum, body); box.append(d);
     });
     if (!cfg.slides.length) box.append(el('p', { class: 'hint' }, ['Nenhuma propaganda cadastrada.']));
-  }
-  function renderMosaic() {
-    const g = cfg.general, b = $('gMosaic'); b.innerHTML = '';
-    b.append(field('Como funciona a tela central', g, 'stageMode', { options: [['slides', 'Slides: uma propaganda por vez'], ['zonas', 'Zonas fixas: várias zonas ao mesmo tempo']] }), field('Cor de fundo 1', g.mosaic, 'bg1', { type: 'color', after: renderMosaic }), field('Cor de fundo 2', g.mosaic, 'bg2', { type: 'color', after: renderMosaic }));
-    const m = $('mosaicEd'); m.innerHTML = ''; m.append(zonesEditor(g.mosaic, 'lista'));
   }
   $('addSlide').onclick = () => { const s = InfoTV.normSlide({ type: 'image', t1: { text: '' }, t2: { text: '', effect: 'none', anim: 'fade' } }); cfg.slides.push(s); openIds.add(s.id); persist(); renderSlides(); };
 
@@ -781,7 +780,7 @@
   addEventListener('resize', pvFit);
 
   /* ---------- Abas / login ---------- */
-  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderSideLogo(); renderMosaic(); renderScreen(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawSources(); drawTicker(); renderRadio(); renderBackup(); }
+  function renderAll() { $('clinicName').textContent = cfg.general.name; renderGeneral(); renderSideLogo(); renderScreen(); renderWeather(); renderSlides(); renderSched(); drawVerses(); renderTickerCfg(); drawCats(); drawSources(); drawTicker(); renderRadio(); renderBackup(); }
   function buildTabs() {
     const secs = [...document.querySelectorAll('section.tab')], nav = $('tabs'); nav.innerHTML = '';
     const show = (n) => { secs.forEach((s) => s.classList.toggle('on', s.dataset.tab === n)); [...nav.children].forEach((b) => b.classList.toggle('on', b.textContent === n)); };

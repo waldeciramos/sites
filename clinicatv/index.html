@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.3">
+<meta name="build" content="9.4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b1c2c">
 <title>Clínica TV</title>
 <link rel="icon" href="logo.svg">
 <link rel="stylesheet" href="assets/fx.css">
@@ -169,6 +172,38 @@
   body.compact #app.v .sched, body.compact #app.v .verse { display: none; }
   body.no-brand .brand, body.no-weather .weather, body.no-schedule .sched, body.no-verse .verse, body.no-ticker #lt { display: none !important; }
 
+
+  /* ===== Marca d'água da clínica (canto inferior direito do campo de propagandas, como o logo das emissoras de TV) ===== */
+  #wm { position: absolute; z-index: 40; width: calc(12% * var(--wms, 1)); max-height: 34%; object-fit: contain; opacity: var(--wmo, .75); pointer-events: none; display: none;
+        filter: drop-shadow(0 0 .12rem rgba(255,255,255,.95)) drop-shadow(0 0 .45rem rgba(255,255,255,.55)) drop-shadow(0 .1rem .35rem rgba(0,0,0,.45)); transition: opacity .6s; }
+  #wm.on { display: block; } #wm.br { right: 2.2%; bottom: 3.5%; } #wm.bl { left: 2.2%; bottom: 3.5%; } #wm.tr { right: 2.2%; top: 3.5%; } #wm.tl { left: 2.2%; top: 3.5%; }
+  #sideLogo { display: none !important; }
+
+  /* ===== Barra inferior: mesmo relevo (esculpido/rebaixado) da lateral e a fonte do relógio ===== */
+  #lt { --panel:#e6eaf1; --lt:#e6eaf1; --ltTxt:#0f2a33; --nsh1:#fff; --nsh2:#c5ccd9; --vizbg:#e6eaf1; --eh:#fff; --es:rgba(15,42,51,.3); --mut:#5d7680; --crawl:transparent; --crawlTxt:#16363f; --ltTxtc:#0f2a33;
+        background: var(--panel); box-shadow: .45rem .45rem 1rem var(--nsh2), -.35rem -.35rem .9rem var(--nsh1); color: var(--ltTxt); }
+  body.side-dark #lt { --panel:#0b1c2c; --lt:#0b1c2c; --ltTxt:#eaf2f8; --nsh1:rgba(120,170,210,.07); --nsh2:rgba(0,0,0,.55); --vizbg:rgba(0,0,0,.28); --eh:rgba(140,190,230,.25); --es:rgba(0,0,0,.7); --mut:#9db3c6; --crawlTxt:#e9f1f8; }
+  #app.fullbleed #lt { box-shadow: 0 -.35rem 1rem var(--nsh2); }
+  #lt, #lt .fx, #lt #tScroll, #lt .lt-date b, #lt .lt-date em, #lt .lt-date small, #lt .lt-date span, #lt .lt-badge, #lt .lt-text, #lt .lt-detail { font-family: var(--ltf, var(--tf, var(--fd))), sans-serif !important; }
+  #lt .lt-head { padding: .7rem .8rem .2rem; gap: .9rem; }
+  #lt .lt-date { background: var(--panel); color: var(--ltTxt); border-radius: 1.1rem; min-width: 12rem; box-shadow: inset .25rem .25rem .6rem var(--nsh2), inset -.2rem -.2rem .5rem var(--nsh1); }
+  #lt .lt-date::after { display: none; }
+  #lt .lt-date b { color: var(--clk2, var(--p)); text-shadow: .035em .04em .025em var(--eh), -.025em -.03em .03em var(--es); }
+  #lt .lt-date small { color: var(--ltTxt); text-shadow: .04em .05em .03em var(--eh), -.03em -.04em .03em var(--es); } #lt .lt-date .mw span { color: var(--mut); opacity: 1; }
+  #lt .lt-date em { background: transparent; color: var(--tempc, #1fa35c); box-shadow: inset .15rem .15rem .4rem var(--nsh2), inset -.12rem -.12rem .3rem var(--nsh1); text-shadow: -.035em -.035em .02em var(--eh), .04em .05em .05em var(--es); }
+  #lt .lt-main { padding: .4rem 1.2rem; } #lt .lt-text { color: var(--ltTxt); text-shadow: .035em .04em .025em var(--eh), -.025em -.03em .03em var(--es); } #lt .lt-detail { color: var(--mut); }
+  #lt .lt-badge { box-shadow: .15rem .15rem .4rem var(--nsh2), -.1rem -.1rem .3rem var(--nsh1); }
+  #lt .lt-crawl { margin: .2rem .8rem .8rem; border-radius: 1rem; background: var(--vizbg); color: var(--crawlTxt); box-shadow: inset .25rem .25rem .6rem var(--nsh2), inset -.2rem -.2rem .5rem var(--nsh1); }
+  #lt #tScroll { padding-left: .6rem; }
+
+  /* ===== Celular: toque para tela cheia + rádio ===== */
+  #tap { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 1.4rem; padding: 2rem; text-align: center; color: #eaf2f8; background: radial-gradient(circle at 50% 40%, rgba(14,79,128,.94), rgba(6,17,29,.97) 75%); cursor: pointer; -webkit-tap-highlight-color: transparent; font-family: var(--tf, var(--fd)), system-ui, sans-serif; }
+  #tap.on { display: flex; }
+  #tap img { max-width: 38vw; max-height: 22vh; object-fit: contain; filter: drop-shadow(0 0 .3rem rgba(255,255,255,.9)) drop-shadow(0 0 1rem rgba(255,255,255,.35)); }
+  #tap .tb { width: 8.5rem; height: 8.5rem; border-radius: 50%; display: grid; place-items: center; font-size: 3.4rem; color: #fff; background: var(--p); box-shadow: .5rem .5rem 1.2rem rgba(0,0,0,.55), -.3rem -.3rem .9rem rgba(120,170,210,.12); animation: hintp 1.4s ease-in-out infinite; }
+  #tap .t1 { font-size: 2.1rem; font-weight: 700; line-height: 1.1; } #tap .t2 { font-size: 1.25rem; opacity: .8; max-width: 24rem; line-height: 1.3; }
+  #tap .t3 { font-size: .95rem; opacity: .65; max-width: 22rem; display: none; } #tap.ios .t3 { display: block; }
+
   #bar { position: fixed; right: 1rem; bottom: 1rem; z-index: 99; display: flex; gap: .5rem; opacity: 0; pointer-events: none; transition: opacity .3s; }
   body.show-ui #bar { opacity: 1; pointer-events: auto; } body.preview #bar { display: none; }
   #bar button, #bar a { font: 700 14px 'Montserrat', system-ui, sans-serif; background: #0e2336; color: #eaf2f8; border: 0; padding: 11px 20px; border-radius: 99rem; cursor: pointer; text-decoration: none; box-shadow: 5px 5px 11px rgba(0,0,0,.45), -3px -3px 9px rgba(120,170,210,.08); transition: .15s; }
@@ -177,6 +212,7 @@
 </style>
 </head>
 <body>
+<div id="tap"><img id="tapLogo" alt=""><div class="tb">⛶</div><div class="t1">Toque para abrir em tela cheia</div><div class="t2">Um toque no meio da tela expande a Clínica TV e liga a rádio.</div><div class="t3">No iPhone: toque em Compartilhar e “Adicionar à Tela de Início” para abrir em tela cheia.</div></div>
 <div id="app" class="h">
   <aside id="side">
     <div class="brand"><img id="logo" alt="" hidden><div><div class="t1" id="name"></div><div class="t2" id="subtitle"></div></div></div>
@@ -192,7 +228,7 @@
     <div class="credit">Clínica TV · idealizado por Waldeci Ramos</div>
   </aside>
   <main id="stage">
-    <div id="frame"><video id="tvid" muted playsinline preload="auto"></video><div id="vErr"></div></div>
+    <div id="frame"><video id="tvid" muted playsinline preload="auto"></video><div id="vErr"></div><img id="wm" alt=""></div>
   </main>
     <footer id="lt">
     <div class="lt-head">
@@ -353,7 +389,7 @@
   let hTimer = null, hIdx = -1, tRaf = null;
   function lowerThird() {
     clearTimeout(hTimer); cancelAnimationFrame(tRaf);
-    const tf = cfg.general.tickerFont ? "'" + cfg.general.tickerFont + "', var(--fd), sans-serif" : '';
+    const tf = cfg.general.tickerFont ? "'" + cfg.general.tickerFont + "', var(--fd), sans-serif" : 'var(--tf, var(--fd)), sans-serif';
     $('tScroll').style.fontFamily = tf;
     const list = items(), lt = $('lt');
     if (!list.length) { lt.style.display = 'none'; return; }
@@ -362,7 +398,7 @@
       hIdx = (hIdx + 1) % list.length; const it = list[hIdx], c = catOf(it.cat);
       lt.style.setProperty('--bc', c.color); $('ltBadge').style.background = c.color; $('ltBadge').textContent = ((c.icon || '') + ' ' + c.label).trim();
       const box = $('ltText'); box.innerHTML = ''; const sp = document.createElement('span');
-      InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)', font: cfg.general.tickerFont || '' }, 0); box.appendChild(sp);
+      InfoFX.text(sp, it.text, { effect: 'none', anim: it.anim || 'up', color: 'var(--ltTxt)', font: cfg.general.tickerFont || ((cfg.general.clock || {}).font) || '' }, 0); box.appendChild(sp);
       $('ltDetail').textContent = it.detail || ''; $('ltDetail').style.display = it.detail ? '' : 'none';
       hTimer = setTimeout(show, Math.max(4, +it.seconds || +cfg.general.headlineSeconds || 9) * 1000);
     };
@@ -388,7 +424,7 @@
     return 'rgb(' + f(m[1]) + ',' + f(m[2]) + ',' + f(m[3]) + ')';
   }
   /* ================= Publicações (slides): modelos, entradas e efeitos ================= */
-  let sIdx = -1, sTimer = null, curEl = null;
+  let sIdx = -1, sTimer = null, curEl = null, lastShown = {}; try { lastShown = JSON.parse(localStorage.getItem('ctv.lastShown') || '{}') || {}; } catch (e) {}
   function validSlides() {
     if (PREVIEW && Q.get('slide')) { const one = (cfg.slides || []).find((x) => x.id === Q.get('slide')); if (one) return [one]; }   // pré-visualização de uma publicação só
     const today = new Date().toISOString().slice(0, 10);
@@ -625,8 +661,16 @@
     if (mosaicEl) stopMosaic();
     const list = validSlides(), frame = $('frame');
     if (!list.length) { frame.querySelectorAll('.slide').forEach((n) => n.remove()); curEl = null; sTimer = setTimeout(nextSlide, 5000); return; }
-    sIdx = (sIdx + 1) % list.length;
+    // publicações com "passar a cada N minutos" (ex.: vídeo de 30 em 30 min) só entram quando o prazo vence; as demais seguem o rodízio
+    const now = Date.now(), due = (x) => !(+x.every > 0) || !lastShown[x.id] || now - lastShown[x.id] >= x.every * 60000, n = list.length;
+    let pick = -1;
+    const venc = list.map((x, i) => [x, i]).filter(([x]) => +x.every > 0 && due(x)).sort((a, b) => (lastShown[a[0].id] || 0) - (lastShown[b[0].id] || 0));
+    if (venc.length && !(PREVIEW && Q.get('slide'))) pick = venc[0][1];
+    else for (let k = 1; k <= n; k++) { const i = (sIdx + k) % n; if (!(+list[i].every > 0) || (PREVIEW && Q.get('slide'))) { pick = i; break; } }
+    if (pick < 0) { frame.querySelectorAll('.slide').forEach((nd) => { nd._stop && nd._stop(); nd.remove(); }); curEl = null; sTimer = setTimeout(nextSlide, 5000); return; }   // só há programadas e nenhuma venceu ainda
+    sIdx = pick;
     const s = list[sIdx], g = cfg.general, el = buildSlide(s);
+    if (+s.every > 0) { lastShown[s.id] = Date.now(); try { localStorage.setItem('ctv.lastShown', JSON.stringify(lastShown)); } catch (e) {} }
     const show = () => {
       frame.appendChild(el);
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
@@ -638,7 +682,7 @@
         // vídeo MP4 / YouTube: com duração 0 vale "até o fim do vídeo" e depois a TV volta aos slides.
         // Com duração maior que 0 ela é o tempo máximo. Se o vídeo não começar em 30 s, segue adiante.
         const lim = s.type === 'zonas' ? 0 : (+s.seconds > 0 ? secs : 0), v = el.querySelector('video');
-        if (list.length === 1 && s.type === 'video' && !lim && v) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
+        if (list.length === 1 && s.type === 'video' && !lim && v && !(+s.every > 0)) { v.loop = true; go(1800000); }   // só ele na lista: repete sem piscar
         else {
           main.onEnd = nextSlide; main.onFail = () => go(3000);
           main.noApi = () => go(Math.max(10, lim || 30) * 1000);
@@ -815,17 +859,59 @@
     // relógio padrão é claro com neon (lateral escura); se a lateral for clara, volta ao azul forte para ter contraste
     if ((g.theme === 'escuro' || g.sidebarStyle === 'escura') && ck.color === InfoTV.DEFAULT.general.clock.color) Object.assign(ck, { color: '#6fb8ff', g1: '#9bd5ff', g2: '#38bdf8' });
     InfoFX.style($('time'), ck, 0); $('time').className += ' time'; $('time').style.fontSize = '';
-    $('sec').style.fontFamily = $('time').style.fontFamily; root.setProperty('--tf', ck.font ? "'" + ck.font + "', var(--fd)" : 'var(--fd)'); root.setProperty('--tempc', g.tempColor || '#1fa35c'); root.setProperty('--clk2', ck.g2 || ck.glow || g.primary);
-    const sl = $('sideLogo'), sli = $('sideLogoImg');
-    if (g.sideLogo && g.sideLogoShow !== false) { if (sli.getAttribute('src') !== g.sideLogo) sli.src = g.sideLogo; sl.hidden = false; } else sl.hidden = true;
-    root.setProperty('--slh', Math.min(2.2, Math.max(0.5, (+g.sideLogoH || 100) / 100))); root.setProperty('--slbg', g.sideLogoBg || '#ffffff');
+    $('sec').style.fontFamily = $('time').style.fontFamily; root.setProperty('--tf', ck.font ? "'" + ck.font + "', var(--fd)" : 'var(--fd)'); root.setProperty('--tempc', g.tempColor || '#1fa35c'); { const lt = $('lt'); if (g.tickerFont) lt.style.setProperty('--ltf', "'" + g.tickerFont + "'"); else lt.style.removeProperty('--ltf'); } root.setProperty('--clk2', ck.g2 || ck.glow || g.primary);
+    watermark(g);
     layout(); renderSchedule(); nextVerse(); weather(); newsSetup(); lowerThird(); radioApply();
     sIdx = -1; nextSlide();
   }
 
+
+  /* ----- marca d'água: logo transparente no canto do campo de propagandas ----- */
+  const wmCache = {};
+  function whiteToAlpha(src, done) {   // JPG com fundo branco -> PNG transparente (só o fundo de fora, o branco de dentro das letras fica)
+    if (wmCache[src]) return done(wmCache[src]);
+    const im = new Image(); if (!/^data:/.test(src)) im.crossOrigin = 'anonymous';
+    im.onload = () => { try {
+      const k = Math.min(1, 520 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.max(1, Math.round(im.naturalWidth * k)), h = Math.max(1, Math.round(im.naturalHeight * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h), a = d.data, seen = new Uint8Array(w * h), st = [];
+      const near = (i) => a[i * 4] > 232 && a[i * 4 + 1] > 232 && a[i * 4 + 2] > 232;
+      const push = (i) => { if (!seen[i] && near(i)) { seen[i] = 1; st.push(i); } };
+      for (let i = 0; i < w; i++) { push(i); push((h - 1) * w + i); } for (let j = 0; j < h; j++) { push(j * w); push(j * w + w - 1); }
+      while (st.length) { const i = st.pop(), cx = i % w, cy = (i / w) | 0; if (cx > 0) push(i - 1); if (cx < w - 1) push(i + 1); if (cy > 0) push(i - w); if (cy < h - 1) push(i + w); }
+      for (let i = 0; i < w * h; i++) if (seen[i]) a[i * 4 + 3] = 0;
+      x.putImageData(d, 0, 0); done(wmCache[src] = c.toDataURL('image/png'));
+    } catch (e) { done(src); } };
+    im.onerror = () => done(src); im.src = src;
+  }
+  function watermark(g) {
+    const wm = $('wm'), raw = g.sideLogo || '';
+    if (!raw || g.sideLogoShow === false) { wm.classList.remove('on'); wm.removeAttribute('src'); return; }
+    const src = InfoTV.mediaURL(raw), needs = !/(^data:image\/(png|webp|svg))|\.(png|webp|svg)(\?|$)/i.test(src);
+    const set = (u) => { if (wm.getAttribute('src') !== u) wm.src = u; wm.className = 'on ' + (['br', 'bl', 'tr', 'tl'].includes(g.wmPos) ? g.wmPos : 'br'); };
+    needs ? whiteToAlpha(src, set) : set(src);
+    const r = document.documentElement.style; r.setProperty('--wmo', Math.min(1, Math.max(.15, (+g.wmOpacity || 75) / 100))); r.setProperty('--wms', Math.min(2.2, Math.max(.5, (+g.sideLogoH || 100) / 100)));
+  }
+  /* ----- celular: ao abrir, um toque no meio da tela já expande e liga a rádio ----- */
+  function tapSetup() {
+    const t = $('tap'); if (!t || PREVIEW || !cfg) return;
+    const touch = matchMedia('(pointer: coarse)').matches, small = Math.min(innerWidth, innerHeight) < 700;
+    if (!(compact() || (touch && small)) || document.fullscreenElement || t._done) return;
+    const g = cfg.general, src = g.sideLogo ? InfoTV.mediaURL(g.sideLogo) : '', li = $('tapLogo');
+    if (src) { /\.(png|webp|svg)(\?|$)/i.test(src) ? (li.src = src) : whiteToAlpha(src, (u) => { li.src = u; }); } else li.style.display = 'none';
+    t.classList.toggle('ios', /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone);
+    t.classList.add('on');
+    t.onclick = () => {
+      t._done = true; t.classList.remove('on');
+      const d = document.documentElement; try { ((d.requestFullscreen || d.webkitRequestFullscreen || (() => Promise.resolve())).call(d) || Promise.resolve()).catch(() => {}); } catch (e) {}
+      try { if (screen.orientation && screen.orientation.lock && innerWidth > innerHeight === false) { /* mantém a orientação do aparelho */ } } catch (e) {}
+      if (cfg.radio && cfg.radio.enabled) { try { rPlay(); } catch (e) {} }
+    };
+  }
+
   async function init() {
     cfg = await InfoTV.load();
-    apply(); tick(); setInterval(tick, 1000); wake();
+    apply(); tick(); setInterval(tick, 1000); wake(); tapSetup();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitClock(); });
     let ct; InfoTV.onChange(() => { clearTimeout(ct); ct = setTimeout(async () => { cfg = await InfoTV.load(); apply(); }, 1200); });
     setInterval(async () => {   // modo GitHub: confere config.json a cada 2 minutos

@@ -68,7 +68,7 @@
     return z;
   };
   function normSlide(s) {
-    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4, ytSound: false, vSound: true, ytStart: 0, zones: [], zEnd: 'tempo' }, s || {});
+    s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, every: 0, start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4, ytSound: false, vSound: true, ytStart: 0, zones: [], zEnd: 'tempo' }, s || {});
     s.id = s.id || rid();
     s.t1 = tdef(s.t1 || { text: s.title || '' });
     s.t2 = tdef(s.t2 || { text: s.body || '', effect: 'none', anim: 'fade' });
@@ -86,7 +86,7 @@
   ];
   const CLOCK_OLD = '#0f766e';
   const DEFAULT = {
-    version: 7,
+    version: 8,
     general: {
       name: 'Clínica TV', subtitle: 'Fisio Clínica Estiva', logo: 'logo.svg',
       brandBg: '#ffffff', brandFg: '#0b1d2e',
@@ -100,7 +100,7 @@
       svcMode: 'passando', svcSpeed: 60, svcFont: '', svcSize: 100,
       newsProxy: '',
       stageMode: 'slides', mosaic: { id: 'mosaico', bg1: '#0b3b4a', bg2: '#0b1d2e', zones: [] },
-      sideLogo: 'midia/logo-clinica.jpg', sideLogoShow: true, sideLogoH: 100, sideLogoBg: '#ffffff',
+      sideLogo: 'midia/logo-clinica.png', sideLogoShow: true, sideLogoH: 100, sideLogoBg: '#ffffff', wmOpacity: 75, wmPos: 'br',
       clock: { font: 'Rajdhani', size: 115, effect: 'baixo', color: '#1565d8', glow: '#38bdf8', g1: '#0646b8', g2: '#1e9bff' }
     },
     radio: { enabled: true, autoplay: true, volume: 0.6, nowPlayingUrl: '', current: 0, viz: 'barras', stations: DEFAULT_STATIONS() },
@@ -184,7 +184,19 @@
     cfg.general.show.services = false;
     cfg.general.mosaic.zones = (Array.isArray(cfg.general.mosaic.zones) ? cfg.general.mosaic.zones : []).map(zdef);
     if (!['slides', 'zonas'].includes(cfg.general.stageMode)) cfg.general.stageMode = 'slides';
-    cfg.version = 7;
+    // v8: as zonas passam a ser uma propaganda como as outras (entram no rodízio, com horário e tempo próprios).
+    // O antigo "mosaico fixo" vira uma publicação do tipo Zonas e a tela volta ao modo de slides. Roda uma vez.
+    if (wasVersion < 8) {
+      const g = cfg.general, m = g.mosaic || {};
+      if (m.zones && m.zones.length && (g.stageMode === 'zonas' || m.zones.some((z) => z.src || (z.items && z.items.length) || (z.type === 'text' && z.text)))) {
+        cfg.slides.push(normSlide({ type: 'zonas', seconds: 30, bg1: m.bg1 || '#0b3b4a', bg2: m.bg2 || '#0b1d2e', zEnd: 'tempo', zones: clone(m.zones) }));
+        g.mosaic.zones = [];
+      }
+      g.stageMode = 'slides';
+      if (!g.sideLogo || g.sideLogo === 'midia/logo-clinica.jpg') g.sideLogo = 'midia/logo-clinica.png';   // PNG com fundo transparente (marca d'água)
+      g.sideLogoShow = true; g.wmOpacity = g.wmOpacity || 75; g.wmPos = g.wmPos || 'br';
+    }
+    cfg.version = 8;
     r.current = Math.min(Math.max(0, +r.current || 0), Math.max(0, r.stations.length - 1));
     if (!['barras', 'espelho', 'onda', 'off'].includes(r.viz)) r.viz = 'barras';
     if (!['escura', 'clara'].includes(cfg.general.sidebarStyle)) cfg.general.sidebarStyle = 'escura';
@@ -326,6 +338,11 @@
       const enc = encodeURIComponent(url), T = [];
       if (proxy) T.push(['seu proxy', proxy.includes('{url}') ? proxy.replace('{url}', enc) : proxy + enc, 'html']);
       const direto = ['direto', url, 'html'], ao = ['allorigins', 'https://api.allorigins.win/raw?url=' + enc, 'html'], cp = ['corsproxy', 'https://corsproxy.io/?url=' + enc, 'html'], jina = ['leitor com JavaScript', 'https://r.jina.ai/' + url, 'md'];
+      // servidor da própria TV (modo Debian): busca a página por dentro, sem depender de sites públicos
+      if (window.InfoTV && window.InfoTV.serverNow && window.InfoTV.serverNow()) {
+        const sv = ['servidor', 'api/noticia?url=' + enc, 'html'], svj = ['servidor + leitor JavaScript', 'api/noticia?url=' + encodeURIComponent('https://r.jina.ai/' + url), 'md'];
+        (src.js ? [svj, sv] : [sv, svj]).forEach((t) => T.push(t));
+      }
       (src.js ? [jina, ao, cp, direto] : [direto, ao, cp, jina]).forEach((t) => T.push(t));
       let err = 'Nenhum texto encontrado nesta página';
       for (const [via, u, kind] of T) {
@@ -345,7 +362,7 @@
     if ((m = u.match(/^https?:\/\/drive\.google\.com\/file\/d\/([\w-]+)/i))) return 'https://drive.google.com/uc?export=download&id=' + m[1];
     return u;
   }
-  window.InfoTV = { mediaURL, DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess, login, hasSession, setToken, getToken, changeAccess, zdef };
+  window.InfoTV = { mediaURL, DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, serverNow: () => SRV, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess, login, hasSession, setToken, getToken, changeAccess, zdef };
   window.InfoNews = InfoNews;
   window.InfoFX = { style: fxStyle, text: fxText };
   try { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONTS_CSS; document.head.appendChild(l); } catch (e) {}

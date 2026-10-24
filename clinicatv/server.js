@@ -58,6 +58,7 @@ function authed(req) {
   if (e < Date.now()) { sessions.delete(t); return false; }
   return true;
 }
+const NEWS_CACHE = new Map();
 const fails = new Map();   // ip -> {n, until}
 const ipOf = (req) => (req.socket.remoteAddress || '').replace('::ffff:', '');
 
@@ -85,6 +86,30 @@ const safeName = (n) => {
 async function api(req, res, url) {
   const name = url.pathname.slice(5);   // depois de /api/
   if (name === 'ping') return send(res, 200, { clinicatv: true, versao: 1 });
+
+  // leitor de páginas para a barra de notícias/trânsito: o servidor busca o site e entrega à TV (o navegador não pode, por CORS)
+  if (name === 'noticia' && req.method === 'GET') {
+    const alvo = String(url.searchParams.get('url') || '');
+    let u; try { u = new URL(alvo); } catch (e) { return send(res, 400, { erro: 'endereço inválido' }); }
+    if (!/^https?:$/.test(u.protocol)) return send(res, 400, { erro: 'só http/https' });
+    try {   // não deixa a TV ser usada para ler a rede interna
+      const ips = await require('dns').promises.lookup(u.hostname, { all: true });
+      const priv = (ip) => /^(127\.|10\.|192\.168\.|169\.254\.|0\.|172\.(1[6-9]|2\d|3[01])\.|::1$|fc|fd|fe80)/i.test(ip);
+      if (!ips.length || ips.some((x) => priv(x.address))) return send(res, 403, { erro: 'endereço interno não permitido' });
+    } catch (e) { return send(res, 502, { erro: 'não achei o site' }); }
+    const cacheKey = u.href, hit = NEWS_CACHE.get(cacheKey);
+    if (hit && Date.now() - hit.t < 120000) return send(res, 200, hit.body, { 'Content-Type': hit.type });
+    const ac = new AbortController(), to = setTimeout(() => ac.abort(), 20000);
+    try {
+      const r = await fetch(u.href, { signal: ac.signal, redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) ClinicaTV', 'Accept': 'text/html,application/xhtml+xml,application/xml,text/plain;q=0.9,*/*;q=0.5', 'Accept-Language': 'pt-BR,pt;q=0.9' } });
+      if (!r.ok) return send(res, 502, { erro: 'o site respondeu ' + r.status });
+      const buf = Buffer.from(await r.arrayBuffer()); if (buf.length > 3 * 1024 * 1024) return send(res, 502, { erro: 'página grande demais' });
+      const type = (r.headers.get('content-type') || 'text/html').includes('charset') ? r.headers.get('content-type') : (r.headers.get('content-type') || 'text/html') + '; charset=utf-8';
+      NEWS_CACHE.set(cacheKey, { t: Date.now(), body: buf, type }); if (NEWS_CACHE.size > 60) NEWS_CACHE.delete(NEWS_CACHE.keys().next().value);
+      return send(res, 200, buf, { 'Content-Type': type });
+    } catch (e) { return send(res, 502, { erro: 'falha ao abrir o site' }); }
+    finally { clearTimeout(to); }
+  }
 
   if (name === 'eventos') {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });

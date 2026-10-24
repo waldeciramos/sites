@@ -50,7 +50,7 @@
     "autoFullscreen": true,
     "transVideo": "",
     "tempColor": "#1fa35c",
-    "sideLogo": "midia/logo-clinica.jpg",
+    "sideLogo": "midia/logo-clinica.png",
     "sideLogoShow": true,
     "sideLogoH": 100,
     "sideLogoBg": "#ffffff"
@@ -90,7 +90,7 @@
       "exclude": "",
       "selector": "",
       "js": true,
-      "active": false
+      "active": true
     }
   ],
   "slides": [
