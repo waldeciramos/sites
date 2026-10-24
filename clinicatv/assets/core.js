@@ -62,7 +62,8 @@
   const zdef = (z) => {
     z = Object.assign({ id: '', type: 'image', src: '', x: 0, y: 0, w: 50, h: 50, fit: 'cover', items: [], radius: 0, border: 0, borderColor: '#ffffff', shadow: false, sound: false, text: '', color: '#ffffff', size: 1, align: 'center', bg: '#0f766e', bgAlpha: 0, font: '' }, z || {});
     z.id = z.id || rid();
-    z.items = (Array.isArray(z.items) ? z.items : []).map((it) => Object.assign({ type: 'image', src: '', seconds: 8, fit: 'cover', sound: false }, it));
+    z.items = (Array.isArray(z.items) ? z.items : []).map((it) => { it = Object.assign({ type: 'image', src: '', seconds: 8, fit: 'cover', sound: false }, it); if (it.type === 'video' && /(youtu\.be\/|youtube\.com\/)/i.test(it.src || '')) it.type = 'youtube'; return it; });
+    if (z.type === 'video' && /(youtu\.be\/|youtube\.com\/)/i.test(z.src || '')) z.type = 'youtube';
     ['x', 'y', 'w', 'h'].forEach((k) => { z[k] = Math.round(Math.min(100, Math.max(0, +z[k] || 0)) * 10) / 10; });
     z.w = Math.max(4, Math.min(z.w, 100 - z.x)); z.h = Math.max(4, Math.min(z.h, 100 - z.y));
     return z;
@@ -70,6 +71,7 @@
   function normSlide(s) {
     s = Object.assign({ id: '', type: 'text', active: true, seconds: 12, every: 0, split: false, splitBase: 'manter', start: '', end: '', fit: 'cover', pos: 'bottom', icon: '', bg1: '#0f766e', bg2: '#134e4a', src: '', tpl: 'cheia', trans: '', kb: '', bgfx: '', bgvid: '', vfit: 'contain', vpos: 'centro', vsize: 100, vimg: '', vimgfit: 'cover', vline: true, vlineColor: '#ffffff', vlineW: 4, ytSound: false, vSound: true, ytStart: 0, zones: [], zEnd: 'tempo' }, s || {});
     s.id = s.id || rid();
+    if (s.type === 'video' && /(youtu\.be\/|youtube\.com\/)/i.test(s.src || '')) s.type = 'youtube';   // link do YouTube colado em "Vídeo MP4": vira YouTube sozinho
     s.t1 = tdef(s.t1 || { text: s.title || '' });
     s.t2 = tdef(s.t2 || { text: s.body || '', effect: 'none', anim: 'fade' });
     delete s.title; delete s.body;
@@ -362,7 +364,7 @@
     if ((m = u.match(/^https?:\/\/drive\.google\.com\/file\/d\/([\w-]+)/i))) return 'https://drive.google.com/uc?export=download&id=' + m[1];
     return u;
   }
-  window.InfoTV = { mediaURL, DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, isServer: () => srvP, serverNow: () => SRV, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess, login, hasSession, setToken, getToken, changeAccess, zdef };
+  window.InfoTV = { mediaURL, DEFAULT, clone, merge, build, normSlide, normSource, tdef, rid, FONTS, FONTS_CSS, EFFECTS, ANIMS, load, loadLocal, loadRepo, save, onChange, upload, clearLocal: () => { try { localStorage.removeItem(KEY); localStorage.removeItem(MODE_KEY); localStorage.removeItem('ctv.lastShown'); } catch (e) {} }, isServer: () => srvP, serverNow: () => SRV, getMode, setMode, getOrient, setOrient, sha256, resolveStream, loadAccess, login, hasSession, setToken, getToken, changeAccess, zdef };
   window.InfoNews = InfoNews;
   window.InfoFX = { style: fxStyle, text: fxText };
   try { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONTS_CSS; document.head.appendChild(l); } catch (e) {}

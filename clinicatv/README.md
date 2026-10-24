@@ -49,3 +49,10 @@ O navegador não deixa ler outro site direto, então a TV usa leitores públicos
 - Ao marcar **✂ Dividir esta tela em zonas** numa publicação de imagem, vídeo, YouTube ou TV ao vivo, o conteúdo dela vira a **zona 1** (com o nome do arquivo) e o fundo da publicação sai, para não tocar duas vezes.
 - Escolha a divisão por **miniaturas numeradas** (2 colunas, 3 colunas, 1 grande + 2, em pé no meio + 2 laterais, 4, 6 quadros…). Cada zona mostra seu **número e o nome** do vídeo/imagem dentro do quadro.
 - Abaixo do quadro há um **cartão por zona**: tipo, escolher da pasta midia, enviar do computador ou colar o caminho/link. Os botões ↖ ↗ ↙ ↘ ◎ ⛶ levam a zona ao canto, ao centro ou à tela toda; você também pode **arrastar uma foto/vídeo do computador direto para o quadro**.
+
+## Versão 9.7 — cache e pasta midia do GitHub
+- **Publicar e Backup › 🧹 Cache**: *Limpar cache e recarregar* (apaga as cópias do navegador sem perder a configuração) e *Descartar o que está só neste navegador* (volta ao `config.json` publicado). Na TV, abrir `index.html?limpar=1` faz a limpeza.
+- Os arquivos `index.html` e `admin.html` chamavam `assets/core.js?v=9.3`; o número agora muda a cada versão (9.7), para o navegador não usar um `core.js` velho. **Ao atualizar no GitHub, troque `assets/core.js` junto com os dois HTML.** A TV também se recarrega sozinha, já ignorando o cache, quando detecta versão nova.
+- **GitHub Pages**: as listas "Escolher da pasta midia" leem a pasta `midia` do repositório pela API pública do GitHub (o repositório é descoberto pelo endereço; se precisar, ajuste em Publicar e Backup › 📂 Pasta midia do GitHub). Envie os arquivos ao repositório e use "Testar e atualizar a lista".
+- **Debian**: o arquivo enviado pelo painel é gravado em `midia/` no servidor e já aparece na lista.
+- Link do YouTube colado em "Vídeo MP4" (publicação, zona ou lista) vira YouTube automaticamente.

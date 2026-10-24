@@ -251,6 +251,18 @@
           <label class="btn" style="cursor:pointer">⬆ Importar config.json<input type="file" id="importFile" accept=".json" hidden></label>
           <button class="btn del" id="btnReset">Restaurar padrão</button>
         </div>
+        <div id="ghBox"><h3>📂 Pasta midia do GitHub (escolher imagens e vídeos já enviados)</h3>
+        <p class="hint">No GitHub Pages o painel não consegue gravar arquivos. Envie as imagens e vídeos para a pasta <code>midia</code> do repositório (no GitHub: Add file ▸ Upload files) e eles aparecem aqui nas listas "Escolher da pasta midia". O endereço do repositório é descoberto sozinho; só preencha abaixo se a lista vier vazia.</p>
+        <div class="grid">
+          <div class="f"><label for="ghOwner">Usuário ou organização</label><input class="neo-in" id="ghOwner" autocomplete="off"></div>
+          <div class="f"><label for="ghRepo">Repositório</label><input class="neo-in" id="ghRepo" autocomplete="off"></div>
+          <div class="f"><label for="ghPath">Pasta da mídia dentro do repositório</label><input class="neo-in" id="ghPath" autocomplete="off"></div>
+        </div>
+        <div class="actions"><button class="btn ok" id="ghTest">🔄 Testar e atualizar a lista</button><a class="btn" id="ghOpen" target="_blank" rel="noopener" style="text-decoration:none">↗ Abrir a pasta no GitHub</a></div>
+        <div class="hint" id="ghMsg" style="margin-top:8px"></div></div>
+        <div id="cacheBox"><h3>🧹 Cache: quando troquei e a tela não mudou</h3>
+        <p class="hint">O navegador (e as TVs) guardam cópias dos arquivos. <b>Limpar cache e recarregar</b> apaga essas cópias e abre o painel de novo, sem perder o que você configurou. <b>Descartar o que está só neste navegador</b> apaga a configuração guardada aqui e carrega o <code>config.json</code> publicado (use se o painel mostra uma versão antiga). Na TV, abrir <code>index.html?limpar=1</code> faz a mesma limpeza.</p>
+        <div class="actions"><button class="btn ok" id="btnCache">🧹 Limpar cache e recarregar</button><button class="btn del" id="btnLocal">↩ Descartar o que está só neste navegador</button></div></div>
         <div id="passBox"><h3>Usuário e senha do admin</h3>
         <div class="grid">
           <div class="f"><label for="newUser">Usuário</label><input class="neo-in" id="newUser"></div>
@@ -271,7 +283,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="assets/core.js?v=9.3"></script>
+<script src="assets/core.js?v=9.7"></script>
 <script>
 (function () {
   'use strict';
@@ -317,7 +329,7 @@
     fr.onerror = rej; fr.readAsDataURL(file);
   });
 
-  const fileToURL = async (file, max, type) => (await InfoTV.isServer()) ? InfoTV.upload(file) : fileToDataURL(file, max, type);
+  const fileToURL = async (file, max, type) => { if (await InfoTV.isServer()) { const u = await InfoTV.upload(file); midiaBust(); return u; } return fileToDataURL(file, max, type); };
 
   /* ---------- Editor de texto com efeitos ---------- */
   function fxEditor(st, title, base, bg) {
@@ -409,9 +421,46 @@
   const TYPES = [['image', '🖼 Imagem'], ['video', '🎬 Vídeo MP4'], ['youtube', '▶ YouTube'], ['zonas', '🧩 Zonas (montar a tela)'], ['live', '📺 TV ao vivo (tela toda)'], ['text', '📝 Slide de texto']];
   const tLabel = (s) => (TYPES.find((t) => t[0] === s.type) || [])[1];
   /* ---------- Biblioteca de arquivos já enviados (servidor) ---------- */
-  async function midiaList() {
-    if (!(await InfoTV.isServer())) return [];
-    try { const r = await fetch('api/midia', { headers: { 'x-token': InfoTV.getToken() }, cache: 'no-store' }); return r.ok ? await r.json() : []; } catch (e) { return []; }
+  /* ---------- lista da pasta midia: no Debian vem do servidor; no GitHub Pages vem da API pública do GitHub ---------- */
+  const GH_KEY = 'ctv.gh', GHC_KEY = 'ctv.gh.cache';
+  let midiaP = null, midiaT = 0, midiaErr = '';
+  const ghSaved = () => { try { return JSON.parse(localStorage.getItem(GH_KEY) || '{}') || {}; } catch (e) { return {}; } };
+  function ghGuess() {   // descobre o repositório pelo endereço: usuario.github.io/pasta/admin
+    const m = location.hostname.match(/^([^.]+)\.github\.io$/i); if (!m) return [];
+    const owner = m[1]; let segs = location.pathname.split('/').filter(Boolean);
+    if (segs.length && /\.[a-z0-9]+$/i.test(segs[segs.length - 1])) segs.pop(); if (segs.length && segs[segs.length - 1] === 'admin') segs.pop();
+    const out = [{ owner, repo: owner + '.github.io', path: (segs.length ? segs.join('/') + '/' : '') + 'midia' }];
+    if (segs.length) out.push({ owner, repo: segs[0], path: (segs.length > 1 ? segs.slice(1).join('/') + '/' : '') + 'midia' });
+    return out;
+  }
+  const ghCands = () => { const g = ghSaved(); return g.owner && g.repo ? [{ owner: g.owner.trim(), repo: g.repo.trim(), path: (g.path || 'midia').trim().replace(/^\/+|\/+$/g, '') }] : ghGuess(); };
+  async function ghFetch(c) {
+    const r = await fetch('https://api.github.com/repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) + '/contents/' + c.path.split('/').map(encodeURIComponent).join('/'), { headers: { Accept: 'application/vnd.github+json' }, cache: 'no-store' });
+    if (r.status === 403 || r.status === 429) throw new Error('limite'); if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json(); if (!Array.isArray(j)) throw new Error('não é pasta');
+    return j.filter((f) => f.type === 'file' && !f.name.startsWith('.')).map((f) => ({ nome: f.name, url: 'midia/' + encodeURI(f.name), bytes: f.size || 0 })).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { numeric: true }));
+  }
+  async function ghList(force) {
+    const cands = ghCands(); if (!cands.length) return { list: [], err: 'Este endereço não é do GitHub Pages: informe o repositório em Publicar e Backup › Pasta midia do GitHub.' };
+    if (!force) { try { const c = JSON.parse(sessionStorage.getItem(GHC_KEY) || 'null'); if (c && Date.now() - c.t < 180000 && JSON.stringify(c.k) === JSON.stringify(cands)) return { list: c.list, used: c.used }; } catch (e) {} }
+    let err = '';
+    for (const c of cands) {
+      try { const list = await ghFetch(c); try { sessionStorage.setItem(GHC_KEY, JSON.stringify({ t: Date.now(), k: cands, list, used: c })); } catch (e) {} return { list, used: c }; }
+      catch (e) { if (e.message === 'limite') { err = 'O GitHub limitou as consultas (60 por hora por rede). Tente de novo mais tarde.'; break; } err = err || 'Não achei a pasta midia no repositório. Confira usuário, repositório e pasta em Publicar e Backup.'; }
+    }
+    return { list: [], err };
+  }
+  function midiaBust() { midiaP = null; try { sessionStorage.removeItem(GHC_KEY); } catch (e) {} }
+  function midiaList(force) {
+    if (force) midiaBust();
+    if (midiaP && Date.now() - midiaT < 60000) return midiaP;
+    midiaT = Date.now();
+    midiaP = (async () => {
+      midiaErr = '';
+      if (await InfoTV.isServer()) { try { const r = await fetch('api/midia', { headers: { 'x-token': InfoTV.getToken() }, cache: 'no-store' }); return r.ok ? await r.json() : []; } catch (e) { return []; } }
+      const g = await ghList(force); midiaErr = g.err || ''; return g.list;
+    })();
+    return midiaP;
   }
   function mediaPicker(kind, onPick) {
     const sel = el('select', { class: 'neo-in', 'aria-label': 'Escolher arquivo da pasta midia' });
@@ -419,7 +468,7 @@
     const isI = (n) => /\.(jpe?g|png|gif|webp|svg)$/i.test(n), isV = (n) => /\.(mp4|m4v|webm|mov)$/i.test(n);
     midiaList().then((l) => {
       l.filter((f) => kind === 'any' || (kind === 'image' ? isI(f.nome) : isV(f.nome))).forEach((f) => sel.append(el('option', { value: f.url }, [f.nome + ' (' + (f.bytes / 1048576).toFixed(1) + ' MB)'])));
-      if (sel.options.length === 1) sel.style.display = 'none';
+      if (sel.options.length === 1) { sel.options[0].textContent = '📂 ' + (midiaErr || 'Nenhum arquivo deste tipo na pasta midia ainda'); sel.disabled = true; }
     });
     sel.onchange = () => { if (sel.value) onPick(sel.value); };
     return sel;
@@ -831,8 +880,35 @@
   function renderBackup() {
     document.querySelectorAll('input[name=mode]').forEach((r) => { r.checked = r.value === InfoTV.getMode(); r.onchange = () => { InfoTV.setMode(r.value); toast('Modo: ' + (r.value === 'repo' ? 'config.json do GitHub' : 'este navegador')); }; });
     $('newUser').value = cfg.admin.user;
-    InfoTV.isServer().then((sv) => { ['modeBox', 'warnPass'].forEach((id) => { $(id).style.display = sv ? 'none' : ''; }); $('passBox').style.display = ''; $('srvNote').style.display = sv ? '' : 'none'; if (sv) $('newPass').placeholder = 'deixe vazio para manter a atual'; });
+    InfoTV.isServer().then((sv) => { ['modeBox', 'warnPass', 'ghBox'].forEach((id) => { $(id).style.display = sv ? 'none' : ''; }); if (!sv) ghInit(); $('passBox').style.display = ''; $('srvNote').style.display = sv ? '' : 'none'; if (sv) $('newPass').placeholder = 'deixe vazio para manter a atual'; });
   }
+  const ghRepoNow = () => { const g = ghSaved(), c = g.owner && g.repo ? { owner: g.owner, repo: g.repo, path: g.path || 'midia' } : (ghGuess()[0] || {}); return c; };
+  function ghInit() {
+    const g = ghSaved(), d = ghGuess()[0] || {};
+    $('ghOwner').value = g.owner || ''; $('ghRepo').value = g.repo || ''; $('ghPath').value = g.path || '';
+    $('ghOwner').placeholder = d.owner || 'seu-usuario'; $('ghRepo').placeholder = d.repo || 'nome-do-repositorio'; $('ghPath').placeholder = d.path || 'midia';
+    const save = () => { const v = { owner: $('ghOwner').value.trim(), repo: $('ghRepo').value.trim(), path: $('ghPath').value.trim() }; try { v.owner || v.repo || v.path ? localStorage.setItem(GH_KEY, JSON.stringify(v)) : localStorage.removeItem(GH_KEY); } catch (e) {} };
+    ['ghOwner', 'ghRepo', 'ghPath'].forEach((id) => { $(id).onchange = save; });
+    $('ghTest').onclick = async () => {
+      save(); $('ghMsg').textContent = 'Consultando o GitHub…'; midiaBust(); const r = await ghList(true);
+      if (r.err) { $('ghMsg').textContent = '⚠ ' + r.err; return; }
+      const u = r.used || {}; $('ghMsg').textContent = '✔ Encontrei ' + r.list.length + ' arquivo(s) em ' + u.owner + '/' + u.repo + '/' + u.path + (r.list.length ? ': ' + r.list.slice(0, 6).map((f) => f.nome).join(', ') + (r.list.length > 6 ? '…' : '') : '. A pasta existe, mas está vazia.');
+      midiaBust(); renderAll();
+    };
+    const open = () => { const c = ghRepoNow(); $('ghOpen').href = c.owner ? 'https://github.com/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) + '/tree/HEAD/' + String(c.path || 'midia').split('/').map(encodeURIComponent).join('/') : 'https://github.com'; };
+    open(); $('ghOpen').onmouseenter = $('ghOpen').onfocus = () => { save(); open(); };
+  }
+  async function limparCaches() {
+    try { if ('serviceWorker' in navigator) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch (e) {}
+    try { if (window.caches) for (const k of await caches.keys()) await caches.delete(k); } catch (e) {}
+    try { sessionStorage.removeItem(GHC_KEY); } catch (e) {}
+  }
+  $('btnCache').onclick = async () => { toast('Limpando…'); await limparCaches(); location.href = location.pathname + '?v=' + Date.now(); };
+  let armLocal = 0;
+  $('btnLocal').onclick = async () => {
+    if (Date.now() - armLocal > 4000) { armLocal = Date.now(); return toast('Isto apaga o que não foi publicado. Clique de novo para confirmar'); }
+    toast('Descartando…'); await limparCaches(); InfoTV.clearLocal(); location.href = location.pathname + '?v=' + Date.now();
+  };
   $('btnExport').onclick = () => { const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' })), download: 'config.json' }); a.click(); };
   $('importFile').onchange = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { cfg = InfoTV.build(JSON.parse(r.result)); persist(); renderAll(); toast('Configuração importada'); } catch (x) { toast('Arquivo inválido'); } }; r.readAsText(f); };
   let armReset = 0; $('btnReset').onclick = () => { if (Date.now() - armReset < 3000) { cfg = InfoTV.build({}); persist(); renderAll(); } else { armReset = Date.now(); toast('Clique de novo para restaurar o padrão'); } };

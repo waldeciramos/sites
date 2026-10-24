@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.6">
+<meta name="build" content="9.7">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b1c2c">
@@ -241,7 +241,19 @@
 </div>
 <div id="bar"><button id="bFull">⛶ Tela cheia (F)</button><button id="bRot">⟳ Girar (R)</button><button id="bMute">📻 Rádio (M)</button><a href="admin.html">⚙ Admin</a></div>
 
-<script src="assets/core.js?v=9.3"></script>
+<script>
+/* index.html?limpar=1 : apaga cópias guardadas (cache, configuração local) e abre a TV de novo, já com tudo atualizado */
+if (/[?&]limpar/.test(location.search)) {
+  window.stop && window.stop();
+  (async () => {
+    try { if (navigator.serviceWorker) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch (e) {}
+    try { if (window.caches) for (const k of await caches.keys()) await caches.delete(k); } catch (e) {}
+    try { Object.keys(localStorage).filter((k) => /^(infotv|ctv)/i.test(k)).forEach((k) => localStorage.removeItem(k)); sessionStorage.clear(); } catch (e) {}
+    location.replace(location.pathname + '?v=' + Date.now());
+  })();
+}
+</script>
+<script src="assets/core.js?v=9.7"></script>
 <script>
 (function () {
   'use strict';
@@ -961,7 +973,7 @@
     }, 120000);
     // versão nova do sistema publicada (GitHub ou servidor)? confere a cada 10 min e recarrega sozinho
     if (!PREVIEW) setInterval(async () => {
-      try { const t = await (await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })).text(); const m = /<meta name="build" content="([^"]+)"/.exec(t), cur = document.querySelector('meta[name=build]'); if (m && cur && m[1] !== cur.content) location.reload(); } catch (e) {}
+      try { const t = await (await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })).text(); const m = /<meta name="build" content="([^"]+)"/.exec(t), cur = document.querySelector('meta[name=build]'); if (m && cur && m[1] !== cur.content) location.replace(location.pathname + '?v=' + encodeURIComponent(m[1]) + '.' + Date.now()); } catch (e) {}
     }, 10 * 60 * 1000);
     if (!PREVIEW) setTimeout(() => location.reload(), 24 * 3600 * 1000);   // recarrega 1x por dia
   }
