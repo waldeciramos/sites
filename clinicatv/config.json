@@ -116,7 +116,7 @@
           "y": 0,
           "w": 50,
           "h": 100,
-          "fit": "contain",
+          "fit": "auto",
           "radius": 0,
           "border": 0,
           "borderColor": "#ffffff",
@@ -139,7 +139,7 @@
           "y": 0,
           "w": 50,
           "h": 100,
-          "fit": "contain",
+          "fit": "auto",
           "radius": 0,
           "border": 0,
           "borderColor": "#ffffff",
@@ -645,5 +645,5 @@
     "user": "admin",
     "hash": ""
   },
-  "rev": "2 zonas + onda (24/10)"
+  "rev": "2 zonas + onda + ajuste auto (24/10)"
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build" content="9.9">
+<meta name="build" content="9.10">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b1c2c">
@@ -617,6 +617,15 @@ if (/[?&]limpar/.test(location.search)) {
     }
     const f = document.createElement('iframe'); f.className = 'zlive'; f.src = src; f.allow = 'autoplay; fullscreen; encrypted-media'; f.setAttribute('referrerpolicy', 'no-referrer'); return f;   // página da internet (alguns sites não permitem ser exibidos assim)
   }
+  /* ajuste de mídia nas zonas: nunca sobra faixa vazia (o fundo é a própria mídia desfocada) e as bordas voltadas para outra zona esmaecem suave, sem linha dura */
+  const feather = (z) => { const l = z.x > 0.5, r = z.x + z.w < 99.5; if (!l && !r) return ''; return 'linear-gradient(90deg,' + [l ? 'transparent 0, #000 12%' : '#000 0', r ? '#000 88%, transparent 100%' : '#000 100%'].join(',') + ')'; };
+  const softMask = (el, z) => { const m = feather(z); if (m) { el.style.webkitMaskImage = m; el.style.maskImage = m; } return !!m; };
+  /* "Automático": se a mídia tem quase a proporção da zona (diferença até ~20%) ela preenche a zona inteira; se não, aparece inteira sobre o fundo desfocado. Reavalia sozinho ao mudar o tamanho da tela */
+  function watchFit(d, stops, natural, apply) {
+    const run = () => { const n = natural(), w = d.clientWidth, h = d.clientHeight; if (!n || !n[0] || !n[1] || !w || !h) return; const za = w / h, ma = n[0] / n[1]; apply(Math.max(za, ma) / Math.min(za, ma) <= 1.2 ? 'cover' : 'contain'); };
+    if (window.ResizeObserver) { const ro = new ResizeObserver(run); ro.observe(d); stops.push(() => ro.disconnect()); } else window.addEventListener('resize', run);
+    return run;
+  }
   function buildZones(s, el, layer) {
     if (!s.bgnone) el.style.background = 'linear-gradient(135deg,' + (s.bg1 || '#0f766e') + ',' + (s.bg2 || '#134e4a') + ')';
     if (layer) el.appendChild(layer);
@@ -627,12 +636,19 @@ if (/[?&]limpar/.test(location.search)) {
       const sh = []; if (+z.border > 0) sh.push('0 0 0 ' + (z.border / 16) + 'rem ' + (z.borderColor || '#fff')); if (z.shadow) sh.push('0 .6rem 1.8rem rgba(0,0,0,.4)'); if (sh.length) d.style.boxShadow = sh.join(',');
       const isMain = s.zEnd === 'fim' && !mainSet && (z.type === 'video' || z.type === 'youtube') && z.src;
       if (isMain) { mainSet = true; el._main = main; }
-      if (z.type === 'image' && z.src) { const i = document.createElement('div'); i.className = 'img'; i.style.backgroundSize = BGFIT[z.fit] || 'cover'; i.style.backgroundImage = 'url("' + InfoTV.mediaURL(z.src) + '")'; d.appendChild(i); }
-      else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); v.style.objectFit = FITCSS[z.fit] || 'cover'; if (!(+z.bgAlpha > 0) && z.fit === 'contain') {   // "inteiro": vídeo no tamanho dele, com o mesmo vídeo desfocado preenchendo as laterais
+      if (z.type === 'image' && z.src) {
+        const au = z.fit === 'auto', url = 'url("' + InfoTV.mediaURL(z.src) + '")';
+        if ((au || z.fit === 'contain') && !(+z.bgAlpha > 0)) {   // fundo: a própria imagem desfocada
+          const bg = document.createElement('div'); bg.className = 'img'; bg.style.backgroundSize = 'cover'; bg.style.backgroundImage = url; bg.style.filter = 'blur(26px) brightness(.75) saturate(1.2)'; bg.style.transform = 'scale(1.25)'; softMask(bg, z); d.appendChild(bg);
+        }
+        const i = document.createElement('div'); i.className = 'img'; i.style.backgroundSize = au ? 'contain' : (BGFIT[z.fit] || 'cover'); i.style.backgroundImage = url; d.appendChild(i);
+        if (au) { let nat = null; const run = watchFit(d, stops, () => nat, (m) => { i.style.backgroundSize = m; }); const im = new Image(); im.onload = () => { nat = [im.naturalWidth, im.naturalHeight]; run(); }; im.src = InfoTV.mediaURL(z.src); }
+      }
+      else if (z.type === 'video' && z.src) { const v = videoEl(z.src, { loop: !isMain, sound: !!z.sound, hooks: isMain ? main : {} }); const au = z.fit === 'auto'; v.style.objectFit = au ? 'contain' : (FITCSS[z.fit] || 'cover'); if (au) v.addEventListener('loadedmetadata', watchFit(d, stops, () => [v.videoWidth, v.videoHeight], (m) => { v.style.objectFit = m; })); if (!(+z.bgAlpha > 0) && (z.fit === 'contain' || au)) {   // "inteiro": vídeo no tamanho dele, com o mesmo vídeo desfocado preenchendo as laterais
         const bg = document.createElement('video'); bg.muted = true; bg.defaultMuted = true; bg.loop = true; bg.autoplay = true; bg.playsInline = true; bg.setAttribute('playsinline', ''); bg.src = InfoTV.mediaURL(z.src);
         bg.style.cssText = 'object-fit:cover;filter:blur(26px) brightness(.75) saturate(1.2);transform:scale(1.25);background:transparent';
         const sync = () => { try { bg.currentTime = v.currentTime; bg.play().catch(() => {}); } catch (e) {} }; v.addEventListener('playing', sync); v.addEventListener('seeked', sync);
-        d.appendChild(bg); d.appendChild(v); v.style.background = 'transparent'; d.style.background = '#000';
+        const soft = softMask(bg, z); d.appendChild(bg); d.appendChild(v); v.style.background = 'transparent'; d.style.background = soft ? 'transparent' : '#000';
       } else { d.appendChild(v); if (!(+z.bgAlpha > 0)) d.style.background = '#000'; } }   // "inteiro": o vídeo aparece no tamanho dele e o fundo da publicação fica à mostra
       else if (z.type === 'lista') playlist(d, z, stops);
       else if (z.type === 'live' && z.src) d.appendChild(liveEl(z, stops));
