@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "dataBackup": "2026-11-03T15:27:23.088Z",
+  "dataBackup": "2026-11-03T15:40:02.640Z",
   "config": {
     "jornadaDiaria": 5,
     "intervaloMinimo": 20,
@@ -552,9 +552,9 @@
       "entrada": "07:06",
       "saidaIntervalo": "12:00",
       "voltaIntervalo": "12:21",
-      "saida": null,
+      "saida": "12:40",
       "obs": "",
-      "_t": 1793719642379
+      "_t": 1793720401895
     },
     "2026-11-02": {
       "tipo": "feriado",
