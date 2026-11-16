@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "dataBackup": "2026-11-13T15:19:50.611Z",
+  "dataBackup": "2026-11-16T15:05:20.355Z",
   "config": {
     "jornadaDiaria": 5,
     "intervaloMinimo": 20,
@@ -621,9 +621,17 @@
       "entrada": "07:08",
       "saidaIntervalo": "11:42",
       "voltaIntervalo": "12:02",
-      "saida": "12:28",
+      "saida": "12:30",
       "obs": "",
-      "_t": 1794583190068
+      "_t": 1794583197884
+    },
+    "2026-11-16": {
+      "entrada": "12:05",
+      "saidaIntervalo": null,
+      "voltaIntervalo": null,
+      "saida": null,
+      "obs": "",
+      "_t": 1794841519405
     }
   },
   "excluidos": {
