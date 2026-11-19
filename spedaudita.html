@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPED — Auditoria Fiscal por CFOP</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#d4ebe1;--surface:#fff;--surface2:#f5faf8;--surface3:#eaf4ef;--border:#e0ebe6;--border2:#c5d9cf;--accent:#2f8a68;--accent-light:#e4f3ec;--green:#2f8a68;--green-light:#e4f3ec;--amber:#c47800;--amber-light:#fff8e6;--red:#d62828;--red-light:#fdecea;--text:#111827;--text2:#374151;--text3:#6b7280;--text4:#9ca3af;--mono:'IBM Plex Mono',monospace;--display:'Barlow Condensed',sans-serif;--r:6px;--r2:10px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04);--shadow2:0 4px 16px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06)}
+body.dark{--bg:#0e1714;--surface:#152119;--surface2:#1a2a22;--surface3:#1f3129;--border:#264036;--border2:#33533f;--accent:#3fbf91;--accent-light:#0f2a20;--green:#3fbf91;--green-light:#0f2a20;--amber:#f0a020;--amber-light:#2a1e00;--red:#f05050;--red-light:#2a0f0f;--text:#f3f4f8;--text2:#c8cdd8;--text3:#7a8099;--text4:#4a5070;--shadow:0 1px 3px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.2);--shadow2:0 4px 20px rgba(0,0,0,.4)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;min-height:100vh;line-height:1.5;transition:background .2s,color .2s}
+.wrap{max-width:1680px;margin:0 auto;padding:28px 20px}
+.hd{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--border)}
+.hd-logo{width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:900;font-size:18px;color:#fff;letter-spacing:-1px;flex-shrink:0}
+.hd-title{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.3px;line-height:1.1}
+.hd-sub{font-size:11px;color:var(--text3);margin-top:2px;letter-spacing:.04em;text-transform:uppercase}
+.hd-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.badge-empresa{background:var(--accent-light);border:1px solid var(--accent);color:var(--accent);padding:5px 12px;border-radius:20px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.02em;white-space:nowrap}
+.btn-theme{background:var(--surface);border:1px solid var(--border2);color:var(--text3);padding:6px 12px;border-radius:20px;cursor:pointer;font-family:var(--mono);font-size:12px;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-theme:hover{border-color:var(--accent);color:var(--accent)}
+.drop-zone{border:2px dashed var(--border2);border-radius:var(--r2);background:var(--surface);padding:32px 20px;cursor:pointer;text-align:center;margin-bottom:28px;position:relative;transition:all .2s}
+.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:var(--accent-light)}
+.drop-zone.ok{border-color:var(--green);border-style:solid;background:var(--green-light)}
+.drop-zone.hidden{display:none}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:32px;display:block;margin-bottom:8px}
+.drop-lbl{font-family:var(--display);font-weight:700;font-size:16px;margin-bottom:4px}
+.drop-hint{color:var(--text3);font-size:11px}
+.drop-ok{margin-top:8px;font-size:12px;color:var(--green);font-weight:600}
+.prog-wrap{margin-bottom:24px;display:none}
+.prog-lbl{font-size:11px;color:var(--text3);margin-bottom:6px}
+.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease}
+.cfop-summary-section{margin-bottom:28px}
+.cfop-summary-title{font-family:var(--display);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:14px}
+.cfop-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.cfop-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.cfop-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent);opacity:.6}
+.cfop-card:hover,.cfop-card.active{border-color:var(--accent);background:var(--accent-light);box-shadow:var(--shadow2);transform:translateY(-1px)}
+.cfop-card.active::before{opacity:1;width:4px}
+.cfop-code{font-family:var(--display);font-weight:900;font-size:26px;color:var(--accent);letter-spacing:-.5px;line-height:1}
+.cfop-desc{font-size:10px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.04em;min-height:28px}
+.cfop-valor{font-family:var(--display);font-weight:700;font-size:17px;margin-top:8px;letter-spacing:-.3px}
+.cfop-aviso{font-size:10px;color:var(--amber);margin-top:4px;line-height:1.3}
+.cfop-sub{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.cfop-sub span{font-size:10px;color:var(--text3);background:var(--surface2);padding:2px 7px;border-radius:10px}
+.cfop-icms{color:var(--amber)!important}
+.cfop-card.entrada::before{background:var(--green)}
+.cfop-card.saida::before{background:var(--red)}
+.cfop-card.entrada .cfop-code{color:var(--green)}
+.cfop-card.saida .cfop-code{color:var(--red)}
+#main-panel{display:none}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.search-input{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:var(--r);font-family:var(--mono);font-size:12px;transition:border .15s}
+.search-input:focus{outline:none;border-color:var(--accent)}
+.cfop-pill-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.cfop-pill{padding:5px 13px;border-radius:20px;font-family:var(--display);font-weight:700;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text3);transition:all .12s;white-space:nowrap}
+.cfop-pill:hover{border-color:var(--accent);color:var(--accent)}
+.cfop-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.cfop-pill.all.active{background:var(--text2);border-color:var(--text2);color:#fff}
+.filter-total{background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--r);padding:10px 16px;margin-bottom:12px;display:none;align-items:center;gap:16px;flex-wrap:wrap}
+.filter-total.show{display:flex}
+.ft-label{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.ft-value{font-family:var(--display);font-weight:800;font-size:20px;color:var(--accent)}
+.ft-clear{margin-left:auto;background:none;border:1px solid var(--accent);color:var(--accent);padding:4px 10px;border-radius:12px;cursor:pointer;font-family:var(--mono);font-size:11px}
+.ft-clear:hover{background:var(--accent);color:#fff}
+.btn-sm{padding:8px 14px;background:var(--surface);border:1px solid var(--border2);color:var(--text3);border-radius:var(--r);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.green:hover{border-color:var(--green);color:var(--green)}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r2);background:var(--surface);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:960px}
+thead tr{background:var(--surface3);border-bottom:2px solid var(--border)}
+th{padding:10px 13px;text-align:left;font-family:var(--display);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);white-space:nowrap;cursor:pointer;user-select:none;transition:color .1s}
+th:hover{color:var(--accent)}
+th.sorted{color:var(--accent)}
+tr:hover td{background:var(--surface2)}
+tr:nth-child(even) td{background:var(--surface2)}
+tr:nth-child(even):hover td{background:var(--accent-light)}
+td{padding:9px 13px;font-size:12px;color:var(--text2);white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+.td-num{font-family:var(--display);font-weight:700;font-size:14px;color:var(--text)}
+.td-cfop{font-family:var(--display);font-weight:800;font-size:15px;color:var(--accent);letter-spacing:-.2px}
+.td-cfop.entrada{color:var(--green)}
+.td-cfop.saida{color:var(--red)}
+.td-date{color:var(--text3);font-size:11px}
+.td-valor{font-family:var(--display);font-weight:700;font-size:14px;color:var(--green);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;letter-spacing:-.2px}
+.td-valor:hover{color:var(--accent)}
+.td-icms{font-family:var(--display);font-weight:600;font-size:13px;color:var(--amber)}
+.td-empty{color:var(--text4);font-style:italic}
+.td-semvalor{color:var(--amber);font-style:italic;cursor:pointer;font-size:11px}
+.td-semvalor:hover{text-decoration:underline}
+.td-ref{cursor:pointer;color:var(--accent);font-weight:600}
+.td-ref:hover{text-decoration:underline}
+.td-chave{font-size:10px;color:var(--text4);letter-spacing:.02em}
+tr.cfop-entrada td:first-child{border-left:3px solid var(--green)}
+tr.cfop-saida td:first-child{border-left:3px solid var(--red)}
+.pag{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:8px 0;flex-wrap:wrap;gap:8px}
+.pag-info{font-size:11px;color:var(--text3)}
+.pag-btns{display:flex;gap:3px}
+.pag-btn{padding:5px 10px;background:var(--surface);border:1px solid var(--border);color:var(--text3);border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;transition:all .1s}
+.pag-btn:hover,.pag-btn.on{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.pag-btn:disabled{opacity:.4;cursor:not-allowed}
+.pag-size select{background:var(--surface);border:1px solid var(--border);color:var(--text3);padding:5px 8px;border-radius:4px;font-family:var(--mono);font-size:11px}
+@keyframes spin{to{transform:rotate(360deg)}}
+button,.btn-sm,.btn-theme,.cfop-pill,.cfop-card{position:relative;overflow:hidden}
+.ripple{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55) 0%,rgba(255,255,255,.18) 60%,rgba(255,255,255,0) 70%);transform:scale(0);animation:rip .65s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(2.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.ripple{display:none}}
+.hd{background:linear-gradient(135deg,#ff6600 0%,#d94f00 55%,#a83c00 100%);color:#fff;border:none;border-radius:var(--r2);padding:22px 26px;margin-bottom:28px;box-shadow:0 10px 30px rgba(255,102,0,.25);flex-wrap:wrap}
+.hd-logo{background:#fff;color:#ff6600;box-shadow:0 4px 14px rgba(0,0,0,.2);width:50px;height:50px;font-size:20px}
+.hd-title{color:#fff;font-size:26px}
+.hd-sub{color:rgba(255,255,255,.85)}
+.badge-empresa{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.6);color:#fff}
+.hd .btn-theme{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);color:#fff}
+.hd .btn-theme:hover{background:#fff;color:#c44d00;border-color:#fff}
+.ftr{margin-top:40px;padding:22px 26px;border-radius:var(--r2);background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.ftr-brand{font-family:var(--display);font-weight:800;font-size:15px;color:var(--text)}
+.ftr-txt{font-size:11px;color:var(--text3);line-height:1.5;flex:1;min-width:240px}
+.ftr-txt strong{color:var(--accent)}
+.ftr .btn-sm:first-of-type{border-color:var(--accent);color:var(--accent)}
+.ftr-bar{height:4px;background:linear-gradient(90deg,#ff6600,#ffb27a,#ff6600);background-size:200% 100%;animation:shimmer 3s linear infinite;border-radius:2px;margin-top:14px;width:100%}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.loader{display:flex;flex-direction:column;align-items:center;gap:12px;padding:28px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow);max-width:420px;margin:0 auto 24px}
+.spin{width:46px;height:46px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+.loader .prog-bar{width:100%;height:6px;background:linear-gradient(90deg,var(--border) 0,var(--accent-light) 50%,var(--border) 100%);background-size:200px 100%;animation:shimmer 1.2s linear infinite}
+.loader .prog-fill{background:var(--accent)}
+.print-btn{margin-right:8px}
+.modal{display:none;position:fixed;z-index:1000;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:90%;max-width:1100px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 48px rgba(0,0,0,.25);animation:slideUp .2s ease}
+.modal-hd{display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--surface3);position:sticky;top:0;z-index:10;border-radius:14px 14px 0 0}
+.modal-hd h3{font-family:var(--display);font-weight:800;font-size:17px;flex:1}
+.modal-close{font-size:24px;cursor:pointer;color:var(--text3);line-height:1;padding:4px 8px;border-radius:4px;transition:all .1s}
+.modal-close:hover{color:var(--red);background:var(--red-light)}
+.modal-bd{padding:24px}
+.m-cfop-group{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:18px}
+.m-cfop-hd{background:var(--surface3);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.m-cfop-code{font-family:var(--display);font-weight:900;font-size:18px;color:var(--accent)}
+.m-cfop-total{font-family:var(--display);font-weight:700;font-size:16px;color:var(--green)}
+.m-table{width:100%;border-collapse:collapse;min-width:0}
+.m-table th{background:var(--surface2);padding:8px 12px;font-family:var(--display);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border);cursor:default}
+.m-table td{padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text2);max-width:none;white-space:normal}
+.m-table tr:last-child td{border-bottom:none}
+.m-footer{background:var(--surface3);padding:8px 16px;text-align:right;font-family:var(--display);font-weight:700;font-size:14px;color:var(--green);border-top:1px solid var(--border)}
+.m-alert{background:var(--amber-light);border:1px solid var(--amber);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--amber);margin-top:12px}
+.m-empty{text-align:center;padding:40px;color:var(--text3)}
+.m-empty-icon{font-size:40px;display:block;margin-bottom:10px}
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:48px;display:block;margin-bottom:12px}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fadeIn{animation:fadeIn .3s ease}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.panel-title{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.2px}
+.panel-count{font-size:11px;color:var(--text3);background:var(--surface3);padding:3px 10px;border-radius:10px;display:inline-block;margin-top:2px}
+.col-toggle-wrap{position:relative}
+.col-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;z-index:200;width:280px;max-height:300px;overflow-y:auto;grid-template-columns:1fr 1fr;gap:3px;box-shadow:var(--shadow2)}
+.col-panel.open{display:grid}
+.col-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:4px;cursor:pointer;font-size:11px;color:var(--text3)}
+.col-item:hover{background:var(--surface3);color:var(--text)}
+.col-item input{cursor:pointer;accent-color:var(--accent)}
+.summary-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center}
+.stat-value{font-family:var(--display);font-weight:900;font-size:24px;color:var(--accent)}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.apu td.n{text-align:right;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+.apu th{cursor:default;text-align:right}.apu th:first-child{text-align:left}
+.apu .grp td{background:var(--surface3);font-family:var(--display);font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.apu .sub td{background:var(--surface2);font-weight:800}
+.apu .ok{color:var(--green)}.apu .dif{color:var(--red)}.apu small{display:block;font-size:10px;font-weight:500;color:var(--text3);font-family:var(--mono)}
+.apu tr.rdif td:first-child{border-left:3px solid var(--red)}
+@media(max-width:768px){.cfop-cards{grid-template-columns:repeat(2,1fr)}.hd-title{font-size:17px}.wrap{padding:16px 12px}}
+@media print{
+  body[data-print] *{visibility:hidden!important}
+  body[data-print] #detailModal,body[data-print] #detailModal *,body[data-print] #apuPanel,body[data-print] #apuPanel *{visibility:visible!important}
+  body[data-print] #detailModal{position:absolute;left:0;top:0;width:100%;height:auto;background:none;backdrop-filter:none;display:block!important}
+  body[data-print] #apuPanel{position:absolute;left:0;top:0;width:100%;display:block!important}
+  body[data-print] .modal-box{max-height:none;box-shadow:none;border:none;width:100%;max-width:none}
+  body[data-print] .modal-hd,body[data-print] .modal-close,body[data-print] .print-btn,body[data-print] #apuPanel .btn-sm{display:none!important}
+  body[data-print] #apuPanel .cfop-summary-title{display:block}
+}
+/* ===== Layout dashboard ===== */
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.wrap{min-width:0;width:100%;margin:0}
+.hd{flex-wrap:wrap}
+.hd-right{flex-wrap:wrap;justify-content:flex-end}
+.side{background:linear-gradient(180deg,#2e7a63 0%,#24604e 100%);color:#fff;padding:26px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:22px;box-shadow:4px 0 20px rgba(0,0,0,.08)}
+.side-logo{display:flex;align-items:center;gap:12px;padding:0 6px}
+.side-ico{width:40px;height:40px;border-radius:12px;background:#fff;color:#2e7a63;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.side-name{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.1}
+.side-sub{font-size:11px;opacity:.75}
+.side-nav{display:flex;flex-direction:column;gap:6px}
+.nav-btn{background:transparent;border:none;color:#e6f3ee;text-align:left;padding:11px 14px;border-radius:12px;font-family:var(--mono);font-size:13px;cursor:pointer;transition:background .2s,transform .15s;width:100%}
+.nav-btn:hover{background:rgba(255,255,255,.14);transform:translateX(3px)}
+.nav-btn.active{background:#fff;color:#2e7a63;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.side-card{background:rgba(255,255,255,.12);border-radius:12px;padding:12px 14px}
+.side-new{border:1px dashed rgba(255,255,255,.55);text-align:center}
+.wrap{max-width:none;padding:24px 28px}
+/* cabeçalho em cartão branco, como o painel da referência */
+.hd{background:var(--surface);color:var(--text);border:none;border-radius:16px;padding:16px 22px;margin-bottom:22px;box-shadow:var(--shadow)}
+.hd-logo{background:var(--accent);color:#fff;box-shadow:none}
+.hd-title{color:var(--text)}
+.hd-sub{color:var(--text3)}
+.badge-empresa{background:var(--accent-light);border:1px solid var(--accent);color:var(--accent)}
+.hd .btn-theme{background:var(--surface);border:1px solid var(--border2);color:var(--text3)}
+.hd .btn-theme:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* cartões arredondados */
+.drop-zone,.table-wrap,.cfop-card,.filter-total,.ftr{border-radius:16px}
+.cfop-card{border:none;box-shadow:var(--shadow)}
+.cfop-card::before{width:4px;border-radius:0 4px 4px 0}
+.cfop-code{font-size:24px}
+.btn-sm,.cfop-pill,.search-input{border-radius:999px}
+.ftr{border:none;box-shadow:var(--shadow);margin-top:28px}
+.ftr-bar{background:linear-gradient(90deg,#2f8a68,#8fd3b6,#2f8a68);background-size:200% 100%}
+@media (max-width:900px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:14px}.side-nav{flex-direction:row;flex-wrap:wrap}.nav-btn{width:auto}.side-foot{display:none}.wrap{padding:16px}}
+
+/* ===== TEMA LARANJA + BOTÕES AQUA TRANSLÚCIDOS ===== */
+:root{--bg:#fff3e6;--surface:#ffffff;--surface2:#fff8f1;--surface3:#ffe9d4;--border:#ffd9b3;--border2:#ffb878;--accent:#ff7a00;--accent-light:#ffe8cf;--green:#0fb5c4;--green-light:#d9f7fa;--amber:#e06a00;--amber-light:#fff0dc;--text:#3d1f00;--text2:#5c3317;--text3:#8a5a2b;--text4:#b8895f}
+body.dark{--bg:#2a1404;--surface:#3a1d08;--surface2:#44240c;--surface3:#4e2b10;--border:#6b3a14;--border2:#8a4d1c;--accent:#ff9a33;--accent-light:#4a2508;--green:#22d3e6;--green-light:#0b3a40;--amber:#ffb347;--amber-light:#4a2a00;--text:#fff4e8;--text2:#ffdcb8;--text3:#e8b98a;--text4:#b08256}
+body{background:linear-gradient(160deg,#fff3e6 0%,#ffd9b0 100%)!important;background-attachment:fixed}
+body.dark{background:linear-gradient(160deg,#2a1404 0%,#4a2208 100%)!important}
+.hd-logo{background:linear-gradient(135deg,#ff9a33,#e05a00)!important;color:#fff!important;box-shadow:0 4px 14px rgba(224,90,0,.35)!important}
+.side{background:linear-gradient(170deg,#ff8c1a,#e65c00)!important;color:#fff}
+.side *{border-color:rgba(255,255,255,.35)}
+.nav-btn{color:#fff!important}
+.nav-btn:hover{background:rgba(255,255,255,.2)!important}
+.nav-btn.active{background:rgba(255,255,255,.95)!important;color:#c24d00!important}
+.cfop-card{border:1px solid #ffd9b3!important;box-shadow:0 2px 10px rgba(255,122,0,.12)!important}
+.cfop-pill.active,.cfop-pill:hover{background:rgba(0,229,255,.35)!important;color:#00414a!important;border-color:rgba(0,190,210,.8)!important}
+th{background:#ffe9d4!important;color:#5c2a00}
+tr.grp td{background:#ffe0bf!important}
+.drop-zone{border-color:#ffb878!important}
+
+/* botões translúcidos aqua */
+button,.btn-sm,.btn-theme,label.btn-sm,.side-new,.pag-btn,.cfop-pill{
+  background:rgba(0,229,255,.22)!important;
+  border:1px solid rgba(0,200,220,.65)!important;
+  color:#00434d!important;
+  -webkit-backdrop-filter:blur(8px) saturate(140%);
+  backdrop-filter:blur(8px) saturate(140%);
+  box-shadow:0 2px 10px rgba(0,190,210,.18),inset 0 1px 0 rgba(255,255,255,.5)!important;
+  transition:all .18s ease!important}
+button:hover,.btn-sm:hover,.btn-theme:hover,label.btn-sm:hover,.pag-btn:hover{
+  background:rgba(0,229,255,.42)!important;border-color:rgba(0,170,195,.9)!important;color:#00323a!important;transform:translateY(-1px)}
+.nav-btn{background:rgba(0,229,255,.2)!important;border:1px solid rgba(255,255,255,.45)!important;color:#fff!important;box-shadow:none!important;backdrop-filter:blur(6px)}
+.nav-btn:hover{background:rgba(0,229,255,.45)!important;transform:translateX(3px)!important}
+.nav-btn.active{background:rgba(0,229,255,.55)!important;color:#00323a!important;border-color:rgba(255,255,255,.9)!important}
+.hd .btn-theme{background:rgba(0,229,255,.25)!important;color:#fff!important;border:1px solid rgba(255,255,255,.7)!important}
+.hd .btn-theme:hover{background:rgba(0,229,255,.5)!important;color:#fff!important}
+body.dark button,body.dark .btn-sm,body.dark .btn-theme{color:#e6fdff!important;background:rgba(0,229,255,.18)!important}
+
+/* ===== BOTÕES v14: vidro aqua polido ===== */
+.btn-sm,.btn-theme,label.btn-sm,.side-new,.pag-btn,.hd .btn-theme,.nav-btn{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg,rgba(190,250,255,.55) 0%,rgba(0,220,240,.28) 48%,rgba(0,190,215,.34) 100%)!important;
+  border:1px solid rgba(0,200,225,.75)!important;
+  color:#00404a!important;
+  border-radius:12px!important;
+  font-family:var(--display)!important;font-weight:700!important;letter-spacing:.06em!important;
+  text-transform:uppercase;font-size:12px!important;
+  -webkit-backdrop-filter:blur(10px) saturate(160%);backdrop-filter:blur(10px) saturate(160%);
+  box-shadow:0 6px 16px -6px rgba(0,170,200,.55),0 1px 0 rgba(255,255,255,.8) inset,0 -1px 0 rgba(0,120,140,.15) inset!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.6);
+  transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s,background .2s,border-color .2s!important;
+}
+.btn-sm::before,.btn-theme::before,label.btn-sm::before,.side-new::before,.pag-btn::before,.hd .btn-theme::before,.nav-btn::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:50%;z-index:-1;border-radius:12px 12px 60% 60%/12px 12px 20px 20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0));pointer-events:none}
+.btn-sm:hover,.btn-theme:hover,label.btn-sm:hover,.side-new:hover,.pag-btn:hover,.hd .btn-theme:hover,.nav-btn:hover{
+  transform:translateY(-2px)!important;
+  background:linear-gradient(180deg,rgba(210,252,255,.7) 0%,rgba(0,230,250,.38) 48%,rgba(0,200,225,.46) 100%)!important;
+  border-color:rgba(0,170,200,.95)!important;
+  box-shadow:0 12px 22px -8px rgba(0,170,200,.6),0 1px 0 rgba(255,255,255,.9) inset!important}
+.btn-sm:active,.btn-theme:active,label.btn-sm:active,.nav-btn:active{transform:translateY(0) scale(.98)!important}
+.btn-sm.green{background:linear-gradient(180deg,rgba(200,255,240,.6),rgba(0,210,170,.3) 50%,rgba(0,180,150,.36)) !important;border-color:rgba(0,180,150,.7)!important;color:#00463a!important}
+.nav-btn{box-shadow:0 4px 12px -6px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.6) inset!important;color:#fff!important;text-shadow:0 1px 2px rgba(0,60,70,.45);font-family:var(--mono)!important;font-weight:600!important;text-transform:none;letter-spacing:.01em!important;font-size:13px!important;border-radius:12px!important}
+.nav-btn.active{background:linear-gradient(180deg,#e6feff,#7ef0ff 55%,#2fd9ec)!important;color:#00323a!important;border-color:#fff!important;text-shadow:none;box-shadow:0 8px 18px -8px rgba(0,200,225,.8),0 1px 0 #fff inset!important}
+.nav-btn::before{display:none}
+.cfop-pill{background:linear-gradient(180deg,rgba(200,252,255,.6),rgba(0,220,240,.25)) !important;border:1px solid rgba(0,200,225,.6)!important;color:#00404a!important;border-radius:999px!important;box-shadow:0 3px 10px -4px rgba(0,170,200,.5)!important}
+.cfop-pill.active{background:linear-gradient(180deg,#8ff4ff,#1dd3e8)!important;color:#003a44!important;border-color:#fff!important}
+body.dark .btn-sm,body.dark .btn-theme,body.dark .cfop-pill{color:#e8feff!important;background:linear-gradient(180deg,rgba(0,240,255,.3),rgba(0,160,185,.18))!important}
+
+/* ===== ESTILO DASHBOARD (referência laranja/coral com cards brancos) ===== */
+body,body.dark{background:radial-gradient(120% 90% at 0% 0%,#ff9a4d 0%,#ff6a2b 45%,#f2441c 100%)!important;background-attachment:fixed!important;color:#2a1408}
+body.dark{background:radial-gradient(120% 90% at 0% 0%,#7a2a10 0%,#4a1608 50%,#2a0c04 100%)!important}
+:root,body.dark{--surface:#ffffff;--surface2:#fff7f2;--surface3:#fff1e8;--border:#f1e3da;--border2:#e6cfc2;--text:#1d1410;--text2:#3a2a22;--text3:#8a6f63;--text4:#b9a196;--accent:#ff6a2b;--accent-light:#fff0e8}
+body.dark{--surface:#24140e;--surface2:#2e1b13;--surface3:#34201a;--border:#43281e;--border2:#5a3728;--text:#fff4ee;--text2:#f3d9cb;--text3:#c79d8b;--accent:#ff8a55;--accent-light:#3a2118}
+.side{background:#1d1410!important;border-radius:22px;margin:14px 0 14px 14px;height:calc(100vh - 28px)!important;box-shadow:0 18px 40px -12px rgba(60,10,0,.45)!important}
+.side-logo,.hd-logo{background:#1d1410!important;color:#fff!important;border-radius:14px!important;box-shadow:0 8px 18px -6px rgba(0,0,0,.5)!important}
+.nav-btn{color:#f5e4da!important}
+.nav-btn.active{background:linear-gradient(180deg,#e6feff,#7ef0ff 55%,#2fd9ec)!important;color:#00323a!important}
+.hd,.ftr,.table-wrap,.cfop-card,.stat-card,.drop-zone,.modal-box,.side-card,.panel,.prog-wrap{
+  background:#fff!important;color:var(--text)!important;border:none!important;border-radius:20px!important;
+  box-shadow:0 14px 34px -14px rgba(120,30,0,.35),0 2px 6px rgba(0,0,0,.05)!important}
+body.dark .hd,body.dark .ftr,body.dark .table-wrap,body.dark .cfop-card,body.dark .stat-card,body.dark .drop-zone,body.dark .modal-box{background:#24140e!important}
+.hd{padding:20px 24px!important;margin-bottom:24px!important}
+.hd-title{color:var(--text)!important;font-weight:800!important}
+.hd-sub{color:var(--text3)!important}
+.badge-empresa{background:#fff0e8!important;border:none!important;color:#d9480f!important;border-radius:999px!important;padding:7px 14px!important}
+.cfop-card{padding:18px 20px!important}
+.stat-value{color:#ff5a1f!important;font-weight:900!important}
+.stat-card{border-radius:18px!important;padding:14px!important}
+.search-input{background:#fff7f2!important;border:1px solid #f1e3da!important;border-radius:999px!important;padding:10px 18px!important}
+.table-wrap{padding:6px 4px!important;overflow:hidden}
+.table-wrap table{min-width:0}
+th{background:transparent!important;color:var(--text3)!important;border-bottom:1px solid #f1e3da!important}
+td{border-bottom:1px solid #f6ece6!important;color:var(--text2)!important}
+tr:hover td{background:#fff7f2}
+tr.grp td,.grp td{background:#fff0e8!important;color:#d9480f!important}
+.ftr{background:#fff!important}
+.ftr-bar{background:linear-gradient(90deg,#ff6a2b,#ffb08a,#ff6a2b)!important}
+.modal-hd{background:#fff7f2!important;border-bottom:1px solid #f1e3da!important}
+.modal-box{border-radius:22px!important}
+.m-alert{border-radius:14px!important}
+/* botões aqua translúcidos mantidos, com cantos mais suaves */
+.btn-sm,.btn-theme,label.btn-sm,.pag-btn,.cfop-pill{border-radius:999px!important}
+.hd .btn-theme{color:#00404a!important}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="side-logo"><span class="side-ico">⚡</span><div><div class="side-name">SPED Auditoria</div><div class="side-sub">Fiscal por CFOP</div></div></div>
+  <nav class="side-nav">
+    <button class="nav-btn active" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="ni"><i>🏠</i></span><span class="nl">Dashboard</span></button>
+    <button class="nav-btn" onclick="toggleApuracaoInline()"><span class="ni"><i>🧾</i></span><span class="nl">Apuração</span></button>
+    <button class="nav-btn kp-nav" onclick="confrontoAction()"><span class="ni"><i>🧮</i></span><span class="nl">Comparador</span></button>
+    <button class="nav-btn" onclick="openRegistros()"><span class="ni"><i>📑</i></span><span class="nl">Registros</span></button>
+    <button class="nav-btn" onclick="showChart()"><span class="ni"><i>📈</i></span><span class="nl">Gráfico</span></button>
+    <button class="nav-btn" onclick="exportFullReport()"><span class="ni"><i>📄</i></span><span class="nl">Relatório</span></button>
+    <button class="nav-btn" onclick="openAjuda()"><span class="ni"><i>📖</i></span><span class="nl">Ajuda</span></button>
+    <button class="nav-btn" onclick="toggleTheme()"><span class="ni"><i>🌓</i></span><span class="nl">Tema</span></button>
+  </nav>
+  <div class="side-foot">
+    <div class="side-card"><div style="font-size:11px;opacity:.8">Arquivo</div><div id="sideArq" style="font-size:12px;font-weight:700;word-break:break-all">Nenhum carregado</div></div>
+    <button class="nav-btn side-new" onclick="novaPesquisa()">🔄 Nova pesquisa</button>
+  </div>
+</aside>
+<div class="wrap">
+
+  <div class="topbar"><label class="tsearch"><span class="tsi">🔍</span><input id="topSearch" type="text" placeholder="Buscar NF, CNPJ, chave ou CFOP…" oninput="topSearch(this.value)" onkeydown="if(event.key==='Enter')topGo()"></label></div>
+  <header class="hd">
+    <div class="greet">Olá, <span class="gname">Waldeci</span><i class="gbadge" id="greetBadge">0</i></div>
+    <div>
+      <div class="hd-title">SPED Fiscal — Auditoria por CFOP</div>
+      <div class="hd-sub">EFD ICMS/IPI · Registros C100/C113/C190/C500/C590/D500/D590/D190/C170</div>
+    </div>
+    <div class="hd-right">
+      <span class="badge-empresa" id="empresaBadge">Aguardando arquivo…</span>
+      <button class="btn-theme" onclick="novaPesquisa()">🔄 Nova pesquisa</button>
+      <button class="btn-theme" onclick="openAjuda()">📖 Como funciona</button>
+      <button class="btn-theme" id="themeBtn" onclick="toggleTheme()">🌞 Claro</button>
+    </div>
+  </header>
+
+  <div class="kp-wrap" id="dash">
+  <div class="kp-top">
+    <div><div class="kp-title">Análise Fiscal · SPED</div><div class="kp-sub" id="kpSub"></div></div>
+    <button class="kp-save" id="kpSave" onclick="showComparador()">Comparador</button>
+  </div>
+  <div class="kp-row" id="kpRow"></div>
+  <div class="kp-charts">
+    <div class="kp-card"><div class="kp-ct">Entradas × Saídas (valor contábil)</div><div class="kp-dn" id="kpDonut1"></div></div>
+    <div class="kp-card"><div class="kp-ct">Top CFOPs por valor contábil</div><div id="kpBars"></div></div>
+    <div class="kp-card"><div class="kp-ct">ICMS por grupo</div><div class="kp-dn" id="kpDonut2"></div></div>
+  </div>
+  <div class="kp-conf" id="kpConf"></div>
+</div>
+<div class="drop-zone" id="dropZone" ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+    <input type="file" accept=".txt,.sped" onchange="onFileSelect(event)">
+    <span class="drop-icon">📂</span>
+    <div class="drop-lbl">Selecione ou arraste o arquivo SPED</div>
+    <div class="drop-hint">Formato .txt / .sped — EFD ICMS/IPI</div>
+    <div class="drop-ok" id="dropOk"></div>
+  </div>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="loader"><div class="spin"></div>
+    <div class="prog-lbl" id="progLbl" style="font-family:var(--display);font-weight:700;font-size:15px;color:var(--text)">Processando…</div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div></div>
+  </div>
+
+  <div id="results" style="display:none" class="fadeIn">
+    <div class="cfop-summary-section">
+      <div class="cfop-summary-title">📊 Resumo por CFOP — clique para filtrar</div>
+      <div class="cfop-cards" id="cfopCards"></div>
+    </div>
+
+    <div id="apuPanel" style="display:none;margin-bottom:24px"></div>
+    <div id="main-panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title" id="panelTitle">Todas as Notas Fiscais</div>
+          <div class="panel-count" id="panelCount"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm" onclick="openRegistros()">📑 Registros</button>
+          <button class="btn-sm" onclick="showChart()">📈 Gráfico</button>
+          <button class="btn-sm" onclick="toggleApuracaoInline()">🧾 Apuração</button>
+          <label class="btn-sm" style="cursor:pointer">📄 Subir apuração (PDF)<input type="file" accept=".pdf" style="display:none" onchange="loadP9(this.files[0]);this.value=''"></label>
+          <div class="col-toggle-wrap">
+            <button class="btn-sm" onclick="toggleColPanel()">⚙ Colunas</button>
+            <div class="col-panel" id="colPanel"></div>
+          </div>
+          <button class="btn-sm green" onclick="exportCsv()">↓ CSV</button>
+          <button class="btn-sm" onclick="exportFullReport()">📑 Relatório Completo</button>
+        </div>
+      </div>
+
+      <div class="cfop-pill-wrap" id="cfopPills"></div>
+
+      <div class="toolbar">
+        <input class="search-input" type="text" id="searchInput" placeholder="🔍 Buscar por Nº NF, CNPJ, chave ou CFOP…" oninput="applyFilters()">
+        <select id="sitFilter" class="search-input" style="flex:0 0 auto;min-width:180px" onchange="currentPage=1;applyFilters()">
+          <option value="">Todas as situações</option>
+          <option value="00">00 · Regular</option>
+          <option value="02">02 · Cancelada</option>
+          <option value="08">08 · Regime especial</option>
+        </select>
+        <input type="date" id="dateStart" class="search-input" style="width:130px;flex:0 0 auto" onchange="applyFilters()">
+        <span>até</span>
+        <input type="date" id="dateEnd" class="search-input" style="width:130px;flex:0 0 auto" onchange="applyFilters()">
+        <button class="btn-sm" onclick="clearAll()">✕ Limpar filtros</button>
+      </div>
+
+      <div class="filter-total" id="filterTotal">
+        <div><div class="ft-label">Total do filtro ativo</div><div class="ft-value" id="ftValue">R$ 0,00</div></div>
+        <div><div class="ft-label">Notas</div><div class="ft-value" id="ftCount">0</div></div>
+        <div><div class="ft-label">Base ICMS</div><div class="ft-value" id="ftBcIcms" style="color:var(--amber)">R$ 0,00</div></div>
+        <div><div class="ft-label">Valor ICMS</div><div class="ft-value" id="ftIcms" style="color:var(--amber)">R$ 0,00</div></div>
+        <button class="ft-clear" onclick="clearAll()">✕ Limpar</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead id="tHead"></thead>
+          <tbody id="tBody"></tbody>
+        </table>
+      </div>
+
+      <div class="pag">
+        <div class="pag-info" id="pagInfo"></div>
+        <div class="pag-size">Linhas:
+          <select onchange="pageSize=+this.value;currentPage=1;renderTable()">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+          </select>
+        </div>
+        <div class="pag-btns" id="pagBtns"></div>
+      </div>
+    </div>
+  </div>
+
+
+<footer class="ftr">
+  <div>
+    <div class="ftr-brand">SPED Auditoria por CFOP</div>
+    <div class="ftr-bar"></div>
+  </div>
+  <div class="ftr-txt"><strong>Privacidade:</strong> o arquivo é lido somente no seu navegador. Nada é enviado para servidor.<br>Revise sempre as diferências antes de corrigir o SPED.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn-sm" onclick="novaPesquisa()">🔄 Nova pesquisa</button>
+    <button class="btn-sm" onclick="openAjuda()">📖 Como funciona</button>
+  </div>
+</footer>
+</div>
+<div class="modal" id="detailModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <h3 id="modalTitle">Detalhamento da NF</h3>
+      <button class="btn-sm print-btn" onclick="imprimir('detailModal')">🖨️ Imprimir</button>
+      <span class="modal-close" title="Fechar (Esc)" onclick="closeModal()">✕</span>
+    </div>
+    <div class="modal-bd" id="modalBd"></div>
+  </div>
+</div>
+
+<script>
+let isDark = false;
+const CST_ISENTAS = ['30','40','41']; // CST (2 últimos dígitos) tratados como Isentas/Não Tributadas; o restante sem base vai em Outras
+let p9 = null, spedCnpj = '', spedPeriodo = '', spedE110 = null;
+let c850List = [];
+let regENT_ = {}, regSAI_ = {}, spedCab = {};
+const naoZerado = c => { const d = cfopSummary[c]; return !!d && (Math.abs(d.vl_opr) > 0.004 || Math.abs(d.vl_icms) > 0.004 || Math.abs(d.vl_bc_icms) > 0.004); };
+let allRecords = [], cfopSummary = {}, itemsIndex = new Map(), filteredRecs = [];
+let activeCfop = 'all', sortCol = null, sortAsc = true, currentPage = 1, pageSize = 100;
+let visibleCols = ['NUM_DOC','DT_DOC','CFOP','VL_OPR','VL_BC_ICMS','VL_ICMS','COD_PART','VL_DOC','COD_SIT','_nrefs','_vlRef','CHV_NFe'];
+
+const COLS = [
+  {key:'NUM_DOC',    label:'Nº NF',         numeric:true},
+  {key:'DT_DOC',     label:'Emissão'},
+  {key:'DT_E_S',     label:'Escritur.'},
+  {key:'CFOP',       label:'CFOP'},
+  {key:'VL_OPR',     label:'Vl. Operação', numeric:true},
+  {key:'VL_BC_ICMS', label:'Base ICMS',    numeric:true},
+  {key:'VL_ICMS',    label:'Valor ICMS',   numeric:true},
+  {key:'VL_IPI',     label:'Valor IPI',    numeric:true},
+  {key:'VL_DOC',     label:'Valor Total NF', numeric:true},
+  {key:'COD_PART',   label:'CNPJ/Terceiro'},
+  {key:'COD_SIT',    label:'Situação'},
+  {key:'_nrefs',     label:'NFC-e ref.'},
+  {key:'_vlRef',     label:'Valor das NFC-e ref.', numeric:true},
+  {key:'CHV_NFe',    label:'Chave NFe'},
+  {key:'COD_MOD',    label:'Modelo'},
+];
+
+const SIT_LABELS = {'00':'Regular','01':'Extemporâneo','02':'Cancelada','03':'Cancelada extemp.','04':'Denegada','05':'Inutilizada','06':'Complementar','07':'Compl. extemp.','08':'Regime especial'};
+
+function parseDec(v) {
+  if (!v && v !== 0) return 0;
+  let s = String(v).trim();
+  if (s.includes(',') && s.includes('.')) s = s.replace(/\./g,'').replace(',','.');
+  else if (s.includes(',')) s = s.replace(',','.');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+function fmt(v, dec=2) {
+  const n = typeof v === 'number' ? v : parseDec(v);
+  return n.toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+}
+function fmtDate(v) {
+  if (!v || v.length < 8) return v || '';
+  if (/^\d{8}$/.test(v)) return `${v.slice(6)}/${v.slice(4,6)}/${v.slice(0,4)}`;
+  return v;
+}
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function cfopClass(cfop) {
+  if (!cfop) return '';
+  const n = parseInt(String(cfop).trim());
+  if (n >= 1000 && n < 4000) return 'entrada';
+  if (n >= 5000 && n < 8000) return 'saida';
+  return '';
+}
+
+// Registros analíticos de resumo (sem nota própria): C320/C390 (NF consumidor), C490 (ECF), C850/C890 (SAT/CF-e).
+// Mesmo layout: |REG|CST|CFOP|ALIQ|VL_OPR|VL_BC_ICMS|VL_ICMS|...
+const RESUMOS = ['C320','C390','C490','C850','C890'];
+function addCfop(cfopSum, cur, p, withIpi, resumo) {
+  const cfop = (p[3] || '').trim();
+  if (!cfop) return;
+  const vl_opr = parseDec(p[5]), vl_bc = parseDec(p[6]), vl_icms = parseDec(p[7]);
+  const vl_ipi = withIpi ? parseDec(p[11] || p[12]) : 0;
+  if (!cfopSum[cfop]) cfopSum[cfop] = {vl_opr:0, vl_bc_icms:0, vl_icms:0, vl_ipi:0, vl_isent:0, vl_outras:0, resumos:0, regs:new Set(), notasSet:new Set()};
+  const s = cfopSum[cfop];
+  const cst = (p[2] || '').trim().slice(-2);
+  const isent = CST_ISENTAS.includes(cst) ? vl_opr : 0;
+  s.vl_isent += isent; s.vl_outras += Math.max(0, vl_opr - vl_bc - isent);
+  s.vl_opr += vl_opr; s.vl_bc_icms += vl_bc; s.vl_icms += vl_icms; s.vl_ipi += vl_ipi;
+  if (resumo) { s.resumos++; s.regs.add(resumo); return; }
+  s.notasSet.add(cur._id);
+  cur.VL_OPR += vl_opr;
+  cur._cfops.push(cfop);
+  if (!cur.CFOP) cur.CFOP = cfop;
+  if (vl_bc > 0) cur.VL_BC_ICMS += vl_bc;
+  if (vl_icms > 0) cur.VL_ICMS += vl_icms;
+  if (vl_ipi > 0) cur.VL_IPI += vl_ipi;
+}
+
+function parseSped(text) {
+  const lines = text.split(/\r?\n/);
+  const c100List = [], itMap = new Map(), cfopSum = {};
+  let e110 = null;
+  const regENT = {}, regSAI = {};
+  let indC = null, indD = null;
+  let cur = null;
+  let cupom = null;
+  const c850 = [];
+
+  const novo = (o) => { cur = Object.assign({CFOP:'', VL_OPR:0, _cfops:[], _refs:[], VL_BC_ICMS:0, VL_ICMS:0, VL_IPI:0, CHV_NFe:''}, o); c100List.push(cur); if (!itMap.has(cur._id)) itMap.set(cur._id, []); };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    const p = line.split('|');
+    const reg = p[1];
+    if (reg === 'C100' || reg === 'C500') indC = (p[2] || '').trim();
+    if (reg === 'D100' || reg === 'D500') indD = (p[2] || '').trim();
+    if (reg === 'C190' || reg === 'C590' || reg === 'D190' || reg === 'D590') {
+      const io = reg[0] === 'C' ? indC : indD;
+      const tgt = io === '0' ? regENT : regSAI;
+      const k = `${(p[2]||'').trim()}|${(p[3]||'').trim()}|${(p[4]||'').trim()}`;
+      if (!tgt[k]) tgt[k] = [0,0,0,0,0,0];
+      for (let i = 0; i < 5; i++) tgt[k][i] += parseDec(p[5+i] || '');
+      tgt[k][5] += parseDec(p[11] || '');
+    }
+    if (reg === 'C850') {
+      const k = `${(p[2]||'').trim()}|${(p[3]||'').trim()}|${(p[4]||'').trim()}`;
+      if (!regSAI[k]) regSAI[k] = [0,0,0,0,0,0];
+      regSAI[k][0] += parseDec(p[5] || ''); regSAI[k][1] += parseDec(p[6] || ''); regSAI[k][2] += parseDec(p[7] || '');
+    }
+
+    if (reg === 'C100') {
+      const num = (p[8] || '').trim(), chave = (p[9] || '').trim();
+      novo({
+        NUM_DOC:num, CHV_NFe:chave, DT_DOC:(p[10]||'').trim(), DT_E_S:(p[11]||'').trim(),
+        VL_DOC:parseDec(p[12]), COD_PART:(p[4]||'').trim(), COD_SIT:(p[6]||'').trim(), COD_MOD:(p[5]||'').trim(),
+        VL_BC_ICMS:parseDec(p[21]), VL_ICMS:parseDec(p[22]), VL_IPI:parseDec(p[25]),
+        _id: chave || `NOTA_${num}_${p[10]||''}`
+      });
+    }
+    else if (reg === 'C500') {
+      const num = (p[9] || '').trim(), chave = (p[22] || '').trim();
+      novo({
+        NUM_DOC:num, CHV_NFe:chave, DT_DOC:(p[10]||'').trim(), DT_E_S:(p[11]||'').trim(),
+        VL_DOC:parseDec(p[12]), COD_PART:(p[4]||'').trim(), COD_SIT:(p[15]||'').trim(), COD_MOD:(p[5]||'').trim(),
+        _id: chave || `NOTA_${num}_${p[10]||''}`
+      });
+    }
+    else if (reg === 'D500') {
+      const num = (p[8] || '').trim();
+      novo({
+        NUM_DOC:num, DT_DOC:(p[10]||'').trim(), DT_E_S:(p[11]||'').trim(),
+        VL_DOC:parseDec(p[12]), COD_PART:(p[4]||'').trim(), COD_SIT:(p[15]||'').trim(), COD_MOD:(p[5]||'').trim(),
+        _id: `NOTA_D500_${num}_${p[10]||''}`
+      });
+    }
+    // C113 - documento fiscal referenciado (NFC-e / cupom)
+    else if (reg === 'C113' && cur) {
+      cur._refs.push({mod:(p[5]||'').trim(), num:(p[8]||'').trim(), dt:(p[9]||'').trim(), chv:(p[10]||'').trim()});
+    }
+    else if (reg === 'E110') e110 = p.slice(2, 15).map(parseDec);
+    else if (reg === 'C800') cupom = {num:(p[4]||'').trim(), dt:(p[5]||'').trim(), sit:(p[3]||'').trim(), chave:(p[11]||'').trim()};
+    else if (RESUMOS.includes(reg)) {
+      addCfop(cfopSum, null, p, false, reg);
+      if (reg === 'C850' && cupom) c850.push({num:cupom.num, dt:cupom.dt, sit:cupom.sit, chave:cupom.chave,
+        cst:(p[2]||'').trim(), cfop:(p[3]||'').trim(), aliq:parseDec(p[4]), vl:parseDec(p[5]), bc:parseDec(p[6]), icms:parseDec(p[7])});
+    }
+    else if (reg === 'C190' && cur) addCfop(cfopSum, cur, p, true);
+    else if ((reg === 'C590' || reg === 'D590' || reg === 'D190') && cur) addCfop(cfopSum, cur, p, false);
+    else if (reg === 'C170' && cur && p.length >= 12) {
+      const vl = parseDec(p[7]), dsc = parseDec(p[8]), qtd = parseDec(p[5]);
+      if (!itMap.has(cur._id)) itMap.set(cur._id, []);
+      itMap.get(cur._id).push({
+        numItem:(p[2]||'').trim(), codigo:(p[3]||'').trim(), descricao:(p[4]||'').trim(),
+        quantidade:qtd, unidade:(p[6]||'').trim(), vlItem:vl, vlDesc:dsc,
+        valorTotal:vl-dsc, vlUnit:qtd>0?(vl-dsc)/qtd:0, cfop:(p[11]||'').trim()
+      });
+    }
+  }
+
+  for (const cfop in cfopSum) {
+    cfopSum[cfop].count = cfopSum[cfop].notasSet.size;
+    delete cfopSum[cfop].notasSet;
+    cfopSum[cfop].regs = [...cfopSum[cfop].regs];
+  }
+  // liga cada C113 ao C100 (NFC-e) da mesma chave, quando estiver no arquivo
+  const porChave = new Map();
+  for (const n of c100List) if (n.CHV_NFe) porChave.set(n.CHV_NFe, n);
+  for (const n of c100List) {
+    n._vlRef = 0; n._achadas = 0;
+    for (const r of n._refs) {
+      const t = r.chv ? porChave.get(r.chv) : null;
+      if (t && t !== n) {
+        r.achada = true; r.valor = t.VL_DOC; r.cfop = t._cfops.join(', '); r.sit = t.COD_SIT;
+        n._vlRef += t.VL_DOC; n._achadas++;
+      }
+    }
+  }
+  return { notas:c100List, cfopSum, itens:itMap, e110, c850, regENT, regSAI };
+}
+
+function onFileSelect(e) { loadFile(e.target.files[0]); }
+function onDrop(e) { e.preventDefault(); onDragLeave(); loadFile(e.dataTransfer.files[0]); }
+function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('over'); }
+function onDragLeave() { document.getElementById('dropZone').classList.remove('over'); }
+
+function loadFile(file) {
+  if (!file) return;
+  const passos = ['Lendo arquivo…', 'Separando notas e cupons…', 'Calculando totais por CFOP…', 'Montando cards e tabela…'];
+  const MIN_MS = 2800;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const txt = ev.target.result;
+    let res = null;
+    setProgress(true, 12, passos[0]);
+    setTimeout(() => setProgress(true, 35, passos[1]), 500);
+    setTimeout(() => {
+      try { res = parseSped(txt); setProgress(true, 70, passos[2]); }
+      catch (err) { console.error(err); document.getElementById('dropOk').textContent = '✗ Erro: ' + err.message; setProgress(false); }
+    }, 1100);
+    setTimeout(() => setProgress(true, 90, passos[3]), 1900);
+    setTimeout(() => {
+      if (!res) return;
+      allRecords = res.notas; cfopSummary = res.cfopSum; itemsIndex = res.itens; spedE110 = res.e110; c850List = res.c850; regENT_ = res.regENT; regSAI_ = res.regSAI;
+      const r0 = txt.split(/\r?\n/).find(l => l.startsWith('|0000|'));
+      if (r0) { const q = r0.split('|'); spedCab = {nome:(q[6]||'').trim(), cnpj:(q[7]||'').trim(), ie:(q[9]||'').trim(), uf:(q[10]||'').trim(), ibge:(q[11]||'').trim(), ini:(q[4]||'').trim(), fin:(q[5]||'').trim()}; }
+      if (r0) { const pp = r0.split('|'); document.getElementById('empresaBadge').textContent = (pp[6] || 'SPED OK').substring(0, 30);
+        spedCnpj = (pp[7] || '').trim(); spedPeriodo = (pp[4] || '').length === 8 ? `${pp[4].slice(2,4)}/${pp[4].slice(4)}` : ''; }
+      setProgress(true, 100, 'Concluído!');
+      document.getElementById('sideArq').textContent = file.name;
+      document.getElementById('dropZone').classList.add('ok');
+      document.getElementById('dropOk').textContent = `✓ ${allRecords.length} notas · ${Object.keys(cfopSummary).length} CFOPs · ${c850List.length} linhas de cupom`;
+      setTimeout(() => { setProgress(false); document.getElementById('dropZone').classList.add('hidden'); renderAll(); }, 400);
+    }, MIN_MS);
+  };
+  reader.readAsText(file, 'latin1');
+}
+
+// Nova pesquisa: zera tudo e volta à tela de envio
+function novaPesquisa() {
+  allRecords = []; cfopSummary = {}; c850List = []; itemsIndex = new Map(); filteredRecs = [];
+  spedE110 = null; p9 = null; spedCnpj = ''; spedPeriodo = ''; activeCfop = 'all'; currentPage = 1;
+  document.getElementById('results').style.display = 'none';
+  const _dash = document.getElementById('dash'); if (_dash) _dash.style.display = 'none';
+  document.getElementById('main-panel').style.display = 'none';
+  document.getElementById('apuPanel').style.display = 'none';
+  document.getElementById('modalBd').innerHTML = '';
+  closeModal();
+  const dz = document.getElementById('dropZone');
+  dz.classList.remove('ok', 'hidden', 'over');
+  document.getElementById('dropOk').textContent = '';
+  const inp = dz.querySelector('input[type=file]'); if (inp) inp.value = '';
+  document.getElementById('empresaBadge').textContent = 'Aguardando arquivo…';
+  document.getElementById('sideArq').textContent = 'Nenhum carregado';
+  setProgress(false);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Efeito de água ao clicar
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('button, .btn-sm, .btn-theme, .cfop-pill, .cfop-card, .modal-close');
+  if (!b || b.disabled) return;
+  const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height);
+  const onda = document.createElement('span');
+  onda.className = 'ripple';
+  onda.style.width = onda.style.height = d + 'px';
+  onda.style.left = (e.clientX - r.left - d / 2) + 'px';
+  onda.style.top = (e.clientY - r.top - d / 2) + 'px';
+  b.appendChild(onda);
+  setTimeout(() => onda.remove(), 700);
+});
+
+function renderAll() {
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('main-panel').style.display = 'block';
+  renderCfopCards(); buildCfopPills(); buildColPanel(); buildTHead(); applyFilters();
+}
+
+const CFOP_LABELS = {
+  '1102':'Compra p/ comercialização','1253':'Compra p/ comercialização (ICMS ST)','1303':'Compra p/ ativo imobilizado',
+  '1353':'Compra p/ uso e consumo','1407':'Compra de bem p/ ativo (ST)','1556':'Compra material p/ uso/consumo',
+  '2102':'Compra interestad. comércio','2353':'Compra interestad. uso/consumo','2556':'Compra interestad. material uso/consumo',
+  '2652':'Entrada mercs. devol. (ST)','5102':'Venda de mercadoria','5405':'Venda ST','5656':'Venda de combustível',
+  '5667':'Venda lubrificantes/derivados','5929':'Lançamento diverso',
+};
+
+
+// CF-e (C800 + C850) viram linhas da tabela principal quando o CFOP for 5102/5405/etc.
+function cupomRecords(cfop) {
+  return c850List.filter(l => l.cfop === cfop).map(l => ({
+    _id: 'CFE_' + (l.chave || l.num) + '_' + l.cst + '_' + l.cfop,
+    NUM_DOC: l.num, DT_DOC: l.dt, DT_E_S: '', CFOP: l.cfop, CHV_NFe: l.chave,
+    VL_OPR: l.vl, VL_BC_ICMS: l.bc, VL_ICMS: l.icms, VL_IPI: 0, VL_DOC: l.vl,
+    COD_PART: '', COD_SIT: l.sit || '00', CFOP_CST: l.cst,
+    _cfops: [l.cfop], _refs: [], _vlRef: 0, _achadas: 0, _cupom: true
+  }));
+}
+
+// Apuração montada do E110 do SPED, no layout do P9, com coluna do PDF quando carregado
+const LINHAS_P9 = [
+  ['001','Por saídas/prestações com débito do imposto'],['002','Outros débitos'],['003','Estorno de créditos'],['004','Sub-total débito'],
+  ['005','Por entradas/aquisições com crédito do imposto'],['006','Outros créditos'],['007','Estorno de débitos'],['008','Sub-total crédito'],
+  ['009','Saldo credor do período anterior'],['010','Total'],['011','Saldo devedor (débito menos crédito)'],['012','Deduções'],
+  ['013','Imposto a recolher'],['014','Saldo credor a transportar para o período seguinte']
+];
+function renderApuracaoInline() {
+  const box = document.getElementById('apuPanel');
+  const r = resumoSped();
+  if (!r) { box.innerHTML = '<p style="color:var(--text3)">Sem registro E110 no SPED.</p>'; box.style.display = 'block'; return; }
+  const pdf = p9?.resumo || {};
+  const desc = Object.fromEntries(LINHAS_P9);
+  const blocos = [
+    ['DÉBITO DO IMPOSTO', ['001','002','003','004']],
+    ['CRÉDITO DO IMPOSTO', ['005','006','007','008','009','010']],
+    ['APURAÇÃO DO SALDO', ['011','012','013','014']]
+  ];
+  let conf = 0, dif = 0, comPdf = 0;
+  const linhaHtml = c => {
+    const sv = r[c] ?? 0, pv = pdf[c];
+    let st = '—';
+    if (pv != null) { comPdf++; if (Math.abs(sv - pv) < 0.005) { conf++; st = '<span style="color:var(--green)">✓ confere</span>'; } else { dif++; st = `<span style="color:var(--red)">R$ ${fmt(sv - pv)}</span>`; } }
+    const negrito = ['004','008','010','013','014'].includes(c) ? 'font-weight:700' : '';
+    return `<tr><td class="td-cfop">${c}</td><td style="${negrito}">${desc[c]}</td><td class="td-valor">R$ ${fmt(sv)}</td><td>${pv == null ? '—' : 'R$ ' + fmt(pv)}</td><td>${st}</td></tr>`;
+  };
+  const corpo = blocos.map(([titulo, cods]) =>
+    `<tr><td colspan="5" style="background:var(--surface3);font-family:var(--display);font-weight:700;letter-spacing:.05em;color:var(--text3)">${titulo}</td></tr>` +
+    cods.map(linhaHtml).join('')).join('');
+  const resumoTxt = !p9 ? 'Suba o PDF da apuração (botão SUBIR APURAÇÃO) para comparar.'
+    : (comPdf === 0 ? '⚠ Não encontrei os códigos 001–014 no PDF. Verifique se é o modelo P9 completo.'
+      : (dif === 0 ? `✓ ${conf} de ${comPdf} linhas conferem com o PDF.` : `${dif} linha(s) divergem do PDF (${conf} conferem).`));
+  box.innerHTML = `
+    <div class="cfop-summary-section">
+      <div class="cfop-summary-title">Resumo da apuração do ICMS (modelo P9) · SPED${p9 ? ' × PDF' : ''}
+        <span style="float:right;display:flex;gap:8px"><button class="btn-sm" onclick="imprimir('apuPanel')">🖨️ Imprimir</button><button class="btn-sm" onclick="document.getElementById('apuPanel').style.display='none'">✕ Fechar</button></span></div>
+      <div class="cfop-aviso" style="font-size:12px;margin-bottom:8px">${resumoTxt}</div>
+      <div class="table-wrap"><table style="min-width:760px">
+        <thead><tr><th>Código</th><th>Descrição</th><th>Valor SPED (E110)</th><th>Valor PDF (P9)</th><th>Situação</th></tr></thead>
+        <tbody>${corpo}</tbody></table></div>
+    </div>`;
+  box.style.display = 'block';
+}
+function toggleApuracaoInline() {
+  const box = document.getElementById('apuPanel');
+  if (box.style.display === 'block') { box.style.display = 'none'; return; }
+  renderApuracaoInline();
+  box.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderCfopCards() {
+  const cont = document.getElementById('cfopCards');
+  const cfops = Object.keys(cfopSummary).filter(naoZerado).sort();
+  if (!cfops.length) { cont.innerHTML = '<p style="color:var(--text3)">Nenhum CFOP encontrado.</p>'; return; }
+  const refSum = {};
+  for (const n of allRecords) if (n._vlRef) for (const c of new Set(n._cfops)) refSum[c] = (refSum[c] || 0) + n._vlRef;
+  cont.innerHTML = cfops.map(cfop => {
+    const d = cfopSummary[cfop], cls = cfopClass(cfop);
+    const lbl = CFOP_LABELS[cfop] || (cls === 'entrada' ? 'Entrada' : cls === 'saida' ? 'Saída' : '');
+    const semValor = d.vl_opr === 0;
+    return `
+    <div class="cfop-card ${cls}" id="card_${cfop}" onclick="filterByCfop('${cfop}')">
+      <div class="cfop-code">${cfop}</div>
+      <div class="cfop-desc">${lbl}</div>
+      <div class="cfop-valor">R$ ${fmt(d.vl_opr)}</div>
+      <div class="cfop-sub">
+        ${d.count || !d.resumos ? `<span>${d.count} NF${d.count !== 1 ? 's' : ''}</span>` : ''}
+        ${d.resumos ? `<span title="Resumos diários (sem nota individual)">${d.resumos} resumo${d.resumos !== 1 ? 's' : ''} ${d.regs.join('/')}</span>` : ''}
+        ${d.vl_icms > 0 ? `<span class="cfop-icms">ICMS R$ ${fmt(d.vl_icms)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildCfopPills() {
+  const cfops = Object.keys(cfopSummary).filter(naoZerado).sort();
+  document.getElementById('cfopPills').innerHTML =
+    `<button class="cfop-pill all active" id="pill_all" onclick="filterByCfop('all')">Todos</button>` +
+    cfops.map(c => `<button class="cfop-pill" id="pill_${c}" onclick="filterByCfop('${c}')">${c}</button>`).join('');
+}
+
+function filterByCfop(cfop) {
+  activeCfop = cfop;
+  document.querySelectorAll('.cfop-card').forEach(el => el.classList.remove('active'));
+  if (cfop !== 'all') { const c = document.getElementById('card_' + cfop); if (c) c.classList.add('active'); }
+  document.querySelectorAll('.cfop-pill').forEach(el => el.classList.remove('active'));
+  const pel = document.getElementById(cfop === 'all' ? 'pill_all' : 'pill_' + cfop); if (pel) pel.classList.add('active');
+  currentPage = 1;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const startDate = document.getElementById('dateStart')?.value;
+  const endDate = document.getElementById('dateEnd')?.value;
+  const sit = document.getElementById('sitFilter')?.value;
+
+  const pool = activeCfop === 'all' ? allRecords : allRecords.concat(cupomRecords(activeCfop));
+  filteredRecs = pool.filter(r => {
+    if (activeCfop !== 'all' && (!r._cfops || !r._cfops.includes(activeCfop))) return false;
+    if (sit && r.COD_SIT !== sit) return false;
+    if (q) {
+      const hay = [r.NUM_DOC, r.COD_PART, r.CHV_NFe, r.CFOP, ...(r._refs || []).map(x => x.chv)].join('|').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // DT_DOC no SPED é DDMMAAAA — converte para AAAA-MM-DD para comparar
+  if (startDate || endDate) {
+    filteredRecs = filteredRecs.filter(r => {
+      const v = r.DT_DOC || '';
+      if (!/^\d{8}$/.test(v)) return true;
+      const iso = `${v.slice(4)}-${v.slice(2,4)}-${v.slice(0,2)}`;
+      if (startDate && iso < startDate) return false;
+      if (endDate && iso > endDate) return false;
+      return true;
+    });
+  }
+
+  if (sortCol) {
+    const col = COLS.find(c => c.key === sortCol);
+    filteredRecs.sort((a, b) => {
+      let va = sortCol === '_nrefs' ? a._refs.length : (a[sortCol] ?? '');
+      let vb = sortCol === '_nrefs' ? b._refs.length : (b[sortCol] ?? '');
+      if (col?.numeric) { va = typeof va === 'number' ? va : parseDec(va); vb = typeof vb === 'number' ? vb : parseDec(vb); }
+      return (va > vb ? 1 : va < vb ? -1 : 0) * (sortAsc ? 1 : -1);
+    });
+  }
+
+  const partes = [];
+  partes.push(activeCfop !== 'all' ? `CFOP ${activeCfop}` : 'Todas as Notas Fiscais');
+  if (sit) partes.push(`Situação ${sit}`);
+  document.getElementById('panelTitle').textContent = partes.join(' · ');
+
+  updateFilterBar();
+  renderTable();
+}
+
+function updateFilterBar() {
+  const ft = document.getElementById('filterTotal');
+  const hasFilter = activeCfop !== 'all' || (document.getElementById('searchInput')?.value || '') ||
+    (document.getElementById('dateStart')?.value || '') || (document.getElementById('dateEnd')?.value || '') ||
+    (document.getElementById('sitFilter')?.value || '');
+  if (hasFilter && filteredRecs.length > 0) {
+    ft.classList.add('show');
+    let totalOpr = 0, totalBc = 0, totalIcms = 0;
+    const soCfop = activeCfop !== 'all' && cfopSummary[activeCfop] &&
+      !document.getElementById('sitFilter')?.value && !document.getElementById('searchInput')?.value &&
+      !document.getElementById('dateStart')?.value && !document.getElementById('dateEnd')?.value;
+    if (soCfop) {
+      const d = cfopSummary[activeCfop];
+      totalOpr = d.vl_opr; totalBc = d.vl_bc_icms; totalIcms = d.vl_icms;
+    } else {
+      for (const r of filteredRecs) { totalOpr += r.VL_OPR || 0; totalBc += r.VL_BC_ICMS || 0; totalIcms += r.VL_ICMS || 0; }
+    }
+    document.getElementById('ftValue').textContent = `R$ ${fmt(totalOpr)}`;
+    document.getElementById('ftCount').textContent = filteredRecs.length;
+    document.getElementById('ftBcIcms').textContent = `R$ ${fmt(totalBc)}`;
+    document.getElementById('ftIcms').textContent = `R$ ${fmt(totalIcms)}`;
+  } else ft.classList.remove('show');
+}
+
+function clearAll() {
+  activeCfop = 'all';
+  document.getElementById('searchInput').value = '';
+  ['dateStart','dateEnd','sitFilter'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+  document.querySelectorAll('.cfop-card').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.cfop-pill').forEach(el => el.classList.remove('active'));
+  const pa = document.getElementById('pill_all'); if (pa) pa.classList.add('active');
+  currentPage = 1;
+  applyFilters();
+}
+
+function buildTHead() {
+  const cols = COLS.filter(c => visibleCols.includes(c.key));
+  document.getElementById('tHead').innerHTML = `<tr>${cols.map(c => {
+    const arr = sortCol === c.key ? (sortAsc ? ' ↑' : ' ↓') : ' ↕';
+    return `<th class="${sortCol===c.key?'sorted':''}" onclick="sortBy('${c.key}')">${c.label}<span style="opacity:.5;font-size:9px">${arr}</span></th>`;
+  }).join('')}</tr>`;
+}
+
+function sortBy(key) {
+  if (sortCol === key) sortAsc = !sortAsc; else { sortCol = key; sortAsc = true; }
+  buildTHead(); applyFilters();
+}
+
+function renderTable() {
+  const cols = COLS.filter(c => visibleCols.includes(c.key));
+  const start = (currentPage - 1) * pageSize;
+  const page = filteredRecs.slice(start, start + pageSize);
+  const total = Math.ceil(filteredRecs.length / pageSize);
+  document.getElementById('panelCount').textContent = `${filteredRecs.length} registro${filteredRecs.length !== 1 ? 's' : ''}`;
+
+  if (!page.length) {
+    document.getElementById('tBody').innerHTML = `<tr><td colspan="${cols.length}"><div class="empty"><span class="empty-icon">🔍</span><p>Nenhum registro encontrado.</p></div></td></tr>`;
+  } else {
+    document.getElementById('tBody').innerHTML = page.map(r => {
+      const cls = cfopClass(r.CFOP);
+      return `<tr class="${cls ? 'cfop-'+cls : ''}">${cols.map(c => renderCell(r, c)).join('')}</tr>`;
+    }).join('');
+  }
+
+  document.getElementById('pagInfo').textContent = filteredRecs.length > 0 ? `Exibindo ${start+1}–${Math.min(start+pageSize, filteredRecs.length)} de ${filteredRecs.length}` : '';
+  let btns = `<button class="pag-btn" onclick="goPage(${currentPage-1})" ${currentPage<=1?'disabled':''}>‹</button>`;
+  const pages = [];
+  if (total <= 7) { for (let i=1;i<=total;i++) pages.push(i); }
+  else {
+    pages.push(1);
+    if (currentPage > 3) pages.push('…');
+    for (let i=Math.max(2,currentPage-1);i<=Math.min(total-1,currentPage+1);i++) pages.push(i);
+    if (currentPage < total-2) pages.push('…');
+    pages.push(total);
+  }
+  for (const p of pages) {
+    if (p === '…') btns += `<span style="padding:4px 6px;color:var(--text4)">…</span>`;
+    else btns += `<button class="pag-btn ${p===currentPage?'on':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+  btns += `<button class="pag-btn" onclick="goPage(${currentPage+1})" ${currentPage>=total?'disabled':''}>›</button>`;
+  document.getElementById('pagBtns').innerHTML = btns;
+}
+
+function renderCell(row, col) {
+  const key = col.key, v = row[key];
+  const idAttr = esc(row._id).replace(/'/g, '&#39;');
+  if (key === '_vlRef') return row._refs.length && row._vlRef
+    ? `<td class="td-valor" onclick="showRefs('${idAttr}')" title="${row._achadas} de ${row._refs.length} NFC-e achadas neste arquivo">R$ ${fmt(row._vlRef)}</td>`
+    : `<td class="td-empty">—</td>`;
+  if (key === '_nrefs') return row._refs.length
+    ? `<td class="td-ref" onclick="showRefs('${idAttr}')" title="Ver NFC-e referenciadas">${row._refs.length} NFC-e</td>`
+    : `<td class="td-empty">—</td>`;
+  if (key === 'COD_SIT') return !v ? `<td class="td-empty">—</td>` : `<td title="${esc(SIT_LABELS[v] || '')}">${esc(v)}${SIT_LABELS[v] ? ' · ' + esc(SIT_LABELS[v]) : ''}</td>`;
+  if (key === 'NUM_DOC') return (!v || v === '0') ? `<td class="td-empty">—</td>` : `<td class="td-num">${esc(v)}</td>`;
+  if (key === 'CFOP') { const cls = cfopClass(v); return `<td class="td-cfop ${cls}">${v ? esc(v) : '<span class="td-empty">—</span>'}</td>`; }
+  if (key === 'VL_OPR') {
+    const n = typeof v === 'number' ? v : parseDec(v);
+    if (n === 0) return row._refs.length
+      ? `<td class="td-semvalor" onclick="showRefs('${idAttr}')" title="Sem valor no C100/C190 — clique para ver as NFC-e referenciadas">${row._vlRef ? 'R$ ' + fmt(row._vlRef) + ' (NFC-e) ›' : 'sem valor ›'}</td>`
+      : `<td class="td-empty">—</td>`;
+    return `<td class="td-valor" onclick="showDetail('${idAttr}','${esc(row.NUM_DOC||'')}','${esc(row.COD_PART||'')}',${row.VL_DOC||0})">R$ ${fmt(n)}</td>`;
+  }
+  if (key === 'VL_DOC') { const n = parseDec(v); return n === 0 ? `<td class="td-empty">—</td>` : `<td style="font-family:var(--display);font-weight:600;font-size:13px">R$ ${fmt(n)}</td>`; }
+  if (key === 'VL_BC_ICMS' || key === 'VL_ICMS') { const n = parseDec(v); return n === 0 ? `<td class="td-empty">—</td>` : `<td class="td-icms">R$ ${fmt(n)}</td>`; }
+  if (col.numeric) { const n = parseDec(v); return n === 0 ? `<td class="td-empty">—</td>` : `<td style="font-family:var(--display);font-weight:600;font-size:13px">R$ ${fmt(n)}</td>`; }
+  if (key === 'DT_DOC' || key === 'DT_E_S') return `<td class="td-date">${fmtDate(v)}</td>`;
+  if (key === 'CHV_NFe') return !v ? `<td class="td-empty">—</td>` : `<td class="td-chave" title="${esc(v)}">${esc(v.substring(0,20))}…</td>`;
+  return (!v || v === '0') ? `<td class="td-empty">—</td>` : `<td title="${esc(v)}">${esc(v)}</td>`;
+}
+
+function goPage(p) {
+  const total = Math.ceil(filteredRecs.length / pageSize);
+  if (p < 1 || p > total) return;
+  currentPage = p; renderTable();
+  document.querySelector('.table-wrap')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function buildColPanel() {
+  document.getElementById('colPanel').innerHTML = COLS.map(c => `<label class="col-item"><input type="checkbox" ${visibleCols.includes(c.key)?'checked':''} onchange="toggleCol('${c.key}',this.checked)"> ${c.label}</label>`).join('');
+}
+function toggleCol(key, on) {
+  if (on && !visibleCols.includes(key)) visibleCols.push(key);
+  else if (!on) visibleCols = visibleCols.filter(k => k !== key);
+  buildTHead(); renderTable();
+}
+function toggleColPanel() { document.getElementById('colPanel').classList.toggle('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('.col-toggle-wrap')) document.getElementById('colPanel')?.classList.remove('open'); });
+
+function showDetail(id, numDoc, cnpj, valorNota) {
+  const itens = itemsIndex.get(id) || [];
+  document.getElementById('modalTitle').textContent = `NF ${numDoc}  ·  ${cnpj}  ·  R$ ${fmt(valorNota)}`;
+  const bd = document.getElementById('modalBd');
+  if (!itens.length) { bd.innerHTML = `<div class="m-empty"><span class="m-empty-icon">📦</span><p>Nenhum item C170 encontrado.</p></div>`; document.getElementById('detailModal').style.display = 'flex'; return; }
+  const grp = new Map();
+  for (const it of itens) { const cf = it.cfop || 'SEM CFOP'; if (!grp.has(cf)) grp.set(cf, []); grp.get(cf).push(it); }
+  let html = `<p style="font-size:12px;color:var(--text3);margin-bottom:16px">📋 <strong>${itens.length}</strong> item(ns) encontrado(s) nos registros C170</p>`;
+  for (const [cfop, group] of grp) {
+    const tot = group.reduce((s, i) => s + i.valorTotal, 0), cls = cfopClass(cfop);
+    html += `<div class="m-cfop-group"><div class="m-cfop-hd"><span class="m-cfop-code" style="${cls==='entrada'?'color:var(--green)':cls==='saida'?'color:var(--red)':''}">CFOP ${esc(cfop)}</span><span class="m-cfop-total">R$ ${fmt(tot)}</span></div>
+      <table class="m-table"><thead><tr><th>Item</th><th>Código</th><th>Descrição</th><th>Qtd</th><th>Unid</th><th>Vl. Unit.</th><th>Vl. Total</th></tr></thead>
+      <tbody>${group.map(it => `<tr>
+        <td>${esc(it.numItem||'-')}</td><td>${esc(it.codigo||'-')}</td>
+        <td title="${esc(it.descricao)}">${esc((it.descricao||'-').substring(0,55))}${it.descricao?.length>55?'…':''}</td>
+        <td>${fmt(it.quantidade)}</td><td>${esc(it.unidade||'-')}</td><td>R$ ${fmt(it.vlUnit)}</td>
+        <td style="font-family:var(--display);font-weight:700;color:var(--green)">R$ ${fmt(it.valorTotal)}</td></tr>`).join('')}</tbody></table>
+      <div class="m-footer">Total CFOP ${esc(cfop)}: R$ ${fmt(tot)}</div></div>`;
+  }
+  const somaItens = itens.reduce((s,i) => s+i.valorTotal, 0);
+  if (Math.abs(somaItens - parseDec(valorNota)) > 0.05) html += `<div class="m-alert">⚠ Soma dos itens: <strong>R$ ${fmt(somaItens)}</strong>  ·  Valor da NF: <strong>R$ ${fmt(valorNota)}</strong>  ·  Diferença: R$ ${fmt(Math.abs(somaItens - parseDec(valorNota)))}</div>`;
+  bd.innerHTML = html;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+function showRefs(id) {
+  const r = allRecords.find(x => x._id === id);
+  if (!r) return;
+  document.getElementById('modalTitle').textContent = `NF ${r.NUM_DOC} · documentos referenciados (C113)`;
+  const rows = (r._refs || []).map(x => `<tr>
+      <td>${esc(x.mod || '-')}</td><td>${esc(x.num || '-')}</td><td>${fmtDate(x.dt)}</td>
+      <td>${x.achada ? esc(x.cfop || '—') : '<span class="td-empty">—</span>'}</td>
+      <td style="font-family:var(--display);font-weight:700;color:${x.achada ? 'var(--green)' : 'var(--amber)'}">${x.achada ? 'R$ ' + fmt(x.valor) : 'não está neste arquivo'}</td>
+      <td class="td-chave" style="user-select:all;word-break:break-all">${esc(x.chv || '-')}</td></tr>`).join('');
+  const sitTxt = SIT_LABELS[r.COD_SIT] ? ` (${SIT_LABELS[r.COD_SIT]})` : '';
+  const faltam = r._refs.length - r._achadas;
+  document.getElementById('modalBd').innerHTML = `
+    <div class="m-alert" style="margin:0 0 14px">Nota com situação <strong>${esc(r.COD_SIT)}${sitTxt}</strong>${r.VL_OPR === 0 ? ' sem valores no C100/C190' : ''}.
+      ${r._achadas} de ${r._refs.length} NFC-e achadas neste arquivo, somando <strong>R$ ${fmt(r._vlRef)}</strong>${faltam ? `. ${faltam} não constam no arquivo (podem estar em outro período).` : '.'}</div>
+    <table class="m-table"><thead><tr><th>Mod.</th><th>Nº</th><th>Emissão</th><th>CFOP</th><th>Valor</th><th>Chave</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+
+// ===== APURAÇÃO (modelo P9) montada a partir do SPED, com comparação opcional com o PDF =====
+const APU_COLS = [['contabil','Valores Contábeis'],['base','Base de Cálculo'],['imposto','Imposto'],['isentas','Isentas/N.Trib.'],['outras','Outras']];
+const APU_GRUPOS = [
+  ['E N T R A D A S · imposto creditado', [['1','1.000 Do Estado'],['2','2.000 De Outros Estados'],['3','3.000 Do Exterior']]],
+  ['S A Í D A S · imposto debitado',      [['5','5.000 Para o Estado'],['6','6.000 Para Outros Estados'],['7','7.000 Para o Exterior']]]
+];
+const zeroV = () => ({contabil:0,base:0,imposto:0,isentas:0,outras:0});
+function apuSped(c) { const d = cfopSummary[c]; return d ? {contabil:d.vl_opr, base:d.vl_bc_icms, imposto:d.vl_icms, isentas:d.vl_isent, outras:d.vl_outras} : zeroV(); }
+function apuSoma(a, b) { for (const k in a) a[k] += b[k]; return a; }
+function apuCell(sv, pv) {
+  if (!p9) return `<td class="n">${fmt(sv)}</td>`;
+  if (Math.abs(sv - pv) < 0.015) return `<td class="n ok">${fmt(sv)}</td>`;
+  return `<td class="n dif">${fmt(sv)}<small>P9: ${fmt(pv)}</small></td>`;
+}
+function apuRow(label, sv, pv, cls) {
+  const bate = !p9 || APU_COLS.every(([k]) => Math.abs(sv[k] - pv[k]) < 0.015);
+  return `<tr class="${cls || ''} ${bate ? '' : 'rdif'}"><td><strong>${label}</strong></td>${APU_COLS.map(([k]) => apuCell(sv[k], pv[k])).join('')}</tr>`;
+}
+const RES_DESC = [['001','Por saídas/prestações com débito do imposto'],['002','Outros débitos'],['003','Estorno de créditos'],['004','Sub-total (débitos)'],
+  ['005','Por entradas/aquisições com crédito do imposto'],['006','Outros créditos'],['007','Estorno de débitos'],['008','Sub-total (créditos)'],
+  ['009','Saldo credor do período anterior'],['010','Total (créditos + saldo anterior)'],['011','Saldo devedor (débito menos crédito)'],
+  ['012','Deduções'],['013','Imposto a recolher'],['014','Saldo credor a transportar para o período seguinte']];
+function resumoSped() {
+  const e = spedE110; if (!e) return null;
+  const r = {'001':e[0],'002':e[2],'003':e[3],'005':e[4],'006':e[6],'007':e[7],'009':e[8],'011':e[9],'012':e[10],'013':e[11],'014':e[12]};
+  r['004'] = e[0] + e[2] + e[3]; r['008'] = e[4] + e[6] + e[7]; r['010'] = r['008'] + e[8];
+  return r;
+}
+function showApuracao() {
+  const cfops = [...new Set([...Object.keys(cfopSummary).filter(naoZerado), ...(p9 ? Object.keys(p9.cfop) : [])])].sort();
+  const bate = (a, b) => APU_COLS.every(([k]) => Math.abs(a[k] - b[k]) < 0.015);
+  let ok = 0, tot = 0, totOk = 0, totN = 0, body = '';
+  APU_GRUPOS.forEach(([titulo, grupos], gi) => {
+    body += `<tr class="grp"><td colspan="6">${titulo}</td></tr>`;
+    const geralS = zeroV(), geralP = zeroV();
+    for (const [dig, nome] of grupos) {
+      const lista = cfops.filter(c => c[0] === dig);
+      if (!lista.length) continue;
+      const subS = zeroV(), subP = zeroV();
+      for (const c of lista) {
+        const sv = apuSped(c), pv = p9?.cfop[c] || zeroV();
+        tot++; if (!p9 || bate(sv, pv)) ok++;
+        body += apuRow(c + (p9 && !p9.cfop[c] ? ' <small style="display:inline">só no SPED</small>' : '') + (p9 && !naoZerado(c) ? ' <small style="display:inline">só no P9</small>' : ''), sv, pv);
+        apuSoma(subS, sv); apuSoma(subP, pv);
+      }
+      body += apuRow('Sub-total ' + nome, subS, subP, 'sub');
+      apuSoma(geralS, subS); apuSoma(geralP, subP);
+    }
+    const pTot = p9?.totais?.[gi] || geralP;
+    if (p9) { totN++; if (bate(geralS, pTot)) totOk++; }
+    body += apuRow('TOTAIS' + (p9?.totais?.[gi] ? ' <small style="display:inline">(impresso no P9)</small>' : ''), geralS, pTot, 'sub');
+  });
+
+  // resumo da apuração (E110 do SPED × página 2 do P9)
+  const rs = resumoSped(); let resOk = 0, resN = 0, resHtml = '';
+  if (rs) for (const [cod, desc] of RES_DESC) {
+    const sv = rs[cod], pv = p9?.resumo?.[cod]; let st = '';
+    if (p9) {
+      if (pv === undefined) st = '<span class="td-empty">não achei no P9</span>';
+      else { resN++; const b = Math.abs(sv - pv) < 0.015; if (b) resOk++; st = b ? '<span class="ok">✓</span>' : `<span class="dif">✗ dif. ${fmt(sv - pv)}</span>`; }
+    }
+    const dest = ['004','008','010','013','014'].includes(cod);
+    resHtml += `<tr class="${dest ? 'sub' : ''}"><td>${cod}</td><td>${desc}</td><td class="n">${fmt(sv)}</td>${p9 ? `<td class="n">${pv === undefined ? '—' : fmt(pv)}</td><td>${st}</td>` : ''}</tr>`;
+  }
+  // conferências internas do próprio SPED
+  const sumImp = ds => Object.entries(cfopSummary).filter(([c]) => ds.includes(c[0])).reduce((a, [, d]) => a + d.vl_icms, 0);
+  const inter = rs ? [['Imposto debitado das saídas (soma dos CFOPs 5/6/7) × 001', sumImp(['5','6','7']), rs['001']],
+                      ['Imposto creditado das entradas (soma dos CFOPs 1/2/3) × 005', sumImp(['1','2','3']), rs['005']],
+                      ['Saldo: 010 − 004 − 013 × 014 (fecha a conta)', rs['010'] - rs['004'] - rs['013'], rs['014']]] : [];
+  const interHtml = inter.map(([d, a, b]) => { const g = Math.abs(a - b) < 0.015; return `<tr><td colspan="2">${d}</td><td class="n">${fmt(a)}</td><td class="n">${fmt(b)}</td><td>${g ? '<span class="ok">✓</span>' : `<span class="dif">✗ dif. ${fmt(a - b)}</span>`}</td></tr>`; }).join('');
+
+  const avisoCnpj = p9 && p9.cnpj && spedCnpj && p9.cnpj !== spedCnpj
+    ? `<div class="m-alert" style="margin:0 0 12px">⚠ O CNPJ do P9 (${p9.cnpj}) é diferente do CNPJ do SPED (${spedCnpj}). A comparação só faz sentido se for o mesmo posto.</div>` : '';
+  const avisoPer = p9 && p9.periodo && spedPeriodo && p9.periodo !== spedPeriodo
+    ? `<div class="m-alert" style="margin:0 0 12px">⚠ Período do P9 (${p9.periodo}) diferente do SPED (${spedPeriodo}).</div>` : '';
+  const todos = p9 && ok === tot && totOk === totN && resOk === resN && (!rs || resN > 0);
+  const resumo = p9
+    ? `<div style="margin-bottom:12px;font-size:12px"><strong style="color:${todos ? 'var(--green)' : 'var(--red)'}">${todos ? '✓ Tudo bate com o P9' : '✗ Há diferenças'}</strong> · CFOPs: ${ok}/${tot} · Totais: ${totOk}/${totN} · Resumo: ${resOk}/${resN} · ${esc(p9.nome)} · período ${p9.periodo || '?'}</div>`
+    : `<div style="margin-bottom:12px;font-size:12px;color:var(--text3)">Apuração montada do SPED (C190/C590/D590/D190/C490/C890…) e do E110. Suba o PDF da apuração da contabilidade para comparar.</div>`;
+  document.getElementById('modalTitle').textContent = '🧾 Apuração do ICMS — SPED × contabilidade';
+  document.getElementById('modalBd').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <label class="btn-sm" style="cursor:pointer">📄 ${p9 ? 'Trocar' : 'Subir'} apuração (PDF)<input type="file" accept=".pdf" style="display:none" onchange="loadP9(this.files[0])"></label>
+      ${p9 ? `<button class="btn-sm" onclick="p9=null;showApuracao()">✕ Remover PDF</button>` : ''}
+      ${p9 ? `<button class="btn-sm" onclick="exportConfronto()">🖨️ Baixar confronto (PRODAC × DP)</button>` : ''}
+    </div>${avisoCnpj}${avisoPer}${resumo}
+    <h4 style="font-family:var(--display);margin:6px 0 8px">ICMS — valores fiscais por CFOP</h4>
+    <div style="overflow-x:auto"><table class="m-table apu"><thead><tr><th>CFOP</th>${APU_COLS.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>
+    <p style="margin:8px 0 18px;font-size:11px;color:var(--text3)">CFOPs com valor zerado não aparecem. Isentas/N.Trib. = CST ${CST_ISENTAS.join('/')} · Outras = contábil − base − isentas · vermelho = diferença para o P9.</p>
+    <h4 style="font-family:var(--display);margin:6px 0 8px">Resumo da apuração (E110 do SPED)</h4>
+    ${rs ? `<div style="overflow-x:auto"><table class="m-table apu"><thead><tr><th>Cód.</th><th style="text-align:left">Descrição</th><th>SPED</th>${p9 ? '<th>P9</th><th style="text-align:left">Situação</th>' : ''}</tr></thead><tbody>${resHtml}
+      <tr class="grp"><td colspan="5">Conferências internas do SPED</td></tr>${interHtml}</tbody></table></div>`
+      : `<div class="m-alert" style="margin:0">Este SPED não tem registro E110 (apuração não escriturada).</div>`}`;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+// ===== COMPARADOR (PRODAC = P9 do PDF · DP = SPED TXT) — layout dashboard, claro/escuro =====
+const CP_TEMA_JS = `function cpSoDif(){var c=document.getElementById('cp');c.classList.toggle('sodif');document.getElementById('cpSoDifBtn').classList.toggle('on',c.classList.contains('sodif'));}function cpTema(){var c=document.getElementById('cp');c.classList.toggle('dark');var b=document.getElementById('cpTemaBtn');b.textContent=c.classList.contains('dark')?'☀ Claro':'🌙 Escuro';}`;
+function cpData(){
+  const cfops = [...new Set([...Object.keys(cfopSummary), ...Object.keys(p9.cfop)])].sort();
+  const acc = (lista, lado) => { const t = zeroV(); lista.forEach(r => apuSoma(t, r[lado])); return t; };
+  return [['E','Entradas',['1','2','3'],0],['S','Saídas',['5','6','7'],1]].map(([key,titulo,digs,gi]) => {
+    const rows = cfops.filter(c => digs.includes(c[0])).map(c => ({cfop:c, sv:apuSped(c), pv:p9.cfop[c] || zeroV()}));
+    const subs = APU_GRUPOS[gi][1].map(([dig,nome]) => { const l = rows.filter(r => r.cfop[0] === dig); return {nome, sv:acc(l,'sv'), pv:acc(l,'pv')}; });
+    return {key, titulo, rows, subs, tot:{sv:acc(rows,'sv'), pv:p9.totais?.[gi] || acc(rows,'pv')}};
+  });
+}
+const cpDif = (a,b) => Math.abs(a-b) >= 0.015;
+const cpOk = r => APU_COLS.every(([k]) => !cpDif(r.sv[k], r.pv[k]));
+function cpTabela(sec){
+  const metr = [['contabil','Valores Contábeis'],['base','Base de Cálculo'],['imposto', sec.key==='E' ? 'Imposto Creditado' : 'Imposto Debitado'],['isentas','Isento / N.Trib.'],['outras','Outras']];
+  const par = (sv,pv,k) => { const d = cpDif(sv[k],pv[k]), dl = sv[k]-pv[k]; return `<td class="n">${fmt(pv[k])}</td><td class="n${d?' dif':''}">${fmt(sv[k])}${d ? `<small>Δ ${dl>0?'+':''}${fmt(dl)}</small>` : ''}</td>`; };
+  const linha = (rot, sv, pv, cls='') => `<tr class="${cls}"><td class="cf">${rot}</td>${metr.map(([k]) => par(sv,pv,k)).join('')}</tr>`;
+  const corpo = sec.rows.map(r => linha(r.cfop, r.sv, r.pv, cpOk(r) ? 'ok' : 'rd')).join('') +
+    sec.subs.map(s => linha(s.nome, s.sv, s.pv, 'sb')).join('') +
+    linha('TOTAIS', sec.tot.sv, sec.tot.pv, 'tt');
+  return `<section class="cp-card" id="cp${sec.key}"><h3>${sec.titulo}</h3><div class="cp-scroll"><table>
+    <thead><tr><th rowspan="2">CFOP</th>${metr.map(([,n]) => `<th colspan="2">${n}</th>`).join('')}</tr>
+    <tr>${metr.map(() => '<th>PRODAC</th><th>DP</th>').join('')}</tr></thead>
+    <tbody>${corpo}</tbody></table></div></section>`;
+}
+function cpGauge(pct, rotulo){
+  const p = Math.max(0, Math.min(100, pct));
+  return `<div class="cp-gauge"><svg viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--line)" stroke-width="9"/>
+    <circle cx="50" cy="50" r="40" fill="none" stroke="url(#cpG)" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="${p.toFixed(1)} 100" transform="rotate(-90 50 50)"/>
+    <defs><linearGradient id="cpG" x1="0" x2="1"><stop offset="0" stop-color="#4f7bff"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs>
+    <text x="50" y="54" text-anchor="middle" font-size="16" font-weight="700" fill="var(--text)">${p.toFixed(0)}%</text></svg>
+    <div class="cp-gl">${rotulo}</div></div>`;
+}
+function cpLinha(rows){
+  if (!rows.length) return '<div class="cp-muted">Sem dados</div>';
+  const W = 720, H = 240, mx = Math.max(1, ...rows.map(r => Math.max(r.sv.contabil, r.pv.contabil)));
+  const xs = i => 30 + i*(W-60)/Math.max(1, rows.length-1);
+  const ys = v => H-30 - (v/mx)*(H-60);
+  const pa = rows.map((r,i) => `${xs(i).toFixed(1)},${ys(r.pv.contabil).toFixed(1)}`).join(' ');
+  const pb = rows.map((r,i) => `${xs(i).toFixed(1)},${ys(r.sv.contabil).toFixed(1)}`).join(' ');
+  let pk = 0, pkd = -1;
+  rows.forEach((r,i) => { const d = Math.abs(r.sv.contabil - r.pv.contabil); if (d > pkd) { pkd = d; pk = i; } });
+  const step = Math.ceil(rows.length / 14);
+  return `<div class="cp-chart"><svg viewBox="0 0 ${W} ${H}" width="100%">
+    ${[0,1,2,3].map(i => `<line x1="20" x2="${W-20}" y1="${30+i*(H-60)/3}" y2="${30+i*(H-60)/3}" stroke="var(--line)"/>`).join('')}
+    <polyline points="${pa}" fill="none" stroke="#4f7bff" stroke-width="2.5"/>
+    <polyline points="${pb}" fill="none" stroke="#ff8a5b" stroke-width="2.5" stroke-dasharray="6 4"/>
+    ${rows.map((r,i) => i % step === 0 ? `<text x="${xs(i)}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--muted)">${r.cfop}</text>` : '').join('')}
+  </svg>
+  <div class="cp-tip" style="left:${xs(pk)/W*100}%;top:${ys(rows[pk].sv.contabil)/H*100}%">${rows[pk].cfop}: ${fmt(rows[pk].sv.contabil - rows[pk].pv.contabil)}</div>
+  <div class="cp-leg"><span><i style="background:#4f7bff"></i>PRODAC (PDF)</span><span><i style="background:#ff8a5b"></i>DP (TXT)</span></div></div>`;
+}
+function cpMonta(){
+  const secs = cpData();
+  const todas = secs.flatMap(s => s.rows);
+  const okTot = todas.filter(cpOk).length;
+  const difCel = todas.reduce((n,r) => n + APU_COLS.filter(([k]) => cpDif(r.sv[k], r.pv[k])).length, 0);
+  const E = secs[0].tot.sv.contabil, S = secs[1].tot.sv.contabil;
+  const pct = (ok, n) => n ? ok/n*100 : 0;
+  const okE = secs[0].rows.filter(cpOk).length, okS = secs[1].rows.filter(cpOk).length;
+  const maior = todas.reduce((m,r) => Math.abs(r.sv.contabil-r.pv.contabil) > Math.abs(m.sv.contabil-m.pv.contabil) ? r : m, todas[0] || {cfop:'-', sv:zeroV(), pv:zeroV()});
+  const kpi = (lbl, val, sub, cls='') => `<div class="cp-kpi ${cls}"><span>${lbl}</span><b>${val}</b><small>${sub}</small></div>`;
+  return `
+  <aside class="cp-side">
+    <div class="cp-brand">COMPARADOR</div>
+    <div class="cp-menu-lbl">Principal</div>
+    <a class="cp-item on" href="#cpTop">▦ Dashboard</a>
+    <a class="cp-item" href="#cpE">⇣ Entradas</a>
+    <a class="cp-item" href="#cpS">⇡ Saídas</a>
+    <a class="cp-item" href="#cpDif">⚠ Diferenças</a>
+    <div class="cp-menu-lbl">Fontes</div>
+    <div class="cp-item">PRODAC · PDF P9 <span class="cp-badge">${todas.length}</span></div>
+    <div class="cp-item">DP · SPED TXT <span class="cp-badge">${todas.length}</span></div>
+  </aside>
+  <main class="cp-main" id="cpTop">
+    <div class="cp-head">
+      <h2>SUMMARY</h2>
+      <div class="cp-pills">
+        <button class="cp-pill blue" onclick="window.print()">Imprimir</button>
+        <button class="cp-pill" onclick="cpBaixar()">Baixar HTML</button>
+        <button class="cp-pill" id="cpSoDifBtn" onclick="cpSoDif()">⚠ Só diferenças</button>
+        <button class="cp-pill" id="cpTemaBtn" onclick="cpTema()">🌙 Escuro</button>
+        <button class="cp-pill" onclick="cpFechar()">Voltar</button>
+      </div>
+    </div>
+    <div class="cp-kpis">
+      ${kpi('Entradas (DP)', fmt(E), 'valor contábil')}
+      ${kpi('Saídas (DP)', fmt(S), 'valor contábil', 'hl')}
+      ${kpi('Diferenças', difCel, 'células divergentes')}
+      ${kpi('CFOPs batendo', okTot + '/' + todas.length, 'PRODAC = DP', 'or')}
+    </div>
+    <div class="cp-row">
+      <section class="cp-card cp-grow"><div class="cp-ct">Valor contábil por CFOP · PRODAC × DP</div>${cpLinha(todas)}</section>
+      <section class="cp-card"><div class="cp-ct">Conformidade</div>
+        <div class="cp-gauges">${cpGauge(pct(okE, secs[0].rows.length), 'Entradas')}${cpGauge(pct(okS, secs[1].rows.length), 'Saídas')}${cpGauge(pct(okTot, todas.length), 'Geral')}</div>
+      </section>
+    </div>
+    <div id="cpDif" class="cp-card"><div class="cp-ct">Maior diferença</div>
+      <div class="cp-muted">${maior ? 'CFOP ' + maior.cfop + ' · PRODAC ' + fmt(maior.pv.contabil) + ' · DP ' + fmt(maior.sv.contabil) : 'Sem dados'}</div></div>
+    ${secs.map(cpTabela).join('')}
+  </main>
+  <aside class="cp-right">
+    <div class="cp-user"><div class="cp-av">CP</div><div><b>Comparação</b><small>PRODAC × DP</small></div></div>
+    <div class="cp-card cp-det"><div class="cp-ct">Detalhes</div>
+      <div class="cp-dl"><span>Empresa</span><b>${esc(p9.nome || '—')}</b></div>
+      <div class="cp-dl"><span>CNPJ</span><b>${esc(p9.cnpj || spedCnpj || '—')}</b></div>
+      <div class="cp-dl"><span>Mês/Ano</span><b>${esc(p9.periodo || spedPeriodo || '—')}</b></div>
+      <div class="cp-dl"><span>PRODAC</span><b>PDF do P9</b></div>
+      <div class="cp-dl"><span>DP</span><b>SPED TXT</b></div>
+      <div class="cp-dl"><span>CFOPs batendo</span><b>${okTot} de ${todas.length}</b></div>
+    </div>
+  </aside>`;
+}
+const CP_CSS = `
+#cp{--bg:#f3f5fb;--card:#fff;--text:#1e2433;--muted:#8a93a8;--line:#e6e9f2;--side:#fff;--blue:#4f7bff;--orange:#ff7a45;--red:#e5484d;--head:#f7f8fc;position:fixed;inset:0;z-index:2000;background:var(--bg);color:var(--text);display:grid;grid-template-columns:220px 1fr 290px;overflow:hidden;font-family:Inter,Arial,Helvetica,sans-serif;font-size:13px}
+#cp.dark{--bg:#161b2e;--card:#1f2640;--text:#e7eaf5;--muted:#7d86a3;--line:#2b3354;--side:#1a2038;--head:#262e4d}
+#cp .cp-side{background:var(--side);padding:22px 16px;overflow:auto;border-right:1px solid var(--line)}
+#cp .cp-brand{font-weight:800;letter-spacing:.06em;font-size:16px;margin-bottom:24px;color:var(--blue)}
+#cp .cp-menu-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:18px 0 8px}
+#cp .cp-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:10px;color:var(--text);text-decoration:none;margin-bottom:4px;cursor:pointer}
+#cp .cp-item:hover{background:var(--head)}
+#cp .cp-item.on{background:linear-gradient(135deg,#4f7bff,#2f5cf0);color:#fff}
+#cp .cp-badge{background:var(--head);color:var(--muted);border-radius:8px;padding:1px 7px;font-size:11px}
+#cp .cp-main{overflow:auto;padding:24px 26px;min-width:0}
+#cp .cp-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+#cp .cp-head h2{font-size:14px;letter-spacing:.12em;color:var(--muted);font-weight:600}
+#cp .cp-pills{display:flex;gap:8px;flex-wrap:wrap}
+#cp .cp-pill{border:none;border-radius:999px;padding:8px 16px;background:var(--card);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#cp .cp-pill.blue{background:linear-gradient(135deg,#4f7bff,#2f5cf0);color:#fff}
+#cp .cp-pill:hover{filter:brightness(1.07)}
+#cp .cp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+#cp .cp-kpi{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:4px;min-width:0}
+#cp .cp-kpi span{color:var(--muted);font-size:12px}
+#cp .cp-kpi b{font-size:22px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cp .cp-kpi small{color:var(--muted);font-size:11px}
+#cp .cp-kpi.hl{background:linear-gradient(135deg,#4f7bff,#2f5cf0);color:#fff}
+#cp .cp-kpi.hl span,#cp .cp-kpi.hl small{color:#dfe7ff}
+#cp .cp-kpi.or b{color:var(--orange)}
+#cp .cp-row{display:grid;grid-template-columns:1.7fr 1fr;gap:12px;margin-bottom:14px}
+#cp .cp-card{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:14px;min-width:0}
+#cp .cp-row .cp-card{margin-bottom:0}
+#cp .cp-ct{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px}
+#cp .cp-muted{color:var(--muted);font-size:12px}
+#cp .cp-chart{position:relative}
+#cp .cp-tip{position:absolute;transform:translate(-50%,-140%);background:#1e2433;color:#fff;border-radius:8px;padding:5px 9px;font-size:11px;white-space:nowrap;pointer-events:none}
+#cp .cp-leg{display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:6px}
+#cp .cp-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+#cp .cp-gauges{display:flex;justify-content:space-around;gap:8px}
+#cp .cp-gauge{width:30%;text-align:center}
+#cp .cp-gauge svg{width:100%;max-width:120px}
+#cp .cp-gl{font-size:11px;color:var(--muted);margin-top:4px}
+#cp h3{font-size:14px;margin-bottom:10px}
+#cp .cp-scroll{overflow:auto}
+#cp table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px}
+#cp th{background:var(--head);color:var(--muted);font-weight:600;padding:8px 10px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+#cp td{padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+#cp td.n{text-align:right;font-variant-numeric:tabular-nums}
+#cp td.cf{text-align:left;font-weight:500}
+#cp td.dif{color:var(--red);font-weight:700}
+#cp tr.sb td{font-weight:600;background:var(--head)}
+#cp tr.tt td{font-weight:800;border-top:2px solid var(--line)}
+#cp .cp-right{background:var(--side);border-left:1px solid var(--line);padding:22px 18px;overflow:auto}
+#cp .cp-user{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+#cp .cp-user b{display:block}
+#cp .cp-user small{color:var(--muted)}
+#cp .cp-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f7bff,#2f5cf0);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+#cp .cp-det .cp-dl{margin-bottom:12px}
+#cp .cp-dl span{display:block;color:var(--muted);font-size:11px}
+#cp .cp-dl b{color:var(--blue);font-weight:600;word-break:break-word}
+@media (max-width:1200px){#cp{grid-template-columns:1fr}#cp .cp-side,#cp .cp-right{display:none}#cp .cp-row{grid-template-columns:1fr}}
+@media (max-width:800px){#cp .cp-kpis{grid-template-columns:repeat(2,1fr)}}
+@media print{body>*:not(#cp){display:none!important}#cp{position:static;display:block;overflow:visible}#cp .cp-side,#cp .cp-right,#cp .cp-pills{display:none!important}}
+html:root body #cp{--zebra:#f7f8fc;--hover:#eaf0ff;--difbg:#fdeced;--okc:#22c55e}
+html:root body #cp.dark{--zebra:#232b49;--hover:#2f3a66;--difbg:rgba(255,107,112,.16);--red:#ff7b80;--head:#2a3354;--card:#1f2640}
+html:root body #cp table{min-width:0!important;width:100%;border-collapse:separate;border-spacing:0}
+html:root body #cp th{background:var(--head)!important;color:var(--muted)!important;border-bottom:1px solid var(--line)!important;padding:9px 8px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:default}
+html:root body #cp th:hover{color:var(--muted)!important}
+html:root body #cp td{background:transparent!important;color:var(--text)!important;border-bottom:1px solid var(--line)!important;padding:7px 8px;max-width:none!important;overflow:visible!important;text-overflow:clip!important}
+html:root body #cp tbody tr:nth-child(even) td{background:var(--zebra)!important}
+html:root body #cp tbody tr.sb td{background:var(--head)!important;font-weight:700}
+html:root body #cp tbody tr.tt td{background:var(--head)!important;font-weight:800;border-top:2px solid var(--line)!important}
+html:root body #cp tbody tr td.dif{background:var(--difbg)!important;color:var(--red)!important;font-weight:800}
+html:root body #cp tbody tr:hover td{background:var(--hover)!important}
+html:root body #cp tbody tr:hover td.dif{background:var(--difbg)!important}
+html:root body #cp td.n small{display:block;font-size:10px;font-weight:600;opacity:.85}
+html:root body #cp td.cf::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:9px;background:transparent}
+html:root body #cp tr.ok td.cf::before{background:var(--okc)}
+html:root body #cp tr.rd td.cf::before{background:var(--red);box-shadow:0 0 0 3px var(--difbg)}
+html:root body #cp tr.rd td.cf{font-weight:800}
+html:root body #cp.sodif tbody tr.ok{display:none}
+html:root body #cp .cp-pill{background:var(--card)!important;color:var(--text)!important;border:1px solid var(--line)!important;box-shadow:0 1px 4px rgba(0,0,0,.12)!important;text-shadow:none!important}
+html:root body #cp .cp-pill:hover{border-color:var(--blue)!important;color:var(--blue)!important}
+html:root body #cp .cp-pill.blue,html:root body #cp .cp-pill.on{background:linear-gradient(135deg,#4f7bff,#2f5cf0)!important;color:#fff!important;border-color:transparent!important}
+html:root body #cp .cp-pill.blue:hover,html:root body #cp .cp-pill.on:hover{color:#fff!important}
+`;
+function cpSoDif(){ const c = document.getElementById('cp'); c.classList.toggle('sodif'); document.getElementById('cpSoDifBtn').classList.toggle('on', c.classList.contains('sodif')); }
+function showComparador(){
+  if (!p9) { toggleApuracaoInline(); return; }
+  let v = document.getElementById('cp'); if (v) v.remove();
+  if (!document.getElementById('cpCss')) { const st = document.createElement('style'); st.id = 'cpCss'; st.textContent = CP_CSS; document.head.appendChild(st); }
+  v = document.createElement('div'); v.id = 'cp';
+  v.innerHTML = cpMonta();
+  document.body.appendChild(v);
+  window.cpTema = function(){ const c = document.getElementById('cp'); c.classList.toggle('dark'); document.getElementById('cpTemaBtn').textContent = c.classList.contains('dark') ? '☀ Claro' : '🌙 Escuro'; try { localStorage.setItem('cpDark', c.classList.contains('dark') ? '1' : '0'); } catch(e) {} };
+  try { if (localStorage.getItem('cpDark') === '1') window.cpTema(); } catch(e) {}
+}
+function cpFechar(){ const v = document.getElementById('cp'); if (v) v.remove(); }
+function cpBaixar(){
+  if (!p9) return;
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Comparador PRODAC × DP</title>
+<style>${CP_CSS.replace('position:fixed;inset:0;z-index:2000;','position:relative;min-height:100vh;').replace('#cp{','#cp{')}</style></head>
+<body><div id="cp" style="display:grid">${cpMonta()}</div>
+<p style="font-size:10px;color:#888;padding:8px 16px">PRODAC = PDF do P9 (contabilidade) · DP = SPED TXT · Gerado em ${hoje}</p>
+<script>${CP_TEMA_JS}<\/script></body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html], {type:'text/html;charset=utf-8'}));
+  a.download = `comparador_prodac_dp_${Date.now()}.html`;
+  a.click();
+}
+
+async function loadP9(file) {
+  if (!file) return;
+  try {
+    if (!window.pdfjsLib) {
+      await new Promise((ok, err) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; sc.onload = ok; sc.onerror = () => err(new Error('Não consegui carregar o leitor de PDF (precisa de internet).')); document.head.appendChild(sc); });
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    const doc = await pdfjsLib.getDocument({data: new Uint8Array(await file.arrayBuffer())}).promise;
+    const cfop = {}, resumo = {}, totais = []; let periodo = '', cnpj = '';
+    const NUM = /^-?[\d.]+,\d{2}$/;
+    for (let n = 1; n <= doc.numPages; n++) {
+      const tc = await (await doc.getPage(n)).getTextContent();
+      const rows = [];
+      for (const it of tc.items) {
+        if (!it.str.trim()) continue;
+        const y = Math.round(it.transform[5]);
+        let r = rows.find(r => Math.abs(r.y - y) <= 2);
+        if (!r) { r = {y, it:[]}; rows.push(r); }
+        r.it.push({x: it.transform[4], s: it.str.trim()});
+      }
+      for (const r of rows) {
+        r.it.sort((a, b) => a.x - b.x);
+        const t = r.it.map(i => i.s), line = t.join(' ');
+        let m;
+        if (!periodo && (m = line.match(/Ano:\s*(\d{2}\/\d{4})/))) periodo = m[1];
+        if (!cnpj && (m = line.match(/CNPJ:\s*([\d.\/-]{18})/))) cnpj = m[1].replace(/\D/g, '');
+        const ult = [...t].reverse().find(x => NUM.test(x));
+        if (t[0] === 'TOTAIS' && t.length === 6 && t.slice(1).every(x => NUM.test(x)) && totais.length < 2) {
+          const v = t.slice(1).map(parseDec), ent = totais.length === 0;
+          totais.push({contabil:v[0], base:v[1], imposto:v[2], isentas: ent ? v[3] : v[4], outras: ent ? v[4] : v[3]});
+        }
+        if (ult !== undefined) {
+          const lm = line.match(/^(\d{3}) - /);
+          if (lm) resumo[lm[1]] = parseDec(ult);
+          for (const [re, cod] of [[/^Total Outros D/, '002'], [/^Total Estornos Cr/, '003'], [/^Total Outros Cr/, '006'], [/^Total Estornos D/, '007'], [/^Total Dedu/, '012']])
+            if (re.test(line)) resumo[cod] = parseDec(ult);
+        }
+        // linha de CFOP: código + 5 valores, na ordem visual: contábil, base, imposto, e (entradas) isentas, outras / (saídas) outras, isentas
+        if (/^\d{4}$/.test(t[0]) && t.length === 6 && t.slice(1).every(x => /^-?[\d.]+,\d{2}$/.test(x))) {
+          const v = t.slice(1).map(parseDec), ent = +t[0][0] < 5;
+          cfop[t[0]] = {contabil:v[0], base:v[1], imposto:v[2], isentas: ent ? v[3] : v[4], outras: ent ? v[4] : v[3], raw:v};
+        }
+      }
+    }
+    if (!Object.keys(cfop).length) throw new Error('Não encontrei linhas de CFOP nesse PDF (é o Modelo P9?).');
+    p9 = {cfop, totais, resumo, periodo, cnpj, nome: file.name};
+    renderApuracaoInline();
+  } catch (e) { console.error(e); alert('Erro ao ler o P9: ' + e.message); }
+}
+
+
+// ===== Ajuda visual: o que a ferramenta faz =====
+function openAjuda() {
+  const passo = (ico, cor, titulo, txt) => `
+    <div style="background:var(--surface2);border:1px solid var(--border);border-top:3px solid ${cor};border-radius:var(--r2);padding:12px 12px 10px">
+      <div style="font-size:24px;line-height:1">${ico}</div>
+      <div style="font-family:var(--display);font-weight:700;font-size:14px;margin-top:6px;color:var(--text)">${titulo}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4">${txt}</div>
+    </div>`;
+  const seta = `<div style="align-self:center;color:var(--text4);font-size:18px">→</div>`;
+  const fluxo = [
+    ['📂','SPED .txt','Arraste o arquivo'],
+    ['🧮','Cards por CFOP','Valor e notas'],
+    ['🧾','Notas e CF-e','Tabela e filtros'],
+    ['⚖️','Apuração','SPED × PDF']
+  ].map(([i,t,x]) => `<div style="flex:1;min-width:120px;text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 8px">
+      <div style="font-size:26px">${i}</div><div style="font-family:var(--display);font-weight:700;font-size:13px;margin-top:4px">${t}</div><div style="font-size:10px;color:var(--text3)">${x}</div></div>`).join(seta);
+  document.getElementById('modalTitle').textContent = '📖 Como funciona';
+  const caixa = (ico, titulo, txt, cor) => `
+    <div style="flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);border-top:3px solid ${cor};border-radius:var(--r2);padding:14px;text-align:center">
+      <div style="font-size:30px">${ico}</div>
+      <div style="font-family:var(--display);font-weight:800;font-size:15px;margin-top:4px">${titulo}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4">${txt}</div>
+    </div>`;
+  const setaH = `<div style="align-self:center;text-align:center;color:var(--text3);font-size:11px"><div style="font-size:22px">⇄</div>compara</div>`;
+  document.getElementById('modalBd').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">O que a ferramenta faz</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch">
+          ${caixa('📂','SPED (.txt)','Lançamentos feitos pela empresa: notas, cupons e totais','var(--accent)')}
+          ${setaH}
+          ${caixa('📄','Apuração (PDF)','Totais apurados pela contabilidade (P9)','var(--text2)')}
+        </div>
+        <div style="display:flex;justify-content:center;margin-top:10px;color:var(--text4);font-size:20px">↓</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <span style="background:var(--green-light);color:var(--green);border:1px solid var(--green);border-radius:20px;padding:8px 14px;font-family:var(--display);font-weight:700;font-size:14px">✓ valores iguais</span>
+          <span style="background:var(--red-light);color:var(--red);border:1px solid var(--red);border-radius:20px;padding:8px 14px;font-family:var(--display);font-weight:700;font-size:14px">⚠ com diferença</span>
+        </div>
+        <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">Mostra onde os valores do SPED não batem com a contabilidade, linha a linha.</div>
+      </div>
+
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Fluxo</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:stretch">${fluxo}</div>
+      </div>
+
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">O que cada parte faz</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
+          ${passo('🔎','var(--accent)','Filtrar','Clique no card ou na pílula do CFOP')}
+          ${passo('🛒','var(--green)','CF-e 5102 / 5405','Cada cupom com nº, data e chave')}
+          ${passo('📊','var(--amber)','Gráfico','Os 15 CFOPs de maior valor')}
+          ${passo('🧾','var(--accent)','Apuração','Resumo P9 do E110 do SPED')}
+          ${passo('📄','var(--red)','Subir PDF','Compara o P9 linha a linha')}
+          ${passo('⬇️','var(--text2)','CSV','Exporta a tela ou o relatório')}
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Como ler a comparação</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <span style="background:var(--green-light);color:var(--green);border:1px solid var(--green);border-radius:20px;padding:6px 12px;font-family:var(--display);font-weight:700;font-size:13px">✓ confere</span>
+          <span style="background:var(--red-light);color:var(--red);border:1px solid var(--red);border-radius:20px;padding:6px 12px;font-family:var(--display);font-weight:700;font-size:13px">R$ diferença</span>
+          <span style="font-size:12px;color:var(--text3)">diferença = SPED − PDF</span>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:10px">
+        ⚠️ O P9 precisa estar no modelo oficial. Revise a diferença antes de corrigir o SPED.
+      </div>
+    </div>`;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+function openRegistros() {
+  if (!Object.keys(regENT_).length && !Object.keys(regSAI_).length) { alert('Carregue um SPED antes.'); return; }
+  const dt = d => (d && d.length === 8) ? `${d.slice(0,2)}/${d.slice(2,4)}/${d.slice(4)}` : (d || '');
+  const fm = v => (Math.abs(v) < 0.005 ? 0 : v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const cnpjF = c => c.length === 14 ? `${c.slice(0,2)}.${c.slice(2,5)}.${c.slice(5,8)}/${c.slice(8,12)}-${c.slice(12)}` : c;
+  const bloco = (titulo, T) => {
+    const linhas = Object.entries(T).sort(([a],[b]) => { const [ca,fa]=a.split('|'), [cb,fb]=b.split('|'); return fa.localeCompare(fb) || ca.localeCompare(cb); });
+    const tot = [0,0,0,0,0,0];
+    const corpo = linhas.map(([k, v]) => {
+      const [cst, cfop, aliq] = k.split('|');
+      v.forEach((x, i) => tot[i] += x);
+      return `<tr><td>${cst}</td><td>${cfop}</td><td class="r">${fm(parseDec(aliq))}</td>${v.map(x => `<td class="r">${fm(x)}</td>`).join('')}</tr>`;
+    }).join('');
+    return `<div class="reg-bloco">
+      <div class="reg-tit">${titulo}</div>
+      <table class="reg-tab"><thead><tr><th>CST/ICMS</th><th>CFOP</th><th>Alíq. ICMS</th><th>Total operação</th><th>Base ICMS</th><th>Total ICMS</th><th>Base ICMS ST</th><th>Total ICMS ST</th><th>Total IPI</th></tr></thead>
+      <tbody>${corpo}<tr class="tot"><td colspan="3" class="c">TOTAL</td>${tot.map(x => `<td class="r">${fm(x)}</td>`).join('')}</tr></tbody></table>
+    </div>`;
+  };
+  const cab = spedCab;
+  const cabHtml = `<div class="reg-cab">
+    <div><b>CONTRIBUINTE:</b> ${esc(cab.nome || '')}</div><div><b>PERÍODO DE APURAÇÃO:</b> ${dt(cab.ini)} a ${dt(cab.fin)}</div>
+    <div><b>CNPJ/CPF:</b> ${cnpjF(cab.cnpj || '')}</div><div><b>INSCRIÇÃO ESTADUAL:</b> ${esc(cab.ie || '')} &nbsp; <b>UF:</b> ${esc(cab.uf || '')} &nbsp; <b>MUNICÍPIO (IBGE):</b> ${esc(cab.ibge || '')}</div>
+  </div>`;
+  const html = `
+    <style>
+      .reg-cab{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;border:1px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:12px;margin-bottom:14px;background:var(--surface2)}
+      .reg-bloco{margin-bottom:22px}
+      .reg-tit{text-align:center;font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.04em;background:var(--surface3);border:1px solid var(--border2);border-radius:10px 10px 0 0;padding:8px;color:var(--text2)}
+      .reg-tab{width:100%;border-collapse:collapse;font-size:11px;border:1px solid var(--border2);border-top:none}
+      .reg-tab th,.reg-tab td{border:1px solid var(--border);padding:6px 8px;white-space:nowrap}
+      .reg-tab th{background:var(--surface2);font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--text3)}
+      .reg-tab td.r{text-align:right;font-variant-numeric:tabular-nums}
+      .reg-tab td.c{text-align:center}
+      .reg-tab tr.tot td{font-weight:700;background:var(--accent-light)}
+      @media print{.reg-bloco{page-break-inside:avoid}}
+    
+/* ===== DASHBOARD igual à referência ===== */
+.dash-wrap{position:relative;margin:18px 0 30px 18px;display:none}
+.dash-logo{position:absolute;left:-16px;top:-16px;width:58px;height:58px;border-radius:16px;background:#1d1410;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;z-index:3;box-shadow:0 12px 24px -8px rgba(0,0,0,.5)}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.dc{background:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 14px 30px -14px rgba(120,30,0,.45);position:relative;min-width:0}
+.dc-graph{grid-column:1 / span 2}
+.dc-users{grid-column:3}
+.dc-h{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#8a6f63;margin-bottom:10px;font-weight:600;font-family:var(--mono)}
+.dc-ico{width:20px;height:20px;display:grid;grid-template-columns:repeat(2,4px);gap:2px;justify-content:center;align-content:center;opacity:.6}
+.dc-ico i{width:4px;height:4px;background:#8a6f63;border-radius:50%;display:block}
+.dc-seg-track{display:flex;background:#ffe6d6;border-radius:999px;padding:4px;width:100%}
+.dc-seg-track button,.dc-tabs button{flex:1;border:none;background:transparent;padding:9px 10px;border-radius:999px;font-family:var(--mono);font-size:12px;font-weight:600;color:#8a4a2a;cursor:pointer;transition:all .2s}
+.dc-seg-track button.on,.dc-tabs button.on{background:#fff;color:#1d1410;box-shadow:0 4px 10px -4px rgba(0,0,0,.25)}
+.dc-tabs{display:flex;gap:4px;background:#fff3ec;border-radius:999px;padding:3px}
+.dc-tabs button{flex:none;padding:6px 14px}
+.dc-sel{font-size:11px;color:#b9a196}
+.dc-seg{display:flex;flex-direction:column;justify-content:center}
+.dc-seg-lbl{font-size:11px;color:#b9a196;margin-top:10px;text-align:center}
+.dc-line{position:relative}
+.dtip{position:absolute;transform:translate(-50%,-135%);background:#1d1410;color:#fff;border-radius:9px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap;pointer-events:none;font-family:var(--mono)}
+.dtip::after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-bottom:0;border-top-color:#1d1410}
+.drow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f6ece6}
+.drow:last-of-type{border-bottom:none}
+.dav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffb08a,#ff6a2b);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);flex-shrink:0}
+.drow.top .dav{background:linear-gradient(135deg,#ffd166,#ff8a00)}
+.dname{flex:1;min-width:0}
+.dname b{display:block;font-size:12px;color:#1d1410;font-weight:600}
+.dname span{font-size:11px;color:#b9a196}
+.dnum{font-size:12px;color:#3a2a22;font-weight:600}
+.drow.top .dnum{color:#ff5a1f}
+.dash-cta{width:100%;margin-top:14px;background:#ff5a1f;color:#fff;border:none;border-radius:14px;padding:13px;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.02em;cursor:pointer;box-shadow:0 10px 20px -8px rgba(255,90,31,.7);transition:transform .15s,background .15s}
+.dash-cta:hover{background:#e84a12;transform:translateY(-1px)}
+.dc-users .dc-h{margin-bottom:4px}
+.dc-cust{position:absolute;right:58px;top:34px;background:#1d1410;color:#fff;font-size:10px;border-radius:7px;padding:5px 9px;pointer-events:none;font-family:var(--mono)}
+@media (max-width:900px){.dash-grid{grid-template-columns:1fr}.dc-graph,.dc-users{grid-column:auto}.dash-wrap{margin-left:10px}}
+
+/* ===== v17: dashboard escuro com cards laranja (referência Sendart) ===== */
+body,body.dark{background:#161616!important;color:#eee}
+.kp-wrap{display:none;max-width:1400px;margin:0 auto 24px;padding:14px;background:#1f1f1f;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.kp-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;color:#fff}
+.kp-title{font-family:var(--display);font-weight:800;font-size:clamp(14px,1.4vw,18px)}
+.kp-sub{font-size:clamp(10px,.9vw,12px);color:#aaa}
+.kp-save{margin-left:auto;background:#111;color:#fff;border:1px solid #333;border-radius:999px;padding:8px 18px;font-weight:700;font-size:clamp(11px,1vw,13px);cursor:pointer;transition:background .15s}
+.kp-save:hover{background:#ff5a1f;border-color:#ff5a1f}
+.kp-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.kp-tile{background:linear-gradient(135deg,#ff6a2b,#c8380f);color:#fff;border-radius:8px;padding:10px 12px;min-height:72px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.kp-tile span{font-size:clamp(9px,.8vw,11px);text-transform:uppercase;letter-spacing:.05em;opacity:.9}
+.kp-tile b{font-size:clamp(14px,1.5vw,20px);font-family:var(--display);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kp-tile small{font-size:clamp(9px,.75vw,10px);opacity:.85}
+.kp-tile.click{cursor:pointer}
+.kp-tile.click:hover{filter:brightness(1.08)}
+.kp-charts{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:8px;margin-top:8px}
+.kp-card{background:#2a2a2a;border-radius:8px;padding:10px 12px;color:#eee;min-width:0}
+.kp-ct{font-size:clamp(10px,.9vw,12px);color:#ccc;margin-bottom:6px;font-weight:600}
+.kp-dn{display:flex;align-items:center;gap:10px}
+.kp-dn svg{width:40%;min-width:90px;flex-shrink:0;height:auto}
+.kp-dn ul{list-style:none;font-size:clamp(9px,.8vw,11px);color:#ddd;display:flex;flex-direction:column;gap:3px;min-width:0;margin:0;padding:0}
+.kp-dn li i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+.kp-br{display:grid;grid-template-columns:54px 1fr 96px;gap:6px;align-items:center;font-size:clamp(9px,.8vw,11px);margin:5px 0;color:#ddd}
+.kp-bt{background:#3a3a3a;border-radius:3px;height:9px;overflow:hidden}
+.kp-bt i{display:block;height:100%;background:linear-gradient(90deg,#ff6a2b,#ffa26b);border-radius:3px}
+.kp-br em{font-style:normal;text-align:right;color:#fff;white-space:nowrap}
+.kp-conf{margin-top:8px;background:#2a2a2a;border-radius:8px;padding:10px 12px;color:#eee;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:clamp(10px,.9vw,12px)}
+.kp-conf button{background:#ff5a1f;color:#fff;border:none;border-radius:999px;padding:7px 16px;font-weight:700;cursor:pointer;margin-left:auto}
+.kp-conf button:hover{background:#e84a12}
+.nav-btn.kp-nav{background:rgba(0,229,255,.2)!important}
+@media(max-width:900px){.kp-row{grid-template-columns:repeat(2,1fr)}.kp-charts{grid-template-columns:1fr}}
+
+
+
+/* ===== v21: menu lateral correto no celular e no desktop ===== */
+.side-nav{display:flex;flex-direction:column;gap:6px}
+.side-nav .nav-btn{width:100%!important;padding:10px 14px!important;border-radius:12px!important}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr!important}
+  .side{position:relative!important;top:auto!important;height:auto!important;display:block!important;margin:8px!important;padding:12px!important;border-radius:16px!important}
+  .side-nav{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:6px!important}
+  .side-nav .nav-btn{width:auto!important;flex:0 0 auto!important;padding:8px 12px!important;font-size:12px!important;border-radius:999px!important;white-space:nowrap!important;min-height:0!important}
+  .side-foot{display:none!important}
+  .side-card{display:none!important}
+}
+</style>
+    ${cabHtml}
+    ${bloco('REGISTROS FISCAIS — DOCUMENTOS DE ENTRADAS (IND_OPER 0)', regENT_)}
+    ${bloco('REGISTROS FISCAIS — DOCUMENTOS DE SAÍDAS (IND_OPER 1 + CUPONS C850)', regSAI_)}`;
+  document.getElementById('modalTitle').textContent = '📑 Registros fiscais — entradas e saídas';
+  document.getElementById('modalBd').innerHTML = html;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+function imprimir(id) {
+  document.body.dataset.print = id;
+  window.onafterprint = () => { delete document.body.dataset.print; window.onafterprint = null; };
+  window.print();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); document.getElementById('apuPanel').style.display = 'none'; } });
+
+function exportCsv() {
+  if (!filteredRecs.length) return;
+  const cols = COLS.filter(c => visibleCols.includes(c.key));
+  const hdr = cols.map(c => c.label).join(';');
+  const rows = filteredRecs.map(r => cols.map(c => {
+    let v = c.key === '_nrefs' ? (r._refs.length || '') : (r[c.key] ?? '');
+    if (c.numeric) v = typeof v === 'number' ? fmt(v) : (parseDec(v) ? fmt(parseDec(v)) : '');
+    if (c.key === 'DT_DOC' || c.key === 'DT_E_S') v = fmtDate(v);
+    return `"${String(v).replace(/"/g,'""')}"`;
+  }).join(';'));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + hdr + '\n' + rows.join('\n')], {type:'text/csv;charset=utf-8;'}));
+  a.download = `sped_cfop_${activeCfop !== 'all' ? activeCfop + '_' : ''}${Date.now()}.csv`;
+  a.click();
+}
+
+function setProgress(show, pct, label) {
+  document.getElementById('progWrap').style.display = show ? 'block' : 'none';
+  if (show) { document.getElementById('progFill').style.width = pct + '%'; document.getElementById('progLbl').textContent = label || 'Processando…'; }
+}
+
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('dark', isDark);
+  document.getElementById('themeBtn').textContent = isDark ? '🌙 Escuro' : '🌞 Claro';
+}
+
+function showChart() {
+  const cfopData = Object.entries(cfopSummary).sort((a,b) => b[1].vl_opr - a[1].vl_opr).slice(0, 15);
+  const sum = f => Object.entries(cfopSummary).filter(([c]) => f(c)).reduce((s,[,d]) => s + d.vl_opr, 0);
+  const totalGeral = Object.values(cfopSummary).reduce((s,d) => s + d.vl_opr, 0);
+  const totalEntradas = sum(c => cfopClass(c) === 'entrada'), totalSaidas = sum(c => cfopClass(c) === 'saida');
+  let html = `
+    <div class="summary-stats">
+      <div class="stat-card"><div class="stat-value">R$ ${fmt(totalGeral)}</div><div class="stat-label">Total Movimentado</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--green)">R$ ${fmt(totalEntradas)}</div><div class="stat-label">Total Entradas</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--red)">R$ ${fmt(totalSaidas)}</div><div class="stat-label">Total Saídas</div></div>
+    </div>
+    <h4 style="font-family:var(--display);margin-bottom:12px">📊 Top 15 CFOPs por Valor de Operação</h4>
+    <div style="display:flex;flex-direction:column;gap:8px">`;
+  const maxValor = Math.max(1, ...cfopData.map(([,d]) => d.vl_opr));
+  for (const [cfop, data] of cfopData) {
+    const percent = (data.vl_opr / maxValor) * 100, cls = cfopClass(cfop);
+    const cor = cls==='entrada' ? 'var(--green)' : cls==='saida' ? 'var(--red)' : 'var(--accent)';
+    html += `
+      <div onclick="filterByCfop('${cfop}');closeModal()" style="cursor:pointer;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:5px">
+          <span style="font-weight:800;color:${cor}">CFOP ${cfop}</span><span style="font-weight:700">R$ ${fmt(data.vl_opr)}</span>
+        </div>
+        <div style="background:var(--border);height:28px;border-radius:14px;overflow:hidden">
+          <div style="width:${percent}%;min-width:max-content;height:100%;background:${cor};display:flex;align-items:center;justify-content:flex-end;padding:0 10px;color:#fff;font-size:11px;font-weight:bold">${data.count} notas | ${Math.round(percent)}%</div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:6px;font-size:10px;color:var(--text3)">
+          <span>💰 ICMS: R$ ${fmt(data.vl_icms)}</span><span>📊 Base: R$ ${fmt(data.vl_bc_icms)}</span>
+        </div>
+      </div>`;
+  }
+  html += `</div><div style="margin-top:16px;text-align:center;font-size:11px;color:var(--text3)">💡 Clique em qualquer CFOP para filtrar a tabela</div>`;
+  document.getElementById('modalTitle').textContent = '📊 Análise Gráfica por CFOP';
+  document.getElementById('modalBd').innerHTML = html;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+function exportFullReport() {
+  if (!allRecords.length) return;
+  const rows = [['CFOP','Tipo','Quantidade Notas','Valor Total (R$)','Base ICMS (R$)','Valor ICMS (R$)','Valor IPI (R$)'].join(';')];
+  for (const [cfop, d] of Object.entries(cfopSummary).sort((a,b) => b[1].vl_opr - a[1].vl_opr)) {
+    const c = cfopClass(cfop);
+    rows.push([cfop, c==='entrada'?'Entrada':c==='saida'?'Saída':'Outros', d.count, fmt(d.vl_opr), fmt(d.vl_bc_icms), fmt(d.vl_icms), fmt(d.vl_ipi)].join(';'));
+  }
+  const tot = k => Object.values(cfopSummary).reduce((s,d) => s + d[k], 0);
+  rows.push(['','','','','','','']);
+  rows.push(['TOTAIS GERAIS','',Object.keys(cfopSummary).length + ' CFOPs',fmt(tot('vl_opr')),fmt(tot('vl_bc_icms')),fmt(tot('vl_icms')),fmt(tot('vl_ipi'))].join(';'));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + rows.join('\n')], {type:'text/csv;charset=utf-8;'}));
+  a.download = `sped_relatorio_completo_${Date.now()}.csv`;
+  a.click();
+}
+
+
+// ===== DASHBOARD v17 (referência Sendart) =====
+const KP_COR = ['#5b4b9d','#8fcfd0','#e0b4ee','#efd3a1','#9aaee6','#f0b4c0'];
+const KP_NOME = {'1':'Ent. Estado','2':'Ent. Outros UF','3':'Ent. Exterior','5':'Sai. Estado','6':'Sai. Outros UF','7':'Sai. Exterior'};
+function kpSoma(keys, g, campo){ return keys.filter(c => g.includes(c[0])).reduce((a,c) => a + cfopSummary[c][campo], 0); }
+function kpDonut(parts, centro, opt){
+  opt = opt || {};
+  const tot = parts.reduce((a,p) => a + p.v, 0);
+  const R = 58, r = opt.r || 36, depth = opt.depth || 7, cores = opt.cores || KP_COR;
+  let ang = -Math.PI/2, top = '', side = '', leg = '';
+  parts.forEach((p,i) => {
+    const cor = cores[i % cores.length];
+    const pc = tot ? p.v/tot*100 : 0;
+    leg += `<li><i style="background:${cor}"></i><span>${p.l}</span><b>${pc.toFixed(1)}%</b><em>${fmt(p.v)}</em></li>`;
+    if (p.v <= 0 || !tot) return;
+    let a = p.v/tot*2*Math.PI; if (a > 2*Math.PI - 1e-4) a = 2*Math.PI - 1e-4;
+    const large = a > Math.PI ? 1 : 0, cx = 60, cy = 60;
+    const x1 = cx+R*Math.cos(ang), y1 = cy+R*Math.sin(ang);
+    ang += a;
+    const x2 = cx+R*Math.cos(ang), y2 = cy+R*Math.sin(ang);
+    const xi1 = cx+r*Math.cos(ang), yi1 = cy+r*Math.sin(ang);
+    const xi2 = cx+r*Math.cos(ang-a), yi2 = cy+r*Math.sin(ang-a);
+    const d = `M${x1} ${y1} A${R} ${R} 0 ${large} 1 ${x2} ${y2} L${xi1} ${yi1} A${r} ${r} 0 ${large} 0 ${xi2} ${yi2} Z`;
+    side += `<path d="${d}" fill="${cor}" transform="translate(0 ${depth})"/>`;
+    top += `<path d="${d}" fill="${cor}" stroke="rgba(255,255,255,.55)" stroke-width=".8"/>`;
+  });
+  const t1 = String(centro[0]), t2 = String(centro[1]);
+  const fs = t2.length > 10 ? 9.5 : t2.length > 8 ? 11 : 12.5;
+  return `<svg viewBox="0 0 120 ${120+depth}"><g style="filter:brightness(.62)">${side}</g>${top}<text x="60" y="57" text-anchor="middle" font-size="8" font-weight="700" fill="#8590a9">${t1}</text><text x="60" y="${57+fs+2}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="#2c3550" class="kp-dn-v">${t2}</text></svg><ul>${leg}</ul>`;
+}
+function kpUnion(keys){ return [...new Set([...keys, ...(p9 ? Object.keys(p9.cfop) : [])])]; }
+function renderDash(){
+  const el = document.getElementById('dash');
+  if (!el || typeof cfopSummary === 'undefined') return;
+  const keys = Object.keys(cfopSummary).filter(naoZerado);
+  if (!keys.length) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const E = kpSoma(keys, '123', 'vl_opr'), S = kpSoma(keys, '567', 'vl_opr');
+  const ICE = kpSoma(keys, '123', 'vl_icms'), ICS = kpSoma(keys, '567', 'vl_icms');
+  const uni = kpUnion(keys);
+  const ok = p9 ? uni.filter(c => APU_COLS.every(([k]) => Math.abs(apuSped(c)[k] - (p9.cfop[c] || zeroV())[k]) < 0.015)).length : 0;
+  document.getElementById('kpSub').textContent = (spedCnpj ? 'CNPJ ' + spedCnpj : '') + (spedPeriodo ? ' · ' + spedPeriodo : '');
+
+  const tiles = [
+    ['Entradas', fmt(E), keys.filter(c => '123'.includes(c[0])).length + ' CFOPs'],
+    ['Saídas', fmt(S), keys.filter(c => '567'.includes(c[0])).length + ' CFOPs'],
+    ['ICMS creditado', fmt(ICE), 'entradas'],
+    ['ICMS debitado', fmt(ICS), 'saídas'],
+    p9 ? ['Confronto', ok + '/' + uni.length, 'CFOPs batem com P9'] : ['Confronto', 'Sem P9', 'clique para gerar']
+  ];
+  document.getElementById('kpRow').innerHTML = tiles.map((t,i) =>
+    `<div class="kp-tile ${i===4?'click':''}" ${i===4?'onclick="confrontoAction()"':''}><span>${t[0]}</span><b>${t[1]}</b><small>${t[2]}</small></div>`).join('');
+
+  const grupos = ['1','2','3','5','6','7'];
+  const dv = grupos.map(g => kpSoma(keys, g, 'vl_opr'));
+  const di = grupos.map(g => kpSoma(keys, g, 'vl_icms'));
+  const dParts = grupos.map((g,i) => ({l: KP_NOME[g], v: dv[i]})).filter(x => x.v > 0);
+  document.getElementById('kpDonut1').innerHTML = kpDonut(dParts, ['TOTAL', fmt(E+S)], {r:40, depth:8});
+  const iParts = grupos.map((g,i) => ({l: KP_NOME[g], v: di[i]})).filter(x => x.v > 0);
+  document.getElementById('kpDonut2').innerHTML = kpDonut(iParts, ['ICMS', fmt(ICE+ICS)], {r:42, depth:5, cores:['#e0901a','#f5b94f','#d9576f','#7a58d6','#3f8fe0','#2fb3a5']});
+
+  const top = [...keys].sort((a,b) => cfopSummary[b].vl_opr - cfopSummary[a].vl_opr).slice(0, 8);
+  const mx = Math.max(...top.map(c => cfopSummary[c].vl_opr), 1);
+  document.getElementById('kpBars').innerHTML = top.map(c => {
+    const v = cfopSummary[c].vl_opr;
+    return `<div class="kp-br"><span>CFOP ${c}</span><div class="kp-bt"><i style="width:${(v/mx*100).toFixed(1)}%"></i></div><em>${fmt(v)}</em></div>`;
+  }).join('');
+
+  document.getElementById('kpConf').innerHTML = p9
+    ? `<span><strong style="color:#ff8a55">${ok}/${uni.length}</strong> CFOPs batem entre PRODAC (P9 do PDF) e DP (SPED). Vermelho no relatório = diferença.</span><button onclick="showComparador()">⇄ Abrir comparador</button>`
+    : `<span>Confronto PRODAC × DP: suba o PDF da apuração (P9).</span><button onclick="toggleApuracaoInline()">📄 Subir PDF do P9</button>`;
+}
+function confrontoAction(){ showComparador(); }
+const _renderAllBase2 = renderAll;
+renderAll = function(){ _renderAllBase2.apply(this, arguments); renderDash(); };
+</script>
+<style id="neo22">
+/* ===== v22: layout neumórfico 3D (referência dashboard claro com cartões pastel) ===== */
+:root{--mono:'Nunito',system-ui,sans-serif;--display:'Nunito',system-ui,sans-serif}
+html:root body:not(.dark){--bg:#e8ebf2;--surface:#f3f5fa;--surface2:#eceff6;--surface3:#e4e8f1;--border:#dde2ed;--border2:#cbd2e1;
+  --accent:#5b4b9d;--accent-light:#e8e4f6;--green:#2f9aa0;--green-light:#d9f0f1;--red:#d2587a;--red-light:#fbe4ea;
+  --amber:#b98230;--amber-light:#fbf0dc;--text:#3a4560;--text2:#56617c;--text3:#8590a9;--text4:#aab2c5;
+  --neo:10px 14px 28px -8px rgba(134,146,176,.55),-10px -10px 24px rgba(255,255,255,.95);
+  --neo-s:6px 8px 16px -6px rgba(134,146,176,.5),-6px -6px 14px rgba(255,255,255,.95);
+  --neo-in:inset 4px 5px 10px rgba(150,160,188,.45),inset -4px -4px 9px rgba(255,255,255,.95);
+  --shadow:var(--neo-s);--shadow2:var(--neo)}
+html:root body.dark{--bg:#1c2031;--surface:#262b40;--surface2:#2b3149;--surface3:#313853;--border:#373f5c;--border2:#454e70;
+  --accent:#a493f0;--accent-light:#343057;--green:#5cc8cd;--green-light:#1f3a43;--red:#ef7f9c;--red-light:#43222f;
+  --amber:#e4b062;--amber-light:#41331a;--text:#e8ebf5;--text2:#c3c9dd;--text3:#8d96b3;--text4:#646d8a;
+  --neo:10px 14px 28px -8px rgba(5,7,16,.7),-8px -8px 20px rgba(58,66,102,.28);
+  --neo-s:6px 8px 16px -6px rgba(5,7,16,.65),-5px -5px 12px rgba(58,66,102,.25);
+  --neo-in:inset 4px 5px 10px rgba(5,7,16,.6),inset -3px -3px 8px rgba(58,66,102,.3);
+  --shadow:var(--neo-s);--shadow2:var(--neo)}
+html:root body{background:radial-gradient(55% 45% at 16% 10%,#ffffff 0%,rgba(255,255,255,0) 70%),linear-gradient(135deg,#eceef4 0%,#dce0ea 100%)!important;
+  background-attachment:fixed!important;color:var(--text)!important;font-family:var(--mono)!important;font-size:13px}
+html:root body.dark{background:radial-gradient(55% 45% at 16% 10%,#2d3352 0%,rgba(0,0,0,0) 70%),linear-gradient(135deg,#202539 0%,#151826 100%)!important}
+html:root body ::selection{background:var(--accent);color:#fff}
+html:root body td,html:root body .td-num,html:root body .cfop-valor,html:root body .ft-value{font-variant-numeric:tabular-nums}
+
+/* --- estrutura --- */
+html:root body .app{grid-template-columns:250px minmax(0,1fr)!important}
+html:root body .wrap{padding:22px 30px 30px 14px!important}
+
+/* --- menu lateral: azulejos neumórficos com rótulo embaixo --- */
+html:root body .side{background:transparent!important;box-shadow:none!important;border-radius:0!important;margin:0!important;
+  padding:30px 14px 24px 26px!important;height:100vh!important;top:0!important;gap:22px!important;color:var(--text)!important;
+  transform-origin:0 50%;transform:perspective(2200px) rotateY(7deg);transition:transform .35s ease}
+html:root body .side *{border-color:transparent}
+html:root body .side-logo{background:none!important;box-shadow:none!important;padding:0 4px!important}
+html:root body .side-ico{background:var(--surface)!important;color:var(--accent)!important;border-radius:16px!important;box-shadow:var(--neo-s)!important}
+html:root body .side-name{color:var(--text)!important;font-weight:800}
+html:root body .side-sub{color:var(--text3)!important;opacity:1!important}
+html:root body .side .side-nav{display:grid!important;grid-template-columns:1fr 1fr!important;gap:22px 8px!important;flex-direction:row!important;margin-top:6px}
+html:root body .side .side-nav .nav-btn{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important;
+  background:none!important;border:none!important;box-shadow:none!important;text-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  padding:0!important;width:auto!important;min-height:0!important;border-radius:0!important;overflow:visible!important;
+  color:var(--text3)!important;font-family:var(--mono)!important;font-size:12px!important;font-weight:700!important;
+  text-transform:none!important;letter-spacing:0!important;transform:none!important;white-space:normal!important;flex:initial!important}
+html:root body .side .side-nav .nav-btn::before{display:none!important}
+html:root body .side .side-nav .nav-btn .ni{width:58px;height:58px;border-radius:19px;background:var(--surface);box-shadow:var(--neo-s);
+  display:grid;place-items:center;transition:transform .2s,box-shadow .2s,background .2s}
+html:root body .side .side-nav .nav-btn .ni i{font-style:normal;font-size:22px;filter:grayscale(1) contrast(.85) opacity(.6);transition:filter .2s}
+html:root body .side .side-nav .nav-btn:hover .ni{transform:translateY(-3px);box-shadow:var(--neo)}
+html:root body .side .side-nav .nav-btn:active .ni{box-shadow:var(--neo-in);transform:none}
+html:root body .side .side-nav .nav-btn:hover{color:var(--accent)!important}
+html:root body .side .side-nav .nav-btn.active{color:var(--text)!important}
+html:root body .side .side-nav .nav-btn.active .ni{background:linear-gradient(145deg,#6c5ab6,#463787);box-shadow:0 14px 24px -8px rgba(70,55,135,.75),inset 0 1px 0 rgba(255,255,255,.25)}
+html:root body .side .side-nav .nav-btn.active .ni i{filter:grayscale(1) brightness(0) invert(1)}
+html:root body .side-foot{gap:12px!important}
+html:root body .side-card{background:var(--surface)!important;box-shadow:var(--neo-s)!important;border-radius:18px!important;color:var(--text2)!important}
+html:root body .side-card div{color:inherit}
+html:root body .side .side-foot .nav-btn{display:block!important;width:100%!important;text-align:center!important;padding:11px 14px!important;
+  background:var(--surface)!important;color:var(--accent)!important;border:none!important;border-radius:999px!important;
+  box-shadow:var(--neo-s)!important;text-shadow:none!important;backdrop-filter:none!important;font-family:var(--mono)!important;
+  font-size:12px!important;font-weight:800!important;text-transform:none!important;letter-spacing:0!important}
+html:root body .side .side-foot .nav-btn:hover{box-shadow:var(--neo)!important;transform:translateY(-1px)!important}
+html:root body .side .side-foot .nav-btn::before{display:none!important}
+
+/* --- topo: busca em pílula afundada + saudação --- */
+html:root body .topbar{margin:0 0 20px}
+html:root body .tsearch{display:flex;align-items:center;gap:10px;width:min(560px,100%);padding:13px 22px;border-radius:999px;background:var(--surface2);
+  box-shadow:var(--neo-in);color:var(--text3);cursor:text}
+html:root body .tsearch input{flex:1;background:none;border:none;outline:none;font:600 14px var(--mono);color:var(--text)}
+html:root body .tsearch input::placeholder{color:var(--text4)}
+html:root body .tsi{filter:grayscale(1) opacity(.55)}
+html:root body .hd{background:transparent!important;box-shadow:none!important;border:none!important;border-radius:0!important;padding:4px 4px 0!important;
+  margin-bottom:26px!important;align-items:flex-end!important;gap:18px!important}
+html:root body .hd-logo{display:none!important}
+html:root body .greet{display:flex;align-items:flex-start;gap:6px;font-size:clamp(34px,3.4vw,50px);line-height:1;font-weight:800;color:#2c3550;letter-spacing:-.02em}
+html:root body.dark .greet{color:#f1f3fb}
+html:root body .gname{font-weight:300;color:var(--text3)}
+html:root body .gbadge{font-style:normal;margin-top:-4px;min-width:26px;height:26px;padding:0 7px;border-radius:999px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#f7b08a,#ef8b5e);color:#fff;font:800 11px var(--mono);box-shadow:0 8px 14px -5px rgba(239,139,94,.7)}
+html:root body .hd-title{color:var(--text)!important;font-size:15px!important;font-weight:800!important;letter-spacing:0!important}
+html:root body .hd-sub{color:var(--text3)!important;font-size:10.5px!important;letter-spacing:0!important;text-transform:none!important}
+html:root body .badge-empresa{background:var(--surface)!important;color:var(--accent)!important;border:none!important;box-shadow:var(--neo-s)!important;
+  font-family:var(--mono)!important;font-weight:800!important;padding:8px 16px!important}
+
+/* --- botões: relevo suave; primário = roxo --- */
+html:root body .btn-sm,html:root body .btn-theme,html:root body label.btn-sm,html:root body .pag-btn,html:root body .cfop-pill,html:root body .ft-clear,html:root body .hd .btn-theme{
+  background:var(--surface)!important;color:var(--text2)!important;border:none!important;border-radius:999px!important;
+  box-shadow:var(--neo-s)!important;text-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  font-family:var(--mono)!important;font-weight:700!important;text-transform:none!important;letter-spacing:0!important;font-size:12px!important;
+  padding:9px 16px;transition:transform .15s,box-shadow .15s,color .15s!important}
+html:root body .btn-sm::before,html:root body .btn-theme::before,html:root body label.btn-sm::before,html:root body .pag-btn::before,html:root body .hd .btn-theme::before{display:none!important}
+html:root body .btn-sm:hover,html:root body .btn-theme:hover,html:root body label.btn-sm:hover,html:root body .pag-btn:hover,html:root body .cfop-pill:hover,html:root body .ft-clear:hover,html:root body .hd .btn-theme:hover{
+  color:var(--accent)!important;background:var(--surface)!important;box-shadow:var(--neo)!important;transform:translateY(-1px)!important}
+html:root body .btn-sm:active,html:root body .btn-theme:active,html:root body .pag-btn:active,html:root body .cfop-pill:active{box-shadow:var(--neo-in)!important;transform:none!important}
+html:root body .cfop-pill.active,html:root body .pag-btn.on,html:root body .btn-sm.green,html:root body .kp-save,html:root body .cfop-pill.all.active{
+  background:linear-gradient(145deg,#6c5ab6,#473888)!important;color:#fff!important;border:none!important;
+  box-shadow:0 12px 22px -9px rgba(71,56,136,.75),inset 0 1px 0 rgba(255,255,255,.22)!important;text-shadow:none!important}
+html:root body .btn-sm.green:hover,html:root body .kp-save:hover{color:#fff!important;background:linear-gradient(145deg,#7664c2,#4f3f95)!important}
+html:root body .pag-btn:disabled{opacity:.45}
+
+/* --- campos afundados --- */
+html:root body .search-input,html:root body select{background:var(--surface2)!important;border:none!important;border-radius:999px!important;
+  box-shadow:var(--neo-in)!important;color:var(--text)!important;font-family:var(--mono)!important;font-weight:600;padding:10px 18px!important}
+html:root body .search-input:focus{outline:2px solid var(--accent)!important;outline-offset:2px}
+html:root body .pag-size select{padding:6px 12px!important}
+
+/* --- superfícies --- */
+html:root body .table-wrap,html:root body .ftr,html:root body .stat-card,html:root body .loader,html:root body .modal-box,html:root body .col-panel{background:var(--surface)!important;color:var(--text)!important;
+  border:none!important;box-shadow:var(--neo)!important;border-radius:26px!important}
+html:root body .cfop-card{background:var(--surface)!important;color:var(--text)!important;border:none!important;border-radius:22px!important;
+  box-shadow:var(--neo-s)!important;padding:18px 20px!important}
+html:root body .cfop-card:hover{box-shadow:var(--neo)!important;background:var(--surface)!important;transform:translateY(-2px)}
+html:root body .cfop-card.active{background:var(--accent-light)!important;box-shadow:var(--neo-in)!important;transform:none}
+html:root body .cfop-card::before{border-radius:0 6px 6px 0;opacity:.85}
+html:root body .cfop-code{font-weight:800}
+html:root body .cfop-sub span{background:var(--surface2)!important;box-shadow:var(--neo-in)}
+html:root body .cfop-summary-title{color:var(--text3)!important;font-size:12px;letter-spacing:.04em}
+html:root body .filter-total{background:var(--surface2)!important;border:none!important;box-shadow:var(--neo-in)!important;border-radius:22px!important}
+html:root body .ft-label,html:root body .ft-value{color:var(--accent)!important}
+html:root body .drop-zone{background:var(--surface)!important;border:2px dashed var(--border2)!important;border-radius:28px!important;box-shadow:var(--neo-in)!important;color:var(--text)!important}
+html:root body .drop-zone:hover,html:root body .drop-zone.over{border-color:var(--accent)!important;background:var(--accent-light)!important}
+html:root body .drop-zone.ok{border-style:solid!important;border-color:var(--green)!important;background:var(--green-light)!important}
+html:root body .table-wrap{padding:8px 6px!important;overflow-x:auto}
+html:root body th{background:transparent!important;color:var(--text3)!important;border-bottom:1px solid var(--border)!important;font-size:11px;font-weight:800}
+html:root body td{border-bottom:1px solid var(--border)!important;color:var(--text2)!important}
+html:root body tr:nth-child(even) td{background:var(--surface2)}
+html:root body tr:hover td,html:root body tr:nth-child(even):hover td{background:var(--accent-light)!important}
+html:root body tr.grp td,html:root body .grp td{background:var(--accent-light)!important;color:var(--accent)!important}
+html:root body .modal{background:rgba(52,58,86,.45)!important}
+html:root body .modal-hd{background:var(--surface2)!important;border-bottom:1px solid var(--border)!important;border-radius:26px 26px 0 0!important}
+html:root body .modal-hd h3{color:var(--text)}
+html:root body .m-alert{border-radius:16px!important}
+html:root body .ftr-bar{background:linear-gradient(90deg,#5b4b9d,#b9aee6,#5b4b9d)!important;background-size:200% 100%}
+html:root body .ftr-brand{color:var(--text)!important}
+html:root body .ftr-txt strong{color:var(--accent)!important}
+html:root body .spin{border-color:var(--border)!important;border-top-color:var(--accent)!important}
+html:root body .loader .prog-bar{background:var(--surface3)!important;box-shadow:var(--neo-in);animation:none}
+html:root body .prog-fill{background:linear-gradient(90deg,#8f7fd6,#5b4b9d)!important}
+
+/* --- DASHBOARD: cartões pastel altos à esquerda, lista de cartões brancos à direita --- */
+html:root body #dash.kp-wrap[style*="block"]{display:grid!important;grid-template-columns:minmax(0,1fr) 330px;
+  grid-template-areas:"top top" "row side" "conf side";gap:6px 26px;align-items:start;max-width:none;margin:0 0 34px;padding:6px 4px 10px;
+  background:transparent!important;box-shadow:none!important;border-radius:0!important;
+  transform-origin:0 0;transform:perspective(2400px) rotateY(5deg) rotateX(.8deg);transition:transform .35s ease}
+html:root body .kp-top{grid-area:top;color:var(--text)!important;margin-bottom:6px!important}
+html:root body .kp-title{font-size:22px!important;font-weight:800;color:var(--text)}
+html:root body .kp-sub{color:var(--text3)!important;font-size:12px!important}
+html:root body .kp-save{border:none!important;padding:10px 20px!important}
+html:root body .kp-row{grid-area:row;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:16px!important;align-items:end;padding:8px 2px 28px}
+html:root body .kp-tile{position:relative;overflow:hidden;border-radius:28px!important;padding:18px 16px 18px!important;min-height:200px!important;
+  justify-content:flex-end!important;gap:3px;color:#4d5c78!important;
+  box-shadow:14px 20px 30px -12px rgba(110,122,156,.65),-4px -4px 14px rgba(255,255,255,.8),inset 0 1px 0 rgba(255,255,255,.65),inset -3px 0 0 rgba(255,255,255,.28)!important;
+  transition:transform .25s ease,box-shadow .25s}
+html:root body.dark .kp-tile{box-shadow:14px 20px 30px -12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.4),inset -3px 0 0 rgba(255,255,255,.18)!important}
+html:root body .kp-tile:nth-child(1){background:linear-gradient(160deg,#b9e3e3,#8fcacb)!important;min-height:200px!important}
+html:root body .kp-tile:nth-child(2){background:linear-gradient(160deg,#efcaf5,#dbb0ea)!important;min-height:262px!important}
+html:root body .kp-tile:nth-child(3){background:linear-gradient(160deg,#f8e6c3,#edd09c)!important;min-height:214px!important}
+html:root body .kp-tile:nth-child(4){background:linear-gradient(160deg,#cddcf7,#a9bde9)!important;min-height:240px!important}
+html:root body .kp-tile:nth-child(5){background:linear-gradient(160deg,#f8d0d7,#eaaebb)!important;min-height:196px!important}
+html:root body .kp-tile::before{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-size:92px;font-weight:800;line-height:1;
+  color:rgba(255,255,255,.5);pointer-events:none}
+html:root body .kp-tile:nth-child(1)::before{content:'↓'}
+html:root body .kp-tile:nth-child(2)::before{content:'↑'}
+html:root body .kp-tile:nth-child(3)::before{content:'+'}
+html:root body .kp-tile:nth-child(4)::before{content:'−'}
+html:root body .kp-tile:nth-child(5)::before{content:'≈'}
+html:root body .kp-tile::after{content:'⋮';position:absolute;top:12px;right:14px;font-size:19px;font-weight:800;color:#5c6b86}
+html:root body .kp-tile span{position:absolute;top:17px;left:16px;font-size:12.5px!important;font-weight:800;text-transform:none!important;letter-spacing:0!important;
+  opacity:1!important;color:#51607b;max-width:calc(100% - 44px)}
+html:root body .kp-tile b{position:relative;font-size:clamp(14px,1.45vw,21px)!important;font-weight:800;color:#44537a;letter-spacing:-.01em}
+html:root body .kp-tile small{position:relative;font-size:10.5px!important;font-weight:700;opacity:.75!important;color:#4d5c78}
+html:root body .kp-tile.click{cursor:pointer}
+html:root body .kp-tile.click:hover,html:root body .kp-tile:hover{filter:none!important;transform:translateY(-6px)}
+html:root body .kp-charts{grid-area:side;display:flex!important;flex-direction:column;gap:16px!important;margin-top:0!important}
+html:root body .kp-card{background:var(--surface)!important;border-radius:22px!important;padding:16px 18px!important;box-shadow:var(--neo-s)!important;color:var(--text2)!important}
+html:root body .kp-ct{font-size:15px!important;font-weight:800!important;color:var(--text)!important;margin-bottom:10px!important}
+html:root body .kp-dn{gap:14px!important}
+html:root body .kp-dn ul{color:var(--text2)!important;font-weight:600}
+html:root body .kp-dn li i{border-radius:50%!important}
+html:root body .kp-dn svg text:first-of-type{fill:var(--text3)!important}
+html:root body .kp-dn svg text:last-of-type{fill:var(--text)!important}
+html:root body .kp-br{color:var(--text2)!important;font-weight:700}
+html:root body .kp-br em{color:var(--text)!important}
+html:root body .kp-bt{background:var(--surface2)!important;box-shadow:var(--neo-in);height:10px!important;border-radius:999px!important}
+html:root body .kp-bt i{background:linear-gradient(90deg,#9a8bdc,#5b4b9d)!important;border-radius:999px!important}
+html:root body .kp-conf{grid-area:conf;margin-top:0!important;background:linear-gradient(135deg,#d6cff1,#bdb2e8)!important;color:#2f2768!important;border-radius:20px!important;
+  padding:14px 18px!important;box-shadow:var(--neo-s)!important;font-weight:700}
+html:root body .kp-conf strong{color:#2f2768!important}
+html:root body .kp-conf button{background:#5b4b9d!important;color:#fff!important;border:none!important;border-radius:999px!important;padding:9px 18px!important;
+  box-shadow:0 10px 18px -8px rgba(71,56,136,.8)!important;font-family:var(--mono)!important;text-transform:none!important}
+html:root body .kp-conf button:hover{background:#4a3b8c!important;color:#fff!important}
+
+/* --- efeito 3D desligável + telas pequenas + impressão --- */
+html:root body.flat .side,html:root body.flat #dash.kp-wrap[style*="block"]{transform:none!important}
+@media (max-width:1180px){
+  html:root body #dash.kp-wrap[style*="block"]{grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "row" "conf" "side";transform:none}
+  html:root body .kp-row{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  html:root body .kp-charts{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+}
+@media (max-width:900px){
+  html:root body .app{grid-template-columns:1fr!important}
+  html:root body .side{position:relative!important;height:auto!important;display:block!important;transform:none!important;padding:16px 14px 6px!important;margin:0!important}
+  html:root body .side .side-nav{grid-template-columns:repeat(4,1fr)!important;gap:16px 6px!important}
+  html:root body .side .side-nav .nav-btn .ni{width:50px;height:50px;border-radius:16px}
+  html:root body .side-foot{display:flex!important;flex-direction:row;flex-wrap:wrap;margin-top:14px}
+  html:root body .side-card{display:none!important}
+  html:root body .wrap{padding:12px 14px 24px!important}
+  html:root body .kp-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media print{html:root body .side,html:root body .topbar{display:none!important}html:root body #dash.kp-wrap[style*="block"]{transform:none!important}}
+@media (prefers-reduced-motion:reduce){html:root body .side,html:root body #dash.kp-wrap[style*="block"]{transition:none}}
+</style>
+<style id="neo23">
+/* ===== v23: layout reto (sem inclinação 3D), cores mais vivas, tamanhos maiores, resumo por CFOP no topo ===== */
+html:root body{font-size:14px!important}
+
+/* --- nada de inclinação: tudo alinhado --- */
+html:root body .side,
+html:root body #dash.kp-wrap[style*="block"]{transform:none!important;transition:none!important}
+
+/* --- cabeçalho: não estoura mais para fora da tela --- */
+html:root body .hd{flex-wrap:wrap!important;row-gap:12px!important}
+html:root body .hd-right{margin-left:auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+html:root body .hd .btn-theme,html:root body .badge-empresa{font-size:13px!important}
+
+/* --- menu lateral: um pouco maior e legível --- */
+html:root body .side .side-nav .nav-btn{font-size:13px!important}
+html:root body .side .side-nav .nav-btn .ni{width:60px;height:60px;border-radius:20px}
+html:root body .side .side-nav .nav-btn .ni i{font-size:24px}
+
+/* rodapé do menu: cartão do arquivo + botão único */
+html:root body .side .side-foot{gap:12px!important}
+html:root body .side-card{padding:14px 16px!important;border-radius:18px!important}
+html:root body .side-card > div:first-child{font-size:12px!important;font-weight:700;opacity:1!important;color:var(--text3)!important;margin-bottom:4px}
+html:root body .side-card #sideArq{font-size:12.5px!important;font-weight:800!important;color:var(--text)!important;line-height:1.35;
+  word-break:break-all;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html:root body .side .side-foot .nav-btn.side-new{display:flex!important;align-items:center;justify-content:center;gap:8px;
+  padding:13px 16px!important;font-size:13px!important;font-weight:800!important;border-radius:16px!important;
+  background:linear-gradient(145deg,#7a62d8,#5238b0)!important;color:#fff!important;
+  box-shadow:0 12px 22px -10px rgba(82,56,176,.75),inset 0 1px 0 rgba(255,255,255,.25)!important}
+html:root body .side .side-foot .nav-btn.side-new:hover{background:linear-gradient(145deg,#8670e2,#5d43bd)!important;color:#fff!important}
+html:root body .side .side-foot .nav-btn.side-3d{display:none!important}
+
+/* --- dashboard: grade reta --- */
+html:root body #dash.kp-wrap[style*="block"]{
+  grid-template-columns:minmax(0,1fr) 340px!important;
+  grid-template-rows:auto auto auto auto 1fr!important;
+  grid-template-areas:"top top" "row side" "conf side" "cfop side" ". side"!important;
+  gap:18px 24px!important;align-items:start!important;padding:0 0 10px!important;margin:0 0 30px!important}
+html:root body .kp-top{margin-bottom:0!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important}
+html:root body .kp-title{font-size:24px!important;font-weight:800!important}
+html:root body .kp-sub{font-size:13px!important}
+
+/* botão Comparador */
+html:root body #dash .kp-save{margin-left:auto;display:inline-flex!important;align-items:center;gap:10px;
+  padding:13px 26px!important;font-size:15px!important;font-weight:800!important;border-radius:16px!important;cursor:pointer;
+  background:linear-gradient(145deg,#7a62d8,#5238b0)!important;color:#fff!important;border:none!important;
+  box-shadow:0 14px 24px -10px rgba(82,56,176,.8),inset 0 1px 0 rgba(255,255,255,.28)!important;transition:transform .15s,box-shadow .15s!important}
+html:root body #dash .kp-save::before{content:'⇄';font-size:18px;line-height:1;display:inline!important}
+html:root body #dash .kp-save:hover{background:linear-gradient(145deg,#8670e2,#5d43bd)!important;color:#fff!important;transform:translateY(-2px)!important;
+  box-shadow:0 18px 28px -10px rgba(82,56,176,.85),inset 0 1px 0 rgba(255,255,255,.3)!important}
+html:root body #dash .kp-save:active{transform:none!important;box-shadow:inset 0 3px 8px rgba(30,15,90,.5)!important}
+html:root body #dash .kp-save:focus-visible{outline:3px solid #b9aee6;outline-offset:3px}
+
+/* --- cartões coloridos: todos do mesmo tamanho, texto escuro e legível --- */
+html:root body .kp-row{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:14px!important;align-items:stretch!important;padding:0!important}
+html:root body .kp-tile{container-type:inline-size;position:relative;overflow:hidden;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+  min-height:150px!important;height:auto!important;padding:16px 16px 15px!important;border-radius:22px!important;gap:0!important;color:#1b2742!important;
+  box-shadow:0 14px 26px -14px rgba(30,40,90,.45),inset 0 1px 0 rgba(255,255,255,.75)!important}
+html:root body .kp-tile:nth-child(n){min-height:150px!important}
+html:root body .kp-tile:nth-child(1){background:linear-gradient(155deg,#a6e8de,#5fcfc2)!important;--ic:#087a71}
+html:root body .kp-tile:nth-child(2){background:linear-gradient(155deg,#d6c9fb,#a68ff0)!important;--ic:#4f33b8}
+html:root body .kp-tile:nth-child(3){background:linear-gradient(155deg,#ffe3a0,#f7be4d)!important;--ic:#9a5f00}
+html:root body .kp-tile:nth-child(4){background:linear-gradient(155deg,#bcd5ff,#7fabf3)!important;--ic:#1f55b8}
+html:root body .kp-tile:nth-child(5){background:linear-gradient(155deg,#ffc6d3,#f18aa4)!important;--ic:#b02a55}
+/* ícone pequeno no canto (antes era uma seta gigante atrás do texto) */
+html:root body .kp-tile::before{position:absolute!important;top:12px!important;right:12px!important;left:auto!important;transform:none!important;
+  width:38px;height:38px;border-radius:13px;display:grid!important;place-items:center;font-size:22px!important;font-weight:800;line-height:1;
+  background:rgba(255,255,255,.72)!important;color:var(--ic)!important;box-shadow:0 4px 10px -4px rgba(30,40,90,.35)}
+html:root body .kp-tile::after{display:none!important}
+html:root body .kp-tile span{position:static!important;display:block;max-width:none!important;padding-right:46px;
+  font-size:13.5px!important;font-weight:800!important;opacity:1!important;color:#1b2742!important;line-height:1.25}
+html:root body .kp-tile b{position:static!important;display:block;margin-top:auto!important;padding-top:14px;
+  font-size:clamp(15px,12.5cqw,30px)!important;font-weight:800!important;line-height:1.1;color:#101a33!important;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+html:root body .kp-tile small{position:static!important;display:block;margin-top:4px;
+  font-size:12.5px!important;font-weight:700!important;opacity:1!important;color:#2b3858!important}
+html:root body .kp-tile:hover{transform:translateY(-4px)!important}
+
+/* --- faixa do confronto: fina, logo abaixo dos cartões --- */
+html:root body .kp-conf{grid-area:conf;display:flex!important;align-items:center;gap:16px;margin:0!important;padding:14px 20px!important;
+  border-radius:18px!important;font-size:14px!important;font-weight:700;line-height:1.4;
+  background:linear-gradient(135deg,#e1dbf7,#c9bfee)!important;color:#2b2366!important}
+html:root body .kp-conf button{margin-left:auto;flex-shrink:0;padding:10px 20px!important;font-size:13.5px!important;font-weight:800!important;border-radius:12px!important;
+  background:#5238b0!important;color:#fff!important}
+html:root body .kp-conf button:hover{background:#44309a!important}
+
+/* --- RESUMO POR CFOP: agora no topo, logo abaixo dos cartões --- */
+html:root body .cfop-summary-section.cfop-top{grid-area:cfop;margin:0!important}
+html:root body .cfop-summary-section.cfop-top .cfop-summary-title{font-size:17px!important;font-weight:800!important;color:var(--text)!important;
+  text-transform:none!important;letter-spacing:0!important;margin:0 0 14px!important}
+html:root body .cfop-summary-section.cfop-top .cfop-cards{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))!important;gap:14px!important}
+html:root body .cfop-summary-section.cfop-top .cfop-card{padding:16px 18px!important;border-radius:20px!important;display:flex;flex-direction:column}
+html:root body .cfop-summary-section.cfop-top .cfop-code{font-size:28px!important}
+html:root body .cfop-summary-section.cfop-top .cfop-desc{font-size:11.5px!important;font-weight:700;letter-spacing:.02em;min-height:30px;margin-top:4px!important}
+html:root body .cfop-summary-section.cfop-top .cfop-valor{font-size:19px!important;margin-top:8px!important}
+html:root body .cfop-summary-section.cfop-top .cfop-sub{margin-top:8px!important;gap:6px!important}
+html:root body .cfop-summary-section.cfop-top .cfop-sub span{font-size:11.5px!important;font-weight:700;padding:3px 9px!important}
+
+/* --- gráficos da direita: textos maiores --- */
+html:root body .kp-charts{grid-area:side!important}
+html:root body .kp-ct{font-size:15px!important}
+html:root body .kp-dn ul{font-size:12.5px!important;gap:5px!important}
+html:root body .kp-br{grid-template-columns:70px 1fr 108px!important;font-size:12.5px!important;margin:8px 0!important}
+
+/* --- telas médias e pequenas --- */
+@media (max-width:1380px){
+  html:root body .kp-row{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media (max-width:1180px){
+  html:root body #dash.kp-wrap[style*="block"]{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:none!important;
+    grid-template-areas:"top" "row" "conf" "cfop" "side"!important}
+  html:root body .kp-charts{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))!important}
+}
+@media (max-width:900px){
+  html:root body .kp-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  html:root body .kp-conf{flex-wrap:wrap}
+  html:root body .kp-conf button{margin-left:0}
+}
+@media (max-width:560px){
+  html:root body .kp-top{flex-wrap:wrap}
+  html:root body #dash .kp-save{width:100%;justify-content:center}
+}
+@media print{html:root body #dash.kp-wrap[style*="block"]{display:block!important}}
+</style>
+<style id="neo24">
+/* ===== v24: faixas horizontais (sem coluna alta = sem espaço vazio), gráficos maiores e diferentes, botões no topo ===== */
+html:root body #dash.kp-wrap[style*="block"]{
+  grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto!important;
+  grid-template-areas:"top" "row" "charts" "cfop"!important;gap:16px!important;margin:0 0 26px!important}
+
+/* topo: título à esquerda, ações à direita, tudo na mesma linha */
+html:root body .kp-top{flex-wrap:wrap!important;gap:14px!important}
+html:root body #dash .kp-save{margin-left:0!important;height:48px;padding:0 24px!important}
+html:root body .kp-top .kp-conf{margin:0 0 0 auto!important;padding:6px 6px 6px 18px!important;min-height:48px;gap:14px!important;
+  border-radius:16px!important;font-size:13px!important;max-width:min(640px,100%);
+  background:linear-gradient(135deg,#e6e0f8,#cfc5f1)!important;box-shadow:0 10px 20px -12px rgba(82,56,176,.55),inset 0 1px 0 rgba(255,255,255,.7)!important}
+html:root body .kp-top .kp-conf button{margin-left:0!important;height:36px;padding:0 18px!important;border-radius:12px!important;white-space:nowrap}
+
+/* gráficos: três cartões lado a lado, cada um com identidade própria */
+html:root body #dash .kp-charts{grid-area:charts!important;display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr)!important;gap:18px!important;margin:0!important;align-items:stretch}
+html:root body #dash .kp-card{position:relative;padding:18px 22px 20px!important;border-radius:24px!important;min-height:290px;
+  background:var(--surface)!important;border-bottom:6px solid var(--cc)!important;
+  box-shadow:0 22px 34px -18px rgba(40,45,100,.55),0 2px 0 rgba(255,255,255,.9) inset,0 0 0 1px rgba(255,255,255,.4)!important}
+html:root body #dash .kp-card:nth-child(1){--cc:#6a4fcf;background:linear-gradient(180deg,#efeafc 0,var(--surface) 55%)!important}
+html:root body #dash .kp-card:nth-child(2){--cc:#0f9d94;background:linear-gradient(180deg,#e2f6f3 0,var(--surface) 55%)!important}
+html:root body #dash .kp-card:nth-child(3){--cc:#e0901a;background:linear-gradient(180deg,#fdf0d8 0,var(--surface) 55%)!important}
+html:root body.dark #dash .kp-card:nth-child(n){background:var(--surface)!important}
+html:root body #dash .kp-ct{font-size:16px!important;font-weight:800!important;margin-bottom:14px!important;color:var(--text)!important}
+html:root body #dash .kp-ct::before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--cc);margin-right:9px;box-shadow:0 3px 6px -2px var(--cc)}
+
+/* rosquinhas em 3D (camada de espessura desenhada no SVG) */
+html:root body #dash .kp-dn{gap:20px!important;justify-content:center}
+html:root body #dash .kp-dn svg{width:48%!important;max-width:250px;min-width:150px;filter:drop-shadow(0 14px 12px rgba(40,45,100,.35))}
+html:root body #dash .kp-dn ul{font-size:13.5px!important;gap:8px!important;font-weight:700}
+html:root body #dash .kp-dn li i{width:12px!important;height:12px!important;box-shadow:0 3px 5px -2px rgba(0,0,0,.4)}
+
+/* barras: grossas, com brilho e sombra */
+html:root body #dash .kp-br{grid-template-columns:76px 1fr 118px!important;font-size:13.5px!important;margin:11px 0!important;gap:12px!important}
+html:root body #dash .kp-bt{height:16px!important;border-radius:999px!important;box-shadow:var(--neo-in)}
+html:root body #dash .kp-bt i{border-radius:999px!important;background:linear-gradient(180deg,#2fd0c4 0,#0f9d94 55%,#0a7a73 100%)!important;
+  box-shadow:0 5px 8px -3px rgba(10,122,115,.6),inset 0 2px 0 rgba(255,255,255,.45)}
+html:root body #dash .kp-br em{font-weight:800}
+
+/* tiles um pouco mais baixos, já que não há mais coluna lateral */
+html:root body .kp-tile,html:root body .kp-tile:nth-child(n){min-height:136px!important}
+html:root body .kp-tile b{font-size:clamp(16px,11.5cqw,34px)!important}
+
+/* resumo por CFOP em largura total */
+html:root body .cfop-summary-section.cfop-top .cfop-cards{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important}
+
+@media (max-width:1180px){
+  html:root body #dash .kp-charts{grid-template-columns:minmax(0,1fr)!important}
+  html:root body .kp-top .kp-conf{margin-left:0!important;max-width:100%}
+}
+@media (max-width:560px){
+  html:root body .kp-top .kp-conf{flex-wrap:wrap;padding:12px 14px!important}
+  html:root body #dash .kp-dn{flex-direction:column}
+}
+</style>
+<style id="neo25">
+/* ===== v25: cartões dos gráficos sem espaço vazio — conteúdo ocupa e centraliza na altura do cartão ===== */
+html:root body #dash .kp-card{display:flex!important;flex-direction:column!important;min-height:300px!important;padding:20px 24px 22px!important}
+html:root body #dash .kp-ct{flex:0 0 auto}
+
+/* rosquinhas: gráfico à esquerda, legenda em mini-cartões à direita */
+html:root body #dash .kp-dn{display:flex!important;flex:1 1 auto;flex-direction:row!important;flex-wrap:wrap;align-items:center!important;justify-content:space-evenly!important;gap:18px 26px!important}
+html:root body #dash .kp-dn svg{flex:0 0 auto;width:clamp(150px,42%,230px)!important;max-width:none!important;min-width:0!important;height:auto}
+html:root body #dash .kp-dn ul{flex:1 1 190px;display:flex!important;flex-direction:column;gap:10px!important;margin:0;padding:0;list-style:none;font-size:13.5px!important}
+html:root body #dash .kp-dn li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;grid-template-areas:"dot nome pct" ". val val";column-gap:10px;row-gap:1px;align-items:center;
+  padding:9px 14px;border-radius:14px;background:rgba(255,255,255,.6);box-shadow:0 8px 14px -10px rgba(40,45,100,.45),inset 0 1px 0 rgba(255,255,255,.8)}
+html:root body.dark #dash .kp-dn li{background:rgba(255,255,255,.06);box-shadow:none}
+html:root body #dash .kp-dn li i{grid-area:dot;margin:0!important}
+html:root body #dash .kp-dn li span{grid-area:nome;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html:root body #dash .kp-dn li b{grid-area:pct;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+html:root body #dash .kp-dn li em{grid-area:val;font-style:normal;font-weight:600;font-size:12px;color:var(--text3);font-variant-numeric:tabular-nums}
+
+/* barras: linhas distribuídas por toda a altura, trilho com preenchimento visível */
+html:root body #dash #kpBars{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;gap:4px}
+html:root body #dash .kp-br{display:grid!important;grid-template-columns:78px minmax(0,1fr) auto!important;align-items:center;gap:14px!important;margin:0!important}
+html:root body #dash .kp-br span{font-weight:800;color:var(--text2);white-space:nowrap}
+html:root body #dash .kp-br em{font-style:normal!important;text-align:right;font-weight:800;font-variant-numeric:tabular-nums;min-width:112px}
+html:root body #dash .kp-bt{display:block;overflow:hidden}
+html:root body #dash .kp-bt i{display:block!important;height:100%}
+
+@media (max-width:560px){
+  html:root body #dash .kp-dn{flex-direction:column!important}
+  html:root body #dash .kp-dn ul{width:100%;flex-basis:auto}
+  html:root body #dash .kp-br{grid-template-columns:72px minmax(0,1fr) auto!important;gap:8px!important;font-size:12.5px!important}
+  html:root body #dash .kp-br em{min-width:0}
+}
+</style>
+
+
+
+<script>
+/* ===== v22: ajustes do novo layout ===== */
+function topSearch(v){var s=document.getElementById('searchInput');if(!s)return;s.value=v;try{applyFilters();}catch(e){}}
+function topGo(){var m=document.getElementById('main-panel');if(m&&m.offsetParent!==null)m.scrollIntoView({behavior:'smooth',block:'start'});}
+function toggle3D(){
+  var flat=document.body.classList.toggle('flat');
+  var b=document.getElementById('btn3d');if(b)b.textContent=flat?'🧊 Efeito 3D: desligado':'🧊 Efeito 3D: ligado';
+  try{localStorage.setItem('sped_3d',flat?'off':'on');}catch(e){}
+}
+(function(){
+  try{if(localStorage.getItem('sped_3d')==='off')toggle3D();}catch(e){}
+  document.querySelectorAll('.side-nav .nav-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(/toggleTheme/.test(b.getAttribute('onclick')||''))return;
+      document.querySelectorAll('.side-nav .nav-btn').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+    });
+  });
+  var _rd=renderDash;
+  renderDash=function(){
+    _rd.apply(this,arguments);
+    try{var n=Object.keys(cfopSummary).filter(naoZerado).length;document.getElementById('greetBadge').textContent=n;}catch(e){}
+  };
+})();
+</script>
+<script>
+/* ===== v23: resumo por CFOP sobe para o dashboard (logo abaixo dos cartões) ===== */
+(function(){
+  var c=document.getElementById('cfopCards'),dash=document.getElementById('dash');
+  var sec=c&&c.closest('.cfop-summary-section');
+  if(sec&&dash){sec.classList.add('cfop-top');dash.appendChild(sec);}
+})();
+</script>
+<script>
+/* ===== v24: faixa do P9 vai para o topo, ao lado do botão Comparador ===== */
+(function(){
+  var top=document.querySelector('#dash .kp-top'),conf=document.getElementById('kpConf'),save=document.getElementById('kpSave');
+  if(top&&conf&&save)top.insertBefore(conf,save);
+})();
+</script>
+</body>
+</html>
