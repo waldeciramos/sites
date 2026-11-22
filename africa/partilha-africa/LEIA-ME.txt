@@ -1,0 +1,70 @@
+PARTILHA DA ÁFRICA — como publicar e usar
+
+PUBLICAR NA SUA PÁGINA
+  Envie TODO o conteúdo desta pasta para o seu servidor, mantendo as subpastas (img e audio).
+  O endereço da apresentação é o do index.html. Não precisa de banco de dados nem de instalação.
+  As fontes vêm do Google Fonts, então a página precisa de internet no primeiro acesso.
+
+ORDEM DA APRESENTAÇÃO (automática ao dar play)
+  Abertura (mapa, barra de 1880 até 1914 com a voz) -> slides 1 a 10 (com descida entre eles)
+  -> Agradecimento (voz) -> Bibliografia e créditos rolando (alunos, textos, imagens).
+
+ARQUIVOS
+  index.html   a apresentação
+  topicos.html folha A4 só com os tópicos de cada slide (para a plateia acompanhar), também no menu ⋯
+  resumo.html  folha A4 com antes e depois. Também abre no popup pelo menu ⋯ (Ver/Imprimir resumo e Ver/Imprimir tópicos).
+  imagens.html lista numerada das imagens com links para baixar (abre em página própria, pelo menu ⋯)
+  dados.js     NOMES DOS ALUNOS, turma, escola, professor e a fonte de cada imagem (abra no Bloco de Notas)
+  img/         imagens numeradas (01.jpg a 29.jpg)
+  audio/       s0.mp3 = abertura do mapa, s1 a s10 = slides, s11 = agradecimento
+
+ALUNOS RESPONSÁVEIS
+  Abra dados.js, complete o sobrenome do Vitor, ou acrescente outros nomes. Salve e recarregue (F5).
+
+COMO TROCAR AS IMAGENS
+  1. Baixe a imagem certa (abra imagens.html, ou o menu ⋯ > Onde baixar as imagens).
+  2. Renomeie para o número da imagem, por exemplo 05.jpg.
+  3. Coloque na pasta img, substituindo a de teste (.jpg, .png ou .webp).
+  4. Recarregue a página. O botão Números mostra ou esconde o número em cada foto (ou abra index.html?n=0).
+  5. Em dados.js, em fontesImagens, escreva o autor e a fonte de cada imagem usada.
+
+IMPRIMIR O RESUMO
+  Menu ⋯ (barra flutuante que aparece ao mexer o mouse/tocar) > Imprimir resumo, ou abra resumo.html e use 'Imprimir / salvar PDF'.
+  Se o navegador pedir, ative 'Gráficos de plano de fundo' para sair com as cores.
+
+LISTA DE IMAGENS (número · slide · o que buscar)
+  01 · slide  1 · Mapa da Partilha da África (1880 e 1914)  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Scramble+for+Africa+map
+  02 · slide  1 · Charge “O Colosso de Rodes”  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Rhodes+Colossus+caricature
+  03 · slide  2 · Mapa da África em 1880  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Africa+1880+political+map
+  04 · slide  2 · Mapa da África em 1914  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Africa+1914+colonial+map
+  05 · slide  3 · Fábrica da Revolução Industrial  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Industrial+Revolution+factory+19th+century
+  06 · slide  3 · Charge “O Fardo do Homem Branco”  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=White+Man's+Burden+cartoon
+  07 · slide  3 · Mina de diamantes de Kimberley  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Kimberley+Big+Hole+1870s
+  08 · slide  4 · Metralhadora Maxim  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Maxim+gun+1890s
+  09 · slide  4 · Barco a vapor no rio Congo  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=steamboat+Congo+river+19th+century
+  10 · slide  4 · Cinchona, a árvore do quinino  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Cinchona+quinine+plant+illustration
+  11 · slide  5 · Conferência de Berlim, gravura de Adalbert von Rössler  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Berlin+Conference+1884+Rössler
+  12 · slide  5 · Otto von Bismarck  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Otto+von+Bismarck+portrait
+  13 · slide  5 · Mapa de Berlim da Conferência  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Berlin+Conference+Africa+map+1885
+  14 · slide  6 · Leopoldo II da Bélgica  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Leopold+II+of+Belgium+portrait
+  15 · slide  6 · Fotografias de Alice Seeley Harris (fortes)  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Alice+Seeley+Harris+Congo+photograph
+  16 · slide  6 · Charge “Rei Leopoldo e a borracha vermelha”  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Congo+Free+State+rubber+caricature
+  17 · slide  7 · Mapa da ferrovia Cabo–Cairo  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Cape+to+Cairo+railway+map
+  18 · slide  7 · Incidente de Fashoda, 1898  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Fashoda+incident+1898
+  19 · slide  7 · Cecil Rhodes, o “Colosso”  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Cecil+Rhodes+Colossus+caricature
+  20 · slide  8 · Batalha de Adwa, pintura etíope  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Battle+of+Adwa+painting
+  21 · slide  8 · Menelik II  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Menelik+II+portrait
+  22 · slide  8 · Batalha de Isandlwana  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Battle+of+Isandlwana+painting
+  23 · slide  9 · Kwame Nkrumah e a independência de Gana, 1957  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Kwame+Nkrumah+independence+Ghana+1957
+  24 · slide  9 · Mapa das independências africanas  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Africa+decolonization+independence+map
+  25 · slide  9 · Trabalho forçado na época colonial  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=colonial+Africa+forced+labor+rubber
+  26 · slide 10 · Mapa político atual da África  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Africa+political+map
+  27 · slide 10 · Cidade africana atual  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=Lagos+Nigeria+skyline
+  28 · slide 10 · Arte e cultura africana contemporânea  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=African+contemporary+art+festival
+  29 · slide 11 · Foto da turma ou imagem final  ->  https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search=school+students+group+photo
+
+Desenvolvido por Waldeci Ramos
+CONTROLES
+  O botão redondo no canto inferior direito abre o painel (arraste pela barra de cima; o – minimiza).
+  A bolinha numerada em cada slide leva ao próximo.
+  Nomes dos alunos e professor: dados.js.
